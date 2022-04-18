@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
-import NavBar from './components/Header/NavBar';
+import NavBar from './components/NavBar/NavBar';
 
 import Login from './components/Login/Login';
 import OnClickOnStart from './components/SearchUser/OnClickOnStart/OnClickOnStart';

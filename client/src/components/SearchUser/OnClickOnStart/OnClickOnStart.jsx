@@ -1,11 +1,12 @@
 import React from 'react'
 import { useState } from 'react'
+import FoundUser from '../FoundUser/FoundUser';
 
 const OnClickOnStart = () => {
-  const [found, setfound] = useState(true);
+  const [isFound, setIsFound] = useState(true);
 
   return (
-    found ? <div>SearchUserChat</div> : <div>Searching.....</div>
+    isFound ? <FoundUser /> : <div>Searching.....</div>
   )
 }
 

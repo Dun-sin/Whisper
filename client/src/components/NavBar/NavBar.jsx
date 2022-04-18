@@ -7,8 +7,8 @@ import { RiUserSearchLine } from 'react-icons/ri';
 import { BiUserCircle } from 'react-icons/bi'
 
 const linkStyle = `h-[80px] w-[90px] flex items-center justify-center hover:bg-[#011627] p-6 rounded-[15px] `;
-const activeStyle = linkStyle + "bg-[#011627]";
-const iconStyle = "fill-[#f5f5f5] active:fill-[#ff9f1c] scale-[1.8]";
+const activeStyle = linkStyle + "bg-[#011627] shadow-2xl";
+const iconStyle = "fill-[#f5f5f5] active:fill-[#ff9f1c] scale-[2]";
 
 const NavBar = () => {
   return (
