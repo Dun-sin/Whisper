@@ -14,7 +14,7 @@ const NavBar = () => {
   return (
     <div className='
     navContainer bg-[#162938] 
-    w-[10%] min-h-[100vh]
+    w-[7%] min-h-[100vh]
     flex items-center flex-col
     justify-center shadow-[0_0_100px_0_rgba(0,0,0,1)] p-5'>
       <div className="justify-between flex items-center flex-col h-[35%]">
