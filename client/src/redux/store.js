@@ -2,8 +2,8 @@ import { combineReducers, createStore } from 'redux';
 import messageReducer from './Reducers/messageReducer';
 
 const reducers = combineReducers({
-	message: messageReducer,
+	messages: messageReducer,
 });
-const store = createStore(reducers, {});
+const store = createStore(reducers);
 
 export default store;

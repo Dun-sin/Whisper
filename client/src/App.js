@@ -1,6 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import './App.css';
+import { useEffect } from 'react';
 
 // components
 import NavBar from './components/NavBar/NavBar';
@@ -11,13 +10,11 @@ import OnClickOnStart from './components/SearchUser/OnClickOnStart/OnClickOnStar
 import SearchUser from './components/SearchUser/SearchUser';
 
 function App() {
-	const state = useSelector((state) => state);
-	console.log(state);
-
 	return (
 		<div className='flex'>
 			<NavBar />
 			<Routes>
+				<Route path='/' element={<SearchUser />} />
 				<Route path='/searchuser' element={<SearchUser />} />
 				<Route path='/searchuser/founduser' element={<OnClickOnStart />} />
 			</Routes>
