@@ -10,7 +10,9 @@ let clients = [];
 app.use(cors());
 
 io.on('connection', (socket) => {
-	console.log(socket.id);
+	socket.on('message', ({ id = socket.id, message }) => {
+		io.emit('message', (id, message));
+	});
 });
 
 server.listen(4000, () => {
