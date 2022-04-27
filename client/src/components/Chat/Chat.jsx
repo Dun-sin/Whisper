@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
+import io from 'socket.io-client';
 
 import './Chat.css'
 
@@ -7,6 +8,8 @@ import { messageAction } from '../../redux/Actions/messageAction'
 
 import ScrollToBottom from 'react-scroll-to-bottom';
 import { IoSend } from 'react-icons/io5';
+
+const socekt = io.connect('http://localhost:4000');
 
 const Chat = () => {
   const dispatch = useDispatch();
