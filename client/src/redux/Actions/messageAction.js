@@ -1,8 +1,8 @@
-export const add_message = 'add_message';
+export const add_messages = 'add_messages';
 
 export const messageAction = (id, message, time, room) => {
 	return {
-		type: add_message,
+		type: add_messages,
 		data: {
 			id,
 			message,
