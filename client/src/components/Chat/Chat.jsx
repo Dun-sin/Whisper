@@ -47,7 +47,7 @@ const Chat = () => {
 
   return (
     <div className='w-[100%] h-[90%] pb-[25px]'>
-      <ScrollToBottom className="displayMessgaes overflow-y-scroll h-[85%] ">
+      <ScrollToBottom className="displayMessgaes h-[85%] ">
         <p className='text-[0.8em] font-semibold mb-[20px] text-center'>Connected with a random User, Send hi</p>
         {messages.map((i, index) => (
           <p key={index} className={`bg-[#FF9F1C] p-[10px] mb-[15px] w-[200px] rounded-[20px] text-primary ${isSender ? 'ml-auto' : ''}`}>{i}</p>
