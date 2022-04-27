@@ -4,14 +4,14 @@
 /node_modules
 /.pnp
 .pnp.js
-
+/client-2
 # testing
 /coverage
-
-# production
-/build
+/.vscode
 
 .gitignore
+# production
+/build
 
 # misc
 .DS_Store
