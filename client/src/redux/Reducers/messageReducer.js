@@ -12,8 +12,10 @@ const messageReducer = (state = initalState, action) => {
 					...state,
 					{
 						id: action.data.id,
-						message: [].concat(action.data.message),
-						time: action.data.time,
+						message: [].concat({
+							message: action.data.messages.message,
+							time: action.data.messages.time,
+						}),
 						room: action.data.room,
 					},
 				];
@@ -21,8 +23,10 @@ const messageReducer = (state = initalState, action) => {
 				return [
 					{
 						id: action.data.id,
-						message: [...foundId.message].concat(action.data.message),
-						time: action.data.time,
+						message: [...foundId.message].concat({
+							message: action.data.messages.message,
+							time: action.data.messages.time,
+						}),
 						room: action.data.room,
 					},
 				];

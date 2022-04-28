@@ -5,8 +5,10 @@ export const messageAction = (id, message, time, room) => {
 		type: add_messages,
 		data: {
 			id,
-			message,
-			time,
+			messages: {
+				message,
+				time,
+			},
 			room,
 		},
 	};
