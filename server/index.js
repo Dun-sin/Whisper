@@ -8,13 +8,15 @@ const io = new Server(server, { cors: { origin: '*' } });
 let clients = [];
 
 io.on('connection', (socket) => {
-	socket.on('message', ({ id, message }) => {
-		io.emit('message', (id, message));
+	console.log('connected');
+	socket.on('message', ({ senderId, message }) => {
+		// io.emit('message', (id, message));
+		socket.broadcast.emit('recieve', { senderId, message });
 	});
 });
 
 app.use(cors());
 
 server.listen(4000, () => {
-	console.log('connected');
+	console.log('on port 4000');
 });
