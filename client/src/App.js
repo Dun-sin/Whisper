@@ -14,7 +14,7 @@ function App() {
 		<div className='flex'>
 			<NavBar />
 			<Routes>
-				<Route path='/' element={<SearchUser />} />
+				<Route path='/' element={<Login />} />
 				<Route path='/searchuser' element={<SearchUser />} />
 				<Route path='/searchuser/founduser' element={<OnClickOnStart />} />
 			</Routes>

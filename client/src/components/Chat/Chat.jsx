@@ -12,15 +12,40 @@ import { IoSend } from 'react-icons/io5';
 const socket = io.connect('http://localhost:4000');
 
 const Chat = () => {
-  const d = new Date();
-  const dispatch = useDispatch();
-  const state = useSelector(state => state);
-  const date = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
-
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [sentMessages, setSentMessages] = useState([]);
+  const [receivedMessages, setReceivedMessages] = useState([]);
   const [senderId, setSenderId] = useState('123456');
   const [isSender, setIsSender] = useState(false);
+
+  const state = useSelector(state => state);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('connected')
+      setSenderId(socket.id);
+    })
+    console.log('render1')
+  }, [])
+
+  useEffect(() => {
+    socket.on('receive_message', ({ senderId, message, time }) => {
+      dispatch(messageAction(senderId, message, time, 'anon'))
+    })
+  }, [dispatch, state.messages])
+
+
+  useEffect(() => {
+    const available = state.messages.length === 0;
+    const findId = state.messages.find(item => item.id === senderId);
+
+    const handleMessages = () => {
+      findId.map(item => setSentMessages(item.message));
+    }
+    !available && handleMessages();
+    console.log('render3')
+  }, [state.messages, senderId])
 
   const handleInput = e => {
     setMessage(e.target.value)
@@ -28,45 +53,27 @@ const Chat = () => {
 
   const handleSubmit = e => {
     e.preventDefault()
+    const d = new Date();
+    const time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
     if (message === '' || senderId === undefined || senderId === '123456') return
-    socket.emit('message', { senderId, message });
-    dispatch(messageAction(senderId, message, date, 'anon'));
+    socket.emit('send_message', { senderId, message, time });
+    dispatch(messageAction(senderId, message, time, 'anon'))
+    console.log(state.messages)
     setMessage('')
   }
 
-  useEffect(() => {
-    socket.on('connect', () => {
-      setSenderId(socket.id);
-    })
-  }, [])
-
-  useEffect(() => {
-    socket.on('recieve', ({ senderId, message }) => {
-      dispatch(messageAction(senderId, message, date, 'anon'));
-    })
-  })
-
-  useEffect(() => {
-    const available = state.messages.length === 0;
-    const handleMessages = () => {
-      const findId = state.messages.find(item => item.id === senderId);
-      state.messages.map(item => setMessages(item.message));
-      if (findId === undefined) {
-        setIsSender(false);
-      } else {
-        setIsSender(true);
-      }
-    }
-    !available && handleMessages();
-  })
-
-
   return (
     <div className='w-[100%] h-[90%] pb-[25px]'>
-      <ScrollToBottom className="displayMessgaes h-[85%] ">
-        <p className='text-[0.8em] font-semibold mb-[20px] text-center'>Connected with a random User, Send hi</p>
-        {messages.map(({ message, time }, index) => (
-          <div key={index} className={`relative mb-[15px] w-[250px] text-primary ${isSender ? 'ml-auto' : ''}`}>
+      <p className='text-[0.8em] font-semibold mb-[20px] text-center'>Connected with a random User</p>
+      <ScrollToBottom initialScrollBehavior='auto' className="displayMessgaes h-[85%] ">
+        {sentMessages.map(({ message, time }, index) => (
+          <div key={index} className={`relative mb-[15px] w-[250px] text-primary ml-auto}`}>
+            <p className='bg-[#FF9F1C] rounded-[20px] p-[15px] break-all'>{message}</p>
+            <p className='text-white ml-[75%] text-[12px]'>{time}</p>
+          </div>
+        ))}
+        {receivedMessages.map(({ message, time }, index) => (
+          <div key={index} className={`relative mb-[15px] w-[250px] text-primary ml-auto}`}>
             <p className='bg-[#FF9F1C] rounded-[20px] p-[15px] break-all'>{message}</p>
             <p className='text-white ml-[75%] text-[12px]'>{time}</p>
           </div>
