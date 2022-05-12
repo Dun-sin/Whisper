@@ -65,7 +65,7 @@ const Chat = () => {
   return (
     <div className='w-[100%] h-[90%] pb-[25px]'>
       <p className='text-[0.8em] font-semibold mb-[20px] text-center'>Connected with a random User</p>
-      <ScrollToBottom initialScrollBehavior='auto' className="displayMessgaes h-[85%] ">
+      <ScrollToBottom initialScrollBehavior='auto' className="displayMessgaes h-[75%] ">
         {sentMessages.map(({ message, time }, index) => (
           <div key={index} className={`relative mb-[15px] w-[250px] text-primary ml-auto}`}>
             <p className='bg-[#FF9F1C] rounded-[20px] p-[15px] break-all'>{message}</p>
