@@ -33,7 +33,7 @@ const Chat = () => {
     socket.on('receive_message', ({ senderId, message, time }) => {
       dispatch(messageAction(senderId, message, time, 'anon'))
     })
-  }, [dispatch, state.messages])
+  }, [dispatch])
 
 
   useEffect(() => {
@@ -41,9 +41,13 @@ const Chat = () => {
     const findId = state.messages.find(item => item.id === senderId);
 
     const handleMessages = () => {
-      findId.map(item => setSentMessages(item.message));
+      findId && setSentMessages(findId.message);
     }
     !available && handleMessages();
+
+    const receivedMessages = state.messages.find(item => item.id !== senderId);
+    receivedMessages && setReceivedMessages(receivedMessages.message);
+    
     console.log('render3')
   }, [state.messages, senderId])
 
