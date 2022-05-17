@@ -9,9 +9,9 @@ let clients = [];
 
 io.on('connection', (socket) => {
 	console.log('connected');
-	socket.on('message', ({ senderId, message }) => {
+	socket.on('send_message', ({ senderId, message }) => {
 		// io.emit('message', (id, message));
-		socket.broadcast.emit('recieve', { senderId, message });
+		socket.broadcast.emit('receive_message', { senderId, message });
 	});
 });
 
