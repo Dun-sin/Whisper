@@ -19,7 +19,7 @@ const NavBar = () => {
     justify-center shadow-[0_0_100px_0_rgba(0,0,0,1)] p-5'>
       <div className="justify-between flex items-center flex-col h-[35%] w-[100%]">
         <NavLink
-          to="/searchuser"
+          to="/"
           className={({ isActive }) => (isActive ? activeStyle : linkStyle)}
         >
           <RiUserSearchLine className={iconStyle} />
