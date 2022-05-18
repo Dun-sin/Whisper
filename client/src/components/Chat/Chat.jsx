@@ -12,8 +12,7 @@ import { IoSend } from 'react-icons/io5';
 const socket = io.connect('http://localhost:4000');
 
 const Chat = () => {
-  const [sentMessages, setSentMessages] = useState([]);
-  const [receivedMessages, setReceivedMessages] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [senderId, setSenderId] = useState(Math.floor(Math.random() * 100000000))
   const inputRef = useRef('');
 
@@ -33,9 +32,7 @@ const Chat = () => {
     const findId = state.messages.find(item => item.id === senderId);
 
     const handleMessages = () => {
-      findId && setSentMessages(findId.message);
-      const receivedMessages = state.messages.find(item => item.id !== senderId);
-      receivedMessages && setReceivedMessages(receivedMessages.message)
+      findId && setMessages(findId.message);
     }
     !available && handleMessages();
     console.log('render2')
@@ -56,15 +53,9 @@ const Chat = () => {
   return (
     <div className='w-[100%] h-[90%] pb-[25px]'>
       <p className='text-[0.8em] font-semibold mb-[20px] text-center'>Connected with a random User</p>
-      <ScrollToBottom initialScrollBehavior='auto' className="displayMessgaes h-[75%] ">
-        {sentMessages.map(({ message, time }, index) => (
+      <ScrollToBottom initialScrollBehavior='auto' className="displayMessgaes h-[75%] w-[100%]">
+        {messages.map(({ message, time }, index) => (
           <div key={index} className={`relative mb-[15px] w-[250px] text-primary ml-auto}`}>
-            <p className='bg-[#FF9F1C] rounded-[20px] p-[15px] break-all'>{message}</p>
-            <p className='text-white ml-[75%] text-[12px]'>{time}</p>
-          </div>
-        ))}
-        {receivedMessages.map(({ message, time }, index) => (
-          < div key={index} className={`relative mb-[15px] w-[250px] text-primary }`}>
             <p className='bg-[#FF9F1C] rounded-[20px] p-[15px] break-all'>{message}</p>
             <p className='text-white ml-[75%] text-[12px]'>{time}</p>
           </div>
