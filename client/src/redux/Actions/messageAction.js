@@ -1,9 +1,9 @@
-export const add_messages = 'add_messages';
+const add_messages = 'add_messages';
 
 export const messageAction = (id, message, time, room) => {
 	return {
 		type: add_messages,
-		data: {
+		payload: {
 			id,
 			messages: {
 				message,
