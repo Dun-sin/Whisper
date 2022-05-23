@@ -1,25 +1,13 @@
-import { Route, Routes } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useState } from 'react';
 
 // components
-import NavBar from './components/NavBar/NavBar';
 import Login from './components/Login/Login';
-
-// icons
-import OnClickOnStart from './components/SearchUser/OnClickOnStart/OnClickOnStart';
-import SearchUser from './components/SearchUser/SearchUser';
+import RoutesComponent from './components/Routes';
 
 function App() {
-	return (
-		<div className='flex'>
-			<NavBar />
-			<Routes>
-				<Route path='/' element={<SearchUser />} />
-				<Route path='/searchuser' element={<SearchUser />} />
-				<Route path='/searchuser/founduser' element={<OnClickOnStart />} />
-			</Routes>
-		</div>
-	);
+	const [isLogged, setIsLogged] = useState(true);
+
+	return <div>{isLogged ? <RoutesComponent /> : <Login />}</div>;
 }
 
 export default App;

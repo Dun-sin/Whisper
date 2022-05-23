@@ -1,0 +1,7 @@
+.App {
+	background: linear-gradient(
+		to right,
+		rbga(0, 0, 0, 0.2),
+		rbga(255, 255, 255, 0.2)
+	);
+}
