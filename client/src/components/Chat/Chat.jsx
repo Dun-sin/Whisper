@@ -21,37 +21,41 @@ const Chat = () => {
   const state = useSelector(state => state.messages);
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   socket.on('receive_message', ({ senderId, message, time }) => {
-  //     dispatch(addMessages({
-  //       id: senderId,
-  //       messages: {
-  //         message: message,
-  //         time: time
-  //       },
-  //       room: 'anon'
-  //     }))
-  // //   })
-  // }, [dispatch])
+  useEffect(() => {
+    socket.on('receive_message', ({ senderId, message, time }) => {
+      dispatch(addMessages({
+        id: senderId,
+        messages: {
+          message: message,
+          time: time
+        },
+        room: 'anon'
+      }))
+    })
+  }, [dispatch])
 
 
-  // useEffect(() => {
-  //   const available = state.messages.length === 0;
-  //   const senderMessages = state.messages.find(item => item.id === senderId);
-  //   const receiverMessages = state.messages.find(item => item.id !== senderId);
+  useEffect(() => {
+    const userIDs = Object.keys(state).map(item => +item);
+    const available = userIDs.length === 0;
+    const sendID = userIDs.find(item => item === senderId);
+    const receiverID = userIDs.find(item => item !== senderId);
+    const handleMessages = () => {
+      sendID && setSentMessages(state[sendID].messages);
+      receiverID && setReceivedMessages(state[receiverID].messages)
+    }
+    !available && handleMessages();
+  }, [state])
 
-  //   const handleMessages = () => {
-  //     senderMessages && setSentMessages(senderMessages.message);
-  //     receiverMessages && setReceivedMessages(receiverMessages.message)
-  //   }
-  //   !available && handleMessages();
-  // }, [state.messages])
 
-  // const combine = () => {
-  //   const array = [...sentMessages, ...receivedMessages];
-  //   // array.map((unit) => console.log(unit))
-  //   // console.log(array)
-  // }
+  useEffect(() => {
+    const array = [...sentMessages, ...receivedMessages].sort((a, b) => {
+      let da = new Date(a.time),
+        db = new Date(b.time);
+      return da - db;
+    });
+    setMessages(array)
+  }, [sentMessages, receivedMessages])
 
   const handleSubmit = e => {
     e.preventDefault()
@@ -70,19 +74,13 @@ const Chat = () => {
     }))
     inputRef.current.value = '';
   }
+
   return (
     <div className='w-[100%] h-[90%] pb-[25px]'>
-    {console.log(state)}
       <p className='text-[0.8em] font-semibold mb-[20px] text-center'>Connected with a random User</p>
       <ScrollToBottom initialScrollBehavior='auto' className="displayMessgaes h-[75%] w-[100%]">
-        {sentMessages.map(({ message, time }, index) => (
+        {messages.map(({ message, time }, index) => (
           <div key={index} className={`relative mb-[15px] w-[250px] text-primary ml-auto}`}>
-            <p className='bg-[#FF9F1C] rounded-[20px] p-[15px] break-all'>{message}</p>
-            <p className='text-white ml-[75%] text-[12px]'>{time}</p>
-          </div>
-        ))}
-        {receivedMessages.map(({ message, time }, index) => (
-          < div key={index} className={`relative mb-[15px] w-[250px] text-primary }`}>
             <p className='bg-[#FF9F1C] rounded-[20px] p-[15px] break-all'>{message}</p>
             <p className='text-white ml-[75%] text-[12px]'>{time}</p>
           </div>
