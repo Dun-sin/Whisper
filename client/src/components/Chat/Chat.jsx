@@ -20,20 +20,18 @@ const Chat = () => {
 
   const state = useSelector(state => state.messages);
   const dispatch = useDispatch();
-  dispatch(addMessages({
-    id: senderId,
-    messages: {
-      message: 'hi',
-      time: '32323'
-    },
-    room: 'anon'
-  }))
 
-  console.log(state)
   // useEffect(() => {
   //   socket.on('receive_message', ({ senderId, message, time }) => {
-  //     dispatch(messageAction(senderId, message, time, 'anon'))
-  //   })
+  //     dispatch(addMessages({
+  //       id: senderId,
+  //       messages: {
+  //         message: message,
+  //         time: time
+  //       },
+  //       room: 'anon'
+  //     }))
+  // //   })
   // }, [dispatch])
 
 
@@ -55,19 +53,26 @@ const Chat = () => {
   //   // console.log(array)
   // }
 
-  // const handleSubmit = e => {
-  //   e.preventDefault()
-  //   const d = new Date();
-  //   const time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
-  //   const message = inputRef.current.value;
-  //   if (message === '' || senderId === undefined || senderId === '123456') return
-  //   socket.emit('send_message', { senderId, message, time });
-  //   dispatch(messageAction(senderId, message, time, 'anon'))
-  //   inputRef.current.value = '';
-  // }
-
+  const handleSubmit = e => {
+    e.preventDefault()
+    const d = new Date();
+    const time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+    const message = inputRef.current.value;
+    if (message === '' || senderId === undefined || senderId === '123456') return
+    socket.emit('send_message', { senderId, message, time });
+    dispatch(addMessages({
+      id: senderId,
+      messages: {
+        message: message,
+        time: time
+      },
+      room: 'anon'
+    }))
+    inputRef.current.value = '';
+  }
   return (
     <div className='w-[100%] h-[90%] pb-[25px]'>
+    {console.log(state)}
       <p className='text-[0.8em] font-semibold mb-[20px] text-center'>Connected with a random User</p>
       <ScrollToBottom initialScrollBehavior='auto' className="displayMessgaes h-[75%] w-[100%]">
         {sentMessages.map(({ message, time }, index) => (
@@ -83,12 +88,12 @@ const Chat = () => {
           </div>
         ))}
       </ScrollToBottom>
-      {/* <form className='flex justify-center items-center mt-[40px]' onSubmit={handleSubmit}>
+      <form className='flex justify-center items-center mt-[40px]' onSubmit={handleSubmit}>
         <input placeholder='Send a Message.....' className='h-[65px] focus:outline-none rounded-[15px] bg-secondary w-[100%] text-white pl-[22px] pr-[22px] text-[18px]' ref={inputRef} />
         <button type="submit" className='bg-[#FF9F1C] h-[65px] w-[70px] flex justify-center items-center rounded-[10px]'>
           <IoSend className='fill-primary scale-[2]' />
         </button>
-      </form> */}
+      </form>
     </div>
   )
 }

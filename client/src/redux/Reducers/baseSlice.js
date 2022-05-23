@@ -7,15 +7,20 @@ const options = {
 	initialState,
 	reducers: {
 		addMessages: (state, action) => {
-			const key = action.payload.id;
-			state[key] = {
-				id: action.payload.id,
-				messages: [].concat({
-					message: action.payload.messages.message,
-					time: action.payload.messages.time,
-				}),
-				room: action.payload.room,
+			let message = {
+				message: action.payload.messages.message,
+				time: action.payload.messages.time,
 			};
+			const key = action.payload.id;
+			if (state[key] === undefined) {
+				state[key] = {
+					id: action.payload.id,
+					messages: [].concat(message),
+					room: action.payload.room,
+				};
+			} else {
+				state[key].messages = [...state[key].messages, message];
+			}
 		},
 	},
 };
