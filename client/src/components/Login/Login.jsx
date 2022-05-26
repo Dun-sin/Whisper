@@ -9,17 +9,30 @@ const Login = () => {
   const emailRef = useRef();
 
   const checkingUser = () => {
-    axios.get(`${baseUrl}/find?email=${emailRef.current.value
-      }`)
-      .then(res => console.log(res))
+    const email = emailRef.current.value;
+    axios.get(`${baseUrl}/find?email=${email}`)
+      .then(res => {
+        console.log(res.status)
+        if (res.status === 200) {
+          loginUser(email)
+        } else if (res.status === 202) {
+          console.log('Exists')
+        }
+      })
       .catch(err => console.log(err))
   }
 
-  const loginUser = () => {
+  function loginUser(email) {
     axios.post(`${baseUrl}/add`, {
-      email: emailRef.current.value
+      email: email
     })
-      .then(res => console.log(res))
+      .then(res => {
+        if (res.status === 202) {
+          console.log('done')
+        } else {
+          console.log('failed')
+        }
+      })
       .catch(err => console.log(err))
   }
 

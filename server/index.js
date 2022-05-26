@@ -7,7 +7,6 @@ const server = http.createServer(app);
 const cors = require('cors');
 const { Server } = require('socket.io');
 const io = new Server(server, { cors: { origin: '*' } });
-const cors = require('cors');
 
 // Mongoose
 const mongoose = require('mongoose');
@@ -24,36 +23,27 @@ app.use(cors());
 
 // Routes
 app.post('/user/add', (req, res) => {
-	createUser(req.body.email);
+	User.create({ email: req.body.email }, (err, data) => {
+		if (err) {
+			console.log(err);
+		} else {
+			res.sendStatus(202);
+		}
+	});
 });
 
 app.get('/user/find', (req, res) => {
-	const result = getUser(req.query);
-	console.log(req.query);
-	result === 'Failed' ? res.sendStatus(200) : res.sendStatus(202);
-});
-
-// Functions for routes
-function createUser(email) {
-	User.create({ email: email }, (err, data) => {
-		if (err) console.log(err);
-		console.log(data);
-	});
-}
-
-function getUser(email) {
-	User.find(email, (err, foundUser) => {
-		if (err) console.log(err);
-		else {
-			if (foundUser.listen === 0) {
-				return 'Failed';
-			}
+	User.find(req.query, (err, data) => {
+		if (err) {
+			console.log(err);
+		} else {
+			console.log(data);
+			data.length === 0 ? res.sendStatus(200) : res.sendStatus(202);
 		}
 	});
-}
+});
 
 // Sockets
-
 io.on('connection', (socket) => {
 	socket.on('send_message', ({ senderId, message, time }) => {
 		socket.broadcast.emit('receive_message', { senderId, message, time });

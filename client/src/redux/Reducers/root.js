@@ -1,4 +1,4 @@
-import messageReducer from './baseSlice';
+import messageReducer from './messageSlice';
 
 const root = {
 	reducer: {

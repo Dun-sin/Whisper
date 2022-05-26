@@ -5,7 +5,7 @@ const initialState = {};
 const options = {
 	name: 'message',
 	initialState,
-	reducers: {
+  reducers: {
 		addMessages: (state, action) => {
 			let message = {
 				message: action.payload.messages.message,
