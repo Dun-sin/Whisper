@@ -1,29 +1,40 @@
 import React, { useRef } from 'react'
 import axios from 'axios';
 
+// redux
+import { useSelector } from 'react-redux';
+import { addID } from '../../redux/Reducers/idSlice';
+import { useDispatch } from 'react-redux';
+
 const centerStuffs = `flex flex-col justify-center items-center`
 
 const baseUrl = 'http://localhost:4000/user';
 
+const date = new Date()
+let userID = Math.floor(+`${date.getTime()}${date.getDate()}${date.getMonth()}` / 10000);
+
 const Login = () => {
   const emailRef = useRef();
+  const dispatch = useDispatch();
 
   const checkingUser = () => {
     const email = emailRef.current.value;
+
     axios.get(`${baseUrl}/find?email=${email}`)
       .then(res => {
         console.log(res.status)
-        if (res.status === 200) {
-          loginUser(email)
-        } else if (res.status === 202) {
-          console.log('Exists')
+        if (res.status === 202) {
+          loginUser(userID, email)
+        } else {
+          dispatch(addID(res.data.id))
         }
       })
       .catch(err => console.log(err))
   }
 
-  function loginUser(email) {
+  function loginUser(id, email) {
     axios.post(`${baseUrl}/add`, {
+      id: id,
       email: email
     })
       .then(res => {

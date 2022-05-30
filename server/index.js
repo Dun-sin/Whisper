@@ -7,8 +7,10 @@ const server = http.createServer(app);
 const cors = require('cors');
 const { Server } = require('socket.io');
 const io = new Server(server, { cors: { origin: '*' } });
+const fs = require('fs');
 
-// Mongoose
+// Mongodb
+const mongo = require('mongodb');
 const mongoose = require('mongoose');
 mongoose.connect(process.env.MongoDB_URL, {
 	useNewUrlParser: true,
@@ -18,18 +20,27 @@ mongoose.connect(process.env.MongoDB_URL, {
 // Schemas
 const User = require('./Schemas/userSchema');
 
+// json
+const user = {};
+
 app.use(express.json());
 app.use(cors());
 
 // Routes
 app.post('/user/add', (req, res) => {
-	User.create({ email: req.body.email }, (err, data) => {
-		if (err) {
-			console.log(err);
-		} else {
-			res.sendStatus(202);
-		}
-	});
+	User.create(
+		{
+			_id: req.body.id,
+			email: req.body.email,
+		},
+		(err, data) => {
+			if (err) {
+				console.log(err);
+			} else {
+				res.sendStatus(202);
+			}
+		},
+	);
 });
 
 app.get('/user/find', (req, res) => {
@@ -37,8 +48,12 @@ app.get('/user/find', (req, res) => {
 		if (err) {
 			console.log(err);
 		} else {
-			console.log(data);
-			data.length === 0 ? res.sendStatus(200) : res.sendStatus(202);
+			if (data.length === 0) {
+				res.sendStatus(202);
+			} else {
+				user['id'] = data[0]._id.toString();
+				res.send(JSON.stringify(user));
+			}
 		}
 	});
 });
