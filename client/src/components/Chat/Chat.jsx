@@ -7,18 +7,20 @@ import './Chat.css'
 import ScrollToBottom from 'react-scroll-to-bottom';
 import { IoSend } from 'react-icons/io5';
 
-import { addMessages } from '../../redux/Reducers/baseSlice';
+import { addMessages } from '../../redux/Reducers/messageSlice';
 
 const socket = io.connect('http://localhost:4000');
 
-const senderId = Math.floor(Math.random() * 100000000)
+let senderId;
 const Chat = () => {
   const [sentMessages, setSentMessages] = useState([]);
   const [receivedMessages, setReceivedMessages] = useState([]);
   const [messages, setMessages] = useState([]);
   const inputRef = useRef('');
 
-  const state = useSelector(state => state.messages);
+  const gettingState = useSelector(state => state);
+  const state = gettingState.messages;
+  senderId = gettingState.ID;
   const dispatch = useDispatch();
 
   useEffect(() => {
