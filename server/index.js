@@ -52,7 +52,7 @@ app.get('/user/find', (req, res) => {
 				res.sendStatus(202);
 			} else {
 				user['id'] = data[0]._id.toString();
-				res.send(JSON.stringify(user));
+				res.status(200).send(JSON.stringify(user));
 			}
 		}
 	});
