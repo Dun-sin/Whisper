@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import axios from 'axios';
 import Sawo from "sawo"
 
@@ -24,7 +24,6 @@ const Login = () => {
       apiKey: '' + apiKey,
       onSuccess: (payload) => {
         checkingUser(payload.identifier)
-        dispatch(changeIsLogged(true))
       },
     };
     let sawo = new Sawo(config)
@@ -33,7 +32,6 @@ const Login = () => {
     const checkingUser = (email) => {
       axios.get(`${baseUrl}/find?email=${email}`)
         .then(res => {
-          console.log(res.status)
           if (res.status === 202) {
             loginUser(userID, email)
 
@@ -45,6 +43,7 @@ const Login = () => {
                 .then(res => {
                   if (res.status === 202) {
                     console.log('done')
+                    dispatch(changeIsLogged(true))
                   } else {
                     console.log('failed')
                   }
@@ -52,6 +51,7 @@ const Login = () => {
                 .catch(err => console.log(err))
             }
           } else if (res.status === 200) {
+            dispatch(changeIsLogged(true))
             dispatch(addID(res.data.id))
 
           }

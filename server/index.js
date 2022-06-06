@@ -20,9 +20,6 @@ mongoose.connect(process.env.MongoDB_URL, {
 // Schemas
 const User = require('./Schemas/userSchema');
 
-// json
-const user = {};
-
 app.use(express.json());
 app.use(cors());
 
@@ -51,6 +48,8 @@ app.get('/user/find', (req, res) => {
 			if (data.length === 0) {
 				res.sendStatus(202);
 			} else {
+				const user = {};
+
 				user['id'] = data[0]._id.toString();
 				res.status(200).send(JSON.stringify(user));
 			}
@@ -58,8 +57,15 @@ app.get('/user/find', (req, res) => {
 	});
 });
 
+const users = [];
+
 // Sockets
 io.on('connection', (socket) => {
+	socket.on('adding', (data) => {
+		if (data.userID === '') return;
+		users.push(data.userID);
+		console.log(users);
+	});
 	socket.on('send_message', ({ senderId, message, time }) => {
 		socket.broadcast.emit('receive_message', { senderId, message, time });
 	});
