@@ -1,6 +1,4 @@
-import React, { useContext, useEffect } from 'react'
-import { SocketContext } from '../../Context';
-import { useSelector } from 'react-redux';
+import React from 'react'
 
 import { RiUserSearchLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
@@ -8,13 +6,6 @@ import { Link } from 'react-router-dom';
 const centerElement = " flex flex-col items-center justify-center";
 
 const SearchUser = () => {
-  const socket = useContext(SocketContext)
-  const userID = useSelector(state => state.ID)
-
-  useEffect(() => {
-    socket.connected && socket.emit('adding', ({ userID }))
-  }, [socket, userID])
-
   return (
     <div className={`bg-primary min-w-[calc(100%-120px)] text-[#FFF]` + centerElement}>
       <RiUserSearchLine style={{ transform: "scale(8)" }} className="text-secondary mb-10" />
