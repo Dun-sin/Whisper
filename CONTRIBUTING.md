@@ -25,7 +25,7 @@ Contributing guidelines
 
 [J] 
 
-[K] 
+[K] Kelvin Parmar[https://twitter.com/Kelvinparmar12] 
 
 [L] 
 
