@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
-import io from 'socket.io-client';
+import { SocketContext } from '../../Context';
 
 import './Chat.css'
 
@@ -9,10 +9,9 @@ import { IoSend } from 'react-icons/io5';
 
 import { addMessages } from '../../redux/Reducers/messageSlice';
 
-const socket = io.connect('http://localhost:4000');
-
 let senderId;
 const Chat = () => {
+  const socket = useContext(SocketContext)
   const [sentMessages, setSentMessages] = useState([]);
   const [receivedMessages, setReceivedMessages] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -34,7 +33,7 @@ const Chat = () => {
         room: 'anon'
       }))
     })
-  }, [dispatch])
+  }, [dispatch, socket])
 
 
   useEffect(() => {
@@ -99,4 +98,3 @@ const Chat = () => {
 }
 
 export default Chat;
-
