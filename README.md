@@ -67,8 +67,11 @@ Before installation, please make sure you have already installed the following t
 
 ## 🛠️ Installation Steps
 
-1. Fork the project
-2. Clone the project
+1. [Fork](https://github.com/Dun-sin/anon-chat-app/fork) the project. Click on the <a href="https://github.com/EddieHubCommunity/good-first-issue-finder/fork"><img src="https://i.imgur.com/G4z1kEe.png" height="15" width="15"></a> icon in the top right to get started
+2. Clone the project, you can use the following command:
+```bash
+git clone https://github.com/<your-github-username>/anon-chat-app
+```
 3. Navigate to the project directory 
 ```bash
 cd anon-chat-app
