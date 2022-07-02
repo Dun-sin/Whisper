@@ -65,7 +65,7 @@ Before installation, please make sure you have already installed the following t
 - [Git](https://git-scm.com/downloads)
 - [NodeJs](https://nodejs.org/en/download/)
 
-## tools Installation Steps
+## 🛠️ Installation Steps
 
 1. Fork the project
 2. Clone the project
