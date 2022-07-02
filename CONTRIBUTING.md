@@ -83,6 +83,6 @@ git push origin YourBranchName
 
 10. Create a [Pull Request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request)!
 
-11. Congratulations! You've made your first contribution to [anonchat](https://github.com/Dun-sin/anon-chat-app/graphs/contributors)! raised_hands_tone2
+11. Congratulations! You've made your first contribution to [anonchat](https://github.com/Dun-sin/anon-chat-app/graphs/contributors)!
 
 🏆 After this, the maintainers will review the PR and will merge it if it helps move the anonchat project forward. Otherwise, it will be given constructive feedback and suggestions for the changes needed to add the PR to the codebase.
