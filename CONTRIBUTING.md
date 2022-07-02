@@ -11,7 +11,7 @@ Contributing guidelines
 
 [C]
 
-[D] 
+[D] Dhrumi Shah[https://twitter.com/deetwts]
 
 [E] 
 
