@@ -11,3 +11,30 @@ This app is developed to make chatting much private and easy without stealing yo
     - SocketIo
     - Sawo
     - Tailwindcss
+
+## 👩🏽‍💻 Demo
+
+Check out the website: [anonChat](https://anon-chat-app.vercel.app/)
+
+## 👇🏽 Prerequisites
+
+Before installation, please make sure you have already installed the following tools:
+
+- [Git](https://git-scm.com/downloads)
+- [NodeJs](https://nodejs.org/en/download/)
+
+## tools Installation Steps
+
+1. Fork the project
+2. Clone the project
+3. Navigate to the project directory cd anon-chat-app
+4. Navigate to client if you want to work on the frontend
+5. Navigate to server if you want to work on the server
+6. Install dependencies with npm install
+7. Run npm start
+
+## 👩🏽‍💻 Contributing
+
+- Contributions make the open source community such an amazing place to learn, inspire, and create.
+- Any contributions you make are greatly appreciated.
+- Check out our [contribution guidelines](/CONTRIBUTING.md) for more information.
