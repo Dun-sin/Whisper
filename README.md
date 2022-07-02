@@ -55,7 +55,6 @@ This app is developed to make chatting much private and easy without stealing yo
   </table>
 	
 <br>
-=======
 
 ## 👩🏽‍💻 Demo
 
