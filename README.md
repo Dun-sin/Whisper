@@ -38,3 +38,15 @@ Before installation, please make sure you have already installed the following t
 - Contributions make the open source community such an amazing place to learn, inspire, and create.
 - Any contributions you make are greatly appreciated.
 - Check out our [contribution guidelines](/CONTRIBUTING.md) for more information.
+
+## 🛡️ License
+
+anonchat is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 💪🏽 Thanks to all Contributors
+
+Thanks a lot for spending your time helping anonchat grow. Thanks a lot! Keep rocking beers
+
+## 🙏🏽 Support
+
+This project needs a star️ from you. Don't forget to leave a star star️
