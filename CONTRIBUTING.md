@@ -86,3 +86,9 @@ git push origin YourBranchName
 11. Congratulations! You've made your first contribution to [anonchat](https://github.com/Dun-sin/anon-chat-app/graphs/contributors)!
 
 🏆 After this, the maintainers will review the PR and will merge it if it helps move the anonchat project forward. Otherwise, it will be given constructive feedback and suggestions for the changes needed to add the PR to the codebase.
+
+---
+
+## 💥 Issues
+
+In order to discuss changes, you are welcome to [open an issue](https://github.com/Dun-sin/anon-chat-app/issues/new/choose) about what you would like to contribute. Enhancements are always encouraged and appreciated.
