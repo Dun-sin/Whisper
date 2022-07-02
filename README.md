@@ -69,11 +69,26 @@ Before installation, please make sure you have already installed the following t
 
 1. Fork the project
 2. Clone the project
-3. Navigate to the project directory cd anon-chat-app
+3. Navigate to the project directory 
+```bash
+cd anon-chat-app
+```
 4. Navigate to client if you want to work on the frontend
-5. Navigate to server if you want to work on the server
+```bash
+cd client
+```
+5. Navigate to server if you want to work on the backend
+```bash
+cd server
+```
 6. Install dependencies with npm install
+```bash
+npm install
+```
 7. Run npm start
+```bash
+npm start
+```
 
 ## 👩🏽‍💻 Contributing
 
