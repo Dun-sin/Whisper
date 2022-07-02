@@ -27,26 +27,28 @@
 
 ## 🌟 HOW TO MAKE A PULL REQUEST:
 
-1. Start by making a Fork of the [LinkFree](https://github.com/Dun-sin/anon-chat-app) repository. Click on the <a href="https://github.com/Dun-sin/anon-chat-app/fork"><img src="https://i.imgur.com/G4z1kEe.png" height="21" width="21"></a>Fork symbol at the top right corner.
+1. Start by making a Fork of the [anon](https://github.com/Dun-sin/anon-chat-app) repository. Click on the <a href="https://github.com/Dun-sin/anon-chat-app/fork"><img src="https://i.imgur.com/G4z1kEe.png" height="21" width="21"></a>Fork symbol at the top right corner.
 
 2. Clone your new fork of the repository in the terminal/CLI on your computer with the following command:
 
+```bash
 git clone https://github.com/<your-github-username>/anon-chat-app
-
+```
 
 3. Navigate to the newly created anon-chat-app project directory:
-
+```bash
 cd anon-chat-app
-
+```
 
 4. Set upstream command:
-
+```bash
 git remote add upstream https://github.com/Dun-sin/anon-chat-app.git
-
+```
 
 5. Create a new branch:
-
+```bash
 git checkout -b YourBranchName
+```
 
 6. Sync your fork or your local repository with the origin repository:
 
@@ -54,12 +56,13 @@ git checkout -b YourBranchName
 - Click "Fetch and merge"
 
 ### Alternatively, Git CLI way to Sync forked repository with origin repository:
-
+```bash
 git fetch upstream
+```
 
-
+```bash
 git merge upstream/main
-
+```
 
 ### [Github Docs](https://docs.github.com/en/github/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-on-github) for Syncing
 
@@ -69,13 +72,14 @@ git merge upstream/main
 
 ⚠️ Make sure not to commit package.json or package-lock.json file
 
+```bash
 git commit -m "<your_commit_message>"
-
+```
 
 9. Push your local commits to the remote repository:
-
+```bash
 git push origin YourBranchName
-
+```
 
 10. Create a [Pull Request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request)!
 
