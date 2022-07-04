@@ -1,7 +1,6 @@
 tasks:
-  - before: |
+  - init: |
       cd ./$type
-  init: |
       npm install
   command: |
       npm start
