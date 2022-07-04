@@ -1,8 +1,10 @@
 tasks:
-  - init: |
+  - before: |
       cd ./$type
+  - init: |
       npm install
-    command: npm start
+  - command: |
+      npm start
 ports:
   - port: 3000
     onOpen: open-preview
