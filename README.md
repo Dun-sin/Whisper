@@ -1,7 +1,23 @@
+Work on Frontend <a href="https://gitpod.io/#type=client/https://github.com/Dun-sin/anon-chat-app">
+<img
+    src="https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod"
+    alt="Contribute with Gitpod"
+  />
+</a>
+
+Work on Backend <a href="https://gitpod.io/#type=server/https://github.com/Dun-sin/anon-chat-app">
+<img
+    src="https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod"
+    alt="Contribute with Gitpod"
+  />
+</a>
+
 ## Anon chat app
+
 This app is developed to make chatting much private and easy without stealing your data!!
 
 ### Languages/ Tool:
+
  <table>
 	 <tbody>
   <tr>
@@ -69,26 +85,37 @@ Before installation, please make sure you have already installed the following t
 
 1. [Fork](https://github.com/Dun-sin/anon-chat-app/fork) the project. Click on the <a href="https://github.com/Dun-sin/anon-chat-app/fork"><img src="https://i.imgur.com/G4z1kEe.png" height="15" width="15"></a> icon in the top right to get started
 2. Clone the project, you can use the following command:
+
 ```bash
 git clone https://github.com/<your-github-username>/anon-chat-app
 ```
-3. Navigate to the project directory 
+
+3. Navigate to the project directory
+
 ```bash
 cd anon-chat-app
 ```
+
 4. Navigate to client if you want to work on the frontend
+
 ```bash
 cd client
 ```
+
 5. Navigate to server if you want to work on the backend
+
 ```bash
 cd server
 ```
+
 6. Install dependencies with npm install
+
 ```bash
 npm install
 ```
+
 7. Run npm start
+
 ```bash
 npm start
 ```
@@ -108,6 +135,7 @@ anonchat is licensed under the MIT License - see the [LICENSE](LICENSE) file for
 Thanks a lot for spending your time helping anonchat grow. Thanks a lot! Keep rocking beers
 
 [![Contributors](https://contrib.rocks/image?repo=Dun-sin/anon-chat-app)](https://github.com/Dun-sin/anon-chat-app/graphs/contributors)
+
 ## 🙏🏽 Support
 
 This project needs a star️ from you. Don't forget to leave a star🌟
