@@ -1,9 +1,9 @@
 tasks:
   - before: |
       cd ./$type
-  - init: |
+  init: |
       npm install
-  - command: |
+  command: |
       npm start
 ports:
   - port: 3000
