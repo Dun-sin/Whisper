@@ -17,6 +17,7 @@ function App() {
 	}, []);
 
 	useEffect(() => {
+		console.log(isLogged);
 		window.localStorage.setItem('isLogged', isLogged);
 	}, [isLogged]);
 
@@ -29,7 +30,6 @@ function App() {
 					<Login />
 				)}
 			</div>
-			;
 		</SocketContext.Provider>
 	);
 }
