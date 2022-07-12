@@ -27,14 +27,13 @@ app.use(cors());
 app.post('/user/add', (req, res) => {
 	User.create(
 		{
-			_id: req.body.id,
 			email: req.body.email,
 		},
 		(err, data) => {
 			if (err) {
 				console.log(err);
 			} else {
-				res.sendStatus(202);
+				res.status(202).json(data);
 			}
 		},
 	);
