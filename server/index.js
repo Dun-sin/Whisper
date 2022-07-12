@@ -7,10 +7,10 @@ const server = http.createServer(app);
 const cors = require('cors');
 const { Server } = require('socket.io');
 const io = new Server(server, { cors: { origin: '*' } });
-const fs = require('fs');
+
+const HTTP_PORT = process.env.PORT || 4000;
 
 // Mongodb
-const mongo = require('mongodb');
 const mongoose = require('mongoose');
 mongoose.connect(process.env.MongoDB_URL, {
 	useNewUrlParser: true,
@@ -72,6 +72,6 @@ io.on('connection', (socket) => {
 
 app.use(cors());
 
-server.listen(4000, () => {
+server.listen(HTTP_PORT, () => {
 	console.log('on port 4000');
 });
