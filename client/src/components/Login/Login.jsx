@@ -17,6 +17,7 @@ let userID = '' + Math.floor(+`${date.getTime()}${date.getDate()}${date.getMonth
 
 const Login = () => {
   const dispatch = useDispatch();
+
   useEffect(() => {
     var config = {
       containerID: "sawo-container",
@@ -26,6 +27,7 @@ const Login = () => {
         checkingUser(payload.identifier)
       },
     };
+
     let sawo = new Sawo(config)
     sawo.showForm()
 
@@ -53,12 +55,13 @@ const Login = () => {
           } else if (res.status === 200) {
             dispatch(changeIsLogged(true))
             dispatch(addID(res.data.id))
-
           }
         })
         .catch(err => console.log(err))
     }
   }, [])
+
+
 
   return (
     <div className={`bg-primary h-[100vh] w-[100vw] text-white ${centerStuffs}`}>
