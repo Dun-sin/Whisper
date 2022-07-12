@@ -81,7 +81,7 @@ Before installation, please make sure you have already installed the following t
 - [Git](https://git-scm.com/downloads)
 - [NodeJs](https://nodejs.org/en/download/)
 
-## 🛠️ Installation Steps
+## 🛠️ Installation Steps using Terminal/Command Line
 
 1. [Fork](https://github.com/Dun-sin/anon-chat-app/fork) the project. Click on the <a href="https://github.com/Dun-sin/anon-chat-app/fork"><img src="https://i.imgur.com/G4z1kEe.png" height="15" width="15"></a> icon in the top right to get started
 2. Clone the project, you can use the following command:
@@ -96,25 +96,25 @@ git clone https://github.com/<your-github-username>/anon-chat-app
 cd anon-chat-app
 ```
 
-4. Navigate to client if you want to work on the frontend
+4. Navigate to client(frontend) folder
 
 ```bash
 cd client
 ```
 
-5. Navigate to server if you want to work on the backend
+5. Navigate to server(backend) folder
 
 ```bash
 cd server
 ```
 
-6. Install dependencies with npm install
+6. Install dependencies with `npm install` in both client and server folder
 
 ```bash
 npm install
 ```
 
-7. Run npm start
+7. Run npm start in both folders also
 
 ```bash
 npm start
