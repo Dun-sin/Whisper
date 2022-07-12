@@ -18,7 +18,7 @@ const Login = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const mojoauth = new MojoAuth("test-d4a1c830-a65f-4c43-a871-abafcc31066d", {
+    const mojoauth = new MojoAuth(`${apiKey}`, {
       source: [{ type: 'email', feature: 'magiclink' }]
     });
     mojoauth.signIn().then(payload => {
