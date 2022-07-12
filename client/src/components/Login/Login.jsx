@@ -12,12 +12,10 @@ const centerStuffs = `flex flex-col justify-center items-center`
 const baseUrl = 'http://localhost:4000/user';
 const apiKey = process.env.REACT_APP_IMPORTANT;
 
-const date = new Date()
-let userID = '' + Math.floor(+`${date.getTime()}${date.getDate()}${date.getMonth()}` / 1000);
+let userID = '' + Math.random().toFixed(12).toString(36).slice(2);
 
 const Login = () => {
   const dispatch = useDispatch();
-
 
   useEffect(() => {
     const mojoauth = new MojoAuth("test-d4a1c830-a65f-4c43-a871-abafcc31066d", {
@@ -33,11 +31,9 @@ const Login = () => {
     axios.get(`${baseUrl}/find?email=${email}`)
       .then(res => {
         if (res.status === 202) {
-          loginUser(userID, email)
-
-          function loginUser(id, email) {
+          loginUser(email)
+          function loginUser(email) {
             axios.post(`${baseUrl}/add`, {
-              id: id,
               email: email
             })
               .then(res => {
