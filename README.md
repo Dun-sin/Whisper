@@ -124,7 +124,7 @@ npm install
 npm start
 ```
 
-# Note: Both ends of the project rely on each other, for you to work on any end(client or server) they both need to be started with `npm start`
+##### Note: Both ends of the project rely on each other, for you to work on any end(client or server) they both need to be started with `npm start`
 
 ## 👩🏽‍💻 Contributing
 
