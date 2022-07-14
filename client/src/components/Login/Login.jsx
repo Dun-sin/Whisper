@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 
 const centerStuffs = `flex flex-col justify-center items-center`
 
-const baseUrl = 'http://localhost:4000/user';
+const baseUrl = `${process.env.REACT_APP_SOCKET_URL}/user`;
 const apiKey = process.env.REACT_APP_IMPORTANT;
 
 let userID = '' + Math.random().toFixed(12).toString(36).slice(2);
