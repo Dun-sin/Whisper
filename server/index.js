@@ -18,7 +18,7 @@ mongoose.connect(process.env.MongoDB_URL, {
 });
 
 // Schemas
-const User = require('./Schemas/userSchema');
+const User = require('./Schemas/UserSchema');
 
 app.use(express.json());
 app.use(cors());
