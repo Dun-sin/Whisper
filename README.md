@@ -70,9 +70,13 @@ This app is developed to make chatting much private and easy without stealing yo
 	
 <br>
 
+#### Screenshot
+![image](https://user-images.githubusercontent.com/78784850/178471942-ce1aeb9f-4833-42d5-9ebc-8844cdc98082.png)
+
 ## 👩🏽‍💻 Demo
 
 Check out the website: [anonChat](https://anon-chat-app.vercel.app/)
+
 
 ## 👇🏽 Prerequisites
 
@@ -120,7 +124,7 @@ npm install
 npm start
 ```
 
-# Note: Both ends of the project rely on each other, for you to work on any end(client or server) they both need to be started with `npm start`
+##### Note: Both ends of the project rely on each other, for you to work on any end(client or server) they both need to be started with `npm start`
 
 ## 👩🏽‍💻 Contributing
 
