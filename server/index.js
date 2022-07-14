@@ -73,5 +73,5 @@ io.on('connection', (socket) => {
 app.use(cors());
 
 server.listen(HTTP_PORT, () => {
-	console.log('on port 4000');
+	console.log(`on port ${HTTP_PORT}`);
 });
