@@ -7,10 +7,10 @@ const server = http.createServer(app);
 const cors = require('cors');
 const { Server } = require('socket.io');
 const io = new Server(server, { cors: { origin: '*' } });
-const fs = require('fs');
+
+const HTTP_PORT = process.env.PORT || 4000;
 
 // Mongodb
-const mongo = require('mongodb');
 const mongoose = require('mongoose');
 mongoose.connect(process.env.MongoDB_URL, {
 	useNewUrlParser: true,
@@ -18,7 +18,7 @@ mongoose.connect(process.env.MongoDB_URL, {
 });
 
 // Schemas
-const User = require('./Schemas/userSchema');
+const User = require('./Schemas/UserSchema');
 
 app.use(express.json());
 app.use(cors());
@@ -72,6 +72,6 @@ io.on('connection', (socket) => {
 
 app.use(cors());
 
-server.listen(4000, () => {
-	console.log('on port 4000');
+server.listen(HTTP_PORT, () => {
+	console.log(`on port ${HTTP_PORT}`);
 });
