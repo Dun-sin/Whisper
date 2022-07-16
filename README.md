@@ -1,3 +1,5 @@
+<div id="top"></div>
+
 <div align="center">
   <img src="https://user-images.githubusercontent.com/80192140/179354812-4d6ef343-076a-4297-8625-b3bfd08f80e4.png" width="120px">
   <h2>Anon Chat App</h2>
@@ -6,9 +8,9 @@
   <p align="center">
     <a href="https://github.com/Dun-sin/anon-chat-app/issues/new?assignees=&labels=bug&template=bug_report.md&title=">View Demo</a>
     ·
-    <a href="https://github.com/Dun-sin/anon-chat-app/issues/new?assignees=&labels=bug&template=bug_report.md&title=">Report Bug</a>
+    <a href="https://github.com/Dun-sin/anon-chat-app/issues/new?assignees=&labels=bug&template=bug.yml&title=%5BBUG%5D+%3Cdescription%3E">Report Bug</a>
     ·
-    <a href="https://github.com/Dun-sin/anon-chat-app/issues">Request Feature</a>
+    <a href="https://github.com/Dun-sin/anon-chat-app/issues/new?assignees=&labels=feature&template=features.yml&title=%5BFEATURE%5D+%3Cdescription%3E">Request Feature</a>
   </p>
 
   <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Dun-sin/anon-chat-app?style=flat">
@@ -75,6 +77,8 @@ This app is developed to make chatting much private and easy without stealing yo
 ### 🖼️ Screenshot
 ![image](https://user-images.githubusercontent.com/78784850/178471942-ce1aeb9f-4833-42d5-9ebc-8844cdc98082.png)
 
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 ## 📚 Getting Started
 To get a local copy up and running follow these simple steps.
 
@@ -120,15 +124,21 @@ Before installation, please make sure you have already installed the following t
    ```
 > Both ends of the project rely on each other, for you to work on any end(client or server) they both need to be started with `npm start`
 
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 ## 🎨 Demo
 
 Check out the website: [anonChat](https://anon-chat-app.vercel.app/)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 ## 👩🏽‍💻 Contributing
 
 - Contributions make the open source community such an amazing place to learn, inspire, and create.
 - Any contributions you make are greatly appreciated.
 - Check out our [contribution guidelines](/CONTRIBUTING.md) for more information.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 ## ✏️ Edit with Gitpod
 
@@ -148,9 +158,13 @@ Work on Backend <a href="https://gitpod.io/#type=server/https://github.com/Dun-s
   />
 </a>
 
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 ## 🛡️ License
 
 AnonChat is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 ## 💪🏽 Thanks to all Contributors
 
@@ -158,6 +172,10 @@ Thanks a lot for spending your time helping anonchat grow. Thanks a lot! Keep ro
 
 [![Contributors](https://contrib.rocks/image?repo=Dun-sin/anon-chat-app)](https://github.com/Dun-sin/anon-chat-app/graphs/contributors)
 
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 ## 🙏🏽 Support
 
 This project needs a star️ from you. Don't forget to leave a star🌟
+
+<p align="right">(<a href="#top">back to top</a>)</p>
