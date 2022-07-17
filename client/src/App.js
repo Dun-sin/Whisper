@@ -13,7 +13,9 @@ function App() {
 	const isLogged = useSelector((state) => state.isLogged);
 
 	useEffect(() => {
-		dispatch(changeIsLogged(window.localStorage.isLogged));
+		// This was the main reason why a blank page appears on first visit
+		// cos localStorage.isLogged is initially undefined/null
+		dispatch(changeIsLogged(window.localStorage.isLogged ?? false));
 	}, []);
 
 	useEffect(() => {
