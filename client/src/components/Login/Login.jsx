@@ -87,7 +87,7 @@ const Login = () => {
       <div ref={mojoAuthForm} id="mojoauth-passwordless-form" className="">
         Loading...
       </div>
-      <a className={'pb-[5px] bg-secondary text-white h-[30px] w-[370px] h-[50px] rounded-[10px] font-light centered'} href='/searchuser'>Login Anonymously</a>
+      {/* <a className={'pb-[5px] bg-secondary text-white h-[30px] w-[370px] h-[50px] rounded-[10px] font-light centered'} href='/searchuser'>Login Anonymously</a> */}
     </div>
   )
 }
