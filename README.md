@@ -117,7 +117,10 @@ Before installation, please make sure you have already installed the following t
    npm install
    ```
 
-7. Run npm start in both folders also
+7. Use `.env_sample` to configure the `.env` file for this project. For mongodb url use the localhost to test 
+   > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0
+
+8. Run npm start in both folders also
 
    ```bash
    npm start
