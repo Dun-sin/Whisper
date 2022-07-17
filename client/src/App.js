@@ -13,7 +13,7 @@ function App() {
 	const isLogged = useSelector((state) => state.isLogged);
 
 	useEffect(() => {
-		dispatch(changeIsLogged(window.localStorage.isLogged));
+		dispatch(changeIsLogged(window.localStorage.isLogged ?? false));
 	}, []);
 
 	useEffect(() => {

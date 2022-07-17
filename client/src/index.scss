@@ -25,3 +25,7 @@ code {
 		height: 65vh !important;
 	}
 }
+
+.centered {
+	@apply flex flex-col justify-center items-center;
+}
