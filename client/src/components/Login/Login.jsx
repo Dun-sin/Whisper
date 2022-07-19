@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import MojoAuth from "mojoauth-web-sdk"
 
@@ -16,6 +16,11 @@ let userID = '' + Math.random().toFixed(12).toString(36).slice(2);
 
 const Login = () => {
   const dispatch = useDispatch();
+  const [loginStatus, setLoginStatus] = useState({
+    email: null,
+    status: 'none',
+    error: false
+  })
 
   useEffect(() => {
     const mojoauth = new MojoAuth(`${apiKey}`, {
@@ -27,31 +32,77 @@ const Login = () => {
     })
   }, [])
 
+  useEffect(() => {
+    if (loginStatus.status === 'complete' && !loginStatus.error) {
+      dispatch(changeIsLogged({
+        isLoggedIn: true,
+        loginType: 'email',
+        loginId: userID,
+        email: loginStatus.email,
+      }))
+    }
+  }, [loginStatus, dispatch])
+
   const checkingUser = (email) => {
     axios.get(`${baseUrl}/find?email=${email}`)
       .then(res => {
         if (res.status === 202) {
           loginUser(email)
           function loginUser(email) {
+            setLoginStatus({
+              ...loginStatus,
+              status: 'loading',
+              error: false,
+            })
+
             axios.post(`${baseUrl}/add`, {
               email: email
             })
               .then(res => {
                 if (res.status === 202) {
                   console.log('done')
-                  dispatch(changeIsLogged(true))
+                  setLoginStatus({
+                    ...loginStatus,
+                    status: 'complete',
+                    error: false,
+                    email
+                  })
                 } else {
                   console.log('failed')
+                  setLoginStatus({
+                    ...loginStatus,
+                    status: 'complete',
+                    error: true
+                  })
                 }
               })
-              .catch(err => console.log(err))
+              .catch(err => {
+                console.log(err)
+                setLoginStatus({
+                  ...loginStatus,
+                  status: 'complete',
+                  error: true
+                })
+              })
           }
         } else if (res.status === 200) {
-          dispatch(changeIsLogged(true))
+          setLoginStatus({
+            ...loginStatus,
+            status: 'complete',
+            error: false,
+            email
+          })
           dispatch(addID(res.data.id))
         }
       })
-      .catch(err => console.log(err))
+      .catch(err => {
+        console.log(err)
+        setLoginStatus({
+          ...loginStatus,
+          status: 'complete',
+          error: true
+        })
+      })
   }
 
   return (
