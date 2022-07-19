@@ -63,8 +63,8 @@ This app is developed to make chatting much private and easy without stealing yo
      <br>SocketIo
     </td>  
 <td align="Center" width="25%">
-<a href="https://sawolabs.com/" target="_blank" rel="noreferrer"><img src="https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/hrucdojgwoypvzvtqq3e" width="36" height="36" alt="Sawo"/></a>
-     <br>Sawo
+<a href="https://mojoauth.com/" target="_blank" rel="noreferrer"><img src="https://user-images.githubusercontent.com/78784850/179708079-25f0c6c7-ae9a-4c07-b5b3-e6dc1a1051c2.png" width="36" height="36" alt="Mojo"/></a>
+     <br>Mojo Auth
     </td>  
     <td align="Center" width="25%">      
 <a href="https://tailwindcss.com/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/tailwindcss-colored.svg" width="36" height="36" alt="TailwindCSS" /></a> 
