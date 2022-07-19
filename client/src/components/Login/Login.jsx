@@ -12,7 +12,7 @@ const centerStuffs = `flex flex-col justify-center items-center`
 const baseUrl = `${process.env.REACT_APP_SOCKET_URL}/user`;
 const apiKey = process.env.REACT_APP_IMPORTANT;
 
-let userID = '' + Math.random().toFixed(12).toString(36).slice(2);
+let userID = '';
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -23,6 +23,10 @@ const Login = () => {
   })
 
   useEffect(() => {
+    // Regenerate userId on each page load/route change
+    // This prevents us from re-using the same userId twice
+    userID = Math.random().toFixed(12).toString(36).slice(2);
+
     const mojoauth = new MojoAuth(`${apiKey}`, {
       source: [{ type: 'email', feature: 'magiclink' }]
     });
@@ -36,7 +40,7 @@ const Login = () => {
     if (loginStatus.status === 'complete' && !loginStatus.error) {
       dispatch(changeIsLogged({
         isLoggedIn: true,
-        loginType: 'email',
+        loginType: loginStatus.email ? 'email' : 'anonymous',
         loginId: userID,
         email: loginStatus.email,
       }))
@@ -105,11 +109,22 @@ const Login = () => {
       })
   }
 
+  const loginAnonymously = () => {
+    setLoginStatus({
+      status: 'complete',
+      error: false,
+      email: null,
+    })
+  }
+
   return (
     <div className={`bg-primary h-[100vh] w-[100vw] text-white ${centerStuffs}`}>
       <h1 className='text-[2em] font-semibold'>Sign-in</h1>
-      <div id="mojoauth-passwordless-form" className=""></div>
-      {/* <a className={`pb-[5px] bg-secondary text-white h-[30px] w-[370px] h-[50px] rounded-[10px] font-light ${centerStuffs}`} href='/searchuser'>Login Anonymously</a> */}
+      {loginStatus.status !== 'loading' && <div className="pb-3">
+        <div id="mojoauth-passwordless-form" className=""></div>
+      </div>}
+      {loginStatus.status === 'loading' && <div className="uppercase py-5">Processing Login</div>}
+      <button disabled={loginStatus.status === 'loading'} onClick={loginAnonymously} className={`disabled:bg-slate-700 pb-[5px] bg-secondary text-white w-[370px] h-[50px] rounded-[10px] font-light ${centerStuffs}`}>Login Anonymously</button>
     </div>
   )
 }
