@@ -19,7 +19,6 @@ mongoose.connect(process.env.MongoDB_URL, {
 
 // Schemas
 const User = require('./models/UserSchema');
-const Login = require('./models/LoginSchema');
 
 app.use(express.json());
 app.use(cors());
@@ -29,22 +28,6 @@ app.post('/user/add', (req, res) => {
 	User.create(
 		{
 			email: req.body.email,
-		},
-		(err, data) => {
-			if (err) {
-				console.log(err);
-			} else {
-				res.status(202).json(data);
-			}
-		},
-	);
-});
-
-// Store loginIds so that we can use it to verify logins later
-app.post('/user/login', (req, res) => {
-	Login.create(
-		{
-			loginId: req.body.loginId,
 		},
 		(err, data) => {
 			if (err) {
