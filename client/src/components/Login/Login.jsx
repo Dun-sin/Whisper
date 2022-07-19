@@ -39,7 +39,12 @@ const Login = () => {
               .then(res => {
                 if (res.status === 202) {
                   console.log('done')
-                  dispatch(changeIsLogged(true))
+                  dispatch(changeIsLogged({
+                    isLoggedIn: true,
+                    loginType: 'email',
+                    loginId: userID,
+                    email,
+                  }))
                 } else {
                   console.log('failed')
                 }
@@ -47,7 +52,12 @@ const Login = () => {
               .catch(err => console.log(err))
           }
         } else if (res.status === 200) {
-          dispatch(changeIsLogged(true))
+          dispatch(changeIsLogged({
+            isLoggedIn: true,
+            loginType: 'email',
+            loginId: userID,
+            email,
+          }))
           dispatch(addID(res.data.id))
         }
       })
