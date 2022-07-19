@@ -34,49 +34,12 @@ const Login = () => {
 
   useEffect(() => {
     if (loginStatus.status === 'complete' && !loginStatus.error) {
-      setLoginStatus({
-        ...loginStatus,
-        status: 'loading',
-        error: false
-      })
-
-      axios.post(`${baseUrl}/login`, {
-        /**
-         * TODO: Use uuid library from npm to generate loginId
-         */
-        loginId: userID
-      })
-        .then(res => {
-          if (res.status === 202) {
-            setLoginStatus({
-              ...loginStatus,
-              status: 'complete',
-              error: false
-            })
-
-            dispatch(changeIsLogged({
-              isLoggedIn: true,
-              loginType: 'email',
-              loginId: userID,
-              email: loginStatus.email,
-            }))
-          } else {
-            console.log('failed')
-            setLoginStatus({
-              ...loginStatus,
-              status: 'complete',
-              error: true
-            })
-          }
-        })
-        .catch(err => {
-          console.log(err)
-          setLoginStatus({
-            ...loginStatus,
-            status: 'complete',
-            error: true
-          })
-        })
+      dispatch(changeIsLogged({
+        isLoggedIn: true,
+        loginType: 'email',
+        loginId: userID,
+        email: loginStatus.email,
+      }))
     }
   }, [loginStatus, dispatch])
 
