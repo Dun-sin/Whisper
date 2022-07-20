@@ -1,26 +1,26 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import MojoAuth from "mojoauth-web-sdk"
+import MojoAuth from 'mojoauth-web-sdk';
 
 // redux
 import { changeIsLogged } from '../../redux/Reducers/isLogged';
 import { addID } from '../../redux/Reducers/idSlice';
 import { useDispatch } from 'react-redux';
 
-const centerStuffs = `flex flex-col justify-center items-center`
+const centerStuffs = `flex flex-col justify-center items-center`;
 
-const baseUrl = `${process.env.REACT_APP_SOCKET_URL}/user`;
-const apiKey = process.env.REACT_APP_IMPORTANT;
+const baseUrl = `${import.meta.env.REACT_APP_SOCKET_URL}/user`;
+const apiKey = import.meta.env.REACT_APP_IMPORTANT;
 
 let userID = '';
 
 const Login = () => {
-  const dispatch = useDispatch();
-  const [loginStatus, setLoginStatus] = useState({
-    email: null,
-    status: 'none',
-    error: false
-  })
+	const dispatch = useDispatch();
+	const [loginStatus, setLoginStatus] = useState({
+		email: null,
+		status: 'none',
+		error: false,
+	});
 
   useEffect(() => {
     // Regenerate userId on each page load/route change
@@ -47,67 +47,69 @@ const Login = () => {
     }
   }, [loginStatus, dispatch])
 
-  const checkingUser = (email) => {
-    axios.get(`${baseUrl}/find?email=${email}`)
-      .then(res => {
-        if (res.status === 202) {
-          loginUser(email)
-          function loginUser(email) {
-            setLoginStatus({
-              ...loginStatus,
-              status: 'loading',
-              error: false,
-            })
+	const checkingUser = email => {
+		axios
+			.get(`${baseUrl}/find?email=${email}`)
+			.then(res => {
+				if (res.status === 202) {
+					loginUser(email);
+					function loginUser(email) {
+						setLoginStatus({
+							...loginStatus,
+							status: 'loading',
+							error: false,
+						});
 
-            axios.post(`${baseUrl}/add`, {
-              email: email
-            })
-              .then(res => {
-                if (res.status === 202) {
-                  console.log('done')
-                  setLoginStatus({
-                    ...loginStatus,
-                    status: 'complete',
-                    error: false,
-                    email
-                  })
-                } else {
-                  console.log('failed')
-                  setLoginStatus({
-                    ...loginStatus,
-                    status: 'complete',
-                    error: true
-                  })
-                }
-              })
-              .catch(err => {
-                console.log(err)
-                setLoginStatus({
-                  ...loginStatus,
-                  status: 'complete',
-                  error: true
-                })
-              })
-          }
-        } else if (res.status === 200) {
-          setLoginStatus({
-            ...loginStatus,
-            status: 'complete',
-            error: false,
-            email
-          })
-          dispatch(addID(res.data.id))
-        }
-      })
-      .catch(err => {
-        console.log(err)
-        setLoginStatus({
-          ...loginStatus,
-          status: 'complete',
-          error: true
-        })
-      })
-  }
+						axios
+							.post(`${baseUrl}/add`, {
+								email: email,
+							})
+							.then(res => {
+								if (res.status === 202) {
+									console.log('done');
+									setLoginStatus({
+										...loginStatus,
+										status: 'complete',
+										error: false,
+										email,
+									});
+								} else {
+									console.log('failed');
+									setLoginStatus({
+										...loginStatus,
+										status: 'complete',
+										error: true,
+									});
+								}
+							})
+							.catch(err => {
+								console.log(err);
+								setLoginStatus({
+									...loginStatus,
+									status: 'complete',
+									error: true,
+								});
+							});
+					}
+				} else if (res.status === 200) {
+					setLoginStatus({
+						...loginStatus,
+						status: 'complete',
+						error: false,
+						email,
+					});
+					dispatch(addID(res.data.id));
+				}
+			})
+			.catch(err => {
+				console.log(err);
+				setLoginStatus({
+					...loginStatus,
+					status: 'complete',
+					error: true,
+				});
+			});
+	};
 
   const loginAnonymously = () => {
     setLoginStatus({
