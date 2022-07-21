@@ -171,7 +171,7 @@ AnonChat is licensed under the MIT License - see the [LICENSE](LICENSE) file for
 
 ## 💪🏽 Thanks to all Contributors
 
-Thanks a lot for spending your time helping anonchat grow. Thanks a lot! Keep rocking beers
+Thanks a lot for spending your time helping anonchat grow. Thanks a lot! Keep rocking🍻
 
 [![Contributors](https://contrib.rocks/image?repo=Dun-sin/anon-chat-app)](https://github.com/Dun-sin/anon-chat-app/graphs/contributors)
 
