@@ -1,0 +1,110 @@
+{
+    "extends": ["eslint:recommended", "plugin:react/recommended", "prettier"],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 2020,
+        "sourceType": "module"
+    },
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    },
+    "env": {
+        "browser": true,
+        "jest": true,
+        "node": true
+    },
+    "rules": {
+        "array-bracket-newline": "error",
+        "camelcase": "error",
+        "no-await-in-loop": "error",
+        "no-constant-binary-expression": "error",
+        "no-duplicate-imports": "error",
+        "no-self-compare": "error",
+        "no-unreachable": "warn",
+        "no-unreachable-loop": "warn",
+        "block-scoped-var": "error",
+        "capitalized-comments": [
+            "error",
+            "always",
+            {
+                "ignoreInlineComments": true,
+                "ignoreConsecutiveComments": true
+            }
+        ],
+        "class-methods-use-this": [
+            "error",
+            {
+                "enforceForClassFields": false
+            }
+        ],
+        "curly": "error",
+        "default-case": "error",
+        "default-case-last": "error",
+        "default-param-last": ["error"],
+        "dot-notation": [
+            "error",
+            {
+                "allowKeywords": true
+            }
+        ],
+        "eqeqeq": ["warn", "smart"],
+        "func-style": [
+            "error",
+            "declaration",
+            {
+                "allowArrowFunctions": true
+            }
+        ],
+        "max-classes-per-file": "error",
+        "max-depth": "warn",
+        "max-len": [
+            "warn",
+            {
+                "ignoreStrings": true,
+                "ignoreTemplateLiterals": true
+            }
+        ],
+        "max-statements-per-line": "warn",
+        "no-confusing-arrow": "error",
+        "no-empty-function": "error",
+        "no-eq-null": "error",
+        "no-extra-bind": "error",
+        "no-implicit-coercion": "error",
+        "no-invalid-this": "error",
+        "no-lonely-if": "warn",
+        "no-loop-func": "error",
+        "no-unused-expressions": [
+            "error",
+            {
+                "allowShortCircuit": true,
+                "allowTernary": true,
+                "enforceForJSX": true
+            }
+        ],
+        "no-use-before-define": [
+            "error",
+            {
+                "allowNamedExports": true
+            }
+        ],
+        "no-useless-concat": "error",
+        "no-useless-constructor": "warn",
+        "no-useless-return": "warn",
+        "no-var": "error",
+        "no-template-curly-in-string": "warn",
+        "one-var-declaration-per-line": ["error", "initializations"],
+        "prefer-arrow-callback": "warn",
+        "prefer-const": "warn",
+        "require-atomic-updates": "error",
+        "require-await": "error",
+        "react/jsx-uses-react": "error",
+        "react/react-in-jsx-scope": "off",
+        "react/jsx-boolean-value": "error",
+        "react/jsx-fragments": ["warn", "syntax"],
+        "spaced-comment": "error"
+    }
+}

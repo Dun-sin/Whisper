@@ -1,0 +1,11 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+max_line_length = 80
+
+[*.{js,jsx,ts,tsx,css,scss,sass,json,html}]
+indent_style = space
+indent_size = 4
