@@ -9,8 +9,8 @@ import { useDispatch } from 'react-redux';
 
 const centerStuffs = `flex flex-col justify-center items-center`;
 
-const baseUrl = `${import.meta.env.REACT_APP_SOCKET_URL}/user`;
-const apiKey = import.meta.env.REACT_APP_IMPORTANT;
+const baseUrl = `${import.meta.env.VITE_SOCKET_URL}/user`;
+const apiKey = import.meta.env.VITE_IMPORTANT;
 
 let userID = '';
 
@@ -22,29 +22,29 @@ const Login = () => {
 		error: false,
 	});
 
-  useEffect(() => {
-    // Regenerate userId on each page load/route change
-    // This prevents us from re-using the same userId twice
-    userID = Math.random().toFixed(12).toString(36).slice(2);
+	useEffect(() => {
+		// Regenerate userId on each page load/route change
+		// This prevents us from re-using the same userId twice
+		userID = Math.random().toFixed(12).toString(36).slice(2);
 
-    const mojoauth = new MojoAuth(`${apiKey}`, {
+		const mojoauth = new MojoAuth(`${apiKey}`, {
       source: [{ type: 'email', feature: 'magiclink' }]
-    });
-    mojoauth.signIn().then(payload => {
+		});
+		mojoauth.signIn().then(payload => {
       checkingUser(payload.user.email)
       document.getElementById("mojoauth-passwordless-form").remove();
     })
   }, [])
 
-  useEffect(() => {
-    if (loginStatus.status === 'complete' && !loginStatus.error) {
+	useEffect(() => {
+		if (loginStatus.status === 'complete' && !loginStatus.error) {
       dispatch(changeIsLogged({
-        isLoggedIn: true,
-        loginType: loginStatus.email ? 'email' : 'anonymous',
-        loginId: userID,
-        email: loginStatus.email,
+					isLoggedIn: true,
+					loginType: loginStatus.email ? 'email' : 'anonymous',
+					loginId: userID,
+					email: loginStatus.email,
       }))
-    }
+		}
   }, [loginStatus, dispatch])
 
 	const checkingUser = email => {
@@ -111,23 +111,23 @@ const Login = () => {
 			});
 	};
 
-  const loginAnonymously = () => {
-    setLoginStatus({
-      status: 'complete',
-      error: false,
-      email: null,
+	const loginAnonymously = () => {
+		setLoginStatus({
+			status: 'complete',
+			error: false,
+			email: null,
     })
   }
 
-  return (
+	return (
     <div className={`bg-primary h-[100vh] w-[100vw] text-white ${centerStuffs}`}>
-      <h1 className='text-[2em] font-semibold'>Sign-in</h1>
+			<h1 className='text-[2em] font-semibold'>Sign-in</h1>
       {loginStatus.status !== 'loading' && <div className="pb-3">
         <div id="mojoauth-passwordless-form" className=""></div>
       </div>}
       {loginStatus.status === 'loading' && <div className="uppercase py-5">Processing Login</div>}
       <button disabled={loginStatus.status === 'loading'} onClick={loginAnonymously} className={`disabled:bg-slate-700 pb-[5px] bg-secondary text-white w-[370px] h-[50px] rounded-[10px] font-light ${centerStuffs}`}>Login Anonymously</button>
-    </div>
+				</div>
   )
 }
 
