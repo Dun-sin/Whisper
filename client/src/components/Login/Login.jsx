@@ -9,8 +9,8 @@ import { useDispatch } from 'react-redux';
 
 const centerStuffs = `flex flex-col justify-center items-center`;
 
-const baseUrl = `${import.meta.env.REACT_APP_SOCKET_URL}/user`;
-const apiKey = import.meta.env.REACT_APP_IMPORTANT;
+const baseUrl = `${import.meta.env.VITE_SOCKET_URL}/user`;
+const apiKey = import.meta.env.VITE_IMPORTANT;
 
 let userID = '';
 
