@@ -3,11 +3,11 @@ import IDReducer from './idSlice';
 import isLoggedReducer from './isLogged';
 
 const root = {
-	reducer: {
-		ID: IDReducer,
-		messages: messageReducer,
-		isLogged: isLoggedReducer,
-	},
+    reducer: {
+        ID: IDReducer,
+        messages: messageReducer,
+        isLogged: isLoggedReducer,
+    },
 };
 
 export default root;
