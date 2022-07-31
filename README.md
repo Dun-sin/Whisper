@@ -164,7 +164,7 @@ Work on Backend <a href="https://gitpod.io/#type=server/https://github.com/Dun-s
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## 👨‍👩‍👦 Community
-Don't forget to join the discord community - ![Join us](https://discord.gg/KUWjx4fygJ) 
+Don't forget to join the discord community - [Join us](https://discord.gg/KUWjx4fygJ) 
 
 ## 🛡️ License
 
