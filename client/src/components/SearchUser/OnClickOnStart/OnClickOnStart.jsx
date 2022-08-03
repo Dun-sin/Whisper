@@ -9,10 +9,11 @@ const OnClickOnStart = () => {
     const [isFound, setIsFound] = useState(false);
     const socket = useContext(SocketContext);
 
-    const userID = useSelector((state) => state.ID);
+    const userID = useSelector((state) => state);
 
     useEffect(() => {
         socket.connected && socket.emit('adding', { userID });
+        socket.emit('createRoom', `${Math.random().toString(36).substring(1, 10)}`);
     }, [socket, userID]);
 
     return isFound ? <FoundUser /> : <div>Searching.....</div>;

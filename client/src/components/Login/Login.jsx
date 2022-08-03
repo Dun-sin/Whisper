@@ -12,7 +12,7 @@ const centerStuffs = `flex flex-col justify-center items-center`;
 const baseUrl = `${import.meta.env.VITE_SOCKET_URL}/user`;
 const apiKey = import.meta.env.VITE_IMPORTANT;
 
-let userID = '';
+const userID = Math.random().toFixed(12).toString(36).slice(2);
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -90,7 +90,6 @@ const Login = () => {
     useEffect(() => {
         // Regenerate userId on each page load/route change
         // This prevents us from re-using the same userId twice
-        userID = Math.random().toFixed(12).toString(36).slice(2);
 
         const mojoauth = new MojoAuth(`${apiKey}`, {
             source: [{ type: 'email', feature: 'magiclink' }],
@@ -103,6 +102,9 @@ const Login = () => {
 
     useEffect(() => {
         if (loginStatus.status === 'complete' && !loginStatus.error) {
+            if (loginStatus.email === null) {
+                dispatch(addID(userID))
+            }
             dispatch(
                 changeIsLogged({
                     isLoggedIn: true,

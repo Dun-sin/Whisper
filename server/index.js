@@ -6,8 +6,10 @@ const http = require('http');
 const server = http.createServer(app);
 const cors = require('cors');
 const { Server } = require('socket.io');
-const io = new Server(server, { cors: { origin: '*' } });
-
+const io = new Server(server, {
+	cors: { origin: '*' },
+	reconnectionAttempts: 5,
+});
 const HTTP_PORT = process.env.PORT || 4000;
 
 // Mongodb
@@ -19,6 +21,9 @@ mongoose.connect(process.env.MongoDB_URL, {
 
 // Schemas
 const User = require('./models/UserSchema');
+
+// Modules
+const userModule = require('./users');
 
 app.use(express.json());
 app.use(cors());
@@ -56,15 +61,17 @@ app.get('/user/find', (req, res) => {
 	});
 });
 
-const users = [];
-
 // Sockets
 io.on('connection', (socket) => {
 	socket.on('adding', (data) => {
-		if (data.userID === '') return;
-		users.push(data.userID);
-		console.log(users);
+		if (data.userID.ID === '') return;
+		userModule.allUsers(data.userID.ID);
 	});
+
+	socket.on('createRoom', (room) => {
+		userModule.matchUsers(socket, room);
+	});
+
 	socket.on('send_message', ({ senderId, message, time }) => {
 		socket.broadcast.emit('receive_message', { senderId, message, time });
 	});
