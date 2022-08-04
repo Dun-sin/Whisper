@@ -68,8 +68,8 @@ io.on('connection', (socket) => {
 		userModule.allUsers(data.userID.ID);
 	});
 
-	socket.on('createRoom', (room) => {
-		userModule.matchUsers(socket, room);
+	socket.on('createRoom', () => {
+		userModule.matchUsers(socket);
 	});
 
 	socket.on('send_message', ({ senderId, message, time }) => {

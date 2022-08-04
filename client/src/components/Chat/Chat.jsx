@@ -85,6 +85,7 @@ const Chat = () => {
             <p className="text-[0.8em] font-semibold mb-[20px] text-center">
                 Connected with a random User
             </p>
+            {console.log(messages)}
             <ScrollToBottom
                 initialScrollBehavior="auto"
                 className="displayMessgaes h-[75%] w-[100%]"

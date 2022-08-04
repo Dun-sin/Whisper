@@ -12,8 +12,16 @@ const OnClickOnStart = () => {
     const userID = useSelector((state) => state);
 
     useEffect(() => {
+        console.log(isFound)
+        if (isFound) {
+            return
+        }
         socket.connected && socket.emit('adding', { userID });
-        socket.emit('createRoom', `${Math.random().toString(36).substring(1, 10)}`);
+        socket.emit('createRoom', `${userID}-in-search`);
+        socket.on('joined', () => {
+            console.log('Someone has joined, Have fun')
+            setIsFound(true)
+        })
     }, [socket, userID]);
 
     return isFound ? <FoundUser /> : <div>Searching.....</div>;
