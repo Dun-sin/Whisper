@@ -12,14 +12,14 @@ const io = new Server(server, {
 });
 const HTTP_PORT = process.env.PORT || 4000;
 
-// Mongodb
+// Mongodb database host connection
 const mongoose = require('mongoose');
 mongoose.connect(process.env.MongoDB_URL, {
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
 });
 
-// Schemas
+// User Schema
 const User = require('./models/UserSchema');
 
 // Modules
@@ -28,7 +28,10 @@ const userModule = require('./users');
 app.use(express.json());
 app.use(cors());
 
-// Routes
+/*
+  @method: post
+  @end-point: /user/add
+*/
 app.post('/user/add', (req, res) => {
 	User.create(
 		{
@@ -44,6 +47,11 @@ app.post('/user/add', (req, res) => {
 	);
 });
 
+
+/*
+  @method: get
+  @end-point: /user/find
+*/
 app.get('/user/find', (req, res) => {
 	User.find(req.query, (err, data) => {
 		if (err) {
