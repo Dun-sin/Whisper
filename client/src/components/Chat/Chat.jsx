@@ -60,6 +60,7 @@ const Chat = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log(inputRef.current.value)
         const d = new Date();
         const time = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
         const message = inputRef.current.value;
@@ -85,7 +86,6 @@ const Chat = () => {
             <p className="text-[0.8em] font-semibold mb-[20px] text-center">
                 Connected with a random User
             </p>
-            {console.log(messages)}
             <ScrollToBottom
                 initialScrollBehavior="auto"
                 className="displayMessgaes h-[75%] w-[100%]"

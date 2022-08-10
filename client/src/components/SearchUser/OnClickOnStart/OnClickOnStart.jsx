@@ -12,10 +12,10 @@ const OnClickOnStart = () => {
     const userID = useSelector((state) => state);
 
     useEffect(() => {
-        console.log(isFound)
         if (isFound) {
             return
         }
+        console.log(userID)
         socket.connected && socket.emit('adding', { userID });
         socket.emit('createRoom', `${userID}-in-search`);
         socket.on('joined', () => {
