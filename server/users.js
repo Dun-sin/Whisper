@@ -4,11 +4,21 @@ let currentRoom;
 
 const user = users[Math.floor(Math.random() * users.length)];
 
+
+/*
+  @params:  object
+  @return: void
+*/
 function allUsers(user) {
 	users.push(user);
 	console.log(users);
 }
 
+
+/*
+  @params: object
+  @return: void
+*/
 function matchUsers(socket) {
 	createRooms();
 	console.log(rooms);
@@ -20,6 +30,10 @@ function matchUsers(socket) {
 	console.log(socket.adapter.rooms.get(pickedRoom).size);
 }
 
+/*
+  @params: void
+  @return: void
+*/
 function createRooms() {
 	if (users.length < 2) return;
 	let numberOfRoomsToGenerate = Math.floor(users.length / 2);
