@@ -21,11 +21,13 @@ function allUsers(user) {
 */
 function matchUsers(socket) {
 	createRooms();
-	users.splice(user, 1);
+	console.log(rooms);
+	if (rooms.length < 1) return;
+
 	const pickedRoom = rooms[Math.floor(Math.random() * rooms.length)];
 	socket.join(pickedRoom);
-	socket.adapter.rooms.get(pickedRoom).size;
 	socket.emit('joined');
+	console.log(socket.adapter.rooms.get(pickedRoom).size);
 }
 
 /*
@@ -34,11 +36,10 @@ function matchUsers(socket) {
 */
 function createRooms() {
 	if (users.length < 2) return;
-	let numberOfRoomsToGenerate = Maths.floor(users.length / 2);
+	let numberOfRoomsToGenerate = Math.floor(users.length / 2);
 	for (let i = 0; i < numberOfRoomsToGenerate; i++) {
-		rooms.push(Math.random().toString(36).substring(1, 12));
+		rooms.push(Math.random().toString(36).substring(1, 10));
 	}
-	console.log(rooms);
 }
 
 module.exports = { allUsers, matchUsers };
