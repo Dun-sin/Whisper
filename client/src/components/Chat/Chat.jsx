@@ -35,6 +35,13 @@ const Chat = () => {
                 })
             );
         });
+
+        socket.on('pmessage',(data) => {
+            console.log("Here is final data",data)
+        })
+
+        
+
     }, [dispatch, socket]);
 
     useEffect(() => {
@@ -68,6 +75,7 @@ const Chat = () => {
             return;
         }
         socket.emit('send_message', { senderId, message, time });
+        socket.emit('pmessage', message);
         dispatch(
             addMessages({
                 id: senderId,

@@ -15,13 +15,12 @@ const OnClickOnStart = () => {
         if (isFound) {
             return
         }
-        console.log(userID)
         socket.connected && socket.emit('adding', { userID });
         socket.emit('createRoom', `${userID}-in-search`);
+        socket.emit('join')
         socket.on('joined', () => {
-            console.log('Someone has joined, Have fun')
-            setIsFound(true)
-        })
+            setIsFound(true);
+        });
     }, [socket, userID]);
 
     return isFound ? <FoundUser /> : <div>Searching.....</div>;
