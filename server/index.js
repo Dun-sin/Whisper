@@ -69,32 +69,27 @@ app.get('/user/find', (req, res) => {
 	});
 });
 
-let waitingUser = {}
-
 const matchMaker = () => {
 	setInterval(() => {
 		if(userModule.getWaitingUserLen() > 1){
-			let keys = userModule.getWaitingUserKeys()
-			let roomval = userModule.getWaitingUserKeys()[0] + userModule.getWaitingUserKeys()[1]
-			userModule.getWaitingUser(keys[0]).join(roomval)
-			userModule.getWaitingUser(keys[1]).join(roomval)
+			let user1 = userModule.getUser()
+			let user2 = userModule.getUser()
+			let roomval = user1.id + user2.id
+			user1.join(roomval)
+			user2.join(roomval)
 			io.to(roomval).emit('joined',"Searched completed")
-			userModule.getWaitingUser(keys[0])
 			let udata1 = {
-				id : keys[0],
+				id : user1.id,
 				room : roomval
 			}
 			let udata2 = {
-				id : keys[1],
+				id : user2.id,
 				room : roomval
 			}
 			userModule.addUser(udata1)
 			userModule.addUser(udata2)
-			userModule.addActiveUser({ id : keys[0] })
-			userModule.addActiveUser({ id : keys[1] })
-			userModule.delWaitingUser(keys[0])
-			userModule.delWaitingUser(keys[1])
-			console.log("running again n again",userModule.getWaitingUserLen(),keys)
+			userModule.addActiveUser({ id : udata1 })
+			userModule.addActiveUser({ id : udata1 })
 		}
 	},3000)
 }
@@ -106,10 +101,9 @@ io.on('connection', (socket) => {
 		userModule.addWaitingUser(socket)
 	})
 
-	socket.on('pmessage',(message,callback) => {
-		console.log("Getting message",message)
+	socket.on('privatemessage',(message,callback) => {
 		let room = userModule.getUserRoom(socket.id)
-		io.to(room).emit('pmessage',message)
+		io.to(room).emit('privatemessage',message)
 	})
 	// socket.on('adding', (data) => {
 	// 	if (data.userID.ID === '') return;

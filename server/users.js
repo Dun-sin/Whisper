@@ -13,7 +13,6 @@ const user = users[Math.floor(Math.random() * users.length)];
 */
 function allUsers(user) {
 	users.push(user);
-	console.log("Here is user list",users);
 }
 
 function addUser(udata) {
@@ -51,6 +50,13 @@ function addActiveUser(udata) {
 	active_users[udata.id] = true
 }
 
+function getUser  () {
+	let keys = getWaitingUserKeys()
+	let index = Math.floor((Math.random()*keys.length));
+	let user1 = waiting_users[keys[index]]
+	delWaitingUser(user1.id)
+	return user1
+}
 
 
 /*
@@ -81,4 +87,4 @@ function createRooms() {
 	}
 }
 
-module.exports = { allUsers, matchUsers, addUser, addWaitingUser, remWaitingUser, addActiveUser, getUserRoom, getWaitingUserLen, getWaitingUserKeys, getWaitingUser, delWaitingUser };
+module.exports = { allUsers, matchUsers, addUser, addWaitingUser, remWaitingUser, addActiveUser, getUserRoom, getWaitingUserLen, getWaitingUserKeys, getWaitingUser, delWaitingUser, getUser };

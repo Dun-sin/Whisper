@@ -36,7 +36,7 @@ const Chat = () => {
             );
         });
 
-        socket.on('pmessage',(data) => {
+        socket.on('privatemessage',(data) => {
             console.log("Here is final data",data)
         })
 
@@ -75,7 +75,7 @@ const Chat = () => {
             return;
         }
         socket.emit('send_message', { senderId, message, time });
-        socket.emit('pmessage', message);
+        socket.emit('privatemessage', message);
         dispatch(
             addMessages({
                 id: senderId,
