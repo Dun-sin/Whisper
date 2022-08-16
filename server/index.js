@@ -89,7 +89,6 @@ const matchMaker = () => {
 			userModule.addUser(udata2)
 			userModule.addActiveUser({ id : udata1 })
 			userModule.addActiveUser({ id : udata1 })
-			console.log("Running for second time",user1.id,user2.id)
 		}
 
 }
