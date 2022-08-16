@@ -70,7 +70,6 @@ app.get('/user/find', (req, res) => {
 });
 
 const matchMaker = () => {
-	setInterval(() => {
 		if(userModule.getWaitingUserLen() > 1){
 			let user1 = userModule.getUser()
 			let user2 = userModule.getUser()
@@ -90,15 +89,17 @@ const matchMaker = () => {
 			userModule.addUser(udata2)
 			userModule.addActiveUser({ id : udata1 })
 			userModule.addActiveUser({ id : udata1 })
+			console.log("Running for second time",user1.id,user2.id)
 		}
-	},3000)
+
 }
-matchMaker()
+
 // Sockets
 io.on('connection', (socket) => {
 	
 	socket.on('join',() => {
 		userModule.addWaitingUser(socket)
+		matchMaker()
 	})
 
 	socket.on('privatemessage',(message,callback) => {
