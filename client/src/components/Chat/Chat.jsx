@@ -36,8 +36,8 @@ const Chat = () => {
             );
         });
 
-        socket.on('privatemessage',(data) => {
-            console.log("Here is final data",data)
+        socket.on('privatemessage',(msg) => {
+            console.log("Here is message :--->",msg)
         })
 
         
