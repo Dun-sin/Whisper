@@ -47,7 +47,6 @@ app.post('/user/add', (req, res) => {
 	);
 });
 
-
 /*
   @method: get
   @end-point: /user/find
@@ -70,41 +69,39 @@ app.get('/user/find', (req, res) => {
 });
 
 const matchMaker = () => {
-		if(userModule.getWaitingUserLen() > 1){
-			let user1 = userModule.getUser()
-			let user2 = userModule.getUser()
-			let roomval = user1.id + user2.id
-			user1.join(roomval)
-			user2.join(roomval)
-			io.to(roomval).emit('joined',"Searched completed")
-			let udata1 = {
-				id : user1.id,
-				room : roomval
-			}
-			let udata2 = {
-				id : user2.id,
-				room : roomval
-			}
-			userModule.addUser(udata1)
-			userModule.addUser(udata2)
-			userModule.addActiveUser({ id : udata1 })
-			userModule.addActiveUser({ id : udata1 })
-		}
-
-}
+	if (userModule.getWaitingUserLen() > 1) {
+		let user1 = userModule.getUser();
+		let user2 = userModule.getUser();
+		let roomval = user1.id + user2.id;
+		user1.join(roomval);
+		user2.join(roomval);
+		io.to(roomval).emit('joined', 'Searched completed');
+		let udata1 = {
+			id: user1.id,
+			room: roomval,
+		};
+		let udata2 = {
+			id: user2.id,
+			room: roomval,
+		};
+		userModule.addUser(udata1);
+		userModule.addUser(udata2);
+		userModule.addActiveUser({ id: udata1 });
+		userModule.addActiveUser({ id: udata1 });
+	}
+};
 
 // Sockets
 io.on('connection', (socket) => {
-	
-	socket.on('join',() => {
-		userModule.addWaitingUser(socket)
-		matchMaker()
-	})
+	socket.on('join', () => {
+		userModule.addWaitingUser(socket);
+		matchMaker();
+	});
 
-	socket.on('privatemessage',(message,callback) => {
-		let room = userModule.getUserRoom(socket.id)
-		io.to(room).emit('privatemessage',message)
-	})
+	socket.on('send_message', ({ senderId, message, time }, callback) => {
+		let room = userModule.getUserRoom(socket.id);
+		io.to(room).emit('receive_message', { senderId, message, time });
+	});
 	// socket.on('adding', (data) => {
 	// 	if (data.userID.ID === '') return;
 	// 	userModule.allUsers(data.userID.ID);

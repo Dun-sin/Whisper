@@ -24,6 +24,9 @@ const Chat = () => {
 
     useEffect(() => {
         socket.on('receive_message', ({ senderId, message, time }) => {
+            console.log(`reciever: ${message}`);
+            console.log(sentMessages, receivedMessages)
+
             dispatch(
                 addMessages({
                     id: senderId,
@@ -36,11 +39,11 @@ const Chat = () => {
             );
         });
 
-        socket.on('privatemessage',(msg) => {
-            console.log("Here is message :--->",msg)
-        })
+        // Socket.on('privatemessage',(msg) => {
+        //     console.log("Here is message :--->",msg)
+        // })
 
-        
+
 
     }, [dispatch, socket]);
 
@@ -67,7 +70,6 @@ const Chat = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(inputRef.current.value)
         const d = new Date();
         const time = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
         const message = inputRef.current.value;
@@ -75,7 +77,8 @@ const Chat = () => {
             return;
         }
         socket.emit('send_message', { senderId, message, time });
-        socket.emit('privatemessage', message);
+        console.log(`sender: ${message}`);
+        // Socket.emit('privatemessage', message);
         dispatch(
             addMessages({
                 id: senderId,
