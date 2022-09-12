@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { SocketContext } from '../../Context';
+import { SocketContext } from '../../context/Context';
 
-import './Chat.css';
+import '../../assets/css/Chat.css'
 
 import ScrollToBottom from 'react-scroll-to-bottom';
 import { IoSend } from 'react-icons/io5';
 
-import { addMessages } from '../../redux/Reducers/messageSlice';
+import { addMessages } from '../../context/redux/Reducers/messageSlice';
 
 let senderId;
 const Chat = () => {

@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { BiDotsVerticalRounded } from 'react-icons/bi';
-import Chat from '../../Chat/Chat';
+import Chat from '../../components/Chat/Chat'
 
 const centerItems = `flex items-center justify-center`;
 
-const FoundUser = () => {
+const Anonymous = () => {
     return (
         <div
             className={`bg-[#011627] min-w-[calc(100%-120px)] ${centerItems} flex-col max-h-[100vh] text-[#FFF]`}
@@ -21,4 +21,4 @@ const FoundUser = () => {
     );
 };
 
-export default FoundUser;
+export default Anonymous;

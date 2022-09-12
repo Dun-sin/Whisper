@@ -1,18 +1,18 @@
 import { Route, Routes } from 'react-router-dom';
-import ComingSoon from './ComingSoon';
+import ComingSoon from '../../pages/ComingSoon/ComingSoon';
 
 // Components
-import NavBar from './NavBar/NavBar';
-import OnClickOnStart from './SearchUser/OnClickOnStart/OnClickOnStart';
-import SearchUser from './SearchUser/SearchUser';
+import NavBar from './NavBar';
+import Searching from '../../pages/Searching';
+import Start from '../../pages/Start';
 
 const RoutesComponent = () => {
     return (
         <div className="flex">
             <NavBar />
             <Routes>
-                <Route path="/" element={<SearchUser />} />
-                <Route path="/founduser" element={<OnClickOnStart />} />
+                <Route path="/" element={<Start />} />
+                <Route path="/founduser" element={<Searching />} />
                 <Route path="/friends" element={<ComingSoon />} />
                 <Route path="/profile" element={<ComingSoon />} />
             </Routes>
