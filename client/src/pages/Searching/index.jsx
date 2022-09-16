@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { SocketContext } from '../../../Context';
+import { SocketContext } from '../../context/Context';
 
 import Anonymous from '../Anonymous';
 
