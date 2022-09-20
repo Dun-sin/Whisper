@@ -38,14 +38,7 @@ const Chat = () => {
                 })
             );
         });
-
-        // Socket.on('privatemessage',(msg) => {
-        //     console.log("Here is message :--->",msg)
-        // })
-
-
-
-    }, [dispatch, socket]);
+    }, [dispatch]);
 
     useEffect(() => {
         const userIDs = Object.keys(state).map((item) => Number(item));
