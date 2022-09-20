@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SocketContext } from '../../context/Context';
 
-import '../../assets/css/Chat.css'
+import '../../styles/chat.css'
 
 import ScrollToBottom from 'react-scroll-to-bottom';
 import { IoSend } from 'react-icons/io5';
