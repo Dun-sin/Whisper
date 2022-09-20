@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { BiDotsVerticalRounded } from 'react-icons/bi';
-import Chat from '../../components/Chat/Chat'
+import Chat from '../components/Chat/Chat'
 
 const centerItems = `flex items-center justify-center`;
 

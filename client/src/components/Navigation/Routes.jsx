@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import ComingSoon from '../../pages/ComingSoon/ComingSoon';
+import ComingSoon from '../../pages/ComingSoon';
 
 // Components
 import NavBar from './NavBar';
