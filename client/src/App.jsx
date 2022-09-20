@@ -4,7 +4,7 @@ import { SocketContext, socket } from './context/Context';
 
 // Components
 import Login from './pages/Login';
-import RoutesComponent from './components/Navigation/Routes';
+import RoutesComponent from './components/Routes';
 import { useEffect } from 'react';
 
 function App() {
