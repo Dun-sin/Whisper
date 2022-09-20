@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SocketContext } from '../../context/Context';
 
-import '../../assets/css/Chat.css'
+import '../../assets/css/Chat.css';
 
 import ScrollToBottom from 'react-scroll-to-bottom';
 import { IoSend } from 'react-icons/io5';
@@ -38,15 +38,7 @@ const Chat = () => {
                 })
             );
         });
-<<<<<<< HEAD
-
-        // Socket.on('privatemessage',(msg) => {
-        //     console.log("Here is message :--->",msg)
-        // })
-    }, [dispatch, socket]);
-=======
     }, [dispatch]);
->>>>>>> 2167daf1241884d93670fd039d6941d0d8c0dacd
 
     useEffect(() => {
         const userIDs = Object.keys(state).map((item) => Number(item));
