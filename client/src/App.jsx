@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SocketContext, socket } from './context/Context';
 
 // Components
-import Login from './pages/Login';
-import RoutesComponent from './components/Routes';
+import Login from 'pages/Login';
+import RoutesComponent from 'components/Routes';
 import { useEffect } from 'react';
 
 function App() {
