@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SocketContext } from '../../context/Context';
 
-import '../../assets/css/Chat.css'
+import '../../assets/css/Chat.css';
 
 import ScrollToBottom from 'react-scroll-to-bottom';
 import { IoSend } from 'react-icons/io5';
@@ -23,10 +23,10 @@ const Chat = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
+        // This is used to recive message form other user.
         socket.on('receive_message', ({ senderId, message, time }) => {
             console.log(`reciever: ${message}`);
-            console.log(sentMessages, receivedMessages)
-
+            console.log(sentMessages, receivedMessages);
             dispatch(
                 addMessages({
                     id: senderId,
@@ -61,6 +61,7 @@ const Chat = () => {
         setMessages(array);
     }, [sentMessages, receivedMessages]);
 
+    // Here whenever user will submit message it will be send to the server
     const handleSubmit = (e) => {
         e.preventDefault();
         const d = new Date();

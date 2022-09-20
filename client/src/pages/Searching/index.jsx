@@ -13,11 +13,13 @@ const Searching = () => {
 
     useEffect(() => {
         if (isFound) {
-            return
+            return;
         }
         socket.connected && socket.emit('adding', { userID });
         socket.emit('createRoom', `${userID}-in-search`);
-        socket.emit('join')
+        // Here server will be informed that user is searching for another user
+        socket.emit('join');
+        // From here will get the info from server that user has joined the room
         socket.on('joined', () => {
             setIsFound(true);
         });
