@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { SocketContext } from 'context/Context';
 
-import Anonymous from './Anonymous';
+import Anonymous from 'components/Anonymous';
 
 const Searching = () => {
     // eslint-disable-next-line no-unused-vars
