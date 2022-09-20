@@ -1,4 +1,17 @@
-### Contributing guidelines
+## Rules
+
+- Don't create a pull request on an issue that doesn't exist, create an issue first and if the changes you are proposing are said to be okay, you can go ahead and create a pull request
+
+- Don't work on anything unless you are assigned, if you make a pull request without being assigned to that issue, it will be closed without being merged
+
+- Don't work on more than one issue at a time, this is so that you don't make a huge pull request and others can have opportunities to work on another issue while you work on something else
+
+- Do read the `readme.md` file
+
+- Fill out issue and pull request(PR) templates properly, if you don't know how, check out previous issues/PR to know how they are filled or this video👇🏾
+
+#### 👌🏾 How to fill a pull request template
+![Pull Request Template](https://user-images.githubusercontent.com/78784850/191111605-f9626ac3-4ec6-4478-9bf5-5e48e58898a1.gif)
 
 ## 👩🏽‍💻 Prerequisite Skills to Contribute
 
