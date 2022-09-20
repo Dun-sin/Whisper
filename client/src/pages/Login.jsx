@@ -3,8 +3,8 @@ import axios from 'axios';
 import MojoAuth from 'mojoauth-web-sdk';
 
 // Redux
-import { changeIsLogged } from '../../context/redux/Reducers/isLogged';
-import { addID } from '../../context/redux/Reducers/idSlice';
+import { changeIsLogged } from 'context/redux/Reducers/isLogged';
+import { addID } from 'context/redux/Reducers/idSlice';
 import { useDispatch } from 'react-redux';
 
 const centerStuffs = `flex flex-col justify-center items-center`;
