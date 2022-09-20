@@ -173,7 +173,7 @@ Work on Backend <a href="https://gitpod.io/#type=server/https://github.com/Dun-s
 
 ## 👨‍👩‍👦 Community
 
-Don't forget to join the discord community - [Join us](https://discord.gg/KUWjx4fygJ)
+Don't forget to join the discord community - [Join us](https://discord.gg/ufcysW9q23)
 
 ## 🛡️ License
 
