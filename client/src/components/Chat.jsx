@@ -23,10 +23,10 @@ const Chat = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
+        // This is used to recive message form other user.
         socket.on('receive_message', ({ senderId, message, time }) => {
             console.log(`reciever: ${message}`);
-            console.log(sentMessages, receivedMessages)
-
+            console.log(sentMessages, receivedMessages);
             dispatch(
                 addMessages({
                     id: senderId,
@@ -38,14 +38,7 @@ const Chat = () => {
                 })
             );
         });
-
-        // Socket.on('privatemessage',(msg) => {
-        //     console.log("Here is message :--->",msg)
-        // })
-
-
-
-    }, [dispatch, socket]);
+    }, [dispatch]);
 
     useEffect(() => {
         const userIDs = Object.keys(state).map((item) => Number(item));
@@ -68,6 +61,7 @@ const Chat = () => {
         setMessages(array);
     }, [sentMessages, receivedMessages]);
 
+    // Here whenever user will submit message it will be send to the server
     const handleSubmit = (e) => {
         e.preventDefault();
         const d = new Date();

@@ -7,12 +7,10 @@ import { Provider } from 'react-redux';
 import store from './context/redux/store'
 
 render(
-    <React.StrictMode>
-        <Provider store={store}>
-            <Router>
-                <App />
-            </Router>
-        </Provider>
-    </React.StrictMode>,
+    <Provider store={store}>
+        <Router>
+            <App />
+        </Router>
+    </Provider>,
     document.getElementById('root')
 );
