@@ -4,8 +4,6 @@ const active_users = {};
 const rooms = [];
 let currentRoom;
 
-const user = users[Math.floor(Math.random() * users.length)];
-
 /*
   @params:  object
   @return: void
@@ -27,6 +25,9 @@ function getUserRoom(id) {
 // Here we are adding user's socket with key as soket id
 function addWaitingUser(udata) {
   waiting_users[udata.id] = udata;
+}
+function getWaitingUser(id) {
+  return waiting_users[id];
 }
 
 // from here we are getting user who are in waiting room.
@@ -65,27 +66,12 @@ function getUser() {
 }
 
 /*
-  @params: object
-  @return: void
-*/
-function matchUsers(socket) {
-  // createRooms();
-  // console.log("Here is room list",rooms);
-  // if (rooms.length < 1) return;
-  // const pickedRoom = rooms[Math.floor(Math.random() * rooms.length)];
-  // socket.join(pickedRoom);
-  // socket.emit('joined');
-  // console.log(socket.adapter.rooms.get(pickedRoom).size);
-}
-
-/*
   @params: void
   @return: void
 */
 function createRooms() {
   if (users.length < 2) return;
   let numberOfRoomsToGenerate = Math.floor(users.length / 2);
-  console.log("Rooms Generated", numberOfRoomsToGenerate);
   for (let i = 0; i < numberOfRoomsToGenerate; i++) {
     rooms.push(Math.random().toString(36).substring(1, 10));
   }
@@ -93,7 +79,6 @@ function createRooms() {
 
 module.exports = {
   allUsers,
-  matchUsers,
   addUser,
   addWaitingUser,
   remWaitingUser,

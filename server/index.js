@@ -122,10 +122,6 @@ io.on("connection", (socket) => {
   // socket.on('createRoom', () => {
   // 	userModule.matchUsers(socket);
   // });
-
-  // socket.on('send_message', ({ senderId, message, time }) => {
-  // 	socket.broadcast.emit('receive_message', { senderId, message, time });
-  // });
 });
 
 app.use(cors());

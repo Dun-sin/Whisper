@@ -43,9 +43,7 @@ const options = {
              */
             if (!payload.loginId && payload.isLoggedIn === true) {
                 // User is trying to hack app by manipulating localStorage
-                throw new Error(
-                    'Gotcha! "ANon Chat App" is "ANon Hackable App"! :D'
-                );
+                throw new Error('Gotcha! :D');
             }
 
             return Object.assign(state, payload);

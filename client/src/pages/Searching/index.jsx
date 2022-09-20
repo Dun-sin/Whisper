@@ -1,10 +1,10 @@
-import React, { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { SocketContext } from '../../../Context';
+import { SocketContext } from '../../context/Context';
 
-import FoundUser from '../FoundUser/FoundUser';
+import Anonymous from '../Anonymous';
 
-const OnClickOnStart = () => {
+const Searching = () => {
     // eslint-disable-next-line no-unused-vars
     const [isFound, setIsFound] = useState(false);
     const socket = useContext(SocketContext);
@@ -25,7 +25,7 @@ const OnClickOnStart = () => {
         });
     }, [socket, userID]);
 
-    return isFound ? <FoundUser /> : <div>Searching.....</div>;
+    return isFound ? <Anonymous /> : <div>Searching.....</div>;
 };
 
-export default OnClickOnStart;
+export default Searching;

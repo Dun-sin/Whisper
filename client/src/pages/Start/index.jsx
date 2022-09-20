@@ -1,11 +1,9 @@
-import React from 'react';
-
 import { RiUserSearchLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 
 const centerElement = ' flex flex-col items-center justify-center';
 
-const SearchUser = () => {
+const Start = () => {
     return (
         <div
             className={
@@ -33,4 +31,4 @@ const SearchUser = () => {
     );
 };
 
-export default SearchUser;
+export default Start;
