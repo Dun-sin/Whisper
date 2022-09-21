@@ -1,44 +1,39 @@
 import { useState, useEffect, useRef, useContext } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { SocketContext } from 'context/Context';
 
-import 'styles/chat.css'
+import 'styles/chat.css';
 
 import ScrollToBottom from 'react-scroll-to-bottom';
 import { IoSend } from 'react-icons/io5';
 
-import { addMessages } from 'context/redux/Reducers/messageSlice';
+import { useChat } from 'src/context/ChatContext';
+import { useAuth } from 'src/context/AuthContext';
 
 let senderId;
 const Chat = () => {
+    const { messages: state, addMessage } = useChat();
+    const { auth } = useAuth();
+
     const socket = useContext(SocketContext);
     const [sentMessages, setSentMessages] = useState([]);
     const [receivedMessages, setReceivedMessages] = useState([]);
     const [messages, setMessages] = useState([]);
     const inputRef = useRef('');
-
-    const gettingState = useSelector((state) => state);
-    const state = gettingState.messages;
-    senderId = gettingState.ID;
-    const dispatch = useDispatch();
+    senderId = auth.loginId;
 
     useEffect(() => {
         // This is used to recive message form other user.
         socket.on('receive_message', ({ senderId, message, time }) => {
             console.log(`reciever: ${message}`);
             console.log(sentMessages, receivedMessages);
-            dispatch(
-                addMessages({
-                    id: senderId,
-                    messages: {
-                        message: message,
-                        time: time,
-                    },
-                    room: 'anon',
-                })
-            );
+            addMessage({
+                id: senderId,
+                message,
+                time,
+                room: 'anon',
+            });
         });
-    }, [dispatch]);
+    }, []);
 
     useEffect(() => {
         const userIDs = Object.keys(state).map((item) => Number(item));
@@ -73,16 +68,12 @@ const Chat = () => {
         socket.emit('send_message', { senderId, message, time });
         console.log(`sender: ${message}`);
         // Socket.emit('privatemessage', message);
-        dispatch(
-            addMessages({
-                id: senderId,
-                messages: {
-                    message: message,
-                    time: time,
-                },
-                room: 'anon',
-            })
-        );
+        addMessage({
+            id: senderId,
+            message,
+            time,
+            room: 'anon',
+        });
         inputRef.current.value = '';
     };
 
