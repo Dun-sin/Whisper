@@ -3,9 +3,9 @@ import axios from 'axios';
 import MojoAuth from 'mojoauth-web-sdk';
 
 // Redux
-import { changeIsLogged } from 'context/redux/Reducers/isLogged';
 import { addID } from 'context/redux/Reducers/idSlice';
 import { useDispatch } from 'react-redux';
+import { useAuth } from 'src/context/AuthContext';
 
 const centerStuffs = `flex flex-col justify-center items-center`;
 
@@ -15,6 +15,7 @@ const apiKey = import.meta.env.VITE_IMPORTANT;
 const userID = Math.random().toFixed(12).toString(36).slice(2);
 
 const Login = () => {
+    const { login } = useAuth();
     const dispatch = useDispatch();
     const [loginStatus, setLoginStatus] = useState({
         email: null,
@@ -105,14 +106,11 @@ const Login = () => {
             if (loginStatus.email === null) {
                 dispatch(addID(userID))
             }
-            dispatch(
-                changeIsLogged({
-                    isLoggedIn: true,
-                    loginType: loginStatus.email ? 'email' : 'anonymous',
-                    loginId: userID,
-                    email: loginStatus.email,
-                })
-            );
+            login({
+                loginType: loginStatus.email ? 'email' : 'anonymous',
+                loginId: userID,
+                email: loginStatus.email,
+            })
         }
     }, [loginStatus, dispatch]);
 
