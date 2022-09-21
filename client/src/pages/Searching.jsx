@@ -1,15 +1,16 @@
 import { useState, useContext, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { SocketContext } from 'context/Context';
 
 import Anonymous from 'components/Anonymous';
+import { useAuth } from 'src/context/AuthContext';
 
 const Searching = () => {
+    const { auth } = useAuth();
     // eslint-disable-next-line no-unused-vars
     const [isFound, setIsFound] = useState(false);
     const socket = useContext(SocketContext);
 
-    const userID = useSelector((state) => state);
+    const userID = auth.loginId;
 
     useEffect(() => {
         if (isFound) {
