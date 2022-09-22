@@ -16,14 +16,26 @@ const Searching = () => {
         if (isFound) {
             return;
         }
+
+        // This is necessary else chat won't be restored after re-connections
+        socket.on('connect', () => {
+            // Here server will be informed that user is searching for
+            // another user
+            socket.emit('join', { loginId: auth.loginId, email: auth.email });
+        });
         socket.connected && socket.emit('adding', { userID });
         socket.emit('createRoom', `${userID}-in-search`);
-        // Here server will be informed that user is searching for another user
-        socket.emit('join');
         // From here will get the info from server that user has joined the room
-        socket.on('joined', () => {
+
+        socket.on('joined', ({ roomId }) => {
+            console.log(roomId) // Had to do this to make eslint happy lol
             setIsFound(true);
         });
+
+        socket.on('chat_restore', ({ chats, currentChatId }) => {
+            setIsFound(true)
+            console.log('chat restored!', chats, currentChatId)
+        })
     }, [socket, userID]);
 
     return isFound ? <Anonymous /> : <div>Searching.....</div>;
