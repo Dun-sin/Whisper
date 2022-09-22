@@ -65,7 +65,12 @@ const Chat = () => {
         if (message === '' || senderId === undefined || senderId === '123456') {
             return;
         }
-        socket.emit('send_message', { senderId, message, time });
+        socket.emit('send_message', {
+            id: Math.random(),
+            senderId,
+            message,
+            time,
+        });
         console.log(`sender: ${message}`);
         // Socket.emit('privatemessage', message);
         addMessage({
