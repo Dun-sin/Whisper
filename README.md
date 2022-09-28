@@ -6,7 +6,7 @@
   <p>An app to help you chat in secret</p>
 
   <p align="center">
-    <a href="https://github.com/Dun-sin/Whisper/issues/new?assignees=&labels=bug&template=bug_report.md&title=">View Demo</a>
+    <a href="https://whischat.vercel.app/">View Demo</a>
     ·
     <a href="https://github.com/Dun-sin/Whisper/issues/new?assignees=&labels=bug&template=bug.yml&title=%5BBUG%5D+%3Cdescription%3E">Report Bug</a>
     ·
