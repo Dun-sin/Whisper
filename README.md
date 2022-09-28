@@ -139,7 +139,7 @@ Before installation, please make sure you have already installed the following t
 
 ## 🎨 Demo
 
-Check out the website: [Whisper](https://Whisper.vercel.app/)
+Check out the website: [Whisper](https://WhisChat.vercel.app/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
