@@ -52,17 +52,12 @@ This app is developed to make chatting much private and easy without stealing yo
   <table>
    <tbody>
       <tr>
-          
- <td align="Center" width="30%">  
- <a href="https://redux.js.org/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/redux-colored.svg" width="36" height="36" alt="Redux" /></a>
-     <br>Redux
-    </td>    
      <td align="Center" width="30%">   
 <a href="https://socket.io/" target="_blank" rel="noreferrer"><img src="https://w7.pngwing.com/pngs/162/702/png-transparent-socket-io-node-js-express-js-npm-network-socket-github-angle-triangle-logo-thumbnail.png" width="36" height="36" alt="SocketIo">
      <br>SocketIo
     </td>  
-<td align="Center" width="30%">
-<a href="https://mojoauth.com/" target="_blank" rel="noreferrer"><img src="https://user-images.githubusercontent.com/78784850/179708079-25f0c6c7-ae9a-4c07-b5b3-e6dc1a1051c2.png" width="36" height="36" alt="Mojo"/></a>
+  <td align="Center" width="30%">
+  <a href="https://mojoauth.com/" target="_blank" rel="noreferrer"><img src="https://user-images.githubusercontent.com/78784850/179708079-25f0c6c7-ae9a-4c07-b5b3-e6dc1a1051c2.png" width="36" height="36" alt="Mojo"/></a>
      <br>Mojo
     </td>  
     <td align="Center" width="30%">      
