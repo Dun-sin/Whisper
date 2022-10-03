@@ -36,7 +36,7 @@ const Chat = () => {
     }, []);
 
     useEffect(() => {
-        const userIDs = Object.keys(state).map((item) => Number(item));
+        const userIDs = Object.keys(state);
         const available = userIDs.length === 0;
         const sendID = userIDs.find((item) => item === senderId);
         const receiverID = userIDs.find((item) => item !== senderId);
