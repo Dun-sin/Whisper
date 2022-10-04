@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 import { BsChatDots } from 'react-icons/bs';
 import { RiUserSearchLine } from 'react-icons/ri';
-import { BiUserCircle } from 'react-icons/bi';
+import { BiUserCircle, BiLogOut } from 'react-icons/bi';
 
 const linkStyle = `h-[80px] w-[100%] flex items-center justify-center hover:bg-primary p-6 rounded-[15px] `;
 const activeStyle = linkStyle + 'bg-primary shadow-2xl';
@@ -11,7 +11,10 @@ const iconStyle = 'fill-[#f5f5f5] scale-[2]';
 
 const NavBar = () => {
 
-
+    function logoutUser() {
+        localStorage.clear();
+        window.location.href = '/';
+    }
 
     return (
         <div
@@ -45,6 +48,15 @@ const NavBar = () => {
                     }
                 >
                     <BiUserCircle className={iconStyle} />
+                </NavLink>
+                <NavLink
+                    to="/"
+                    onClick={logoutUser}
+                    className={({ isActive }) =>
+                        (isActive ? activeStyle : linkStyle)
+                    }
+                >
+                    <BiLogOut className={iconStyle} />
                 </NavLink>
             </div>
         </div>
