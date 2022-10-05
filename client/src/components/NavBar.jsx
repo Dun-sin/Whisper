@@ -11,11 +11,6 @@ const iconStyle = 'fill-[#f5f5f5] scale-[2]';
 
 const NavBar = () => {
 
-    function logoutUser() {
-        localStorage.clear();
-        window.location.href = '/';
-    }
-
     return (
         <div
             className="
@@ -50,8 +45,7 @@ const NavBar = () => {
                     <BiUserCircle className={iconStyle} />
                 </NavLink>
                 <NavLink
-                    to="/"
-                    onClick={logoutUser}
+                    to="/logout"
                     className={({ isActive }) =>
                         (isActive ? activeStyle : linkStyle)
                     }
