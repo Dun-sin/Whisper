@@ -4,6 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import 'styles/index.css';
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
+import "rsuite/dist/rsuite.min.css";
 
 render(
     <AuthProvider>
