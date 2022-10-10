@@ -1,27 +1,28 @@
 {
-	"name": "Whisper-backend",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"start": "nodemon index.js",
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"author": "",
-	"license": "ISC",
-	"dependencies": {
-		"cors": "^2.8.5",
-		"dotenv": "^16.0.1",
-		"express": "^4.17.3",
-		"heroku": "^7.60.2",
-		"mongodb": "^4.6.0",
-		"mongoose": "^6.3.4",
-		"nodemon": "^2.0.15",
-		"npm": "^8.13.2",
-		"socket.io": "^4.4.1"
-	},
-	"engines": {
-		"node": "16.x",
-		"npm": "8.x"
-	}
+  "name": "server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.17.3",
+    "heroku": "^7.60.2",
+    "mongodb": "^4.6.0",
+    "mongoose": "^6.3.4",
+    "nodemon": "^2.0.15",
+    "npm": "^8.13.2",
+    "socket.io": "^4.4.1"
+  },
+  "engines": {
+    "node": "16.x",
+    "npm": "8.x"
+  }
 }

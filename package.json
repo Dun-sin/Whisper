@@ -1,0 +1,27 @@
+{
+  "name": "whisper",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "start:server": "npm run start --workspace=server",
+    "start:client": "npm run start --workspace=client",
+    "build:client": "npm run build --workspace=client",
+    "lint:client": "npm run lint --workspace=client",
+    "format: client": "npm run format --workspace=client",
+    "start": "npm run start:server & npm run start:client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dun-sin/Whisper.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Dun-sin/Whisper/issues"
+  },
+  "homepage": "https://github.com/Dun-sin/Whisper#readme"
+}
