@@ -8,6 +8,7 @@ import { IoSend } from 'react-icons/io5';
 
 import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';
+import { intervalToDuration } from 'date-fns';
 
 let senderId;
 const Chat = () => {
@@ -20,12 +21,9 @@ const Chat = () => {
     const [messages, setMessages] = useState([]);
     const inputRef = useRef('');
     senderId = auth.loginId;
-
     useEffect(() => {
         // This is used to recive message form other user.
         socket.on('receive_message', ({ senderId, message, time }) => {
-            console.log(`reciever: ${message}`);
-            console.log(sentMessages, receivedMessages);
             addMessage({
                 id: senderId,
                 message,
@@ -36,13 +34,13 @@ const Chat = () => {
     }, []);
 
     useEffect(() => {
-        const userIDs = Object.keys(state);
+        const userIDs = Object.keys(state).map((item) => item);
         const available = userIDs.length === 0;
         const sendID = userIDs.find((item) => item === senderId);
         const receiverID = userIDs.find((item) => item !== senderId);
         const handleMessages = () => {
-            sendID && setSentMessages(state[sendID].messages);
-            receiverID && setReceivedMessages(state[receiverID].messages);
+            sendID && setSentMessages([...state[sendID].messages]);
+            receiverID && setReceivedMessages([...state[receiverID].messages]);
         };
         !available && handleMessages();
     }, [state]);
@@ -53,35 +51,47 @@ const Chat = () => {
                 db = new Date(b.time);
             return da - db;
         });
-        setMessages(array);
+        setMessages([...array]);
     }, [sentMessages, receivedMessages]);
 
     // Here whenever user will submit message it will be send to the server
     const handleSubmit = (e) => {
         e.preventDefault();
+
         const d = new Date();
-        const time = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+        const time = d.getTime();
         const message = inputRef.current.value;
         if (message === '' || senderId === undefined || senderId === '123456') {
             return;
         }
-        socket.emit('send_message', {
-            id: Math.random(),
-            senderId,
-            message,
-            time,
-        });
+        if (socket.connected) {
+            socket.emit('send_message', { senderId, message, time });
+        } else {
+            console.log('Something went wrong on the server 4853789');
+            addMessage({
+                id: senderId,
+                message,
+                time,
+                room: 'anon',
+            });
+        }
+
         console.log(`sender: ${message}`);
         // Socket.emit('privatemessage', message);
-        addMessage({
-            id: senderId,
-            message,
-            time,
-            room: 'anon',
-        });
+        // addMessage({
+        //     id: senderId,
+        //     message,
+        //     time,
+        //     room: 'anon',
+        // });
         inputRef.current.value = '';
     };
 
+    const getTime = (time) => {
+        const d = intervalToDuration({ start: 0, end: time * 1000 });
+        const t = d.hours + ':' + d.minutes + ':' + d.seconds;
+        return t;
+    };
     return (
         <div className="w-[100%] h-[90%] pb-[25px]">
             <p className="text-[0.8em] font-semibold mb-[20px] text-center">
@@ -100,7 +110,7 @@ const Chat = () => {
                             {message}
                         </p>
                         <p className="text-white ml-[75%] text-[12px]">
-                            {time}
+                            {getTime(time)}
                         </p>
                     </div>
                 ))}
