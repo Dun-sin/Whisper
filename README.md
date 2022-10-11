@@ -100,29 +100,17 @@ Before installation, please make sure you have already installed the following t
    cd Whisper
    ```
 
-4. Navigate to client(frontend) folder
-
-   ```bash
-   cd client
-   ```
-
-5. Navigate to server(backend) folder
-
-   ```bash
-   cd server
-   ```
-
-6. Install dependencies with `npm install` in both client and server folder
+4. Install dependencies with `npm install`
 
    ```bash
    npm install
    ```
 
-7. Use `.env_sample` to configure the `.env` file for this project. For mongodb url use the localhost to test
+5. Use `.env_sample` to configure the `.env` file for this project. For mongodb url use the localhost to test
 
    > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0
 
-8. Run npm start in both folders also
+6. Run npm start in project root directory
 
    ```bash
    npm start
