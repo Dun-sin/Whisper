@@ -8,6 +8,7 @@ import { IoSend } from 'react-icons/io5';
 
 import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';
+import { intervalToDuration } from 'date-fns';
 
 let senderId;
 const Chat = () => {
@@ -42,7 +43,6 @@ const Chat = () => {
             receiverID && setReceivedMessages([...state[receiverID].messages]);
         };
         !available && handleMessages();
-        console.log('here is state', state);
     }, [state]);
 
     useEffect(() => {
@@ -64,7 +64,7 @@ const Chat = () => {
             return;
         }
         if (socket.connected) {
-            socket.emit('send_message', { senderId, message, time });
+            socket.emit('send_message', { senderId, message });
         } else {
             console.log('Something went wrong on the server 4853789');
             addMessage({
@@ -87,8 +87,8 @@ const Chat = () => {
     };
 
     const getTime = (time) => {
-        const d = new Date(time * 1000);
-        const t = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+        const d = intervalToDuration({ start: 0, end: time * 1000 });
+        const t = d.hours + ':' + d.minutes + ':' + d.seconds;
         return t;
     };
     return (
