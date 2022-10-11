@@ -5,8 +5,8 @@
   <h2>Whisper</h2>
   <p>An app to help you chat in secret</p>
 
-  <p align="center">
-    <a href="https://github.com/Dun-sin/Whisper/issues/new?assignees=&labels=bug&template=bug_report.md&title=">View Demo</a>
+  <p  align="center">
+    <a href="https://whischat.vercel.app/">View Demo</a>
     ·
     <a href="https://github.com/Dun-sin/Whisper/issues/new?assignees=&labels=bug&template=bug.yml&title=%5BBUG%5D+%3Cdescription%3E">Report Bug</a>
     ·
@@ -52,17 +52,12 @@ This app is developed to make chatting much private and easy without stealing yo
   <table>
    <tbody>
       <tr>
-          
- <td align="Center" width="30%">  
- <a href="https://redux.js.org/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/redux-colored.svg" width="36" height="36" alt="Redux" /></a>
-     <br>Redux
-    </td>    
      <td align="Center" width="30%">   
 <a href="https://socket.io/" target="_blank" rel="noreferrer"><img src="https://w7.pngwing.com/pngs/162/702/png-transparent-socket-io-node-js-express-js-npm-network-socket-github-angle-triangle-logo-thumbnail.png" width="36" height="36" alt="SocketIo">
      <br>SocketIo
     </td>  
-<td align="Center" width="30%">
-<a href="https://mojoauth.com/" target="_blank" rel="noreferrer"><img src="https://user-images.githubusercontent.com/78784850/179708079-25f0c6c7-ae9a-4c07-b5b3-e6dc1a1051c2.png" width="36" height="36" alt="Mojo"/></a>
+  <td align="Center" width="30%">
+  <a href="https://mojoauth.com/" target="_blank" rel="noreferrer"><img src="https://user-images.githubusercontent.com/78784850/179708079-25f0c6c7-ae9a-4c07-b5b3-e6dc1a1051c2.png" width="36" height="36" alt="Mojo"/></a>
      <br>Mojo
     </td>  
     <td align="Center" width="30%">      
@@ -105,29 +100,17 @@ Before installation, please make sure you have already installed the following t
    cd Whisper
    ```
 
-4. Navigate to client(frontend) folder
-
-   ```bash
-   cd client
-   ```
-
-5. Navigate to server(backend) folder
-
-   ```bash
-   cd server
-   ```
-
-6. Install dependencies with `npm install` in both client and server folder
+4. Install dependencies with `npm install`
 
    ```bash
    npm install
    ```
 
-7. Use `.env_sample` to configure the `.env` file for this project. For mongodb url use the localhost to test
+5. Use `.env_sample` to configure the `.env` file for this project. For mongodb url use the localhost to test
 
    > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0
 
-8. Run npm start in both folders also
+6. Run npm start in project root directory
 
    ```bash
    npm start
@@ -139,7 +122,7 @@ Before installation, please make sure you have already installed the following t
 
 ## 🎨 Demo
 
-Check out the website: [Whisper](https://Whisper.vercel.app/)
+Check out the website: [Whisper](https://WhisChat.vercel.app/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
