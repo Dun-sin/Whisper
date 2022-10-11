@@ -110,8 +110,11 @@ io.on("connection", (socket) => {
     matchMaker();
   });
 
-  socket.on("send_message", ({ senderId, message, time }, callback) => {
+  socket.on("send_message", ({ senderId, message }, callback) => {
     let room = userModule.getUserRoom(socket.id);
+    let time = new Date();
+    time = time.getTime();
+    // const time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
     io.to(room).emit("receive_message", { senderId, message, time });
   });
   // socket.on('adding', (data) => {
