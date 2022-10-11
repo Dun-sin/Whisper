@@ -57,14 +57,15 @@ const Chat = () => {
     // Here whenever user will submit message it will be send to the server
     const handleSubmit = (e) => {
         e.preventDefault();
+
         const d = new Date();
-        const time = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+        const time = d.getTime();
         const message = inputRef.current.value;
         if (message === '' || senderId === undefined || senderId === '123456') {
             return;
         }
         if (socket.connected) {
-            socket.emit('send_message', { senderId, message });
+            socket.emit('send_message', { senderId, message, time });
         } else {
             console.log('Something went wrong on the server 4853789');
             addMessage({
