@@ -4,6 +4,7 @@ import { SocketContext } from 'context/Context';
 
 import Anonymous from 'components/Anonymous';
 import { useAuth } from 'src/context/AuthContext';
+import Button from 'src/components/Button';
 
 const Searching = () => {
     const { auth } = useAuth();
@@ -69,11 +70,25 @@ const Searching = () => {
         <Anonymous />
     ) : (
         <div className="flex w-full justify-center items-center h-screen flex-col">
-            <ThreeDots fill="rgb(1, 22, 39)" />
+              <img width={'20%'} src='https://res.cloudinary.com/freexitnow/image/upload/v1665540379/98723-search-users_1_x1btuw.gif'/>
+            
+             <ThreeDots fill="rgb(1, 22, 39)" />
+          
             <div className="text-lg text-center">
-                {loadingText.split('\n').map((text) => (
-                    <p key={text}>{text}</p>
-                ))}
+                 <div >
+             
+
+              
+                    {loadingText.split('\n').map((text) => (
+                   
+                          <p key={text}>{text}</p>
+
+                           
+              
+                     ))}
+                     <Button value={'Refresh'} onClick=
+                         {()=>window.location.reload()}/> 
+                </div>
             </div>
         </div>
     );

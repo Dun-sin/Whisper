@@ -1,0 +1,16 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* color tins and hues */
+    --primary-teal: #011627;
+    --secondary-teal: #162938 ;
+    --primary-color:  #ff9f1c;
+
+    /* fonts and font styles */
+
+}
+

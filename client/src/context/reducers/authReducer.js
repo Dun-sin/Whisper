@@ -1,5 +1,5 @@
 import { cloneState } from './utils';
-
+import {toast} from 'react-toastify';
 export default function authReducer(state, action) {
     const clonedState = cloneState(state);
 
@@ -18,7 +18,20 @@ export default function authReducer(state, action) {
 
         case 'LOGOUT':
             localStorage.removeItem('auth');
-            alert('logout called!');
+            
+
+            toast.error('Logged out successfully', {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                });
+                
+
             return {
                 ...cloneState,
                 email: null,

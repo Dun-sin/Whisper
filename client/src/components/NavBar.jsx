@@ -11,15 +11,17 @@ const iconStyle = 'fill-[#f5f5f5] scale-[2]';
 
 const NavBar = () => {
 
+   
     return (
         <div
             className="
-    navContainer bg-secondary 
-    w-[120px] min-h-[100vh]
-    flex items-center flex-col
-    justify-center shadow-[0_0_100px_0_rgba(0,0,0,1)] p-5"
+            
+            navContainer bg-secondary 
+            w-[120px] min-h-[100vh]
+            flex items-center flex-col
+            justify-center shadow-[0_0_100px_0_rgba(0,0,0,1)] p-5"
         >
-            <div className="justify-between flex items-center flex-col h-[35%] w-[100%]">
+            <div className="justify-between flex items-center flex-col h-[35%] w-[100%] for_mobile">
                 <NavLink
                     to="/"
                     className={({ isActive }) =>
@@ -49,6 +51,7 @@ const NavBar = () => {
                     className={({ isActive }) =>
                         (isActive ? activeStyle : linkStyle)
                     }
+                 
                 >
                     <BiLogOut className={iconStyle} />
                 </NavLink>

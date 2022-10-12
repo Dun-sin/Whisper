@@ -5,9 +5,11 @@ import 'styles/index.css';
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
 import "rsuite/dist/rsuite.min.css";
+import { ToastContainer  } from 'react-toastify';
 
 render(
     <AuthProvider>
+            <ToastContainer />
             <Router>
                 <App />
             </Router>
