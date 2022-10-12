@@ -12,4 +12,4 @@ jobs:
       - name: install dependencies
         run: npm ci
       - name: run build
-        run: npm run build
+        run: npm run build:client
