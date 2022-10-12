@@ -21,7 +21,7 @@ const Start = () => {
             <Link
                 to="/founduser"
                 className={
-                    'font-medium text-black text-[1.5em] bg-[#FF9F1C] w-[8em] h-[2.3em] mt-5 rounded-[30px]' +
+                    'hover:no-underline hover:text-black font-medium text-black text-[1.5em] bg-[#FF9F1C] w-[8em] h-[2.3em] mt-5 rounded-[30px]' +
                     centerElement
                 }
             >
