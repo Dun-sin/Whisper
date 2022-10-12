@@ -18,7 +18,6 @@ export default function authReducer(state, action) {
 
         case 'LOGOUT':
             localStorage.removeItem('auth');
-            alert('logout called!');
             return {
                 ...cloneState,
                 email: null,
