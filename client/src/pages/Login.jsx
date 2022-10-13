@@ -119,7 +119,6 @@ const Login = () => {
         <div
             className={`bg-primary h-[100vh] w-[100vw] text-white ${centerStuffs}`}
         >
-            <h1 className="text-[2em] font-semibold">Sign-in</h1>
             {loginStatus.status !== 'loading' && (
                 <div className="pb-3">
                     <div id="mojoauth-passwordless-form" className=""></div>
