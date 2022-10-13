@@ -11,7 +11,8 @@
 - Fill out issue and pull request(PR) templates properly, if you don't know how, check out previous issues/PR to know how they are filled or this video👇🏾
 
 #### 👌🏾 How to fill a pull request template
-![Pull Request Template](https://user-images.githubusercontent.com/78784850/191111605-f9626ac3-4ec6-4478-9bf5-5e48e58898a1.gif)
+[pull request template.webm](https://user-images.githubusercontent.com/78784850/195570788-05a6fe61-a9a3-4abe-ae17-936ffd6ea171.webm)
+
 
 ## 👩🏽‍💻 Prerequisite Skills to Contribute
 
