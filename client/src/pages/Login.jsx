@@ -127,13 +127,14 @@ const Login = () => {
             {loginStatus.status === 'loading' && (
                 <div className="uppercase py-5">Processing Login</div>
             )}
-            <button
+            <p
                 disabled={loginStatus.status === 'loading'}
                 onClick={loginAnonymously}
-                className={`disabled:bg-slate-700 pb-[5px] bg-secondary text-white w-[370px] h-[50px] rounded-[10px] font-light ${centerStuffs}`}
+                className={'font-bold hover:underline cursor-pointer'} 
+               
             >
                 Login Anonymously
-            </button>
+            </p>
         </div>
     );
 };
