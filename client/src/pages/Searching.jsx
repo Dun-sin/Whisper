@@ -68,8 +68,8 @@ const Searching = () => {
     return isFound ? (
         <Anonymous />
     ) : (
-        <div className="flex w-full justify-center items-center h-screen flex-col">
-            <ThreeDots fill="rgb(1, 22, 39)" />
+        <div className="flex w-full justify-center items-center h-screen flex-col bg-primary">
+            <ThreeDots fill="rgb(255 159 28)" />
             <div className="text-lg text-center">
                 {loadingText.split('\n').map((text) => (
                     <p key={text}>{text}</p>
