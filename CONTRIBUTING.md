@@ -1,18 +1,26 @@
+# Table of content
+  - [Rules](#rules)
+  - [Skills needed to contribute](#-prerequisite-skills-to-contribute)
+  - [How to contribute](#-how-to-contribute)
+
 ## Rules
+  - Don't create a pull request on an issue that doesn't exist, create an issue first and if the changes you are proposing are said to be okay, you can go ahead and create a pull request
 
-- Don't create a pull request on an issue that doesn't exist, create an issue first and if the changes you are proposing are said to be okay, you can go ahead and create a pull request
+  - Don't work on anything unless you are assigned, if you make a pull request without being assigned to that issue, it will be closed without being merged
 
-- Don't work on anything unless you are assigned, if you make a pull request without being assigned to that issue, it will be closed without being merged
+  - Don't work on more than one issue at a time, this is so that you don't make a huge pull request and others can have opportunities to work on another issue while you work on something else
 
-- Don't work on more than one issue at a time, this is so that you don't make a huge pull request and others can have opportunities to work on another issue while you work on something else
+  - Do read the `readme.md` file
 
-- Do read the `readme.md` file
+  - Fill out issue and pull request(PR) templates properly, if you don't know how, check out previous issues/PR to know how they are filled, this video👇🏾 or [this](#-how-to-fill-a-pull-request-templatetext)
 
-- Fill out issue and pull request(PR) templates properly, if you don't know how, check out previous issues/PR to know how they are filled or this video👇🏾
+  #### 👌🏾 How to fill a pull request template(video)
+  [pull request template.webm](https://user-images.githubusercontent.com/78784850/195570788-05a6fe61-a9a3-4abe-ae17-936ffd6ea171.webm)
 
-#### 👌🏾 How to fill a pull request template
-[pull request template.webm](https://user-images.githubusercontent.com/78784850/195570788-05a6fe61-a9a3-4abe-ae17-936ffd6ea171.webm)
-
+  #### 👌🏾 How to fill a pull request template(Text)
+   - Your PR title should be according to the conventional commit standards([link](https://gist.github.com/Zekfad/f51cb06ac76e2457f11c80ed705c95a3)) for example, if the added something new to the project(doesn't matter how small), your PR title should be like this -> `feat: added a text` <- Whatever you added. If you fixed something then your PR title should be like this -> `fix: wrong link` <- whatever you fixed
+   - Your PR description should have either `fixes`, `closes` with the issue number you worked on, for example, `fixes #123` or `closes #123` where #123 is the issue you worked on. It should not be `fixes issue #123`
+   - Your PR description should also have the changes you did e.g added a new component, added a new image.
 
 ## 👩🏽‍💻 Prerequisite Skills to Contribute
 
