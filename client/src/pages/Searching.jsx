@@ -22,7 +22,7 @@ const Searching = () => {
                 setLoadingText(
                     'Taking too long? No chat buddy is currently available :(\nTry refreshing!'
                 );
-            }, 5000);
+            }, 15000);
         }
 
         return () => {
