@@ -11,6 +11,8 @@
   - Don't work on more than one issue at a time, this is so that you don't make a huge pull request and others can have opportunities to work on another issue while you work on something else
 
   - Do read the `readme.md` file
+ 
+  - Don't work on the main branch, create your own branch by following the instructions [here](#-how-to-make-a-pull-request) 
 
   - Fill out issue and pull request(PR) templates properly, if you don't know how, check out previous issues/PR to know how they are filled, this video👇🏾 or [this](#-how-to-fill-a-pull-request-templatetext)
 
