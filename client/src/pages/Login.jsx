@@ -21,6 +21,7 @@ const Login = () => {
             email,
         })
             .then((res) => {
+                setIsLoggingIn(false);
                 if (res.status === 200) {
                     console.log('done');
                     login({
@@ -34,8 +35,6 @@ const Login = () => {
             })
             .catch((err) => {
                 console.log(err);
-            })
-            .finally(() => {
                 setIsLoggingIn(false);
             });
     }
