@@ -197,50 +197,60 @@ io.on("connection", (socket) => {
     matchMaker(io);
   });
 
-  socket.on("send_message", ({ senderId, message, time }, callback) => {
-    const user = getActiveUser({
-      socketId: socket.id,
-    });
-
-    if (!user) {
-      socket.emit("send_failed", {
-        message:
-          "Hmmm. It seems your login session has expired. " +
-          "Re-login and try again",
-        messageId: id,
-      });
-    }
-
-    const id = uuid.v4();
-
-    /**
-     * Cache the sent message for each user in the chat.
-     * This is also the point, where we persist the message in the db
-     */
-    user.chats[user.currentChatId ?? ""].userIds.forEach((userId) => {
+  socket.on(
+    "send_message",
+    ({ senderId, message, time }, returnMessageToSender) => {
       const user = getActiveUser({
-        email: userId,
-        loginId: userId,
+        socketId: socket.id,
       });
 
-      if (user) {
-        user.chats[user.currentChatId ?? ""].messages.push({
-          id,
-          message,
-          time,
-          senderId,
-          type: "message",
+      if (!user) {
+        socket.emit("send_failed", {
+          message:
+            "Hmmm. It seems your login session has expired. " +
+            "Re-login and try again",
+          messageId: id,
         });
       }
-    });
 
-    io.to(user.currentChatId).emit("receive_message", {
-      senderId,
-      message,
-      time,
-      id,
-    });
-  });
+      const id = uuid.v4();
+
+      /**
+       * Cache the sent message for each user in the chat.
+       * This is also the point, where we persist the message in the db
+       */
+      user.chats[user.currentChatId ?? ""].userIds.forEach((userId) => {
+        const user = getActiveUser({
+          email: userId,
+          loginId: userId,
+        });
+
+        if (user) {
+          user.chats[user.currentChatId ?? ""].messages.push({
+            id,
+            message,
+            time,
+            senderId,
+            type: "message",
+          });
+        }
+      });
+
+      const sentMessage = {
+        senderId,
+        message,
+        time,
+        id,
+        status: "sent",
+      };
+
+      returnMessageToSender(sentMessage);
+
+      socket.broadcast
+        .to(user.currentChatId)
+        .emit("receive_message", sentMessage);
+    }
+  );
   // socket.on('adding', (data) => {
   // 	if (data.userID.ID === '') return;
   // 	userModule.allUsers(data.userID.ID);

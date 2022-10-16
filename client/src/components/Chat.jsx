@@ -8,13 +8,15 @@ import { IoSend } from 'react-icons/io5';
 
 import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';
+import useChatUtils from 'src/lib/chat';
 
 let senderId;
 const Chat = () => {
     const { messages: state, addMessage } = useChat();
     const { auth } = useAuth();
-
     const socket = useContext(SocketContext);
+
+    const { sendMessage } = useChatUtils(socket);
     const [sentMessages, setSentMessages] = useState([]);
     const [receivedMessages, setReceivedMessages] = useState([]);
     const inputRef = useRef('');
@@ -61,7 +63,7 @@ const Chat = () => {
     );
 
     // Here whenever user will submit message it will be send to the server
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const d = new Date();
@@ -70,9 +72,28 @@ const Chat = () => {
         if (message === '' || senderId === undefined || senderId === '123456') {
             return;
         }
-        if (socket.connected) {
-            socket.emit('send_message', { senderId, message, time });
-        } else {
+
+        if (inputRef.current) {
+            inputRef.current.value = '';
+            inputRef.current.focus();
+        }
+
+        try {
+            console.log('sending...');
+            const sentMessage = await sendMessage({
+                senderId,
+                message,
+                time,
+            });
+
+            addMessage({
+                id: sentMessage.senderId,
+                message: sentMessage.message,
+                time: sentMessage.time,
+                room: 'anon',
+                messageId: sentMessage.id,
+            });
+        } catch {
             console.log('Something went wrong on the server 4853789');
             addMessage({
                 id: senderId,
@@ -80,20 +101,16 @@ const Chat = () => {
                 time,
                 room: 'anon',
             });
-        }
-
-        console.log(`sender: ${message}`);
-        // Socket.emit('privatemessage', message);
-        // addMessage({
-        //     id: senderId,
-        //     message,
-        //     time,
-        //     room: 'anon',
-        // });
-
-        if (inputRef.current) {
-            inputRef.current.value = '';
-            inputRef.current.focus();
+        } finally {
+            console.log('send complete');
+            console.log(`sender: ${message}`);
+            // Socket.emit('privatemessage', message);
+            // addMessage({
+            //     id: senderId,
+            //     message,
+            //     time,
+            //     room: 'anon',
+            // });
         }
     };
 
