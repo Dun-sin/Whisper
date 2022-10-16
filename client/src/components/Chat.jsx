@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useEffect, useRef, useContext, useMemo } from 'react';
 import { SocketContext } from 'context/Context';
 
 import 'styles/chat.css';
@@ -8,7 +8,6 @@ import { IoSend } from 'react-icons/io5';
 
 import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';
-import { intervalToDuration } from 'date-fns';
 
 let senderId;
 const Chat = () => {
@@ -18,19 +17,25 @@ const Chat = () => {
     const socket = useContext(SocketContext);
     const [sentMessages, setSentMessages] = useState([]);
     const [receivedMessages, setReceivedMessages] = useState([]);
-    const [messages, setMessages] = useState([]);
     const inputRef = useRef('');
     senderId = auth.loginId;
     useEffect(() => {
-        // This is used to recive message form other user.
-        socket.on('receive_message', ({ senderId, message, time }) => {
+        const newMessageHandler = ({ id, senderId, message, time }) => {
             addMessage({
                 id: senderId,
                 message,
                 time,
                 room: 'anon',
+                messageId: id,
             });
-        });
+        };
+
+        // This is used to recive message form other user.
+        socket.on('receive_message', newMessageHandler);
+
+        return () => {
+            socket.off('receive_message', newMessageHandler);
+        };
     }, []);
 
     useEffect(() => {
@@ -45,14 +50,15 @@ const Chat = () => {
         !available && handleMessages();
     }, [state]);
 
-    useEffect(() => {
-        const array = [...sentMessages, ...receivedMessages].sort((a, b) => {
-            const da = new Date(a.time),
-                db = new Date(b.time);
-            return da - db;
-        });
-        setMessages([...array]);
-    }, [sentMessages, receivedMessages]);
+    const sortedMessages = useMemo(
+        () =>
+            [...sentMessages, ...receivedMessages].sort((a, b) => {
+                const da = new Date(a.time),
+                    db = new Date(b.time);
+                return da - db;
+            }),
+        [sentMessages, receivedMessages]
+    );
 
     // Here whenever user will submit message it will be send to the server
     const handleSubmit = (e) => {
@@ -84,13 +90,15 @@ const Chat = () => {
         //     time,
         //     room: 'anon',
         // });
-        inputRef.current.value = '';
+
+        if (inputRef.current) {
+            inputRef.current.value = '';
+            inputRef.current.focus();
+        }
     };
 
     const getTime = (time) => {
-        const d = intervalToDuration({ start: 0, end: time * 1000 });
-        const t = d.hours + ':' + d.minutes + ':' + d.seconds;
-        return t;
+        return new Date(time).toLocaleTimeString();
     };
     return (
         <div className="w-[100%] h-[90%] pb-[25px]">
@@ -101,19 +109,23 @@ const Chat = () => {
                 initialScrollBehavior="auto"
                 className="displayMessgaes h-[75%] w-[100%]"
             >
-                {messages.map(({ message, time }, index) => (
-                    <div
-                        key={index}
-                        className={`relative mb-[15px] w-[250px] text-primary ml-auto}`}
-                    >
-                        <p className="bg-[#FF9F1C] rounded-[20px] p-[15px] break-all">
-                            {message}
-                        </p>
-                        <p className="text-white ml-[75%] text-[12px]">
-                            {getTime(time)}
-                        </p>
-                    </div>
-                ))}
+                {sortedMessages.map(
+                    ({ message, time, senderId: sender, id }) => (
+                        <div
+                            key={id}
+                            className={`message-block ${
+                                sender.toString() === senderId.toString()
+                                    ? 'me'
+                                    : 'other'
+                            }`}
+                        >
+                            <div className="message">
+                                <p className="content">{message}</p>
+                                <p className="time">{getTime(time)}</p>
+                            </div>
+                        </div>
+                    )
+                )}
             </ScrollToBottom>
             <form
                 className="flex justify-center items-center mt-[40px]"

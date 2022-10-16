@@ -11,6 +11,7 @@ const io = new Server(server, {
   reconnectionAttempts: 5,
 });
 const HTTP_PORT = process.env.PORT || 4000;
+const uuid = require("uuid");
 
 // Mongodb database host connection
 const mongoose = require("mongoose");
@@ -195,7 +196,7 @@ io.on("connection", (socket) => {
     matchMaker(io);
   });
 
-  socket.on("send_message", ({ senderId, id, message, time }, callback) => {
+  socket.on("send_message", ({ senderId, message, time }, callback) => {
     const user = getActiveUser({
       socketId: socket.id,
     });
@@ -208,6 +209,8 @@ io.on("connection", (socket) => {
         messageId: id,
       });
     }
+
+    const id = uuid.v4();
 
     /**
      * Cache the sent message for each user in the chat.
@@ -234,6 +237,7 @@ io.on("connection", (socket) => {
       senderId,
       message,
       time,
+      id,
     });
   });
   // socket.on('adding', (data) => {

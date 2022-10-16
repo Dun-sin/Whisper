@@ -1,6 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* width */
 ::-webkit-scrollbar {
     width: 0px;
 }
 
+@layer components {
+    .message-block {
+        @apply w-full flex;
+    }
 
+    .message-block.me {
+        @apply justify-end;
+    }
+
+    .message-block.me .message {
+        @apply items-end;
+    }
+
+    .message-block.other .message {
+        @apply items-start;
+    }
+
+    .message-block.other {
+        @apply justify-start;
+    }
+
+    .message-block .message {
+        @apply flex flex-col mb-[15px] min-w-[250px] max-w-[80%] text-primary;
+    }
+
+    .message-block .message .content {
+        @apply bg-[#FF9F1C] rounded-[20px] p-[15px] break-all w-full;
+    }
+
+    .message-block .message .time {
+        @apply text-white px-[20px] text-[12px];
+    }
+}
