@@ -5,11 +5,13 @@ export default function chatReducer(state, action) {
 
     switch (action.type) {
         case 'ADD_MESSAGE': {
-            const { id, time, room } = action.payload;
+            const { id, time, room, messageId } = action.payload;
 
             const message = {
                 message: action.payload.message,
                 time,
+                senderId: id,
+                id: messageId,
             };
 
             if (clonedState[id] === undefined) {

@@ -36,7 +36,7 @@ export const ChatProvider = ({ children }) => {
         }
     );
 
-    function addMessage({ id, message, time, room }) {
+    function addMessage({ id, message, time, room, messageId }) {
         dispatch({
             type: 'ADD_MESSAGE',
             payload: {
@@ -44,6 +44,7 @@ export const ChatProvider = ({ children }) => {
                 message,
                 time,
                 room,
+                messageId
             },
         });
     }
