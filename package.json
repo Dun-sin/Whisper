@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/Dun-sin/Whisper/issues"
   },
-  "homepage": "https://github.com/Dun-sin/Whisper#readme"
+  "homepage": "https://github.com/Dun-sin/Whisper#readme",
+  "dependencies": {
+    "validator": "^13.7.0"
+  }
 }
