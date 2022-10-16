@@ -39,6 +39,35 @@ const {
 app.use(express.json());
 app.use(cors());
 
+app.post("/login", async (req, res) => {
+  const { email } = req.body;
+
+  if (typeof email !== "string" || !validator.isEmail(email)) {
+    res.status(406).json({
+      message: "Email is invalid",
+    });
+
+    return;
+  }
+
+  try {
+    let user = await User.find({ email });
+
+    if (!user) {
+      user = await User.create({ email });
+    }
+
+    res.status(200).json({
+      id: user._id,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "An error occured whiles logging in",
+    });
+  }
+});
+
 /*
   @method: post
   @end-point: /user/add

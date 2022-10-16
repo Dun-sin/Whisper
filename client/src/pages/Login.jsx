@@ -1,88 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import MojoAuth from 'mojoauth-web-sdk';
 
 // Redux
 import { useAuth } from 'src/context/AuthContext';
+import { api } from 'src/lib/axios';
 
 const centerStuffs = `flex flex-col justify-center items-center`;
 
-const baseUrl = `${import.meta.env.VITE_SOCKET_URL}/user`;
 const apiKey = import.meta.env.VITE_IMPORTANT;
 
 const userID = Math.random().toFixed(12).toString(36).slice(2);
 
 const Login = () => {
     const { login } = useAuth();
-    const [loginStatus, setLoginStatus] = useState({
-        email: null,
-        status: 'none',
-        error: false,
-    });
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-    function loginUser(email) {
-        setLoginStatus({
-            ...loginStatus,
-            status: 'loading',
-            error: false,
-        });
-
-        axios
-            .post(`${baseUrl}/add`, {
-                email: email,
-            })
+    function loginWithEmail(email) {
+        setIsLoggingIn(true);
+        api.post('/login', {
+            email,
+        })
             .then((res) => {
-                if (res.status === 202) {
+                if (res.status === 200) {
                     console.log('done');
-                    setLoginStatus({
-                        ...loginStatus,
-                        status: 'complete',
-                        error: false,
+                    login({
+                        loginType: 'email',
+                        loginId: userID,
                         email,
                     });
                 } else {
                     console.log('failed');
-                    setLoginStatus({
-                        ...loginStatus,
-                        status: 'complete',
-                        error: true,
-                    });
                 }
             })
             .catch((err) => {
                 console.log(err);
-                setLoginStatus({
-                    ...loginStatus,
-                    status: 'complete',
-                    error: true,
-                });
+            })
+            .finally(() => {
+                setIsLoggingIn(false);
             });
     }
 
-    const checkingUser = (email) => {
-        axios
-            .get(`${baseUrl}/find?email=${email}`)
-            .then((res) => {
-                if (res.status === 202) {
-                    loginUser(email);
-                } else if (res.status === 200) {
-                    setLoginStatus({
-                        ...loginStatus,
-                        status: 'complete',
-                        error: false,
-                        email,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-                setLoginStatus({
-                    ...loginStatus,
-                    status: 'complete',
-                    error: true,
-                });
-            });
-    };
+    function loginAnonymously() {
+        login({
+            loginType: 'anonymous',
+            loginId: userID,
+            email: null,
+        });
+    }
 
     useEffect(() => {
         // Regenerate userId on each page load/route change
@@ -91,49 +55,31 @@ const Login = () => {
         const mojoauth = new MojoAuth(`${apiKey}`, {
             source: [{ type: 'email', feature: 'magiclink' }],
         });
+
         mojoauth.signIn().then((payload) => {
-            checkingUser(payload.user.email);
-            document.getElementById('mojoauth-passwordless-form').remove();
+            loginWithEmail(payload.user.email);
+            document.getElementById('mojoauth-passwordless-form')?.remove();
         });
     }, []);
-
-    useEffect(() => {
-        if (loginStatus.status === 'complete' && !loginStatus.error) {
-            login({
-                loginType: loginStatus.email ? 'email' : 'anonymous',
-                loginId: userID,
-                email: loginStatus.email,
-            })
-        }
-    }, [loginStatus]);
-
-    const loginAnonymously = () => {
-        setLoginStatus({
-            status: 'complete',
-            error: false,
-            email: null,
-        });
-    };
 
     return (
         <div
             className={`bg-primary h-[100vh] w-[100vw] text-white ${centerStuffs}`}
         >
-            {loginStatus.status !== 'loading' && (
+            {isLoggingIn ? (
+                <div className="uppercase py-5">Processing Login</div>
+            ) : (
                 <div className="pb-3">
                     <div id="mojoauth-passwordless-form" className=""></div>
                 </div>
             )}
-            {loginStatus.status === 'loading' && (
-                <div className="uppercase py-5">Processing Login</div>
-            )}
-            <div
-                disabled={loginStatus.status === 'loading'}
+            <button
+                disabled={isLoggingIn}
                 onClick={loginAnonymously}
                 className={`disabled:bg-slate-700 pb-[5px] text-white h-[50px] rounded-[10px] font-light cursor-pointer hover:underline ${centerStuffs}`}
             >
                 Login Anonymously
-            </div>
+            </button>
         </div>
     );
 };
