@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/Dun-sin/Whisper#readme",
   "dependencies": {
+    "uuid": "^9.0.0",
     "validator": "^13.7.0"
   }
 }
