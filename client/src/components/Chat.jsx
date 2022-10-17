@@ -52,28 +52,17 @@ const Chat = () => {
         [state, currentChatId]
     );
 
-    // Here whenever user will submit message it will be send to the server
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        const d = new Date();
-        const time = d.getTime();
-        const message = inputRef.current.value;
-        if (message === '' || senderId === undefined || senderId === '123456') {
-            return;
-        }
-
-        if (inputRef.current) {
-            inputRef.current.value = '';
-            inputRef.current.focus();
-        }
-
-        const tmpId = uuid();
-
+    const doSend = async ({
+        senderId,
+        room,
+        tmpId = uuid(),
+        message,
+        time,
+    }) => {
         try {
             addMessage({
                 senderId,
-                room: currentChatId,
+                room,
                 id: tmpId,
                 message,
                 time,
@@ -81,6 +70,7 @@ const Chat = () => {
             });
         } catch {
             logout();
+            return false;
         }
 
         try {
@@ -95,12 +85,13 @@ const Chat = () => {
                 updateMessage(tmpId, sentMessage);
             } catch {
                 logout();
+                return false;
             }
         } catch (e) {
             try {
                 updateMessage(tmpId, {
                     senderId,
-                    room: currentChatId,
+                    room,
                     id: tmpId,
                     message,
                     time,
@@ -109,6 +100,8 @@ const Chat = () => {
             } catch {
                 logout();
             }
+
+            return false;
         } finally {
             console.log('send complete');
             console.log(`sender: ${message}`);
@@ -120,6 +113,48 @@ const Chat = () => {
             //     room: 'anon',
             // });
         }
+
+        return true;
+    };
+
+    // Here whenever user will submit message it will be send to the server
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        const d = new Date();
+        const message = inputRef.current.value;
+        if (message === '' || senderId === undefined || senderId === '123456') {
+            return;
+        }
+
+        doSend({
+            senderId,
+            room: currentChatId,
+            message,
+            time: d.getTime(),
+        });
+
+        if (inputRef.current) {
+            inputRef.current.value = '';
+            inputRef.current.focus();
+        }
+    };
+
+    const handleResend = (id) => {
+        if (!state[currentChatId]) {
+            return;
+        }
+
+        const { senderId, room, message, time } =
+            state[currentChatId].messages[id];
+
+        doSend({
+            senderId,
+            room,
+            message,
+            time,
+            tmpId: id,
+        });
     };
 
     const getTime = (time) => {
@@ -160,6 +195,7 @@ const Chat = () => {
                                             sender.toString() ===
                                             senderId.toString()
                                         }
+                                        onResend={() => handleResend(id)}
                                     />
                                 </div>
                             </div>
