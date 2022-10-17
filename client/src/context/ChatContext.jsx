@@ -3,12 +3,27 @@ import PropTypes from 'prop-types';
 
 import chatReducer from './reducers/chatReducer';
 
+/**
+ * @typedef {'pending' | 'sent' | 'failed'} MessageStatus
+ *
+ * @typedef {{
+ *     senderId: string,
+ *     room: string,
+ *     id: string,
+ *     message: string,
+ *     time: number | string,
+ *     status: MessageStatus,
+ * }} Message
+ */
+
 const initialState = {};
 
 const ChatContext = createContext({
     ...initialState,
     deleteMessage: () => undefined,
     addMessage: () => undefined,
+    updateMessage: () => undefined,
+    createChat: () => undefined,
 });
 
 export const useChat = () => {
@@ -36,21 +51,46 @@ export const ChatProvider = ({ children }) => {
         }
     );
 
-    function addMessage({ id, message, time, room, messageId }) {
+    /**
+     *
+     * @param {Message} message
+     */
+    function addMessage(message) {
         dispatch({
             type: 'ADD_MESSAGE',
-            payload: {
-                id,
-                message,
-                time,
-                room,
-                messageId
-            },
+            payload: message,
+        });
+    }
+
+    /**
+     * @param {string} id
+     * @param {Message} message
+     */
+    function updateMessage(id, message) {
+        dispatch({
+            type: 'UPDATE_MESSAGE',
+            payload: { id, message },
+        });
+    }
+
+    /**
+     *
+     * @param {string} chatId
+     * @param {string[]} userIds
+     * @param {{[key: string]: Message}} messages
+     * @param { string | number | Date } createdAt
+     */
+    function createChat(chatId, userIds, messages, createdAt) {
+        dispatch({
+            type: 'CREATE_CHAT',
+            payload: { chatId, userIds, messages, createdAt },
         });
     }
 
     return (
-        <ChatContext.Provider value={{ messages: state, addMessage }}>
+        <ChatContext.Provider
+            value={{ messages: state, addMessage, updateMessage, createChat }}
+        >
             {children}
         </ChatContext.Provider>
     );
