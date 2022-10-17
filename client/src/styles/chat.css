@@ -36,7 +36,7 @@
         @apply bg-[#FF9F1C] rounded-[20px] p-[15px] break-all w-full;
     }
 
-    .message-block .message .time {
-        @apply text-white px-[20px] text-[12px];
+    .message-block .message .status {
+        @apply px-[20px] text-[12px] flex gap-2 items-center;
     }
 }

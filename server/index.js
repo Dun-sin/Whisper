@@ -128,7 +128,7 @@ const matchMaker = (io) => {
     const chat = {
       id: newRoomId,
       userIds: [],
-      messages: [],
+      messages: {},
       createdAt: new Date(),
     };
 
@@ -145,6 +145,7 @@ const matchMaker = (io) => {
 
     io.to(newRoomId).emit("joined", {
       roomId: newRoomId,
+      userIds: pairedUsers.map((user) => user.emailOrLoginId),
     });
   }
 };
@@ -199,7 +200,7 @@ io.on("connection", (socket) => {
 
   socket.on(
     "send_message",
-    ({ senderId, message, time }, returnMessageToSender) => {
+    ({ senderId, message, time, chatId }, returnMessageToSender) => {
       const user = getActiveUser({
         socketId: socket.id,
       });
@@ -211,6 +212,8 @@ io.on("connection", (socket) => {
             "Re-login and try again",
           messageId: id,
         });
+
+        return;
       }
 
       const id = uuid.v4();
@@ -226,13 +229,13 @@ io.on("connection", (socket) => {
         });
 
         if (user) {
-          user.chats[user.currentChatId ?? ""].messages.push({
+          user.chats[user.currentChatId ?? ""].messages[id] = {
             id,
             message,
             time,
             senderId,
             type: "message",
-          });
+          };
         }
       });
 
@@ -241,6 +244,7 @@ io.on("connection", (socket) => {
         message,
         time,
         id,
+        room: user.currentChatId,
         status: "sent",
       };
 
