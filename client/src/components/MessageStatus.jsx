@@ -31,7 +31,7 @@ export default function MessageStatus({
                                 title="Resend message"
                                 onClick={handleResend}
                             >
-                                <IoRefreshCircle />
+                                <IoRefreshCircle size={20} />
                             </button>
                         </>
                     )}

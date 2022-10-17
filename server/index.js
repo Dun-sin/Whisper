@@ -201,6 +201,13 @@ io.on("connection", (socket) => {
   socket.on(
     "send_message",
     ({ senderId, message, time, chatId }, returnMessageToSender) => {
+      // Below line is just a failed message simulator for testing purposes.
+
+      // const rndInt = Math.floor(Math.random() * 6) + 1;
+      // if (rndInt % 2 !== 0) {
+      //   return;
+      // }
+
       const user = getActiveUser({
         socketId: socket.id,
       });
