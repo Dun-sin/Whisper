@@ -18,6 +18,9 @@ import MessageStatus from './MessageStatus';
 let senderId;
 const Chat = () => {
     const [currentChatId, setCurrentChatId] = useState(null);
+    const [editing, setEditing] = useState(
+        { isediting: false, messageID: null }
+    );
     const {
         messages: state,
         addMessage,
@@ -38,6 +41,7 @@ const Chat = () => {
 
         return state[currentChatId].messages[id];
     };
+
 
     const messageExists = (id) => {
         return Boolean(getMessage(id));
@@ -101,7 +105,6 @@ const Chat = () => {
         }
 
         try {
-            console.log('sending...');
             const sentMessage = await sendMessage({
                 senderId,
                 message,
@@ -131,8 +134,6 @@ const Chat = () => {
 
             return false;
         } finally {
-            console.log('send complete');
-            console.log(`sender: ${message}`);
             // Socket.emit('privatemessage', message);
             // addMessage({
             //     id: senderId,
@@ -145,50 +146,7 @@ const Chat = () => {
         return true;
     };
 
-    // Here whenever user will submit message it will be send to the server
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        const d = new Date();
-        const message = inputRef.current.value;
-        if (message === '' || senderId === undefined || senderId === '123456') {
-            return;
-        }
-
-        doSend({
-            senderId,
-            room: currentChatId,
-            message,
-            time: d.getTime(),
-        });
-
-        if (inputRef.current) {
-            inputRef.current.value = '';
-            inputRef.current.focus();
-        }
-    };
-
-    const handleResend = (id) => {
-        if (!messageExists(id)) {
-            return;
-        }
-
-        const { senderId, room, message, time } = getMessage(id);
-
-        doSend({
-            senderId,
-            room,
-            message,
-            time,
-            tmpId: id,
-        });
-    };
-
     const handleDelete = async (id) => {
-        if (!confirm('Are you sure you want to delete this message?')) {
-            return;
-        }
-
         if (!messageExists(id)) {
             return;
         }
@@ -216,6 +174,65 @@ const Chat = () => {
         }
     };
 
+
+    // Here whenever user will submit message it will be send to the server
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        const d = new Date();
+        const message = inputRef.current.value;
+        if (message === '' || senderId === undefined || senderId === '123456') {
+            return;
+        }
+
+        if (editing.isediting === true) {
+            const { time } = getMessage(editing.messageID);
+            handleDelete(editing.messageID)
+            doSend({
+                senderId,
+                room: currentChatId,
+                message,
+                time: time,
+            });
+            setEditing({ isediting: false, messageID: null })
+        } else {
+            doSend({
+                senderId,
+                room: currentChatId,
+                message,
+                time: d.getTime(),
+            });
+        }
+
+        if (inputRef.current) {
+            inputRef.current.value = '';
+            inputRef.current.focus();
+        }
+    };
+
+    const handleResend = (id) => {
+        if (!messageExists(id)) {
+            return;
+        }
+
+        const { senderId, room, message, time } = getMessage(id);
+
+        doSend({
+            senderId,
+            room,
+            message,
+            time,
+            tmpId: id,
+        });
+    };
+
+    const handleEdit = (id) => {
+        const { message } = getMessage(id)
+        inputRef.current.value = message;
+        setEditing({ isediting: true, messageID: id })
+
+    }
+
     const getTime = (time) => {
         return new Date(time).toLocaleTimeString();
     };
@@ -242,11 +259,10 @@ const Chat = () => {
                     ({ senderId: sender, id, message, time, status }) => (
                         <div
                             key={id}
-                            className={`message-block ${
-                                sender.toString() === senderId.toString()
-                                    ? 'me'
-                                    : 'other'
-                            }`}
+                            className={`message-block ${sender.toString() === senderId.toString()
+                                ? 'me'
+                                : 'other'
+                                }`}
                         >
                             <div className="message">
                                 <div className="content">
@@ -265,17 +281,23 @@ const Chat = () => {
                                                         handleDelete(id)
                                                     }
                                                 >
-                                                    Delete Message
+                                                    Delete
+                                                </Dropdown.Item>
+                                                <Dropdown.Item
+                                                    onClick={() =>
+                                                        handleEdit(id)
+                                                    }
+                                                >
+                                                    Edit
                                                 </Dropdown.Item>
                                             </Dropdown>
                                         )}
                                 </div>
                                 <div
-                                    className={`status ${
-                                        status === 'failed'
-                                            ? 'text-red-600'
-                                            : 'text-white'
-                                    }`}
+                                    className={`status ${status === 'failed'
+                                        ? 'text-red-600'
+                                        : 'text-white'
+                                        }`}
                                 >
                                     <MessageStatus
                                         time={getTime(time)}

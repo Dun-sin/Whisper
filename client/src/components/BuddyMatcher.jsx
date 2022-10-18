@@ -90,7 +90,6 @@ const BuddyMatcher = () => {
             });
 
             setIsFound(true);
-            console.log('chat restored!', chats, currentChatId);
         });
 
         return () => {
