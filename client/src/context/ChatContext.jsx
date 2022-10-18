@@ -103,6 +103,13 @@ export const ChatProvider = ({ children }) => {
         });
     }
 
+    function closeAllChats() {
+        dispatch({
+            type: 'CLOSE_ALL_CHATS',
+            payload: {},
+        });
+    }
+
     return (
         <ChatContext.Provider
             value={{
@@ -112,6 +119,7 @@ export const ChatProvider = ({ children }) => {
                 createChat,
                 removeMessage,
                 closeChat,
+                closeAllChats,
             }}
         >
             {children}

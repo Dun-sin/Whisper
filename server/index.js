@@ -328,6 +328,48 @@ io.on("connection", (socket) => {
       });
     }
   });
+
+  socket.on("close", (chatId, setChatClosed) => {
+    const user = getActiveUser({
+      socketId: socket.id,
+    });
+
+    if (!user || !user.chats[chatId]) {
+      setChatClosed(false);
+      return;
+    }
+
+    const inactiveList = [];
+
+    user.chats[chatId].userIds.forEach((userId) => {
+      const user = getActiveUser({
+        email: userId,
+        loginId: userId,
+      });
+
+      if (!user) {
+        return;
+      }
+
+      delete user.chats[chatId];
+
+      // User does not have any open chats, so remove from active list
+      // So that the user can search for new buddies again
+      if (Object.values(user.chats).length == 0) {
+        delActiveUser(user);
+
+        if (!inactiveList.includes(user.emailOrLoginId)) {
+          inactiveList.push(user.emailOrLoginId);
+        }
+      }
+    });
+
+    setChatClosed(true);
+    socket.broadcast.to(chatId).emit("close", chatId);
+    inactiveList.forEach((emailOrLoginId) => {
+      socket.broadcast.to(emailOrLoginId).emit("inactive");
+    });
+  });
   // socket.on('adding', (data) => {
   // 	if (data.userID.ID === '') return;
   // 	userModule.allUsers(data.userID.ID);

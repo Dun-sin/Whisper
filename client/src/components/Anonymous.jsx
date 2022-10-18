@@ -1,13 +1,47 @@
-import React from 'react';
+import { useContext } from 'react';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
 import Chat from 'components/Chat';
 import Dropdown from 'rsuite/Dropdown';
 import { useNavigate } from 'react-router-dom';
+import { SocketContext } from 'src/context/Context';
+import { useChat } from 'src/context/ChatContext';
 
 const centerItems = `flex items-center justify-center`;
 
 const Anonymous = () => {
     const navigate = useNavigate();
+    const socket = useContext(SocketContext);
+    const { closeChat } = useChat();
+
+    const handleClose = () => {
+        if (!confirm('Are you sure you want to close this chat?')) {
+            return;
+        }
+
+        const currentChatId = localStorage.getItem('currentChatId');
+
+        if (!currentChatId) {
+            navigate('/');
+            return;
+        }
+
+        socket
+            .timeout(30000)
+            .emit('close', currentChatId, (err, chatClosed) => {
+                if (err) {
+                    alert('An error occured whiles closing chat.');
+                    console.log(err);
+                    return;
+                }
+
+                if (chatClosed) {
+                    closeChat(currentChatId);
+                }
+
+                navigate('/');
+                localStorage.removeItem('currentChatId')
+            });
+    };
 
     return (
         <div
@@ -24,11 +58,7 @@ const Anonymous = () => {
                     }
                     noCaret
                 >
-                    <Dropdown.Item
-                        onClick={() => {
-                            navigate('/');
-                        }}
-                    >
+                    <Dropdown.Item onClick={handleClose}>
                         Close Chat
                     </Dropdown.Item>
                 </Dropdown>
