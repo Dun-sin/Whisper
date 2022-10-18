@@ -24,6 +24,7 @@ const ChatContext = createContext({
     addMessage: () => undefined,
     updateMessage: () => undefined,
     createChat: () => undefined,
+    removeMessage: () => undefined,
 });
 
 export const useChat = () => {
@@ -87,9 +88,22 @@ export const ChatProvider = ({ children }) => {
         });
     }
 
+    function removeMessage(id, chatId) {
+        dispatch({
+            type: 'REMOVE_MESSAGE',
+            payload: { id, room: chatId },
+        });
+    }
+
     return (
         <ChatContext.Provider
-            value={{ messages: state, addMessage, updateMessage, createChat }}
+            value={{
+                messages: state,
+                addMessage,
+                updateMessage,
+                createChat,
+                removeMessage,
+            }}
         >
             {children}
         </ChatContext.Provider>

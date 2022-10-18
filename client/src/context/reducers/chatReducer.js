@@ -77,6 +77,17 @@ export default function chatReducer(state, action) {
             break;
         }
 
+        case 'REMOVE_MESSAGE': {
+            const { id, room } = action.payload;
+
+            if (!clonedState[room]) {
+                break;
+            }
+
+            delete clonedState[room].messages[id];
+            break;
+        }
+
         default:
             throw new Error('No action provided!');
     }

@@ -4,7 +4,10 @@ import { SocketContext } from 'context/Context';
 import 'styles/chat.css';
 
 import ScrollToBottom from 'react-scroll-to-bottom';
+import Dropdown from 'rsuite/Dropdown';
 import { IoSend } from 'react-icons/io5';
+import { BiDotsVerticalRounded } from 'react-icons/bi';
+
 import { v4 as uuid } from 'uuid';
 
 import { useChat } from 'src/context/ChatContext';
@@ -15,13 +18,31 @@ import MessageStatus from './MessageStatus';
 let senderId;
 const Chat = () => {
     const [currentChatId, setCurrentChatId] = useState(null);
-    const { messages: state, addMessage, updateMessage } = useChat();
+    const {
+        messages: state,
+        addMessage,
+        updateMessage,
+        removeMessage,
+    } = useChat();
     const { auth, logout } = useAuth();
     const socket = useContext(SocketContext);
 
-    const { sendMessage } = useChatUtils(socket);
+    const { sendMessage, deleteMessage } = useChatUtils(socket);
     const inputRef = useRef('');
     senderId = auth.loginId;
+
+    const getMessage = (id) => {
+        if (!state[currentChatId]) {
+            return null;
+        }
+
+        return state[currentChatId].messages[id];
+    };
+
+    const messageExists = (id) => {
+        return Boolean(getMessage(id));
+    };
+
     useEffect(() => {
         const newMessageHandler = (message) => {
             try {
@@ -31,12 +52,18 @@ const Chat = () => {
             }
         };
 
+        const deleteMessageHandler = ({ id, chatId }) => {
+            removeMessage(id, chatId);
+        };
+
         // This is used to recive message form other user.
         socket.on('receive_message', newMessageHandler);
+        socket.on('delete_message', deleteMessageHandler);
         setCurrentChatId(localStorage.getItem('currentChatId'));
 
         return () => {
             socket.off('receive_message', newMessageHandler);
+            socket.off('delete_message', deleteMessageHandler);
         };
     }, []);
 
@@ -79,6 +106,7 @@ const Chat = () => {
                 senderId,
                 message,
                 time,
+                chatId: room,
             });
 
             try {
@@ -141,12 +169,11 @@ const Chat = () => {
     };
 
     const handleResend = (id) => {
-        if (!state[currentChatId]) {
+        if (!messageExists(id)) {
             return;
         }
 
-        const { senderId, room, message, time } =
-            state[currentChatId].messages[id];
+        const { senderId, room, message, time } = getMessage(id);
 
         doSend({
             senderId,
@@ -157,9 +184,51 @@ const Chat = () => {
         });
     };
 
+    const handleDelete = async (id) => {
+        if (!confirm('Are you sure you want to delete this message?')) {
+            return;
+        }
+
+        if (!messageExists(id)) {
+            return;
+        }
+
+        const message = getMessage(id);
+        updateMessage(id, {
+            ...message,
+            status: 'pending',
+        });
+
+        try {
+            const messageDeleted = await deleteMessage({
+                id,
+                chatId: message.room,
+            });
+
+            if (!messageDeleted) {
+                updateMessage(id, message);
+                return;
+            }
+
+            removeMessage(id, message.room);
+        } catch {
+            updateMessage(id, message);
+        }
+    };
+
     const getTime = (time) => {
         return new Date(time).toLocaleTimeString();
     };
+
+    const renderIconButton = (props) => {
+        return (
+            <BiDotsVerticalRounded
+                {...props}
+                className="fill-primary scale-[1.8]"
+            />
+        );
+    };
+
     return (
         <div className="w-[100%] h-[90%] pb-[25px]">
             <p className="text-[0.8em] font-semibold mb-[20px] text-center">
@@ -180,7 +249,27 @@ const Chat = () => {
                             }`}
                         >
                             <div className="message">
-                                <p className="content">{message}</p>
+                                <div className="content">
+                                    <p className="text">{message}</p>
+                                    {sender.toString() ===
+                                        senderId.toString() &&
+                                        status !== 'pending' && (
+                                            <Dropdown
+                                                placement="leftStart"
+                                                style={{ zIndex: 3 }}
+                                                renderToggle={renderIconButton}
+                                                noCaret
+                                            >
+                                                <Dropdown.Item
+                                                    onClick={() =>
+                                                        handleDelete(id)
+                                                    }
+                                                >
+                                                    Delete Message
+                                                </Dropdown.Item>
+                                            </Dropdown>
+                                        )}
+                                </div>
                                 <div
                                     className={`status ${
                                         status === 'failed'
