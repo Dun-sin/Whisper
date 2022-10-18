@@ -139,6 +139,14 @@ function addActiveUser(user) {
   active_users[user.emailOrLoginId] = user;
 }
 
+/**
+ *
+ * @param {ActiveUser} user
+ */
+function delActiveUser(user) {
+  delete active_users[user.emailOrLoginId];
+}
+
 /*
   @params:  object
   @return: void
@@ -228,4 +236,5 @@ module.exports = {
   isUserActive,
   getActiveUser,
   addToWaitingList,
+  delActiveUser,
 };

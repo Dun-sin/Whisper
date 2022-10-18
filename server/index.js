@@ -36,6 +36,7 @@ const {
   isUserActive,
   getActiveUser,
   addToWaitingList,
+  delActiveUser,
 } = require("./users");
 
 app.use(express.json());
@@ -291,6 +292,42 @@ io.on("connection", (socket) => {
       messageWasDeletedSuccessfully(true);
     }
   );
+
+  socket.on("logout", () => {
+    const user = getActiveUser({
+      socketId: socket.id,
+    });
+
+    if (!user) {
+      return;
+    }
+
+    // User is an anonymous user, so close all active chats
+    if (!user.email) {
+      Object.values(user.chats).forEach((chat) => {
+        chat.userIds.forEach((userId) => {
+          const user = getActiveUser({
+            email: userId,
+            loginId: userId,
+          });
+
+          if (!user) {
+            return;
+          }
+
+          delete user.chats[chat.id];
+
+          // User does not have any open chats, so remove from active list
+          // So that the user can search for new buddies again
+          if (Object.values(user.chats).length == 0) {
+            delActiveUser(user);
+            io.to(user.emailOrLoginId).emit("inactive");
+          }
+        });
+        io.to(chat.id).emit("close", chat.id);
+      });
+    }
+  });
   // socket.on('adding', (data) => {
   // 	if (data.userID.ID === '') return;
   // 	userModule.allUsers(data.userID.ID);

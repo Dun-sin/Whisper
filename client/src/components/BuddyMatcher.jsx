@@ -5,10 +5,12 @@ import { SocketContext } from 'context/Context';
 import Anonymous from 'components/Anonymous';
 import { useAuth } from 'src/context/AuthContext';
 import { useChat } from 'src/context/ChatContext';
+import { useNavigate } from 'react-router-dom';
 
 const BuddyMatcher = () => {
+    const navigate = useNavigate();
     const { auth } = useAuth();
-    const { createChat } = useChat();
+    const { createChat, closeChat } = useChat();
 
     // eslint-disable-next-line no-unused-vars
     const [isFound, setIsFound] = useState(false);
@@ -41,6 +43,23 @@ const BuddyMatcher = () => {
         if (!socket.connected) {
             socket.connect();
         }
+
+        socket.on('close', (chatId) => {
+            setIsFound(false);
+            closeChat(chatId);
+
+            if (
+                !confirm(
+                    'This chat is closed! Would you like to search for a new buddy?'
+                )
+            ) {
+                navigate('/');
+                return;
+            }
+
+            setLoadingText(defaultLoadingText);
+            socket.emit('join', { loginId: auth.loginId, email: auth.email });
+        });
 
         // This is necessary else chat won't be restored after re-connections
         socket.on('connect', () => {
@@ -75,7 +94,11 @@ const BuddyMatcher = () => {
         });
 
         return () => {
-            socket.off('connect').off('joined').off('chat_restore');
+            socket
+                .off('connect')
+                .off('joined')
+                .off('chat_restore')
+                .off('close');
             socket.disconnect();
         };
     }, []);
