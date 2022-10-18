@@ -32,8 +32,12 @@
         @apply flex flex-col mb-[15px] min-w-[250px] max-w-[80%] text-primary;
     }
 
+    .message-block.me .message .content {
+        @apply justify-end;
+    }
+
     .message-block .message .content {
-        @apply bg-[#FF9F1C] rounded-[20px] p-[15px] break-all w-full;
+        @apply bg-[#FF9F1C] rounded-[20px] p-[15px] break-all w-full flex gap-2 items-start;
     }
 
     .message-block .message .status {

@@ -27,7 +27,32 @@ export default function useChatUtils(socket) {
         });
     }
 
+    function deleteMessage({ id, chatId }) {
+        return new Promise((resolve, reject) => {
+            if (!socket.connected) {
+                reject(null);
+                return;
+            }
+
+            socket
+                .timeout(30000)
+                .emit(
+                    'delete_message',
+                    { id, chatId },
+                    (err, messageDeleted) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+
+                        resolve(messageDeleted);
+                    }
+                );
+        });
+    }
+
     return {
         sendMessage,
+        deleteMessage,
     };
 }

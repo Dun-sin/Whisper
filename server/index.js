@@ -229,14 +229,14 @@ io.on("connection", (socket) => {
        * Cache the sent message for each user in the chat.
        * This is also the point, where we persist the message in the db
        */
-      user.chats[user.currentChatId ?? ""].userIds.forEach((userId) => {
+      user.chats[chatId].userIds.forEach((userId) => {
         const user = getActiveUser({
           email: userId,
           loginId: userId,
         });
 
         if (user) {
-          user.chats[user.currentChatId ?? ""].messages[id] = {
+          user.chats[chatId].messages[id] = {
             id,
             message,
             time,
@@ -251,15 +251,44 @@ io.on("connection", (socket) => {
         message,
         time,
         id,
-        room: user.currentChatId,
+        room: chatId,
         status: "sent",
       };
 
       returnMessageToSender(sentMessage);
 
+      socket.broadcast.to(chatId).emit("receive_message", sentMessage);
+    }
+  );
+
+  socket.on(
+    "delete_message",
+    ({ id: messageId, chatId }, messageWasDeletedSuccessfully) => {
+      const user = getActiveUser({
+        socketId: socket.id,
+      });
+
+      if (!user || !messageId || !chatId) {
+        messageWasDeletedSuccessfully(false);
+        return;
+      }
+
+      user.chats[chatId].userIds.forEach((userId) => {
+        const user = getActiveUser({
+          email: userId,
+          loginId: userId,
+        });
+
+        if (user) {
+          delete user.chats[chatId].messages[messageId];
+        }
+      });
+
       socket.broadcast
-        .to(user.currentChatId)
-        .emit("receive_message", sentMessage);
+        .to(chatId)
+        .emit("delete_message", { id: messageId, chatId });
+
+      messageWasDeletedSuccessfully(true);
     }
   );
   // socket.on('adding', (data) => {
