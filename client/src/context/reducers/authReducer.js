@@ -17,7 +17,8 @@ export default function authReducer(state, action) {
         }
 
         case 'LOGOUT':
-            localStorage.removeItem('auth');
+            localStorage.clear();
+
             return {
                 ...cloneState,
                 email: null,
