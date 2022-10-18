@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 const BuddyMatcher = () => {
     const navigate = useNavigate();
     const { auth } = useAuth();
-    const { createChat, closeChat } = useChat();
+    const { createChat, closeChat, closeAllChats } = useChat();
 
     // eslint-disable-next-line no-unused-vars
     const [isFound, setIsFound] = useState(false);
@@ -92,12 +92,20 @@ const BuddyMatcher = () => {
             setIsFound(true);
         });
 
+        socket.on('inactive', () => {
+            closeAllChats();
+            localStorage.removeItem('currentChatId')
+
+            setIsFound(false)
+        });
+
         return () => {
             socket
                 .off('connect')
                 .off('joined')
                 .off('chat_restore')
-                .off('close');
+                .off('close')
+                .off('inactive');
             socket.disconnect();
         };
     }, []);
