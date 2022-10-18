@@ -43,6 +43,13 @@ export default function chatReducer(state, action) {
             break;
         }
 
+        case 'CLOSE_CHAT': {
+            const { chatId } = action.payload;
+
+            delete clonedState[chatId];
+            break;
+        }
+
         case 'ADD_MESSAGE': {
             const { senderId, room, id, message, time, status } =
                 action.payload;

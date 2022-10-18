@@ -25,6 +25,7 @@ const ChatContext = createContext({
     updateMessage: () => undefined,
     createChat: () => undefined,
     removeMessage: () => undefined,
+    closeChat: () => undefined,
 });
 
 export const useChat = () => {
@@ -95,6 +96,13 @@ export const ChatProvider = ({ children }) => {
         });
     }
 
+    function closeChat(chatId) {
+        dispatch({
+            type: 'CLOSE_CHAT',
+            payload: { chatId },
+        });
+    }
+
     return (
         <ChatContext.Provider
             value={{
@@ -103,6 +111,7 @@ export const ChatProvider = ({ children }) => {
                 updateMessage,
                 createChat,
                 removeMessage,
+                closeChat,
             }}
         >
             {children}
