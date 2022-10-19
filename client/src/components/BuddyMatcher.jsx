@@ -115,7 +115,7 @@ const BuddyMatcher = () => {
     ) : (
         <div className="flex w-full justify-center items-center h-screen flex-col bg-primary">
             <ThreeDots fill="rgb(255 159 28)" />
-            <div className="text-lg text-center">
+            <div className="text-lg text-center text-white">
                 {loadingText.split('\n').map((text) => (
                     <p key={text}>{text}</p>
                 ))}
