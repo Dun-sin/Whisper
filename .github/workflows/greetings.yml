@@ -1,15 +1,11 @@
 on:
   fork:
   push:
-    branches: [ main ]
+    branches: [main]
   issues:
-    types: [ opened ]
+    types: [opened]
   issue_comment:
-    types: [ created ]
-  pull_request_target:
-    types: [ opened ]
-  pull_request_review_comment:
-    types: [ created ]
+    types: [created]
 
 jobs:
   welcome:
@@ -19,5 +15,4 @@ jobs:
       - uses: EddieHubCommunity/gh-action-community/src/welcome@main
         with:
           github-token: ${{ secrets.GENERAL_TOKEN}}
-          issue-message: '<h1>It''s great having you contribute to this project by creating an issue</h1> Make sure you are assigned to this before you work on it, Thank you! Welcome to the community :nerd_face:'
-          pr-message: '<h1>It''s great having you contribute to this project by submitting a pull request</h1> Make sure you filled the template properly, Thank you! Welcome to the community :nerd_face:'
+          issue-message: '<h1>It''s great having you contribute to this project by creating an issue</h1> Make sure you are assigned to this before you work on it and you read the <a href="https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md">Contributing.md file</a>, Thank you! Welcome to the community :nerd_face:'
