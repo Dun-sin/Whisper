@@ -70,15 +70,16 @@ const Login = () => {
             ) : (
                 <div>
                     <div id="mojoauth-passwordless-form" className=""></div>
+                    <button
+                        disabled={isLoggingIn}
+                        onClick={loginAnonymously}
+                        className={`disabled:bg-slate-700 text-white pt-[2px] font-light cursor-pointer hover:underline ${centerStuffs}`}
+                    >
+                        Login Anonymously
+                    </button>
                 </div>
+
             )}
-            <button
-                disabled={isLoggingIn}
-                onClick={loginAnonymously}
-                className={`disabled:bg-slate-700 text-white pt-[2px] font-light cursor-pointer hover:underline ${centerStuffs}`}
-            >
-                Login Anonymously
-            </button>
         </div>
     );
 };
