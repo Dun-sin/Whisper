@@ -96,6 +96,13 @@ export const ChatProvider = ({ children }) => {
         });
     }
 
+    function editText(id, chatId, newText) {
+        dispatch({
+            type: 'EDIT_TEXT',
+            payload: { id, room: chatId, newText }
+        })
+    }
+
     function closeChat(chatId) {
         dispatch({
             type: 'CLOSE_CHAT',
@@ -118,6 +125,7 @@ export const ChatProvider = ({ children }) => {
                 updateMessage,
                 createChat,
                 removeMessage,
+                editText,
                 closeChat,
                 closeAllChats,
             }}

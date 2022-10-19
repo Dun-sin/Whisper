@@ -50,13 +50,6 @@ export default function chatReducer(state, action) {
             break;
         }
 
-        case 'CLOSE_ALL_CHATS': {
-            for (const chatId in clonedState) {
-                delete clonedState[chatId];
-            }
-            break;
-        }
-
         case 'ADD_MESSAGE': {
             const { senderId, room, id, message, time, status } =
                 action.payload;
@@ -102,6 +95,15 @@ export default function chatReducer(state, action) {
             break;
         }
 
+        case 'EDIT_TEXT': {
+            const { id, room, newText } = action.payload;
+            if (!clonedState[room]) {
+                return;
+            }
+
+            clonedState[room].messages[id].message = newText;
+            break;
+        }
         default:
             throw new Error('No action provided!');
     }

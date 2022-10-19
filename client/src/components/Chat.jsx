@@ -26,6 +26,7 @@ const Chat = () => {
         addMessage,
         updateMessage,
         removeMessage,
+        editText
     } = useChat();
     const { auth, logout } = useAuth();
     const socket = useContext(SocketContext);
@@ -186,14 +187,7 @@ const Chat = () => {
         }
 
         if (editing.isediting === true) {
-            const { time } = getMessage(editing.messageID);
-            handleDelete(editing.messageID)
-            doSend({
-                senderId,
-                room: currentChatId,
-                message,
-                time: time,
-            });
+            editText(editing.messageID, currentChatId, message)
             setEditing({ isediting: false, messageID: null })
         } else {
             doSend({
