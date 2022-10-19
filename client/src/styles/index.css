@@ -17,11 +17,5 @@ code {
 }
 
 .mj-main-js {
-    height: 55vh !important;
-}
-
-@media screen and (max-width: 1400px) {
-    .mj-main-js {
-        height: 65vh !important;
-    }
+    height: fit-content !important;
 }
