@@ -32,7 +32,7 @@ const Chat = () => {
 
     const { sendMessage, deleteMessage } = useChatUtils(socket);
     const inputRef = useRef('');
-    senderId = auth.loginId;
+    senderId = auth.email ?? auth.loginId;
 
     const getMessage = (id) => {
         if (!state[currentChatId]) {
