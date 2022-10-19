@@ -51,8 +51,33 @@ export default function useChatUtils(socket) {
         });
     }
 
+    function editMessage({ id, chatId, newMessage }) {
+        return new Promise((resolve, reject) => {
+            if (!socket.connected) {
+                reject(null);
+                return;
+            }
+
+            socket
+                .timeout(30000)
+                .emit(
+                    'edit_message',
+                    { id, chatId, newMessage },
+                    (err, messageEdited) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+
+                        resolve(messageEdited);
+                    }
+                );
+        });
+    }
+
     return {
         sendMessage,
         deleteMessage,
+        editMessage,
     };
 }

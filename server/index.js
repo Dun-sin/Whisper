@@ -151,233 +151,263 @@ const matchMaker = (io) => {
 };
 
 // Sockets
-io.on("connection", (socket) => {
-  /**
-   * This event is emitted once the user clicks on the Start button or
-   * navigates to the /founduser route
-   */
-  socket.on("join", ({ loginId, email }) => {
-    /**
-     * This is necessary to enable us send notifications to users
-     * using multiple devices to chat
-     */
-    socket.join(loginId);
-    // Email is possibly null for anonymous users
-    if (email) {
-      socket.join(email);
-    }
+io.on('connection', (socket) => {
+	/**
+	 * This event is emitted once the user clicks on the Start button or
+	 * navigates to the /founduser route
+	 */
+	socket.on('join', ({ loginId, email }) => {
+		/**
+		 * This is necessary to enable us send notifications to users
+		 * using multiple devices to chat
+		 */
+		socket.join(loginId);
+		// Email is possibly null for anonymous users
+		if (email) {
+			socket.join(email);
+		}
 
-    /**
-     * First we check if user is already chatting.
-     * If user is already chatting, continue chat from where the user left
-     */
-    if (isUserActive(email ?? loginId)) {
-      const user = getActiveUser({
-        socketId: socket.id,
-        loginId,
-        email: email ?? null,
-      });
+		/**
+		 * First we check if user is already chatting.
+		 * If user is already chatting, continue chat from where the user left
+		 */
+		if (isUserActive(email ?? loginId)) {
+			const user = getActiveUser({
+				socketId: socket.id,
+				loginId,
+				email: email ?? null,
+			});
 
-      // First join user to lost chat
-      socket.join(user.currentChatId);
-      user.socketConnections.push(socket);
-      user.socketIds.push(socket.id);
+			// First join user to lost chat
+			socket.join(user.currentChatId);
+			user.socketConnections.push(socket);
+			user.socketIds.push(socket.id);
 
-      // Then return all chat messages
-      socket.emit("chat_restore", {
-        chats: user.chats,
-        currentChatId: user.currentChatId,
-      });
-      return;
-    }
+			// Then return all chat messages
+			socket.emit('chat_restore', {
+				chats: user.chats,
+				currentChatId: user.currentChatId,
+			});
+			return;
+		}
 
-    // User was not having any previous chat. So add to waiting list
-    addToWaitingList({ loginId, email, socket });
+		// User was not having any previous chat. So add to waiting list
+		addToWaitingList({ loginId, email, socket });
 
-    // Finally, run matchMaker to pair all users on the waiting list
-    matchMaker(io);
-  });
+		// Finally, run matchMaker to pair all users on the waiting list
+		matchMaker(io);
+	});
 
-  socket.on(
-    "send_message",
-    ({ senderId, message, time, chatId }, returnMessageToSender) => {
-      // Below line is just a failed message simulator for testing purposes.
+	socket.on(
+		'send_message',
+		({ senderId, message, time, chatId }, returnMessageToSender) => {
+			// Below line is just a failed message simulator for testing purposes.
 
-      // const rndInt = Math.floor(Math.random() * 6) + 1;
-      // if (rndInt % 2 !== 0) {
-      //   return;
-      // }
+			// const rndInt = Math.floor(Math.random() * 6) + 1;
+			// if (rndInt % 2 !== 0) {
+			//   return;
+			// }
 
-      const user = getActiveUser({
-        socketId: socket.id,
-      });
+			const user = getActiveUser({
+				socketId: socket.id,
+			});
 
-      if (!user) {
-        socket.emit("send_failed", {
-          message:
-            "Hmmm. It seems your login session has expired. " +
-            "Re-login and try again",
-          messageId: id,
-        });
+			if (!user) {
+				socket.emit('send_failed', {
+					message:
+						'Hmmm. It seems your login session has expired. ' +
+						'Re-login and try again',
+					messageId: id,
+				});
 
-        return;
-      }
+				return;
+			}
 
-      const id = uuid.v4();
+			const id = uuid.v4();
 
-      /**
-       * Cache the sent message for each user in the chat.
-       * This is also the point, where we persist the message in the db
-       */
-      user.chats[chatId].userIds.forEach((userId) => {
-        const user = getActiveUser({
-          email: userId,
-          loginId: userId,
-        });
+			/**
+			 * Cache the sent message for each user in the chat.
+			 * This is also the point, where we persist the message in the db
+			 */
+			user.chats[chatId].userIds.forEach((userId) => {
+				const user = getActiveUser({
+					email: userId,
+					loginId: userId,
+				});
 
-        if (user) {
-          user.chats[chatId].messages[id] = {
-            id,
-            message,
-            time,
-            senderId,
-            type: "message",
-          };
-        }
-      });
+				if (user) {
+					user.chats[chatId].messages[id] = {
+						id,
+						message,
+						time,
+						senderId,
+						type: 'message',
+					};
+				}
+			});
 
-      const sentMessage = {
-        senderId,
-        message,
-        time,
-        id,
-        room: chatId,
-        status: "sent",
-      };
+			const sentMessage = {
+				senderId,
+				message,
+				time,
+				id,
+				room: chatId,
+				status: 'sent',
+			};
 
-      returnMessageToSender(sentMessage);
+			returnMessageToSender(sentMessage);
 
-      socket.broadcast.to(chatId).emit("receive_message", sentMessage);
-    }
-  );
+			socket.broadcast.to(chatId).emit('receive_message', sentMessage);
+		},
+	);
 
-  socket.on(
-    "delete_message",
-    ({ id: messageId, chatId }, messageWasDeletedSuccessfully) => {
-      const user = getActiveUser({
-        socketId: socket.id,
-      });
+	socket.on(
+		'delete_message',
+		({ id: messageId, chatId }, messageWasDeletedSuccessfully) => {
+			const user = getActiveUser({
+				socketId: socket.id,
+			});
 
-      if (!user || !messageId || !chatId) {
-        messageWasDeletedSuccessfully(false);
-        return;
-      }
+			if (!user || !messageId || !chatId) {
+				messageWasDeletedSuccessfully(false);
+				return;
+			}
 
-      user.chats[chatId].userIds.forEach((userId) => {
-        const user = getActiveUser({
-          email: userId,
-          loginId: userId,
-        });
+			user.chats[chatId].userIds.forEach((userId) => {
+				const user = getActiveUser({
+					email: userId,
+					loginId: userId,
+				});
 
-        if (user) {
-          delete user.chats[chatId].messages[messageId];
-        }
-      });
+				if (user) {
+					delete user.chats[chatId].messages[messageId];
+				}
+			});
 
-      socket.broadcast
-        .to(chatId)
-        .emit("delete_message", { id: messageId, chatId });
+			socket.broadcast
+				.to(chatId)
+				.emit('delete_message', { id: messageId, chatId });
 
-      messageWasDeletedSuccessfully(true);
-    }
-  );
+			messageWasDeletedSuccessfully(true);
+		},
+	);
 
-  socket.on("logout", () => {
-    const user = getActiveUser({
-      socketId: socket.id,
-    });
+	socket.on(
+		'edit_message',
+		({ id: messageId, chatId, newMessage }, messageWasEditedSuccessfully) => {
+			const user = getActiveUser({
+				socketId: socket.id,
+			});
 
-    if (!user) {
-      return;
-    }
+			if (!user || !messageId || !chatId) {
+				messageWasEditedSuccessfully(false);
+				return;
+			}
 
-    // User is an anonymous user, so close all active chats
-    if (!user.email) {
-      Object.values(user.chats).forEach((chat) => {
-        chat.userIds.forEach((userId) => {
-          const user = getActiveUser({
-            email: userId,
-            loginId: userId,
-          });
+			user.chats[chatId].userIds.forEach((userId) => {
+				const user = getActiveUser({
+					email: userId,
+					loginId: userId,
+				});
 
-          if (!user) {
-            return;
-          }
+				if (user) {
+					user.chats[chatId].messages[messageId].message = newMessage;
+				}
+			});
 
-          delete user.chats[chat.id];
+			socket.broadcast
+				.to(chatId)
+				.emit('edit_message', { id: messageId, chatId, newMessage });
 
-          // User does not have any open chats, so remove from active list
-          // So that the user can search for new buddies again
-          if (Object.values(user.chats).length == 0) {
-            delActiveUser(user);
-            io.to(user.emailOrLoginId).emit("inactive");
-          }
-        });
-        io.to(chat.id).emit("close", chat.id);
-      });
-    }
-  });
+			messageWasEditedSuccessfully(true);
+		},
+	);
 
-  socket.on("close", (chatId, setChatClosed) => {
-    const user = getActiveUser({
-      socketId: socket.id,
-    });
+	socket.on('logout', () => {
+		const user = getActiveUser({
+			socketId: socket.id,
+		});
 
-    if (!user || !user.chats[chatId]) {
-      setChatClosed(false);
-      return;
-    }
+		if (!user) {
+			return;
+		}
 
-    const inactiveList = [];
+		// User is an anonymous user, so close all active chats
+		if (!user.email) {
+			Object.values(user.chats).forEach((chat) => {
+				chat.userIds.forEach((userId) => {
+					const user = getActiveUser({
+						email: userId,
+						loginId: userId,
+					});
 
-    user.chats[chatId].userIds.forEach((userId) => {
-      const user = getActiveUser({
-        email: userId,
-        loginId: userId,
-      });
+					if (!user) {
+						return;
+					}
 
-      if (!user) {
-        return;
-      }
+					delete user.chats[chat.id];
 
-      delete user.chats[chatId];
+					// User does not have any open chats, so remove from active list
+					// So that the user can search for new buddies again
+					if (Object.values(user.chats).length == 0) {
+						delActiveUser(user);
+						io.to(user.emailOrLoginId).emit('inactive');
+					}
+				});
+				io.to(chat.id).emit('close', chat.id);
+			});
+		}
+	});
 
-      // User does not have any open chats, so remove from active list
-      // So that the user can search for new buddies again
-      if (Object.values(user.chats).length == 0) {
-        delActiveUser(user);
+	socket.on('close', (chatId, setChatClosed) => {
+		const user = getActiveUser({
+			socketId: socket.id,
+		});
 
-        if (!inactiveList.includes(user.emailOrLoginId)) {
-          inactiveList.push(user.emailOrLoginId);
-        }
-      }
-    });
+		if (!user || !user.chats[chatId]) {
+			setChatClosed(false);
+			return;
+		}
 
-    setChatClosed(true);
-    socket.broadcast.to(chatId).emit("close", chatId);
-    inactiveList.forEach((emailOrLoginId) => {
-      socket.broadcast.to(emailOrLoginId).emit("inactive");
-    });
-  });
-  // socket.on('adding', (data) => {
-  // 	if (data.userID.ID === '') return;
-  // 	userModule.allUsers(data.userID.ID);
-  // });
+		const inactiveList = [];
 
-  // socket.on('createRoom', () => {
-  // 	userModule.matchUsers(socket);
-  // });
+		user.chats[chatId].userIds.forEach((userId) => {
+			const user = getActiveUser({
+				email: userId,
+				loginId: userId,
+			});
 
+			if (!user) {
+				return;
+			}
+
+			delete user.chats[chatId];
+
+			// User does not have any open chats, so remove from active list
+			// So that the user can search for new buddies again
+			if (Object.values(user.chats).length == 0) {
+				delActiveUser(user);
+
+				if (!inactiveList.includes(user.emailOrLoginId)) {
+					inactiveList.push(user.emailOrLoginId);
+				}
+			}
+		});
+
+		setChatClosed(true);
+		socket.broadcast.to(chatId).emit('close', chatId);
+		inactiveList.forEach((emailOrLoginId) => {
+			socket.broadcast.to(emailOrLoginId).emit('inactive');
+		});
+	});
+	// socket.on('adding', (data) => {
+	// 	if (data.userID.ID === '') return;
+	// 	userModule.allUsers(data.userID.ID);
+	// });
+
+	// socket.on('createRoom', () => {
+	// 	userModule.matchUsers(socket);
+	// });
 });
 
 app.use(cors());
