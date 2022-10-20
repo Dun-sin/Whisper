@@ -42,18 +42,6 @@ const ActiveUserSchema = new Schema(
                 },
             },
         },
-        methods: {
-            getChats(cb) {
-                return Chat.find(
-                    {
-                        users: {
-                            $in: [this._id],
-                        },
-                    },
-                    cb
-                );
-            },
-        },
     }
 );
 
