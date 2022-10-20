@@ -1,7 +1,7 @@
 <div id="top"></div>
 
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/80192140/179354812-4d6ef343-076a-4297-8625-b3bfd08f80e4.png" width="120px">
+  <img src="https://user-images.githubusercontent.com/88016895/196855572-7bf5a696-098e-461d-a021-61c37bca6ba3.png" width="120px">
   <h2>Whisper</h2>
   <p>An app to help you chat in secret</p>
 
