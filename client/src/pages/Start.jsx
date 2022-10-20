@@ -7,7 +7,7 @@ const Start = () => {
     return (
         <div
             className={
-                `bg-primary min-w-[calc(100%-120px)] text-[#FFF]` +
+                `bg-primary min-w-[calc(100%-108px)] text-white mdl:min-h-[86.5vh]` +
                 centerElement
             }
         >

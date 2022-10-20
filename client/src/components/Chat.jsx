@@ -259,8 +259,8 @@ const Chat = () => {
     };
 
     return (
-        <div className="w-[100%] h-[90%] pb-[25px]">
-            <p className="text-[0.8em] font-semibold mb-[20px] text-center">
+        <div className="w-[100%] md: h-[90%] min-h-[75.7vh] pb-[25px] mdl:flex mdl:flex-col mdl:justify-between">
+            <p className="text-[0.8em] font-semibold mb-[10px] mt-[10px] text-center">
                 Connected with a random User
             </p>
             <ScrollToBottom

@@ -45,7 +45,7 @@ const Anonymous = () => {
 
     return (
         <div
-            className={`bg-[#011627] min-w-[calc(100%-120px)] ${centerItems} flex-col max-h-[100vh] text-[#FFF]`}
+            className={`bg-[#011627] min-w-[calc(100%-108px)] ${centerItems} flex-col max-h-[100vh] text-[#FFF]`}
         >
             <div className="flex justify-between border-b-[2px] border-secondary pt-[50px] pr-[60px] pl-[60px] pb-[15px] h-[13%] w-[100%]">
                 <p className="text-[1em] font-semibold">Anonymous User</p>

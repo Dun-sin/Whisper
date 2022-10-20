@@ -27,13 +27,9 @@ const NavBar = () => {
 
     return (
         <div
-            className="
-    navContainer bg-secondary 
-    w-[120px] min-h-[100vh]
-    flex items-center flex-col
-    justify-center shadow-[0_0_100px_0_rgba(0,0,0,1)] p-5"
+            className="navContainer bg-secondary md:w-[120px] md:min-h-[100vh] mdl: flex items-center flex-col mdl:flex-row justify-center shadow-[0_0_100px_0_rgba(0,0,0,1)] p-5"
         >
-            <div className="justify-between flex items-center flex-col h-[35%] w-[100%]">
+            <div className="justify-between flex items-center flex-col mdl:flex-row h-[35%] w-[100%]">
                 <NavLink
                     to="/"
                     className={({ isActive }) =>
