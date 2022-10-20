@@ -102,6 +102,15 @@ export default function chatReducer(state, action) {
             break;
         }
 
+        case 'EDIT_TEXT': {
+            const { id, room, newText } = action.payload;
+            if (!clonedState[room]) {
+                break;
+            }
+
+            clonedState[room].messages[id].message = newText;
+            break;
+        }
         default:
             throw new Error('No action provided!');
     }

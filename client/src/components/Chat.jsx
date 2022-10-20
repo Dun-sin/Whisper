@@ -26,13 +26,14 @@ const Chat = () => {
         addMessage,
         updateMessage,
         removeMessage,
+        editText
     } = useChat();
     const { auth, logout } = useAuth();
     const socket = useContext(SocketContext);
 
-    const { sendMessage, deleteMessage } = useChatUtils(socket);
+    const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
     const inputRef = useRef('');
-    senderId = auth.loginId;
+    senderId = auth.email ?? auth.loginId;
 
     const getMessage = (id) => {
         if (!state[currentChatId]) {
@@ -60,14 +61,20 @@ const Chat = () => {
             removeMessage(id, chatId);
         };
 
+        const editMessageHandler = ({ id, chatId, newMessage }) => {
+            editText(id, chatId, newMessage)
+        }
+
         // This is used to recive message form other user.
         socket.on('receive_message', newMessageHandler);
         socket.on('delete_message', deleteMessageHandler);
+        socket.on('edit_message', editMessageHandler)
         setCurrentChatId(localStorage.getItem('currentChatId'));
 
         return () => {
             socket.off('receive_message', newMessageHandler);
             socket.off('delete_message', deleteMessageHandler);
+            socket.off('edit_message', editMessageHandler)
         };
     }, []);
 
@@ -176,7 +183,7 @@ const Chat = () => {
 
 
     // Here whenever user will submit message it will be send to the server
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const d = new Date();
@@ -186,14 +193,19 @@ const Chat = () => {
         }
 
         if (editing.isediting === true) {
-            const { time } = getMessage(editing.messageID);
-            handleDelete(editing.messageID)
-            doSend({
-                senderId,
-                room: currentChatId,
-                message,
-                time: time,
-            });
+            try {
+                await editMessage({
+                    id: editing.messageID,
+                    chatId: currentChatId,
+                    newMessage: message
+                })
+                editText(editing.messageID, currentChatId, message)
+                const messageObject = getMessage(editing.messageID)
+                updateMessage(editing.messageID, messageObject)
+            } catch {
+                setEditing({ isediting: false, messageID: null })
+                return;
+            }
             setEditing({ isediting: false, messageID: null })
         } else {
             doSend({

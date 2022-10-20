@@ -38,6 +38,7 @@ const {
     removeMessage,
     addMessage,
     chatExists,
+    editMessage,
 } = require('./lib');
 
 app.use(express.json());
@@ -232,6 +233,33 @@ io.on('connection', (socket) => {
     );
 
     socket.on(
+        'edit_message',
+        async (
+            { id: messageId, chatId, newMessage },
+            messageWasEditedSuccessfully
+        ) => {
+            const user = getActiveUser({
+                socketId: socket.id,
+            });
+
+            if (!user || !messageId || !chatId) {
+                messageWasEditedSuccessfully(false);
+                return;
+            }
+
+            const messageEditted = await editMessage(chatId, {
+                id: messageId,
+                message: newMessage,
+            });
+
+            socket.broadcast
+                .to(chatId)
+                .emit('edit_message', { id: messageId, chatId, newMessage });
+            messageWasEditedSuccessfully(messageEditted);
+        }
+    );
+
+    socket.on(
         'delete_message',
         async ({ id: messageId, chatId }, messageWasDeletedSuccessfully) => {
             const user = getActiveUser({
@@ -243,13 +271,12 @@ io.on('connection', (socket) => {
                 return;
             }
 
-            messageWasDeletedSuccessfully(
-                await removeMessage(chatId, messageId)
-            );
+            const messageDeleted = await removeMessage(chatId, messageId);
 
             socket.broadcast
                 .to(chatId)
                 .emit('delete_message', { id: messageId, chatId });
+            messageWasDeletedSuccessfully(messageDeleted);
         }
     );
 
@@ -292,14 +319,6 @@ io.on('connection', (socket) => {
             socket.broadcast.to(emailOrLoginId).emit('inactive');
         });
     });
-    // socket.on('adding', (data) => {
-    // 	if (data.userID.ID === '') return;
-    // 	userModule.allUsers(data.userID.ID);
-    // });
-
-    // socket.on('createRoom', () => {
-    // 	userModule.matchUsers(socket);
-    // });
 });
 
 app.use(cors());
