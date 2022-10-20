@@ -79,11 +79,15 @@ async function init() {
     }
 
     for await (const activeUser of ActiveUser.find()) {
+        const chats = await Chat.find({
+            users: {
+                $in: [activeUser._id],
+            },
+        });
+
         active_users[activeUser.emailOrLoginId] = {
             ...activeUser.optimizedVersion,
-            chatIds: (await activeUser.getChats()).map((chat) =>
-                chat._id.toString()
-            ),
+            chatIds: chats.map((chat) => chat._id.toString()),
         };
     }
 }
