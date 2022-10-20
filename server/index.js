@@ -12,7 +12,6 @@ const io = new Server(server, {
     reconnectionAttempts: 5,
 });
 const HTTP_PORT = process.env.PORT || 4000;
-const uuid = require('uuid');
 
 // Mongodb database host connection
 const mongoose = require('mongoose');
