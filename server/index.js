@@ -279,6 +279,10 @@ io.on('connection', (socket) => {
 		},
 	);
 
+	socket.on('typing', ({ chatId, isTyping }) => {
+		socket.to(chatId).emit('display', isTyping);
+	});
+
 	socket.on('logout', async () => {
 		const user = getActiveUser({
 			socketId: socket.id,

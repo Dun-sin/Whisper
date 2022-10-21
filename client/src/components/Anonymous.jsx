@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
 import Chat from 'components/Chat';
 import Dropdown from 'rsuite/Dropdown';
@@ -12,6 +12,15 @@ const Anonymous = () => {
     const navigate = useNavigate();
     const socket = useContext(SocketContext);
     const { closeChat } = useChat();
+    const [isTyping, setIsTyping] = useState(false);
+
+    socket.on('display', (isTyping) => {
+        if (isTyping) {
+            setIsTyping(true)
+        } else {
+            setIsTyping(false)
+        }
+    })
 
     const handleClose = () => {
         if (!confirm('Are you sure you want to close this chat?')) {
@@ -47,8 +56,11 @@ const Anonymous = () => {
         <div
             className={`bg-[#011627] min-w-[calc(100%-108px)] ${centerItems} flex-col max-h-[100vh] text-[#FFF]`}
         >
-            <div className="flex justify-between border-b-[2px] border-secondary pt-[50px] pr-[60px] pl-[60px] pb-[15px] h-[13%] w-[100%]">
-                <p className="text-[1em] font-semibold">Anonymous User</p>
+            <div className="flex items-center justify-between border-b-[2px] px-8 border-secondary h-[10%] w-[100%]">
+                <div>
+                    <h2 className="text-[1em] font-semibold">Anonymous User</h2>
+                    {isTyping && <p className='mt-[-15px]'>Typing</p>}
+                </div>
 
                 <Dropdown
                     placement="leftStart"
@@ -63,7 +75,7 @@ const Anonymous = () => {
                     </Dropdown.Item>
                 </Dropdown>
             </div>
-            <div className={`flex-col w-[90%] h-[87%] ${centerItems} mt-auto`}>
+            <div className={`flex-col w-[90%] h-[90%] ${centerItems} mt-auto`}>
                 <Chat />
             </div>
         </div>

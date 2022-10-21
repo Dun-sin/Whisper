@@ -186,6 +186,7 @@ const Chat = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        socket.emit('typing', ({ chatId: currentChatId, isTyping: false }))
         const d = new Date();
         const message = inputRef.current.value;
         if (message === '' || senderId === undefined || senderId === '123456') {
@@ -239,11 +240,19 @@ const Chat = () => {
     };
 
     const handleEdit = (id) => {
-        inputRef.current.focus();        
+        inputRef.current.focus();
 
         const { message } = getMessage(id)
         inputRef.current.value = message;
         setEditing({ isediting: true, messageID: id })
+    }
+
+    const handleTypingStatus = (e) => {
+        if (e.target.value.length > 0) {
+            socket.emit('typing', ({ chatId: currentChatId, isTyping: true }))
+        } else {
+            socket.emit('typing', ({ chatId: currentChatId, isTyping: false }))
+        }
     }
 
     const getTime = (time) => {
@@ -259,9 +268,11 @@ const Chat = () => {
         );
     };
 
+
+
     return (
-        <div className="w-[100%] md: h-[90%] min-h-[75.7vh] pb-[25px] mdl:flex mdl:flex-col mdl:justify-between">
-            <p className="text-[0.8em] font-semibold mb-[10px] mt-[10px] text-center">
+        <div className="w-[100%] md: h-[90%] min-h-[100%] pb-[25px] mdl:flex mdl:flex-col mdl:justify-between">
+            <p className="text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center">
                 Connected with a random User
             </p>
             <ScrollToBottom
@@ -335,6 +346,7 @@ const Chat = () => {
                     placeholder="Send a Message....."
                     className="h-[65px] focus:outline-none rounded-[15px] bg-secondary w-[100%] text-white pl-[22px] pr-[22px] text-[18px]"
                     ref={inputRef}
+                    onChange={handleTypingStatus}
                 />
                 <button
                     type="submit"
