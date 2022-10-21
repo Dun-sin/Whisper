@@ -6,6 +6,8 @@ import 'styles/chat.css';
 
 import ScrollToBottom from 'react-scroll-to-bottom';
 import Dropdown from 'rsuite/Dropdown';
+
+import { ImCancelCircle } from 'react-icons/im';
 import { IoSend } from 'react-icons/io5';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
 
@@ -14,6 +16,7 @@ import { debounce } from 'lodash';
 
 import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';
+
 import useChatUtils from 'src/lib/chat';
 import MessageStatus from './MessageStatus';
 
@@ -248,6 +251,14 @@ const Chat = () => {
         setEditing({ isediting: true, messageID: id });
     };
 
+    const cancelEdit = () => {
+        inputRef.current.value = '';
+        setEditing({ isediting: false, messageID: null });
+        socket
+            .timeout(10000)
+            .emit('typing', { chatId: currentChatId, isTyping: false });
+    };
+
     const handleTypingStatus = debounce((e) => {
         if (e.target.value.length > 0) {
             socket
@@ -257,6 +268,8 @@ const Chat = () => {
             socket
                 .timeout(10000)
                 .emit('typing', { chatId: currentChatId, isTyping: false });
+            editing.isediting &&
+                setEditing({ isediting: false, messageID: null });
         }
     }, 500);
 
@@ -351,12 +364,20 @@ const Chat = () => {
                 className="flex justify-center items-center mt-[40px]"
                 onSubmit={handleSubmit}
             >
-                <input
-                    placeholder="Send a Message....."
-                    className="h-[65px] focus:outline-none rounded-[15px] bg-secondary w-[100%] text-white pl-[22px] pr-[22px] text-[18px]"
-                    ref={inputRef}
-                    onChange={handleTypingStatus}
-                />
+                <div className="w-[100%] flex items-center justify-between bg-secondary rounded-[15px]">
+                    <input
+                        placeholder="Send a Message....."
+                        className="h-[65px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] pl-[22px] pr-[22px] text-[18px]"
+                        ref={inputRef}
+                        onChange={handleTypingStatus}
+                    />
+                    {editing.isediting && (
+                        <ImCancelCircle
+                            onClick={cancelEdit}
+                            className="fill-white mr-5 scale-[1.3] cursor-pointer"
+                        />
+                    )}
+                </div>
                 <button
                     type="submit"
                     className="bg-[#FF9F1C] h-[65px] w-[70px] flex justify-center items-center rounded-[10px]"
