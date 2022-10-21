@@ -268,8 +268,6 @@ const Chat = () => {
             socket
                 .timeout(10000)
                 .emit('typing', { chatId: currentChatId, isTyping: false });
-            editing.isediting &&
-                setEditing({ isediting: false, messageID: null });
         }
     }, 500);
 
