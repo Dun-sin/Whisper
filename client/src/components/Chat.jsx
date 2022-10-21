@@ -271,73 +271,75 @@ const Chat = () => {
 
 
     return (
-        <div className="w-[100%] md: h-[90%] min-h-[100%] pb-[25px] mdl:flex mdl:flex-col mdl:justify-between">
-            <p className="text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center">
-                Connected with a random User
-            </p>
-            <ScrollToBottom
-                initialScrollBehavior="auto"
-                className="displayMessgaes h-[75%] w-[100%]"
-            >
-                {sortedMessages.map(
-                    ({ senderId: sender, id, message, time, status }) => (
-                        <div
-                            key={id}
-                            className={`message-block ${sender.toString() === senderId.toString()
-                                ? 'me'
-                                : 'other'
-                                }`}
-                        >
-                            <div className="message">
-                                <div className="content">
-                                    <p className="text">{message}</p>
-                                    {sender.toString() ===
-                                        senderId.toString() &&
-                                        status !== 'pending' && (
-                                            <Dropdown
-                                                placement="leftStart"
-                                                style={{ zIndex: 3 }}
-                                                renderToggle={renderIconButton}
-                                                noCaret
-                                            >
-                                                <Dropdown.Item
-                                                    onClick={() =>
-                                                        handleDelete(id)
-                                                    }
+        <div className="w-[100%] md:h-[90%] min-h-[100%] mdl:min-h-[80.7vh] pb-[25px] flex flex-col justify-between">
+            <div>
+                <p className="text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center">
+                    Connected with a random User
+                </p>
+                <ScrollToBottom
+                    initialScrollBehavior="auto"
+                    className="displayMessgaes h-[100%] w-[100%] "
+                >
+                    {sortedMessages.map(
+                        ({ senderId: sender, id, message, time, status }) => (
+                            <div
+                                key={id}
+                                className={`message-block ${sender.toString() === senderId.toString()
+                                    ? 'me'
+                                    : 'other'
+                                    }`}
+                            >
+                                <div className="message">
+                                    <div className="content">
+                                        <p className="text">{message}</p>
+                                        {sender.toString() ===
+                                            senderId.toString() &&
+                                            status !== 'pending' && (
+                                                <Dropdown
+                                                    placement="leftStart"
+                                                    style={{ zIndex: 3 }}
+                                                    renderToggle={renderIconButton}
+                                                    noCaret
                                                 >
-                                                    Delete
-                                                </Dropdown.Item>
-                                                <Dropdown.Item
-                                                    onClick={() =>
-                                                        handleEdit(id)
-                                                    }
-                                                >
-                                                    Edit
-                                                </Dropdown.Item>
-                                            </Dropdown>
-                                        )}
-                                </div>
-                                <div
-                                    className={`status ${status === 'failed'
-                                        ? 'text-red-600'
-                                        : 'text-white'
-                                        }`}
-                                >
-                                    <MessageStatus
-                                        time={getTime(time)}
-                                        status={status ?? 'sent'}
-                                        iAmTheSender={
-                                            sender.toString() ===
-                                            senderId.toString()
-                                        }
-                                        onResend={() => handleResend(id)}
-                                    />
+                                                    <Dropdown.Item
+                                                        onClick={() =>
+                                                            handleDelete(id)
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </Dropdown.Item>
+                                                    <Dropdown.Item
+                                                        onClick={() =>
+                                                            handleEdit(id)
+                                                        }
+                                                    >
+                                                        Edit
+                                                    </Dropdown.Item>
+                                                </Dropdown>
+                                            )}
+                                    </div>
+                                    <div
+                                        className={`status ${status === 'failed'
+                                            ? 'text-red-600'
+                                            : 'text-white'
+                                            }`}
+                                    >
+                                        <MessageStatus
+                                            time={getTime(time)}
+                                            status={status ?? 'sent'}
+                                            iAmTheSender={
+                                                sender.toString() ===
+                                                senderId.toString()
+                                            }
+                                            onResend={() => handleResend(id)}
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )
-                )}
-            </ScrollToBottom>
+                        )
+                    )}
+                </ScrollToBottom>
+            </div>
             <form
                 className="flex justify-center items-center mt-[40px]"
                 onSubmit={handleSubmit}
