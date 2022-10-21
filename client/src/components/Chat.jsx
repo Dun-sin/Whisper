@@ -239,10 +239,11 @@ const Chat = () => {
     };
 
     const handleEdit = (id) => {
+        inputRef.current.focus();        
+
         const { message } = getMessage(id)
         inputRef.current.value = message;
         setEditing({ isediting: true, messageID: id })
-
     }
 
     const getTime = (time) => {
