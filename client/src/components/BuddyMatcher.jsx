@@ -17,7 +17,7 @@ const BuddyMatcher = () => {
     const socket = useContext(SocketContext);
 
     const userID = auth.loginId;
-    const defaultLoadingText = 'Looking for a random buddy';
+    const defaultLoadingText = <p>Looking for a random buddy</p>
     const [loadingText, setLoadingText] = useState(defaultLoadingText);
     let timeout = null;
 
@@ -25,7 +25,7 @@ const BuddyMatcher = () => {
         if (loadingText === defaultLoadingText) {
             timeout = setTimeout(() => {
                 setLoadingText(
-                    'Taking too long? No chat buddy is currently available :(\nTry refreshing!'
+                    <p>Taking too long? No chat buddy is currently available :( <br /> <a href="https://ctt.ac/US0h0" target="_blank" rel='noreferrer'>Tweet</a> about this app and get more people to use it!</p>
                 );
             }, 15000);
         }
@@ -116,9 +116,7 @@ const BuddyMatcher = () => {
         <div className="flex w-full justify-center items-center min-h-[86.5vh] flex-col bg-primary">
             <ThreeDots fill="rgb(255 159 28)" />
             <div className="text-lg text-center text-white">
-                {loadingText.split('\n').map((text) => (
-                    <p key={text}>{text}</p>
-                ))}
+                {loadingText}
             </div>
         </div>
     );
