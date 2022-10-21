@@ -273,13 +273,13 @@ const Chat = () => {
 
     return (
         <div className="w-[100%] md:h-[90%] min-h-[100%] mdl:min-h-[80.7vh] pb-[25px] flex flex-col justify-between">
-            <div>
+            <div className='max-h-[67vh]'>
                 <p className="text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center">
                     Connected with a random User
                 </p>
                 <ScrollToBottom
                     initialScrollBehavior="auto"
-                    className="displayMessgaes h-[100%] w-[100%] "
+                    className="displayMessgaes h-[100%] mdl:max-h-[62vh] overflow-y-scroll w-[100%] "
                 >
                     {sortedMessages.map(
                         ({ senderId: sender, id, message, time, status }) => (
