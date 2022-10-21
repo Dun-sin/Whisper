@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
 import Chat from 'components/Chat';
 import Dropdown from 'rsuite/Dropdown';
@@ -9,18 +9,22 @@ import { useChat } from 'src/context/ChatContext';
 const centerItems = `flex items-center justify-center`;
 
 const Anonymous = () => {
+    const [currentChatId, setCurrentChatId] = useState(null);
+    const [isTyping, setIsTyping] = useState(false);
+
     const navigate = useNavigate();
     const socket = useContext(SocketContext);
     const { closeChat } = useChat();
-    const [isTyping, setIsTyping] = useState(false);
 
-    socket.on('display', (isTyping) => {
-        if (isTyping) {
-            setIsTyping(true)
-        } else {
-            setIsTyping(false)
-        }
-    })
+    useEffect(() => {
+        setCurrentChatId(localStorage.getItem('currentChatId'));
+    }, []);
+
+    socket.on('display', ({ isTyping, chatId }) => {
+        // eslint-disable-next-line curly
+        if (chatId !== currentChatId) return;
+        isTyping ? setIsTyping(true) : setIsTyping(false);
+    });
 
     const handleClose = () => {
         if (!confirm('Are you sure you want to close this chat?')) {
@@ -48,7 +52,7 @@ const Anonymous = () => {
                 }
 
                 navigate('/');
-                localStorage.removeItem('currentChatId')
+                localStorage.removeItem('currentChatId');
             });
     };
 
@@ -59,7 +63,7 @@ const Anonymous = () => {
             <div className="flex items-center justify-between border-b-[2px] px-8 border-secondary h-[10%] w-[100%]">
                 <div>
                     <h2 className="text-[1em] font-semibold">Anonymous User</h2>
-                    {isTyping && <p className='mt-[-15px]'>Typing</p>}
+                    {isTyping && <p className="mt-[-15px]">Typing</p>}
                 </div>
 
                 <Dropdown

@@ -280,7 +280,7 @@ io.on("connection", (socket) => {
   );
 
   socket.on("typing", ({ chatId, isTyping }) => {
-    socket.to(chatId).emit("display", isTyping);
+    socket.to(chatId).timeout(5000).emit("display", { isTyping, chatId });
   });
 
   socket.on("logout", async () => {
