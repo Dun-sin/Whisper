@@ -280,6 +280,7 @@ io.on('connection', (socket) => {
 	);
 
 	socket.on('typing', ({ chatId, isTyping }) => {
+		console.log(isTyping);
 		socket.to(chatId).emit('display', isTyping);
 	});
 

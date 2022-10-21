@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { useEffect, useRef, useContext, useMemo, useState } from 'react';
 import { SocketContext } from 'context/Context';
 
