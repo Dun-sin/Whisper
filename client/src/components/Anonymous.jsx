@@ -1,16 +1,20 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
 import Chat from 'components/Chat';
 import Dropdown from 'rsuite/Dropdown';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'src/context/Context';
 import { useChat } from 'src/context/ChatContext';
+import PropTypes from 'prop-types';
 
 const centerItems = `flex items-center justify-center`;
 
-const Anonymous = () => {
+const Anonymous = ({ onChatClosed }) => {
     const [currentChatId, setCurrentChatId] = useState(null);
     const [isTyping, setIsTyping] = useState(false);
+    const [autoSearchAfterClose, setAutoSearchAfterClose] = useState(false);
+    const autoSearchRef = useRef();
+    autoSearchRef.current = autoSearchAfterClose;
 
     const navigate = useNavigate();
     const socket = useContext(SocketContext);
@@ -26,7 +30,7 @@ const Anonymous = () => {
         isTyping ? setIsTyping(true) : setIsTyping(false);
     });
 
-    const handleClose = () => {
+    const handleClose = (autoSearch = false) => {
         if (!confirm('Are you sure you want to close this chat?')) {
             return;
         }
@@ -38,12 +42,16 @@ const Anonymous = () => {
             return;
         }
 
+        setAutoSearchAfterClose(autoSearch);
+
         socket
             .timeout(30000)
             .emit('close', currentChatId, (err, chatClosed) => {
                 if (err) {
                     alert('An error occured whiles closing chat.');
                     console.log(err);
+
+                    setAutoSearchAfterClose(false);
                     return;
                 }
 
@@ -51,8 +59,17 @@ const Anonymous = () => {
                     closeChat(currentChatId);
                 }
 
-                navigate('/');
                 localStorage.removeItem('currentChatId');
+
+                if (chatClosed && autoSearchRef.current) {
+                    if (onChatClosed) {
+                        onChatClosed();
+                    }
+
+                    setAutoSearchAfterClose(false);
+                } else {
+                    navigate('/');
+                }
             });
     };
 
@@ -74,8 +91,13 @@ const Anonymous = () => {
                     }
                     noCaret
                 >
-                    <Dropdown.Item onClick={handleClose}>
+                    <Dropdown.Item onClick={() => handleClose()}>
                         Close Chat
+                    </Dropdown.Item>
+
+                    {/* TODO: Use a checkbox in modal dialog instead */}
+                    <Dropdown.Item onClick={() => handleClose(true)}>
+                        Close &apos;n find new buddy
                     </Dropdown.Item>
                 </Dropdown>
             </div>
@@ -87,3 +109,7 @@ const Anonymous = () => {
 };
 
 export default Anonymous;
+
+Anonymous.propTypes = {
+    onChatClosed: PropTypes.func,
+};
