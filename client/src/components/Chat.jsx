@@ -258,6 +258,23 @@ const Chat = () => {
             .timeout(10000)
             .emit('typing', { chatId: currentChatId, isTyping: false });
     };
+    
+    // Clear chat when escape is pressed
+    useEffect(() => {
+        const keyDownHandler = event => {
+
+            if (event.key === 'Escape' && editing.isediting) {
+                event.preventDefault();
+                cancelEdit();
+            };
+        }
+
+        document.addEventListener('keydown', keyDownHandler);
+
+        return () => {
+            document.removeEventListener('keydown', keyDownHandler);
+        };
+    }, [editing]);
 
     const handleTypingStatus = debounce((e) => {
         if (e.target.value.length > 0) {
