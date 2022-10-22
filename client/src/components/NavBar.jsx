@@ -5,7 +5,7 @@ import { Tooltip, Whisper } from 'rsuite';
 // Icons
 import { BsChatDots } from 'react-icons/bs';
 import { RiUserSearchLine } from 'react-icons/ri';
-import { BiUserCircle, BiLogOut } from 'react-icons/bi';
+import { BiUserCircle, BiLogOut, BiCog } from 'react-icons/bi';
 
 // Store
 import { useAuth } from 'context/AuthContext';
@@ -60,6 +60,16 @@ const NavBar = () => {
                 >
                     <NavLink to="/profile" className={getLinkStyle}>
                         <BiUserCircle className={iconStyle} />
+                    </NavLink>
+                </Whisper>
+                <Whisper
+                    placement="auto"
+                    controlId="control-id-hover"
+                    trigger="hover"
+                    speaker={<Tooltip>System Settings</Tooltip>}
+                >
+                    <NavLink to="/settings" className={getLinkStyle}>
+                        <BiCog className={iconStyle} />
                     </NavLink>
                 </Whisper>
                 <Whisper

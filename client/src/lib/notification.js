@@ -25,6 +25,14 @@ export function useSound(soundSrc, settings) {
 
     return {
         async play() {
+            if (
+                !audio.paused &&
+                (audio.currentTime / audio.duration) * 100 >= 1
+            ) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+
             await audio.play();
         },
     };
