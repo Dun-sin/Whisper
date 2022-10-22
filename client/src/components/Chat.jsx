@@ -19,9 +19,11 @@ import { useAuth } from 'src/context/AuthContext';
 
 import useChatUtils from 'src/lib/chat';
 import MessageStatus from './MessageStatus';
+import { useNotification } from 'src/lib/notification';
 
 let senderId;
 const Chat = () => {
+    const { playNotification } = useNotification();
     const [currentChatId, setCurrentChatId] = useState(null);
     const [editing, setEditing] = useState({
         isediting: false,
@@ -57,6 +59,7 @@ const Chat = () => {
         const newMessageHandler = (message) => {
             try {
                 addMessage(message);
+                playNotification('newMessage');
             } catch {
                 logout();
             }
@@ -258,16 +261,15 @@ const Chat = () => {
             .timeout(10000)
             .emit('typing', { chatId: currentChatId, isTyping: false });
     };
-    
+
     // Clear chat when escape is pressed
     useEffect(() => {
-        const keyDownHandler = event => {
-
+        const keyDownHandler = (event) => {
             if (event.key === 'Escape' && editing.isediting) {
                 event.preventDefault();
                 cancelEdit();
-            };
-        }
+            }
+        };
 
         document.addEventListener('keydown', keyDownHandler);
 
