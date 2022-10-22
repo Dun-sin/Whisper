@@ -97,7 +97,7 @@ const Anonymous = ({ onChatClosed }) => {
 
                     {/* TODO: Use a checkbox in modal dialog instead */}
                     <Dropdown.Item onClick={() => handleClose(true)}>
-                        Close &apos;n find new buddy
+                        find new buddy
                     </Dropdown.Item>
                 </Dropdown>
             </div>
