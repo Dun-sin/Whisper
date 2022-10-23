@@ -1,12 +1,18 @@
-// Components
-import Login from 'pages/Login';
-import { useAuth } from 'context/AuthContext';
-import NavBar from 'components/NavBar';
 import { Navigate, Route, Routes } from 'react-router-dom';
+
+// Store
+import { useAuth } from 'context/AuthContext';
+
+// Components
+import ProtectedRoutes from 'components/ProtectedRoutes';
+import NavBar from 'components/NavBar';
+
+// Pages
 import Start from 'pages/Start';
 import Searching from 'pages/Searching';
 import ComingSoon from 'pages/ComingSoon';
-import ProtectedRoutes from 'components/ProtectedRoutes';
+import Login from 'pages/Login';
+import Settings from 'pages/Settings';
 
 function App() {
     const { isLoggedIn } = useAuth();
@@ -25,6 +31,7 @@ function App() {
                     <Route exact path="/founduser" element={<Searching />} />
                     <Route exact path="/friends" element={<ComingSoon />} />
                     <Route exact path="/profile" element={<ComingSoon />} />
+                    <Route exact path="/settings" element={<Settings />} />
                 </Route>
 
                 <Route
@@ -33,8 +40,6 @@ function App() {
                     element={isLoggedIn ? <Navigate to="/" /> : <Login />}
                 />
             </Routes>
-
-
         </div>
     );
 }
