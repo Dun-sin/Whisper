@@ -16,14 +16,26 @@ const activeStyle = linkStyle + 'bg-primary shadow-2xl';
 const iconStyle = 'fill-[#f5f5f5] scale-[2]';
 
 const NavBar = () => {
-    const { logout } = useAuth();
+    const { auth, logout } = useAuth();
     const socket = useContext(SocketContext);
 
     const handleLogout = () => {
         if (confirm('Are you sure you want to logout?')) {
             logout();
 
-            socket.emit('logout');
+            // Ensure that logout event is not queued by socket.io in case
+            // socket is disconnected
+            if (socket.disconnected) {
+                socket.volatile.emit('logout', {
+                    email: auth.email,
+                    loginId: auth.loginId,
+                });
+            } else {
+                socket.emit('logout', {
+                    email: auth.email,
+                    loginId: auth.loginId,
+                });
+            }
         }
     };
 
