@@ -1,3 +1,4 @@
+import { useApp } from 'src/context/AppContext';
 import ChatClosedSound from '/notifications/closed.mp3';
 import NewMessageSound from '/notifications/new_message.mp3';
 import PairedSound from '/notifications/paired.mp3';
@@ -25,6 +26,14 @@ export function useSound(soundSrc, settings) {
 
     return {
         async play() {
+            if (
+                !audio.paused &&
+                (audio.currentTime / audio.duration) * 100 >= 1
+            ) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            
             await audio.play();
         },
     };
@@ -35,11 +44,21 @@ export function useSound(soundSrc, settings) {
  * @param {NotificationSettings} settings
  */
 export function useNotification(settings = {}) {
+    const { app } = useApp();
+    const { settings: appSettings } = app;
+
+    const _settings = {
+        volume: appSettings.notificationsEnabled
+            ? appSettings.notificationVolume
+            : 0,
+        ...settings,
+    };
+
     /** @type {{[event in NotificationEvent]: Sound}} */
     const notifications = {
-        chatClosed: useSound(ChatClosedSound, settings),
-        newMessage: useSound(NewMessageSound, settings),
-        buddyPaired: useSound(PairedSound, settings),
+        chatClosed: useSound(ChatClosedSound, _settings),
+        newMessage: useSound(NewMessageSound, _settings),
+        buddyPaired: useSound(PairedSound, _settings),
     };
 
     return {
