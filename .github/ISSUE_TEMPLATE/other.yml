@@ -1,11 +1,12 @@
 name: Other
 description: Use this for any other issues. Please do NOT create blank issues
-title: '[OTHER]'
-labels: ['🚦 status: awaiting triage']
+title: "[OTHER]"
+labels:
+  ["hacktoberfest"]
 body:
   - type: markdown
     attributes:
-      value: '# Other issue'
+      value: "# Other issue"
   - type: textarea
     id: issuedescription
     attributes:
@@ -20,7 +21,32 @@ body:
       description: Is there anything else we should know about this issue?
     validations:
       required: false
+
+  - type: checkboxes
+    id: no-duplicate-issues
+    attributes:
+      label: "👀 Have you checked if this issue has been raised before?"
+      options:
+        - label: "I checked and didn't find similar issue"
+          required: true
+
+  - type: checkboxes
+    id: read-code-of-conduct
+    attributes:
+      label: "🏢 Have you read the Contributing Guidelines?"
+      options:
+        - label: "I have read and understood the rules in the [Contributing Guidelines](https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md)"
+          required: true
+
+  - type: dropdown
+    attributes:
+      label: Are you willing to work on this issue ?
+      description: This is absolutely not required, but we are happy to guide you in the contribution process.
+      options:
+        - "Yes I am willing to submit a PR!"
+
   - type: markdown
     attributes:
       value: |
-        You can also join our Discord community [here](https://discord.gg/KUWjx4fygJ)
+        Follow me on Twitter [here](https://twitter.com/DunsinWebDev)
+        Feel free to Join the discord server [here](https://discord.gg/kcFraw3nhz) and check out other cool repositories [here](https://github.com/Dunsin)

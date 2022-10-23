@@ -1,29 +1,27 @@
-<!-- If your PR fixes an open issue, use `Closes #101` to link your PR with the issue. #101 stands for the issue number you are fixing -->
+# Fixes Issue
 
-## 🛠️ Fixes Issue
+**My PR closes #issue_number_here**
 
-<!-- Remove this section if not applicable -->
+# 👨‍💻 Changes proposed(What did you do ?)
 
-<!-- Example: Closes #31 -->
-
-## 👨‍💻 Changes proposed
-
-<!-- List all the proposed changes in your PR -->
-
-## ✔️ Check List (Check all the applicable boxes) <!-- Follow the below conventions to check the box -->
-
+# ✔️ Check List (Check all the applicable boxes)
 <!-- Mark all the applicable boxes. To mark the box as done follow the following conventions -->
+
 <!--
 [x] - Correct; marked as done
+[X] - Correct; marked as done
+
 [ ] - Not correct; marked as **not** done
 -->
 
-- [ ] My code follows the code style of this project.
-- [ ] This PR does not contain plagiarized content.
-- [ ] The title of my pull request is a short description of the requested changes.
+- [] My code follows the code style of this project.
+- [] This PR does not contain plagiarized content.
+- [] The title and description of the PR is clear and explains the approach.
 
-## 📄 Note to reviewers
+##  Note to reviewers
 
 <!-- Add notes to reviewers if applicable -->
 
-## 📷 Screenshots
+# 📷 Screenshots
+
+<!-- Add all the screenshots which support your changes -->

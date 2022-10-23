@@ -17,15 +17,32 @@ const BuddyMatcher = () => {
     const socket = useContext(SocketContext);
 
     const userID = auth.loginId;
-    const defaultLoadingText = <p>Looking for a random buddy</p>
+    const defaultLoadingText = <p>Looking for a random buddy</p>;
     const [loadingText, setLoadingText] = useState(defaultLoadingText);
     let timeout = null;
+
+    const startNewSearch = () => {
+        setIsFound(false);
+        setLoadingText(defaultLoadingText);
+        socket.emit('join', { loginId: auth.loginId, email: auth.email });
+    };
 
     useEffect(() => {
         if (loadingText === defaultLoadingText) {
             timeout = setTimeout(() => {
                 setLoadingText(
-                    <p>Taking too long? No chat buddy is currently available :( <br /> <a href="https://ctt.ac/US0h0" target="_blank" rel='noreferrer'>Tweet</a> about this app and get more people to use it!</p>
+                    <p>
+                        Taking too long? No chat buddy is currently available :({' '}
+                        <br />{' '}
+                        <a
+                            href="https://ctt.ac/US0h0"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            Tweet
+                        </a>{' '}
+                        about this app and get more people to use it!
+                    </p>
                 );
             }, 15000);
         }
@@ -57,8 +74,7 @@ const BuddyMatcher = () => {
                 return;
             }
 
-            setLoadingText(defaultLoadingText);
-            socket.emit('join', { loginId: auth.loginId, email: auth.email });
+            startNewSearch();
         });
 
         // This is necessary else chat won't be restored after re-connections
@@ -94,9 +110,9 @@ const BuddyMatcher = () => {
 
         socket.on('inactive', () => {
             closeAllChats();
-            localStorage.removeItem('currentChatId')
+            localStorage.removeItem('currentChatId');
 
-            setIsFound(false)
+            setIsFound(false);
         });
 
         return () => {
@@ -111,13 +127,11 @@ const BuddyMatcher = () => {
     }, []);
 
     return isFound ? (
-        <Anonymous />
+        <Anonymous onChatClosed={startNewSearch} />
     ) : (
         <div className="flex w-full justify-center items-center min-h-[86.5vh] flex-col bg-primary">
             <ThreeDots fill="rgb(255 159 28)" />
-            <div className="text-lg text-center text-white">
-                {loadingText}
-            </div>
+            <div className="text-lg text-center text-white">{loadingText}</div>
         </div>
     );
 };

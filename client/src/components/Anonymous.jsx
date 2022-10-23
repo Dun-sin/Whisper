@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
 import Chat from 'components/Chat';
 import Dropdown from 'rsuite/Dropdown';
@@ -6,24 +6,33 @@ import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'src/context/Context';
 import { useChat } from 'src/context/ChatContext';
 import { DialogContext } from 'src/context/DialogContext';
+import PropTypes from 'prop-types';
+
 
 const centerItems = `flex items-center justify-center`;
 
-const Anonymous = () => {
+const Anonymous = ({ onChatClosed }) => {
+    const [currentChatId, setCurrentChatId] = useState(null);
+    const [isTyping, setIsTyping] = useState(false);
+    const [autoSearchAfterClose, setAutoSearchAfterClose] = useState(false);
+    const autoSearchRef = useRef();
+    autoSearchRef.current = autoSearchAfterClose;
+
     const navigate = useNavigate();
     const socket = useContext(SocketContext);
     const { setDialog } = useContext(DialogContext);
     const { closeChat } = useChat();
-    const [isTyping, setIsTyping] = useState(false);
 
-    socket.on('display', (isTyping) => {
-        if (isTyping) {
-            setIsTyping(true)
-        } else {
-            setIsTyping(false)
-        }
-    })
+    useEffect(() => {
+        setCurrentChatId(localStorage.getItem('currentChatId'));
+    }, []);
 
+    socket.on('display', ({ isTyping, chatId }) => {
+        // eslint-disable-next-line curly
+        if (chatId !== currentChatId) return;
+        isTyping ? setIsTyping(true) : setIsTyping(false);
+    });
+    
     const closeConnection = () => {
         const currentChatId = localStorage.getItem('currentChatId');
 
@@ -32,12 +41,16 @@ const Anonymous = () => {
             return;
         }
 
+        setAutoSearchAfterClose(autoSearch);
+
         socket
             .timeout(30000)
             .emit('close', currentChatId, (err, chatClosed) => {
                 if (err) {
                     alert('An error occured whiles closing chat.');
                     console.log(err);
+
+                    setAutoSearchAfterClose(false);
                     return;
                 }
 
@@ -45,8 +58,17 @@ const Anonymous = () => {
                     closeChat(currentChatId);
                 }
 
-                navigate('/');
-                localStorage.removeItem('currentChatId')
+                localStorage.removeItem('currentChatId');
+
+                if (chatClosed && autoSearchRef.current) {
+                    if (onChatClosed) {
+                        onChatClosed();
+                    }
+
+                    setAutoSearchAfterClose(false);
+                } else {
+                    navigate('/');
+                }
             });
     }
 
@@ -67,7 +89,7 @@ const Anonymous = () => {
             <div className="flex items-center justify-between border-b-[2px] px-8 border-secondary h-[10%] w-[100%]">
                 <div>
                     <h2 className="text-[1em] font-semibold">Anonymous User</h2>
-                    {isTyping && <p className='mt-[-15px]'>Typing</p>}
+                    {isTyping && <p className="mt-[-15px]">Typing</p>}
                 </div>
 
                 <Dropdown
@@ -78,8 +100,13 @@ const Anonymous = () => {
                     }
                     noCaret
                 >
-                    <Dropdown.Item onClick={handleClose}>
+                    <Dropdown.Item onClick={() => handleClose()}>
                         Close Chat
+                    </Dropdown.Item>
+
+                    {/* TODO: Use a checkbox in modal dialog instead */}
+                    <Dropdown.Item onClick={() => handleClose(true)}>
+                        find new buddy
                     </Dropdown.Item>
                 </Dropdown>
             </div>
@@ -91,3 +118,7 @@ const Anonymous = () => {
 };
 
 export default Anonymous;
+
+Anonymous.propTypes = {
+    onChatClosed: PropTypes.func,
+};

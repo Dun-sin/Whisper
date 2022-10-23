@@ -11,8 +11,8 @@ jobs:
   welcome:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@v1
       - uses: EddieHubCommunity/gh-action-community/src/welcome@main
         with:
-          github-token: ${{ secrets.GENERAL_TOKEN}}
+          github-token: ${{ secrets.GITHUB_TOKEN}}
           issue-message: '<h1>It''s great having you contribute to this project by creating an issue</h1> Make sure you are assigned to this before you work on it and you read the <a href="https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md">Contributing.md file</a>, Thank you! Welcome to the community :nerd_face:'
