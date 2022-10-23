@@ -5,12 +5,14 @@ import Dropdown from 'rsuite/Dropdown';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'src/context/Context';
 import { useChat } from 'src/context/ChatContext';
+import { DialogContext } from 'src/context/DialogContext';
 
 const centerItems = `flex items-center justify-center`;
 
 const Anonymous = () => {
     const navigate = useNavigate();
     const socket = useContext(SocketContext);
+    const { setDialog } = useContext(DialogContext);
     const { closeChat } = useChat();
     const [isTyping, setIsTyping] = useState(false);
 
@@ -22,11 +24,7 @@ const Anonymous = () => {
         }
     })
 
-    const handleClose = () => {
-        if (!confirm('Are you sure you want to close this chat?')) {
-            return;
-        }
-
+    const closeConnection = () => {
         const currentChatId = localStorage.getItem('currentChatId');
 
         if (!currentChatId) {
@@ -50,6 +48,16 @@ const Anonymous = () => {
                 navigate('/');
                 localStorage.removeItem('currentChatId')
             });
+    }
+
+    const handleClose = () => {
+        setDialog({
+            isOpen: true,
+            text: 'Are you sure you want to close the chat?',
+            noBtnText: 'Cancel',
+            yesBtnText: 'Yes, close the chat',
+            handler: () => closeConnection()
+        })
     };
 
     return (
