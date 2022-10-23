@@ -33,7 +33,7 @@ export function useSound(soundSrc, settings) {
                 audio.pause();
                 audio.currentTime = 0;
             }
-
+            
             await audio.play();
         },
     };
