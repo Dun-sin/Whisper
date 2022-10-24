@@ -8,7 +8,7 @@ import { RiUserSearchLine } from 'react-icons/ri';
 import { BiUserCircle, BiLogOut, BiCog } from 'react-icons/bi';
 
 // Store
-import { DialogContext } from 'src/context/DialogContext';
+import { useDialog } from 'src/context/DialogContext';
 import { useAuth } from 'context/AuthContext';
 import { SocketContext } from 'context/Context';
 
@@ -19,7 +19,7 @@ const iconStyle = 'fill-[#f5f5f5] scale-[2]';
 const NavBar = () => {
     const { auth, logout } = useAuth();
     const socket = useContext(SocketContext);
-    const { setDialog } = useContext(DialogContext);
+    const { setDialog } = useDialog();
 
     const handleLogout = () => {
         setDialog({
