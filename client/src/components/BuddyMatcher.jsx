@@ -6,8 +6,10 @@ import Anonymous from 'components/Anonymous';
 import { useAuth } from 'src/context/AuthContext';
 import { useChat } from 'src/context/ChatContext';
 import { useNavigate } from 'react-router-dom';
+import { useNotification } from 'src/lib/notification';
 
 const BuddyMatcher = () => {
+    const { playNotification } = useNotification();
     const navigate = useNavigate();
     const { auth } = useAuth();
     const { createChat, closeChat, closeAllChats } = useChat();
@@ -64,6 +66,7 @@ const BuddyMatcher = () => {
         socket.on('close', (chatId) => {
             setIsFound(false);
             closeChat(chatId);
+            playNotification('chatClosed');
 
             if (
                 !confirm(
@@ -89,6 +92,7 @@ const BuddyMatcher = () => {
 
         socket.on('joined', ({ roomId, userIds }) => {
             localStorage.setItem('currentChatId', roomId);
+            playNotification('buddyPaired');
 
             createChat(roomId, userIds);
             setIsFound(true);
