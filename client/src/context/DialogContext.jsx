@@ -1,9 +1,24 @@
-import { createContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
-const DialogContext = createContext(null);
+const initialState = {
+    isOpen: false,
+    text: '',
+    handler: () => undefined,
+    noBtnText: '',
+    yesBtnText: '',
+};
 
-function DialogProvider({ children, ...props }) {
+const DialogContext = createContext({
+    dialog: { ...initialState },
+    // Tried to add typehint but eslint complains so I had to do this.
+    // eslint-disable-next-line no-unused-vars
+    setDialog: (_options = { ...initialState }) => undefined,
+});
+
+export const useDialog = () => useContext(DialogContext);
+
+export function DialogProvider({ children, ...props }) {
     const [dialog, setDialog] = useState({
         isOpen: false,
         text: '',
@@ -22,5 +37,3 @@ function DialogProvider({ children, ...props }) {
 DialogProvider.propTypes = {
     children: PropTypes.node.isRequired,
 };
-
-export { DialogContext, DialogProvider };
