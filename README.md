@@ -44,7 +44,11 @@ This app is developed to make chatting much private and easy without stealing yo
     <td align="Center" width="30%">  
 <a href="https://www.mongodb.com/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/mongodb-colored.svg" width="36" height="36" alt="MongoDB" /></a>
     <br>MongoDB
-    </td>     
+    </td>  
+        <td align="Center" width="30%">  
+<a href="https://www.mongodb.com/" target="_blank" rel="noreferrer"><img src=".github/docker.png" width="36" height="36" alt="MongoDB" /></a>
+    <br>Docker
+    </td>   
       </tr>
 </tbody>
   </table>
@@ -84,6 +88,7 @@ Before installation, please make sure you have already installed the following t
 
 - [Git](https://git-scm.com/downloads)
 - [NodeJs](https://nodejs.org/en/download/)
+- [Docker](https://docker.com/desktop)
 
 ### 🛠️ Installation
 
@@ -107,8 +112,8 @@ Before installation, please make sure you have already installed the following t
    ```
 
 5. Use `.env_sample` to configure the `.env` file for this project. For mongodb url use the localhost to test
-
-   > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0
+   > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0  
+   > Note: If using Docker, the MongoDB port is **27018**
 
 6. Run npm start in project root directory
 
