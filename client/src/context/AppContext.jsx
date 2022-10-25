@@ -10,11 +10,15 @@ const initialState = {
         notificationVolume: 10,
     },
     tmpSettings: null,
+    currentChatId: null,
+    isSearching: false,
 };
 
 const AppContext = createContext({
     ...initialState,
     updateSettings: () => undefined,
+    startSearch: () => undefined,
+    endSearch: () => undefined
 });
 
 export const useApp = () => {
@@ -77,6 +81,19 @@ export const AppProvider = ({ children }) => {
         });
     }
 
+    function startSearch() {
+        dispatch({
+            type: 'START_SEARCHING',
+        });
+    }
+
+    function endSearch(currentChatId = null) {
+        dispatch({
+            type: 'STOP_SEARCHING',
+            payload: { currentChatId },
+        });
+    }
+
     return (
         <AppContext.Provider
             value={{
@@ -85,6 +102,8 @@ export const AppProvider = ({ children }) => {
                 updateSettings,
                 updateTmpSettings,
                 cancelSettingsUpdate,
+                startSearch,
+                endSearch,
             }}
         >
             {children}

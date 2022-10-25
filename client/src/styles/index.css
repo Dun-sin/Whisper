@@ -19,3 +19,7 @@ code {
 .mj-main-js {
     height: fit-content !important;
 }
+
+.rs-form-control {
+    @apply w-full;
+}
