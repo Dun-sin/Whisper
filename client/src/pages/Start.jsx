@@ -14,10 +14,10 @@ const Start = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (app.isSearching || app.currentChatId) {
+        if (app.isSearching) {
             navigate('/founduser');
         }
-    }, [])
+    }, []);
     return (
         <div
             className={createClassesFromArray([
@@ -54,7 +54,7 @@ const Start = () => {
                     'rounded-[30px]',
                 ])}
             >
-                Start
+                {app.currentChatId ? 'Open Chat' : 'Start'}
             </Link>
         </div>
     );
