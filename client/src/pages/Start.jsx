@@ -1,9 +1,19 @@
+import { useEffect } from 'react';
 import { RiUserSearchLine } from 'react-icons/ri';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useApp } from 'src/context/AppContext';
 
 const centerElement = ' flex flex-col items-center justify-center';
 
 const Start = () => {
+    const { app } = useApp();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (app.isSearching || app.currentChatId) {
+            navigate('/founduser');
+        }
+    }, [])
     return (
         <div
             className={
