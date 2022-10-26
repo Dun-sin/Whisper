@@ -5,6 +5,7 @@ import Dropdown from 'rsuite/Dropdown';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'src/context/Context';
 import { useChat } from 'src/context/ChatContext';
+import { useDialog } from 'src/context/DialogContext';
 import PropTypes from 'prop-types';
 
 const centerItems = `flex items-center justify-center`;
@@ -19,6 +20,7 @@ const Anonymous = ({ onChatClosed }) => {
     const navigate = useNavigate();
     const socket = useContext(SocketContext);
     const { closeChat } = useChat();
+    const { setDialog } = useDialog();
 
     useEffect(() => {
         setCurrentChatId(localStorage.getItem('currentChatId'));
@@ -30,11 +32,7 @@ const Anonymous = ({ onChatClosed }) => {
         isTyping ? setIsTyping(true) : setIsTyping(false);
     });
 
-    const handleClose = (autoSearch = false) => {
-        if (!confirm('Are you sure you want to close this chat?')) {
-            return;
-        }
-
+    const closeChatHandler = (autoSearch = false) => {
         const currentChatId = localStorage.getItem('currentChatId');
 
         if (!currentChatId) {
@@ -71,6 +69,14 @@ const Anonymous = ({ onChatClosed }) => {
                     navigate('/');
                 }
             });
+    };
+
+    const handleClose = (autoSearch = false) => {
+        setDialog({
+            isOpen: true,
+            text: 'Are you sure you want to close this chat?',
+            handler: () => closeChatHandler(autoSearch),
+        });
     };
 
     return (

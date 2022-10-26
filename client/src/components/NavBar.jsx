@@ -8,6 +8,7 @@ import { RiUserSearchLine } from 'react-icons/ri';
 import { BiUserCircle, BiLogOut, BiCog } from 'react-icons/bi';
 
 // Store
+import { useDialog } from 'src/context/DialogContext';
 import { useAuth } from 'context/AuthContext';
 import { SocketContext } from 'context/Context';
 
@@ -18,25 +19,29 @@ const iconStyle = 'fill-[#f5f5f5] scale-[2]';
 const NavBar = () => {
     const { auth, logout } = useAuth();
     const socket = useContext(SocketContext);
+    const { setDialog } = useDialog();
 
     const handleLogout = () => {
-        if (confirm('Are you sure you want to logout?')) {
-            logout();
-
-            // Ensure that logout event is not queued by socket.io in case
-            // socket is disconnected
-            if (socket.disconnected) {
-                socket.volatile.emit('logout', {
-                    email: auth.email,
-                    loginId: auth.loginId,
-                });
-            } else {
-                socket.emit('logout', {
-                    email: auth.email,
-                    loginId: auth.loginId,
-                });
-            }
-        }
+        setDialog({
+            isOpen: true,
+            text: 'Are you sure you want to logout?',
+            noBtnText: 'Cancel',
+            yesBtnText: 'Yes, log me out',
+            handler: () => {
+                logout();
+                if (socket.disconnected) {
+                    socket.volatile.emit('logout', {
+                        email: auth.email,
+                        loginId: auth.loginId,
+                    });
+                } else {
+                    socket.emit('logout', {
+                        email: auth.email,
+                        loginId: auth.loginId,
+                    });
+                }
+            },
+        });
     };
 
     const getLinkStyle = ({ isActive }) => (isActive ? activeStyle : linkStyle);
