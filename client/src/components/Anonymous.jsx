@@ -13,6 +13,7 @@ import { BiArrowBack, BiDotsVerticalRounded } from 'react-icons/bi';
 import { SocketContext } from 'src/context/Context';
 import { useChat } from 'src/context/ChatContext';
 import { useApp } from 'src/context/AppContext';
+import { useDialog } from 'src/context/DialogContext';
 
 // Components
 import Chat from 'components/Chat';
@@ -32,6 +33,7 @@ const Anonymous = ({ onChatClosed }) => {
     const navigate = useNavigate();
     const socket = useContext(SocketContext);
     const { closeChat } = useChat();
+    const { setDialog } = useDialog();
 
     socket.on('display', ({ isTyping, chatId }) => {
         // eslint-disable-next-line curly
@@ -39,11 +41,7 @@ const Anonymous = ({ onChatClosed }) => {
         isTyping ? setIsTyping(true) : setIsTyping(false);
     });
 
-    const handleClose = (autoSearch = false) => {
-        if (!confirm('Are you sure you want to close this chat?')) {
-            return;
-        }
-
+    const closeChatHandler = (autoSearch = false) => {
         const currentChatId = currentChatIdRef.current;
 
         if (!currentChatId) {
@@ -68,7 +66,7 @@ const Anonymous = ({ onChatClosed }) => {
                     closeChat(currentChatId);
                 }
 
-                endSearch()
+                endSearch();
 
                 if (chatClosed && autoSearchRef.current) {
                     if (onChatClosed) {
@@ -94,6 +92,13 @@ const Anonymous = ({ onChatClosed }) => {
         );
     };
 
+    const handleClose = (autoSearch = false) => {
+        setDialog({
+            isOpen: true,
+            text: 'Are you sure you want to close this chat?',
+            handler: () => closeChatHandler(autoSearch),
+        });
+    };
     return (
         <div
             className={createClassesFromArray([
@@ -150,7 +155,7 @@ const Anonymous = ({ onChatClosed }) => {
                     centerItems,
                     'flex-col',
                     'w-[90%]',
-                    'h-[calc(100%-65px)]'
+                    'h-[calc(100%-65px)]',
                 ])}
             >
                 <Chat />
