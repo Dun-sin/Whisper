@@ -18,7 +18,7 @@ function App() {
     const { isLoggedIn } = useAuth();
 
     return (
-        <div className="flex flex-col-reverse md:flex-row min-h-screen">
+        <div className="flex flex-col-reverse md:flex-row h-full">
             {/* TODO: Create layouts */}
             {isLoggedIn && <NavBar />}
             <Routes>

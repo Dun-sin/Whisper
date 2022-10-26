@@ -68,14 +68,14 @@ const NavBar = ({ className }) => {
                 'flex-row',
                 'justify-center',
                 'shadow-[0_0_100px_0_rgba(0,0,0,1)]',
-                'p-2',
+                'px-2',
                 'md:p-5',
                 'sticky bottom-0',
-                'md:flex',
+                'flex',
                 'h-[70px]'
             ])}
         >
-            <div className="justify-between md:justify-center flex items-center md:flex-col flex-row h-full w-full gap-2 flex-nowrap overflow-auto md:h-full">
+            <div className="justify-between md:justify-center flex items-center md:flex-col flex-row w-full gap-2 flex-nowrap overflow-auto md:h-full no-scrollbar">
                 <Whisper
                     placement="auto"
                     controlId="control-id-hover"

@@ -11,7 +11,7 @@ const ComingSoon = () => {
                 'justify-center',
                 'flex-col',
                 'md:min-h-screen',
-                'min-h-[calc(100vh-70px)]',
+                'min-h-[calc(100%-70px)]',
                 'text-white',
                 'text-[calc(1.2vh+1.2vh+1.2vmin)]'
             )}

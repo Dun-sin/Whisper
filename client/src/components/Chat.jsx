@@ -304,14 +304,16 @@ const Chat = () => {
     };
 
     return (
-        <div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between">
-            <div className="max-h-[67vh]">
-                <p className="text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center">
-                    Connected with a random User
-                </p>
+        <div className="w-full min-h-[100%] flex flex-col justify-between">
+            <div className="h-[calc(100%-100px)]">
+                <div className="h-[35px] flex items-center justify-center">
+                    <p className="text-[0.8em] font-semibold text-center">
+                        Connected with a random User
+                    </p>
+                </div>
                 <ScrollToBottom
                     initialScrollBehavior="auto"
-                    className="displayMessgaes h-[100%] max-h-[62vh] md:max-h-full overflow-y-scroll w-[100%] "
+                    className="displayMessgaes h-[calc(100%-35px)] md:max-h-full overflow-y-scroll w-[100%] "
                 >
                     {sortedMessages.map(
                         ({ senderId: sender, id, message, time, status }) => (
@@ -378,7 +380,7 @@ const Chat = () => {
                 </ScrollToBottom>
             </div>
             <form
-                className="flex justify-center items-center mt-[40px]"
+                className="flex justify-center items-center h-[100px]"
                 onSubmit={handleSubmit}
             >
                 <div className="w-[100%] flex items-center justify-between bg-secondary rounded-[15px]">

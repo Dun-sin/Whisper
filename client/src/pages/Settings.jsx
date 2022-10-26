@@ -40,7 +40,7 @@ const Searching = () => {
 
     return (
         <div
-            className="md:flex md:justify-center md:items-center flex-col w-full p-2 gap-5 bg-primary md:min-h-screen min-h-[calc(100vh-70px)]"
+            className="md:flex md:justify-center md:items-center flex-col w-full p-2 gap-5 px-10 md:px-2 bg-primary md:min-h-screen min-h-[calc(100%-70px)]"
         >
             <Form onSubmit={handleSubmit} onChange={handleChange}>
                 <Divider className="text-white">Notifications</Divider>

@@ -26,7 +26,7 @@ const Start = () => {
                 'min-w-[calc(100%-108px)]',
                 'text-white',
                 'md:min-h-screen',
-                'min-h-[calc(100vh-70px)]',
+                'min-h-[calc(100%-70px)]',
             ])}
         >
             <RiUserSearchLine
