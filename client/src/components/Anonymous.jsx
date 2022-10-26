@@ -13,10 +13,14 @@ import { BiArrowBack, BiDotsVerticalRounded } from 'react-icons/bi';
 import { SocketContext } from 'src/context/Context';
 import { useChat } from 'src/context/ChatContext';
 import { useApp } from 'src/context/AppContext';
+import { useDialog } from 'src/context/DialogContext';
 
 // Components
 import Chat from 'components/Chat';
 import { createClassesFromArray } from 'src/lib/utils';
+
+import PropTypes from 'prop-types';
+
 
 const centerItems = `flex items-center justify-center`;
 
@@ -32,6 +36,7 @@ const Anonymous = ({ onChatClosed }) => {
     const navigate = useNavigate();
     const socket = useContext(SocketContext);
     const { closeChat } = useChat();
+    const { setDialog } = useDialog();
 
     socket.on('display', ({ isTyping, chatId }) => {
         // eslint-disable-next-line curly
@@ -39,12 +44,8 @@ const Anonymous = ({ onChatClosed }) => {
         isTyping ? setIsTyping(true) : setIsTyping(false);
     });
 
-    const handleClose = (autoSearch = false) => {
-        if (!confirm('Are you sure you want to close this chat?')) {
-            return;
-        }
-
-        const currentChatId = currentChatIdRef.current;
+    const closeChatHandler = (autoSearch = false) => {
+        const currentChatId = localStorage.getItem('currentChatId');
 
         if (!currentChatId) {
             navigate('/');
@@ -92,7 +93,13 @@ const Anonymous = ({ onChatClosed }) => {
                 circle
             />
         );
-    };
+
+    const handleClose = (autoSearch = false) => {
+        setDialog({
+            isOpen: true,
+            text: 'Are you sure you want to close this chat?',
+            handler: () => closeChatHandler(autoSearch),
+        });
 
     return (
         <div
