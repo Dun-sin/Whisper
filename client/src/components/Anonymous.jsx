@@ -44,6 +44,8 @@ const Anonymous = ({ onChatClosed }) => {
         isTyping ? setIsTyping(true) : setIsTyping(false);
     });
 
+
+    const currentChatId = currentChatIdRef.current;
     const closeChatHandler = (autoSearch = false) => {
         const currentChatId = localStorage.getItem('currentChatId');
 
@@ -93,6 +95,8 @@ const Anonymous = ({ onChatClosed }) => {
                 circle
             />
         );
+
+    };
 
     const handleClose = (autoSearch = false) => {
         setDialog({

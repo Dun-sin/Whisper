@@ -16,7 +16,7 @@ const BuddyMatcher = () => {
     const { auth } = useAuth();
     const { createChat, closeChat, closeAllChats } = useChat();
     const { startSearch, endSearch, app } = useApp();
-    
+
     const [isStoppingSearch, setIsStoppingSearch] = useState(false);
     const socket = useContext(SocketContext);
 
@@ -32,13 +32,19 @@ const BuddyMatcher = () => {
     };
 
     const handleStopSearch = () => {
-        socket.emit('stop_search', { loginId: auth.loginId, email: auth.email });
+        socket.emit('stop_search', {
+            loginId: auth.loginId,
+            email: auth.email,
+        });
         setIsStoppingSearch(true);
     };
 
     useEffect(() => {
-        setLoadingText(isStoppingSearch ? stoppingSearchLoadingText : defaultLoadingText);
-    }, [isStoppingSearch]);
+
+        setLoadingText(
+            isStoppingSearch ? stoppingSearchLoadingText : defaultLoadingText
+        );
+
 
     useEffect(() => {
         if (loadingText === defaultLoadingText) {
@@ -47,7 +53,10 @@ const BuddyMatcher = () => {
                     <>
                         <p>
                             Taking too long? <br className="md:hidden" />
-                            No <span className="hidden sm:inline">chat</span> buddy is currently available :({' '}
+                            No <span className="hidden sm:inline">
+                                chat
+                            </span>{' '}
+                            buddy is currently available :({' '}
                         </p>
                         <p>
                             <a
@@ -130,6 +139,7 @@ const BuddyMatcher = () => {
 
         socket.on('stop_search_success', () => {
             setIsStoppingSearch(false);
+            endSearch();
             navigate('/');
         });
 
@@ -148,14 +158,16 @@ const BuddyMatcher = () => {
         <div className="flex w-full justify-center items-center min-h-[calc(100vh-70px)] flex-col bg-primary">
             <ThreeDots fill="rgb(255 159 28)" />
             <div className="text-lg text-center text-white">{loadingText}</div>
-            {!isStoppingSearch && <button
-                onClick={handleStopSearch}
-                className={
-                    'hover:no-underline hover:text-white font-medium text-white text-[1.5em] w-[8em] h-[2.3em] mt-4 rounded-[30px] bg-[#FF3A46] flex flex-col items-center justify-center'
-                }
-            >
-                Stop
-            </button>}
+            {!isStoppingSearch && (
+                <button
+                    onClick={handleStopSearch}
+                    className={
+                        'hover:no-underline hover:text-white font-medium text-white text-[1.5em] w-[8em] h-[2.3em] mt-4 rounded-[30px] bg-[#FF3A46] flex flex-col items-center justify-center'
+                    }
+                >
+                    Stop
+                </button>
+            )}
         </div>
     ) : (
         <Anonymous onChatClosed={startNewSearch} />
