@@ -327,6 +327,11 @@ io.on('connection', (socket) => {
             socket.broadcast.to(emailOrLoginId).emit('inactive');
         });
     });
+
+    socket.on('stop_search', async ({ loginId, email }) => {
+        await delWaitingUser(email ?? loginId);
+        socket.emit('stop_search_success');
+    });
 });
 
 app.use(cors());
