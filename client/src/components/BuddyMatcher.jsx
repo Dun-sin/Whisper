@@ -5,9 +5,10 @@ import { SocketContext } from 'context/Context';
 import Anonymous from 'components/Anonymous';
 import { useAuth } from 'src/context/AuthContext';
 import { useChat } from 'src/context/ChatContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useNotification } from 'src/lib/notification';
 
+const stoppingSearchLoadingText = <p>Stopping the search</p>;
 const BuddyMatcher = () => {
     const { playNotification } = useNotification();
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ const BuddyMatcher = () => {
 
     // eslint-disable-next-line no-unused-vars
     const [isFound, setIsFound] = useState(false);
+    const [isStoppingSearch, setIsStoppingSearch] = useState(false);
     const socket = useContext(SocketContext);
 
     const userID = auth.loginId;
@@ -28,6 +30,15 @@ const BuddyMatcher = () => {
         setLoadingText(defaultLoadingText);
         socket.emit('join', { loginId: auth.loginId, email: auth.email });
     };
+
+    const handleStopSearch = () => {
+        socket.emit('stop_search', { loginId: auth.loginId, email: auth.email });
+        setIsStoppingSearch(true);
+    };
+
+    useEffect(() => {
+        setLoadingText(isStoppingSearch ? stoppingSearchLoadingText : defaultLoadingText);
+    }, [isStoppingSearch]);
 
     useEffect(() => {
         if (loadingText === defaultLoadingText) {
@@ -119,6 +130,11 @@ const BuddyMatcher = () => {
             setIsFound(false);
         });
 
+        socket.on('stop_search_success', () => {
+            setIsStoppingSearch(false);
+            navigate('/');
+        });
+
         return () => {
             socket
                 .off('connect')
@@ -136,14 +152,14 @@ const BuddyMatcher = () => {
         <div className="flex w-full justify-center items-center min-h-[86.5vh] flex-col bg-primary">
             <ThreeDots fill="rgb(255 159 28)" />
             <div className="text-lg text-center text-white">{loadingText}</div>
-            <Link
-                to="/"
+            {!isStoppingSearch && <button
+                onClick={handleStopSearch}
                 className={
                     'hover:no-underline hover:text-white font-medium text-white text-[1.5em] w-[8em] h-[2.3em] mt-4 rounded-[30px] border-4 border-solid border-[#f04336] flex flex-col items-center justify-center'
                 }
             >
                 Stop
-            </Link>
+            </button>}
         </div>
     );
 };
