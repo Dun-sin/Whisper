@@ -5,7 +5,7 @@ import { SocketContext } from 'context/Context';
 import Anonymous from 'components/Anonymous';
 import { useAuth } from 'src/context/AuthContext';
 import { useChat } from 'src/context/ChatContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useNotification } from 'src/lib/notification';
 
 const BuddyMatcher = () => {
@@ -136,6 +136,14 @@ const BuddyMatcher = () => {
         <div className="flex w-full justify-center items-center min-h-[86.5vh] flex-col bg-primary">
             <ThreeDots fill="rgb(255 159 28)" />
             <div className="text-lg text-center text-white">{loadingText}</div>
+            <Link
+                to="/"
+                className={
+                    'hover:no-underline hover:text-white font-medium text-white text-[1.5em] w-[8em] h-[2.3em] mt-4 rounded-[30px] border-4 border-solid border-[#f04336] flex flex-col items-center justify-center'
+                }
+            >
+                Stop
+            </Link>
         </div>
     );
 };
