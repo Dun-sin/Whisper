@@ -39,16 +39,17 @@ const Searching = () => {
     };
 
     return (
-        <div className="md:flex md:justify-center md:items-center flex-col w-full p-2 gap-5 bg-primary">
+        <div
+            className="md:flex md:justify-center md:items-center flex-col w-full p-2 gap-5 bg-primary md:min-h-screen min-h-[calc(100vh-70px)]"
+        >
             <Form onSubmit={handleSubmit} onChange={handleChange}>
                 <Divider className="text-white">Notifications</Divider>
-                <Form.Group controlId="name-6">
+                <Form.Group controlId="notifications-enabled">
                     <Form.Control
                         name="notificationsEnabled"
                         accepter={Checkbox}
                         checked={settings.notificationsEnabled}
                         value={!settings.notificationsEnabled}
-                        style={{ width: 300 }}
                     >
                         Enable Notifications
                     </Form.Control>
@@ -56,12 +57,11 @@ const Searching = () => {
                         Enable/Disable notifications
                     </Form.HelpText>
                 </Form.Group>
-                <Form.Group controlId="name-6">
+                <Form.Group controlId="notification-volume">
                     <Form.ControlLabel>Volume level (%)</Form.ControlLabel>
                     <Form.Control
                         name="notificationVolume"
                         accepter={Slider}
-                        style={{ width: 300 }}
                         progress
                         step={10}
                         graduated

@@ -7,6 +7,7 @@ import { useAuth } from 'src/context/AuthContext';
 import { useChat } from 'src/context/ChatContext';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from 'src/lib/notification';
+import { useApp } from 'src/context/AppContext';
 
 const stoppingSearchLoadingText = <p>Stopping the search</p>;
 const BuddyMatcher = () => {
@@ -14,9 +15,8 @@ const BuddyMatcher = () => {
     const navigate = useNavigate();
     const { auth } = useAuth();
     const { createChat, closeChat, closeAllChats } = useChat();
-
-    // eslint-disable-next-line no-unused-vars
-    const [isFound, setIsFound] = useState(false);
+    const { startSearch, endSearch, app } = useApp();
+    
     const [isStoppingSearch, setIsStoppingSearch] = useState(false);
     const socket = useContext(SocketContext);
 
@@ -26,7 +26,7 @@ const BuddyMatcher = () => {
     let timeout = null;
 
     const startNewSearch = () => {
-        setIsFound(false);
+        startSearch();
         setLoadingText(defaultLoadingText);
         socket.emit('join', { loginId: auth.loginId, email: auth.email });
     };
@@ -44,18 +44,22 @@ const BuddyMatcher = () => {
         if (loadingText === defaultLoadingText) {
             timeout = setTimeout(() => {
                 setLoadingText(
-                    <p>
-                        Taking too long? No chat buddy is currently available :({' '}
-                        <br />{' '}
-                        <a
-                            href="https://ctt.ac/US0h0"
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            Tweet
-                        </a>{' '}
-                        about this app and get more people to use it!
-                    </p>
+                    <>
+                        <p>
+                            Taking too long? <br className="md:hidden" />
+                            No <span className="hidden sm:inline">chat</span> buddy is currently available :({' '}
+                        </p>
+                        <p>
+                            <a
+                                href="https://ctt.ac/US0h0"
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                Tweet
+                            </a>{' '}
+                            about this app and get more people to use it!
+                        </p>
+                    </>
                 );
             }, 15000);
         }
@@ -66,8 +70,8 @@ const BuddyMatcher = () => {
     }, [loadingText]);
 
     useEffect(() => {
-        if (isFound) {
-            return;
+        if (!app.currentChatId) {
+            startSearch();
         }
 
         if (!socket.connected) {
@@ -75,7 +79,7 @@ const BuddyMatcher = () => {
         }
 
         socket.on('close', (chatId) => {
-            setIsFound(false);
+            endSearch();
             closeChat(chatId);
             playNotification('chatClosed');
 
@@ -102,15 +106,13 @@ const BuddyMatcher = () => {
         // From here will get the info from server that user has joined the room
 
         socket.on('joined', ({ roomId, userIds }) => {
-            localStorage.setItem('currentChatId', roomId);
             playNotification('buddyPaired');
 
             createChat(roomId, userIds);
-            setIsFound(true);
+            endSearch(roomId);
         });
 
         socket.on('chat_restore', ({ chats, currentChatId }) => {
-            localStorage.setItem('currentChatId', currentChatId);
             Object.values(chats).forEach((chat) => {
                 createChat(
                     chat.id,
@@ -119,15 +121,11 @@ const BuddyMatcher = () => {
                     chat.createdAt
                 );
             });
-
-            setIsFound(true);
+            endSearch(currentChatId);
         });
 
         socket.on('inactive', () => {
             closeAllChats();
-            localStorage.removeItem('currentChatId');
-
-            setIsFound(false);
         });
 
         socket.on('stop_search_success', () => {
@@ -146,10 +144,8 @@ const BuddyMatcher = () => {
         };
     }, []);
 
-    return isFound ? (
-        <Anonymous onChatClosed={startNewSearch} />
-    ) : (
-        <div className="flex w-full justify-center items-center min-h-[86.5vh] flex-col bg-primary">
+    return app.isSearching ? (
+        <div className="flex w-full justify-center items-center min-h-[calc(100vh-70px)] flex-col bg-primary">
             <ThreeDots fill="rgb(255 159 28)" />
             <div className="text-lg text-center text-white">{loadingText}</div>
             {!isStoppingSearch && <button
@@ -161,6 +157,8 @@ const BuddyMatcher = () => {
                 Stop
             </button>}
         </div>
+    ) : (
+        <Anonymous onChatClosed={startNewSearch} />
     );
 };
 
