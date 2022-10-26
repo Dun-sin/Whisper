@@ -7,13 +7,18 @@ import { AuthProvider } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import 'rsuite/dist/rsuite.min.css';
 import { socket, SocketContext } from 'context/Context';
+import { DialogProvider } from './context/DialogContext';
+import Dialog from './components/Dialog';
 
 render(
     <AuthProvider>
         <AppProvider>
             <Router>
                 <SocketContext.Provider value={socket}>
-                    <App />
+                    <DialogProvider>
+                        <App />
+                        <Dialog />
+                    </DialogProvider>
                 </SocketContext.Provider>
             </Router>
         </AppProvider>

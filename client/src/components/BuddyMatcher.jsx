@@ -40,10 +40,11 @@ const BuddyMatcher = () => {
     };
 
     useEffect(() => {
+
         setLoadingText(
             isStoppingSearch ? stoppingSearchLoadingText : defaultLoadingText
         );
-    }, [isStoppingSearch]);
+
 
     useEffect(() => {
         if (loadingText === defaultLoadingText) {
