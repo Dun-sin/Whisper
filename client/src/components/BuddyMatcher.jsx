@@ -155,7 +155,7 @@ const BuddyMatcher = () => {
             {!isStoppingSearch && <button
                 onClick={handleStopSearch}
                 className={
-                    'hover:no-underline hover:text-white font-medium text-white text-[1.5em] w-[8em] h-[2.3em] mt-4 rounded-[30px] border-4 border-solid border-[#f04336] flex flex-col items-center justify-center'
+                    'hover:no-underline hover:text-white font-medium text-white text-[1.5em] w-[8em] h-[2.3em] mt-4 rounded-[30px] bg-[#FF3A46] flex flex-col items-center justify-center'
                 }
             >
                 Stop
