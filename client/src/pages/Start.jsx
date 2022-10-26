@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { RiUserSearchLine } from 'react-icons/ri';
-
 import { useApp } from 'src/context/AppContext';
 
 import { createClassesFromArray } from 'src/lib/utils';

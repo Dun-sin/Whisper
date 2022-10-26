@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .dialog-overlay {
+        @apply z-50 fixed inset-0 bg-black opacity-60;
+    }
+
+    .dialog-container {
+        @apply z-50 rounded-lg fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 bg-secondary w-[90%] md:w-auto md:max-w-md px-6 py-6;
+    }
+
+    .dialog-btn {
+        @apply hover:opacity-80 text-white px-4 py-2 rounded-lg;
+    }
+}
