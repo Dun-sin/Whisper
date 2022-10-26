@@ -19,6 +19,20 @@ export default function chatReducer(state, action) {
             break;
         }
 
+        case 'START_SEARCHING': {
+            clonedState.isSearching = true;
+            clonedState.currentChatId = null;
+            break;
+        }
+
+        case 'STOP_SEARCHING': {
+            const { currentChatId } = action.payload;
+
+            clonedState.isSearching = false;
+            clonedState.currentChatId = currentChatId;
+            break;
+        }
+
         default:
             throw new Error('No action provided!');
     }

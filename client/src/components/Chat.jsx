@@ -20,11 +20,12 @@ import { useAuth } from 'src/context/AuthContext';
 import useChatUtils from 'src/lib/chat';
 import MessageStatus from './MessageStatus';
 import { useNotification } from 'src/lib/notification';
+import { useApp } from 'src/context/AppContext';
 
 let senderId;
 const Chat = () => {
+    const { app } = useApp();
     const { playNotification } = useNotification();
-    const [currentChatId, setCurrentChatId] = useState(null);
     const [editing, setEditing] = useState({
         isediting: false,
         messageID: null,
@@ -44,11 +45,11 @@ const Chat = () => {
     senderId = auth.email ?? auth.loginId;
 
     const getMessage = (id) => {
-        if (!state[currentChatId]) {
+        if (!state[app.currentChatId]) {
             return null;
         }
 
-        return state[currentChatId].messages[id];
+        return state[app.currentChatId].messages[id];
     };
 
     const messageExists = (id) => {
@@ -77,7 +78,6 @@ const Chat = () => {
         socket.on('receive_message', newMessageHandler);
         socket.on('delete_message', deleteMessageHandler);
         socket.on('edit_message', editMessageHandler);
-        setCurrentChatId(localStorage.getItem('currentChatId'));
 
         return () => {
             socket.off('receive_message', newMessageHandler);
@@ -88,14 +88,14 @@ const Chat = () => {
 
     const sortedMessages = useMemo(
         () =>
-            Object.values(state[currentChatId]?.messages ?? {})?.sort(
+            Object.values(state[app.currentChatId]?.messages ?? {})?.sort(
                 (a, b) => {
                     const da = new Date(a.time),
                         db = new Date(b.time);
                     return da - db;
                 }
             ),
-        [state, currentChatId]
+        [state, app.currentChatId]
     );
 
     const doSend = async ({
@@ -193,7 +193,7 @@ const Chat = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        socket.emit('typing', { chatId: currentChatId, isTyping: false });
+        socket.emit('typing', { chatId: app.currentChatId, isTyping: false });
         const d = new Date();
         const message = inputRef.current.value;
         if (message === '' || senderId === undefined || senderId === '123456') {
@@ -204,10 +204,10 @@ const Chat = () => {
             try {
                 await editMessage({
                     id: editing.messageID,
-                    chatId: currentChatId,
+                    chatId: app.currentChatId,
                     newMessage: message,
                 });
-                editText(editing.messageID, currentChatId, message);
+                editText(editing.messageID, app.currentChatId, message);
                 const messageObject = getMessage(editing.messageID);
                 updateMessage(editing.messageID, messageObject);
             } catch {
@@ -218,7 +218,7 @@ const Chat = () => {
         } else {
             doSend({
                 senderId,
-                room: currentChatId,
+                room: app.currentChatId,
                 message,
                 time: d.getTime(),
             });
@@ -259,7 +259,7 @@ const Chat = () => {
         setEditing({ isediting: false, messageID: null });
         socket
             .timeout(10000)
-            .emit('typing', { chatId: currentChatId, isTyping: false });
+            .emit('typing', { chatId: app.currentChatId, isTyping: false });
     };
 
     // Clear chat when escape is pressed
@@ -282,11 +282,11 @@ const Chat = () => {
         if (e.target.value.length > 0) {
             socket
                 .timeout(5000)
-                .emit('typing', { chatId: currentChatId, isTyping: true });
+                .emit('typing', { chatId: app.currentChatId, isTyping: true });
         } else {
             socket
                 .timeout(10000)
-                .emit('typing', { chatId: currentChatId, isTyping: false });
+                .emit('typing', { chatId: app.currentChatId, isTyping: false });
         }
     }, 500);
 
@@ -304,14 +304,14 @@ const Chat = () => {
     };
 
     return (
-        <div className="w-[100%] md:h-[90%] min-h-[100%] mdl:min-h-[80.7vh] pb-[25px] flex flex-col justify-between">
+        <div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between">
             <div className="max-h-[67vh]">
                 <p className="text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center">
                     Connected with a random User
                 </p>
                 <ScrollToBottom
                     initialScrollBehavior="auto"
-                    className="displayMessgaes h-[100%] mdl:max-h-[62vh] overflow-y-scroll w-[100%] "
+                    className="displayMessgaes h-[100%] max-h-[62vh] md:max-h-full overflow-y-scroll w-[100%] "
                 >
                     {sortedMessages.map(
                         ({ senderId: sender, id, message, time, status }) => (
