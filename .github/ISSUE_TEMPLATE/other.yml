@@ -1,8 +1,6 @@
 name: Other
 description: Use this for any other issues. Please do NOT create blank issues
 title: "[OTHER]"
-labels:
-  ["hacktoberfest"]
 body:
   - type: markdown
     attributes:
