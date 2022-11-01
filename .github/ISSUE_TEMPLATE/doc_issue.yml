@@ -1,11 +1,7 @@
 name: 📄 Documentation issue
 description: Found an issue in the documentation? You can use this one!
 title: "[DOCS] <what do you have to add>"
-labels:
-  [
-    "documentation",
-    "hacktoberfest",
-  ]
+labels: ["documentation"]
 body:
   - type: textarea
     id: description
