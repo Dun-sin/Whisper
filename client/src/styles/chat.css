@@ -37,7 +37,7 @@
     }
 
     .message-block .message .content {
-        @apply bg-[#FF9F1C] rounded-[20px] p-[15px] break-all w-full flex gap-2 items-start;
+        @apply bg-highlight rounded-[20px] p-[15px] break-all w-full flex gap-2 items-start;
     }
 
     .message-block .message .status {
