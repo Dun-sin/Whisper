@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -19,6 +19,7 @@ import { useDialog } from 'src/context/DialogContext';
 import Chat from 'components/Chat';
 import { createClassesFromArray } from 'src/lib/utils';
 
+import useKeyPress from 'src/hooks/useKeyPress';
 
 const centerItems = `flex items-center justify-center`;
 
@@ -101,24 +102,10 @@ const Anonymous = ({ onChatClosed }) => {
     });
   };
 
-  const handleKeyPress = useCallback((event) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'c') {
-          handleClose();
-      }
-      if ((event.ctrlKey || event.metaKey) && event.key === 'n') {
-          handleClose(true);
-      }
-  }, []);
+    useKeyPress(['c'], () => handleClose());
+    useKeyPress(['n'], () => handleClose(true));
 
-  useEffect(() => {
-      document.addEventListener('keydown', handleKeyPress);
-
-      return () => {
-          document.removeEventListener('keydown', handleKeyPress);
-      };
-  }, [handleKeyPress]);
-
-  return (
+    return (
     <div
       className={createClassesFromArray([
         centerItems,
