@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -99,8 +99,25 @@ const Anonymous = ({ onChatClosed }) => {
       text: 'Are you sure you want to close this chat?',
       handler: () => closeChatHandler(autoSearch),
     });
+  };
 
-  }
+  const handleKeyPress = useCallback((event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'c') {
+          handleClose();
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key === 'n') {
+          handleClose(true);
+      }
+  }, []);
+
+  useEffect(() => {
+      document.addEventListener('keydown', handleKeyPress);
+
+      return () => {
+          document.removeEventListener('keydown', handleKeyPress);
+      };
+  }, [handleKeyPress]);
+
   return (
     <div
       className={createClassesFromArray([
