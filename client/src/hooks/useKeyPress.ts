@@ -6,9 +6,11 @@ const useKeyPress = (keys, callback, node = null) => {
         callbackRef.current = callback;
     });
 
+    const isShortcut = (event) => keys.some((key) => event.key === key);
+
     const handleKeyPress = useCallback(
         (event) => {
-            if ((event.ctrlKey || event.metaKey) && keys.some((key) => event.key === key)) {
+            if ((event.ctrlKey || event.metaKey) && isShortcut(event)) {
                 callbackRef.current(event);
             }
         },
@@ -17,12 +19,16 @@ const useKeyPress = (keys, callback, node = null) => {
 
     useEffect(() => {
         const targetNode = node ?? document;
-        targetNode &&
-        targetNode.addEventListener("keydown", handleKeyPress);
 
-        return () =>
-            targetNode &&
-            targetNode.removeEventListener("keydown", handleKeyPress);
+        if (targetNode) {
+            targetNode.addEventListener("keydown", handleKeyPress);
+        }
+
+        return () => {
+            if (targetNode) {
+                targetNode.removeEventListener("keydown", handleKeyPress);
+            }
+        }
     }, [handleKeyPress, node]);
 };
 
