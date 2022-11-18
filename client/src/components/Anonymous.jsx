@@ -19,6 +19,7 @@ import { useDialog } from 'src/context/DialogContext';
 import Chat from 'components/Chat';
 import { createClassesFromArray } from 'src/lib/utils';
 
+import useKeyPress from 'src/hooks/useKeyPress';
 
 const centerItems = `flex items-center justify-center`;
 
@@ -99,9 +100,12 @@ const Anonymous = ({ onChatClosed }) => {
       text: 'Are you sure you want to close this chat?',
       handler: () => closeChatHandler(autoSearch),
     });
+  };
 
-  }
-  return (
+    useKeyPress(['c'], () => handleClose());
+    useKeyPress(['n'], () => handleClose(true));
+
+    return (
     <div
       className={createClassesFromArray([
         centerItems,
