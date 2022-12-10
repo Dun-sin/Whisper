@@ -115,13 +115,12 @@ Before installation, please make sure you have already installed the following t
    > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0  
    > Note: If using Docker, the MongoDB port is **27018**
 
-6. Run npm start in project root directory
+6. Run npm start in project root directory, this uses docker for the server part
 
    ```bash
    npm start
    ```
-
-   > Both ends of the project rely on each other, for you to work on any end(client or server) they both need to be started with `npm start`
+   > For those who do not wish to use Docker, here is another option -> [to start the project](https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md#starting-the-project-without-docker)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

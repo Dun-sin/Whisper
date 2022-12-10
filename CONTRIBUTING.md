@@ -49,6 +49,25 @@
 
 ---
 
+## Starting the Project without Docker
+- Navigate to the Client Folder
+  ```bash
+  cd client
+  ```
+- Start the client Side
+  ```bash
+  npm start
+  ```
+- Navigate to the Server Folder
+  ```bash
+  cd server
+  ```
+- Start the Server Side
+  ```bash
+  nodemon index.js
+  ```
+  > Note: you must have gotten past step 5 in ["Installation"](https://github.com/Dun-sin/Whisper#%EF%B8%8F-installation) part of the readme file
+
 ## 🌟 HOW TO MAKE A PULL REQUEST:
 
 1. Start by making a Fork of the [Whisper](https://github.com/Dun-sin/Whisper) repository. Click on the <a href="https://github.com/Dun-sin/Whisper/fork"><img src="https://i.imgur.com/G4z1kEe.png" height="21" width="21"></a>Fork symbol at the top right corner.
