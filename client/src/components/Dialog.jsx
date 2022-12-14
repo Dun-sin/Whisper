@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { useDialog } from 'src/context/DialogContext';
+import useTheme from 'src/hooks/useTheme';
 
 import 'styles/dialog.css';
 
@@ -36,6 +37,8 @@ const Dialog = ({ ...rest }) => {
         return null;
     }
 
+    const context = useTheme();
+    const light = context.theme === 'light';
     return ReactDOM.createPortal(
         <>
             <div
@@ -43,8 +46,18 @@ const Dialog = ({ ...rest }) => {
                 className="dialog-overlay"
                 onClick={resetDialog}
             />
-            <dialog open={isOpen} {...rest} className="dialog-container">
-                <p className="text-white text-[1rem]">
+            <dialog
+                open={isOpen}
+                {...rest}
+                className={`dialog-container ${
+                    light && 'dialog-container-light'
+                }`}
+            >
+                <p
+                    className={`${
+                        light && 'text-black'
+                    } text-white text-[1rem]`}
+                >
                     {text || 'Are you sure?'}
                 </p>
 

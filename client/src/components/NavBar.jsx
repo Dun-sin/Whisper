@@ -17,9 +17,8 @@ import { SocketContext } from 'context/Context';
 import { createClassesFromArray } from 'src/lib/utils';
 import { useApp } from 'src/context/AppContext';
 
-const linkStyle = `py-4 md:h-[80px] w-[100%] flex items-center justify-center hover:bg-primary p-6 rounded-[15px] `;
-const activeStyle = linkStyle + 'bg-primary shadow-2xl';
-const iconStyle = 'fill-[#f5f5f5] scale-[2]';
+// Theme
+import useTheme from 'src/hooks/useTheme';
 
 const NavBar = ({ className }) => {
     const { auth, logout } = useAuth();
@@ -27,6 +26,19 @@ const NavBar = ({ className }) => {
     const socket = useContext(SocketContext);
     const location = useLocation();
     const { setDialog } = useDialog();
+
+    const context = useTheme();
+    const light = context.theme === 'light';
+
+    const linkStyle = `py-4 md:h-[80px] w-[100%] flex items-center justify-center hover:bg-primary ${
+        light && 'hover:bg-[#dcdbdf]'
+    } p-6 rounded-[15px] transition-all duration-500 `;
+    const activeStyle =
+        linkStyle +
+        `bg-primary ${
+            light && 'bg-[#dcdbdf] shadow-[#a7c4d8] shadow-sm'
+        } shadow-2xl transition-all duration-500`;
+    const iconStyle = `fill-[#f5f5f5] ${light && 'fill-[#423939]'} scale-[2]`;
 
     const handleLogout = () => {
         setDialog({
@@ -66,6 +78,7 @@ const NavBar = ({ className }) => {
                 hideNavbar && 'hidden',
                 'navContainer',
                 'bg-secondary',
+                light && 'bg-[#b0bbe4]',
                 'md:w-[120px]',
                 'md:min-h-screen',
                 'items-center',
@@ -73,11 +86,13 @@ const NavBar = ({ className }) => {
                 'flex-row',
                 'justify-center',
                 'shadow-[0_0_100px_0_rgba(0,0,0,1)]',
+                light && 'shadow-[0_0_100px_0_#d1c6da]',
                 'p-2',
                 'md:p-5',
                 'sticky bottom-0',
                 'md:flex',
-                'h-[70px]'
+                'h-[70px]',
+                'transition-all duration-500',
             ])}
         >
             <div className="justify-between md:justify-center flex items-center md:flex-col flex-row h-full w-full gap-2 flex-nowrap overflow-auto md:h-full">

@@ -6,6 +6,8 @@ import { useApp } from 'src/context/AppContext';
 
 import { createClassesFromArray } from 'src/lib/utils';
 
+import useTheme from 'src/hooks/useTheme';
+
 const centerElement = ' flex flex-col items-center justify-center';
 
 const Start = () => {
@@ -17,13 +19,17 @@ const Start = () => {
             navigate('/founduser');
         }
     }, []);
+    const context = useTheme();
+    const light = context.theme === 'light';
     return (
         <div
             className={createClassesFromArray([
                 centerElement,
                 'bg-primary',
+                light && 'bg-white',
                 'min-w-[calc(100%-108px)]',
                 'text-white',
+                light && 'text-black',
                 'md:min-h-screen',
                 'min-h-[calc(100vh-70px)]',
             ])}

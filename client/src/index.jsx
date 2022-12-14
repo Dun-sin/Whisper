@@ -8,20 +8,23 @@ import { AppProvider } from './context/AppContext';
 import 'rsuite/dist/rsuite.min.css';
 import { socket, SocketContext } from 'context/Context';
 import { DialogProvider } from './context/DialogContext';
+import ThemeProvider from './context/ThemeProvider';
 import Dialog from './components/Dialog';
 
 render(
-    <AuthProvider>
-        <AppProvider>
-            <Router>
-                <SocketContext.Provider value={socket}>
-                    <DialogProvider>
-                        <App />
-                        <Dialog />
-                    </DialogProvider>
-                </SocketContext.Provider>
-            </Router>
-        </AppProvider>
-    </AuthProvider>,
+    <ThemeProvider>
+        <AuthProvider>
+            <AppProvider>
+                <Router>
+                    <SocketContext.Provider value={socket}>
+                        <DialogProvider>
+                            <App />
+                            <Dialog />
+                        </DialogProvider>
+                    </SocketContext.Provider>
+                </Router>
+            </AppProvider>
+        </AuthProvider>
+    </ThemeProvider>,
     document.getElementById('root')
 );

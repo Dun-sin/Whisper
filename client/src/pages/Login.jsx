@@ -5,6 +5,8 @@ import MojoAuth from 'mojoauth-web-sdk';
 import { useAuth } from 'src/context/AuthContext';
 import { api } from 'src/lib/axios';
 
+import useTheme from 'src/hooks/useTheme';
+
 const centerStuffs = `flex flex-col justify-center items-center`;
 
 const apiKey = import.meta.env.VITE_IMPORTANT;
@@ -61,9 +63,13 @@ const Login = () => {
         });
     }, []);
 
+    const context = useTheme();
+    const light = context.theme === 'light';
     return (
         <div
-            className={`bg-primary h-[100vh] w-[100vw] text-white ${centerStuffs}`}
+            className={`bg-primary ${
+                light && 'bg-white text-black'
+            } h-[100vh] w-[100vw] text-white ${centerStuffs}`}
         >
             {isLoggingIn ? (
                 <div className="uppercase py-5">Processing Login</div>
@@ -73,12 +79,13 @@ const Login = () => {
                     <button
                         disabled={isLoggingIn}
                         onClick={loginAnonymously}
-                        className={`disabled:bg-slate-700 text-white pt-[2px] font-light cursor-pointer hover:underline ${centerStuffs}`}
+                        className={`disabled:bg-slate-700 text-white ${
+                            light && 'text-black'
+                        } pt-[2px] font-light cursor-pointer hover:underline ${centerStuffs}`}
                     >
                         Login Anonymously
                     </button>
                 </div>
-
             )}
         </div>
     );
