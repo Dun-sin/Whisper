@@ -7,7 +7,6 @@ import {
     Checkbox,
     Divider,
     Form,
-    IconButton,
     Message,
     Slider,
 } from 'rsuite';
@@ -89,47 +88,6 @@ const Searching = () => {
                 </Form.Group>
 
                 <Form.Group>
-                    <ButtonToolbar>
-                        {light ? (
-                            <IconButton
-                                placement="center"
-                                onClick={toggleMode}
-                                className="bg-primary
-                                 focus:bg-primary
-                                 hover:bg-[#0f3a5e] 
-                                flex justify-between 
-                                gap-2 items-center
-                                transition-all duration-500"
-                                appearance="primary"
-                            >
-                                <BsFillMoonFill />
-                                Dark Mode
-                            </IconButton>
-                        ) : (
-                            <IconButton
-                                placement="center"
-                                onClick={toggleMode}
-                                className="bg-light
-                                hover:bg-[#d1d1d4]
-                                hover:text-primary
-                             focus:bg-light
-                              focus:text-primary
-                               text-primary flex 
-                               justify-between gap-2 
-                               items-center
-                               transition-all duration-500"
-                                appearance="primary"
-                            >
-                                <BsSunFill />
-                                Light Mode
-                            </IconButton>
-                        )}
-                    </ButtonToolbar>
-                    <Form.HelpText tooltip>
-                        Enable/Disable Dark Mode
-                    </Form.HelpText>
-                </Form.Group>
-                <Form.Group>
                     <ButtonToolbar className="flex justify-end">
                         <Animation.Fade in={hasUnsavedSettings}>
                             <Button
@@ -149,7 +107,6 @@ const Searching = () => {
                         </Button>
                     </ButtonToolbar>
                 </Form.Group>
-
                 <Animation.Bounce in={hasUnsavedSettings}>
                     <Message
                         showIcon
@@ -160,6 +117,52 @@ const Searching = () => {
                         You have unsaved settings!
                     </Message>
                 </Animation.Bounce>
+
+                <Form.Group>
+                    <Divider className={`${light && 'text-black'} text-white`}>
+                        Change Mode
+                    </Divider>
+                    <ButtonToolbar
+                        className="flex"
+                        aria-label="outlined button group"
+                    >
+                        {light ? (
+                            <Button
+                                onClick={toggleMode}
+                                className="bg-primary
+                                 focus:bg-primary
+                                 hover:bg-[#0f3a5e] 
+                                flex justify-between 
+                                gap-2 items-center
+                                transition-all duration-500"
+                                appearance="primary"
+                            >
+                                <BsFillMoonFill />
+                                Dark
+                            </Button>
+                        ) : (
+                            <Button
+                                onClick={toggleMode}
+                                className="bg-light
+                                hover:bg-[#d1d1d4]
+                                hover:text-primary
+                             focus:bg-light
+                              focus:text-primary
+                               text-primary flex 
+                               justify-between gap-2 
+                               items-center
+                               transition-all duration-500"
+                                appearance="primary"
+                            >
+                                <BsSunFill />
+                                Light
+                            </Button>
+                        )}
+                    </ButtonToolbar>
+                    <Form.HelpText tooltip>
+                        Enable/Disable Dark Mode
+                    </Form.HelpText>
+                </Form.Group>
             </Form>
         </div>
     );
