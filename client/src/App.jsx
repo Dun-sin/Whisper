@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 // Store
@@ -13,12 +14,27 @@ import Searching from 'pages/Searching';
 import ComingSoon from 'pages/ComingSoon';
 import Login from 'pages/Login';
 import Settings from 'pages/Settings';
+import Profile from './pages/Profile';
 
 function App() {
     const { isLoggedIn } = useAuth();
+    const [correctViewHeight, setCorrectViewHeight] = useState(
+        window.innerHeight * 0.01
+    );
+
+    // Set height for mobile so it doesn't get hidden in some browsers
+    useEffect(() => {
+        function setNewViewHeight() {
+            setCorrectViewHeight(window.innerHeight * 0.01)
+        }
+
+        window.addEventListener('resize', setNewViewHeight)
+
+        return () => window.removeEventListener('resize', setNewViewHeight)
+    }, []);
 
     return (
-        <div className="flex flex-col-reverse md:flex-row min-h-screen">
+        <div className={`flex flex-col-reverse md:flex-row h-[${correctViewHeight}px]`}>
             {/* TODO: Create layouts */}
             {isLoggedIn && <NavBar />}
             <Routes>
@@ -30,7 +46,7 @@ function App() {
                     <Route exact path="/" element={<Start />} />
                     <Route exact path="/founduser" element={<Searching />} />
                     <Route exact path="/friends" element={<ComingSoon />} />
-                    <Route exact path="/profile" element={<ComingSoon />} />
+                    <Route exact path="/profile" element={<Profile />} />
                     <Route exact path="/settings" element={<Settings />} />
                 </Route>
 

@@ -1,6 +1,6 @@
 {
   "name": "whisper",
-  "version": "1.0.0",
+  "version": "0.0.0-development",
   "private": true,
   "workspaces": [
     "server",
@@ -12,7 +12,8 @@
     "build:client": "npm run build --workspace=client",
     "lint:client": "npm run lint --workspace=client",
     "format: client": "npm run format --workspace=client",
-    "start": "npm run start:server & npm run start:client"
+    "start": "npm run start:server & npm run start:client",
+    "semantic-release": "semantic-release --branches main"
   },
   "repository": {
     "type": "git",
@@ -27,5 +28,15 @@
   "dependencies": {
     "uuid": "^9.0.0",
     "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "commitizen": "^4.2.6",
+    "cz-conventional-changelog": "^3.3.0",
+    "semantic-release": "^19.0.5"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

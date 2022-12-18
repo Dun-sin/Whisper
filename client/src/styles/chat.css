@@ -29,15 +29,15 @@
     }
 
     .message-block .message {
-        @apply flex flex-col mb-[15px] min-w-[250px] mdl:max-w-[80%] max-w-[50%] text-primary;
+        @apply flex flex-col mb-[15px] min-w-[250px] mdl:max-w-[80%] max-w-[50%];
     }
 
     .message-block.me .message .content {
-        @apply justify-end;
+        @apply bg-secondary justify-end;
     }
 
     .message-block .message .content {
-        @apply bg-highlight rounded-[20px] p-[15px] break-all w-full flex gap-2 items-start;
+        @apply bg-red rounded-[20px] p-[15px] break-all w-full flex gap-2 items-start;
     }
 
     .message-block .message .status {
