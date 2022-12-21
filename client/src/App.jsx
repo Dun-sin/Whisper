@@ -33,7 +33,7 @@ function App() {
     }, []);
 
     return (
-        <div className={`flex flex-col-reverse md:flex-row h-[${correctViewHeight}px]`}>
+        <div className={`flex flex-col-reverse md:flex-row max-h-[${correctViewHeight}px]`}>
             {/* TODO: Create layouts */}
             {isLoggedIn && <NavBar />}
             <Routes>
