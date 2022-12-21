@@ -42,6 +42,21 @@ const Chat = () => {
 
     const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
     const inputRef = useRef('');
+    const listOfBadWordsNotAllowed = [
+        'sex',
+        'porn',
+        'fuck',
+        'cock',
+        'titties',
+        'boner',
+        'muff',
+        'pussy',
+        'asshole',
+        'cunt',
+        'ass',
+        'cockfoam',
+        'nigger',
+    ];
     senderId = auth.email ?? auth.loginId;
 
     const getMessage = (id) => {
@@ -85,6 +100,30 @@ const Chat = () => {
             socket.off('edit_message', editMessageHandler);
         };
     }, []);
+
+    const cancelEdit = () => {
+        inputRef.current.value = '';
+        setEditing({ isediting: false, messageID: null });
+        socket
+            .timeout(10000)
+            .emit('typing', { chatId: app.currentChatId, isTyping: false });
+    };
+
+    // Clear chat when escape is pressed
+    useEffect(() => {
+        const keyDownHandler = (event) => {
+            if (event.key === 'Escape' && editing.isediting) {
+                event.preventDefault();
+                cancelEdit();
+            }
+        };
+
+        document.addEventListener('keydown', keyDownHandler);
+
+        return () => {
+            document.removeEventListener('keydown', keyDownHandler);
+        };
+    }, [editing]);
 
     const sortedMessages = useMemo(
         () =>
@@ -189,15 +228,41 @@ const Chat = () => {
         }
     };
 
+    const warningMessage = (sender, message) => {
+        if (message.includes('Warning Message')) {
+            if (senderId === sender) {
+                return (
+                    <span className="text-red">
+                        ADMIN MESSAGE: You are trying to send a bad word!
+                    </span>
+                );
+            } else {
+                return (
+                    <span className="text-black">
+                        ADMIN MESSAGE: The person you are chatting with is
+                        trying to send a bad word!
+                    </span>
+                );
+            }
+        }
+    };
+
     // Here whenever user will submit message it will be send to the server
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         socket.emit('typing', { chatId: app.currentChatId, isTyping: false });
         const d = new Date();
-        const message = inputRef.current.value;
+        let message = inputRef.current.value;
         if (message === '' || senderId === undefined || senderId === '123456') {
             return;
+        }
+
+        const splitMessage = message.split(' ');
+        for (const word of splitMessage) {
+            if (listOfBadWordsNotAllowed.includes(word)) {
+                message = 'Warning Message: send a warning to users';
+            }
         }
 
         if (editing.isediting === true) {
@@ -254,30 +319,6 @@ const Chat = () => {
         setEditing({ isediting: true, messageID: id });
     };
 
-    const cancelEdit = () => {
-        inputRef.current.value = '';
-        setEditing({ isediting: false, messageID: null });
-        socket
-            .timeout(10000)
-            .emit('typing', { chatId: app.currentChatId, isTyping: false });
-    };
-
-    // Clear chat when escape is pressed
-    useEffect(() => {
-        const keyDownHandler = (event) => {
-            if (event.key === 'Escape' && editing.isediting) {
-                event.preventDefault();
-                cancelEdit();
-            }
-        };
-
-        document.addEventListener('keydown', keyDownHandler);
-
-        return () => {
-            document.removeEventListener('keydown', keyDownHandler);
-        };
-    }, [editing]);
-
     const handleTypingStatus = debounce((e) => {
         if (e.target.value.length > 0) {
             socket
@@ -314,66 +355,78 @@ const Chat = () => {
                     className="displayMessgaes h-[100%] max-h-[62vh] md:max-h-full overflow-y-scroll w-[100%] "
                 >
                     {sortedMessages.map(
-                        ({ senderId: sender, id, message, time, status }) => (
-                            <div
-                                key={id}
-                                className={`message-block ${
-                                    sender.toString() === senderId.toString()
-                                        ? 'me'
-                                        : 'other'
-                                }`}
-                            >
-                                <div className="message">
-                                    <div className="content">
-                                        <p className="text">{message}</p>
-                                        {sender.toString() ===
-                                            senderId.toString() &&
-                                            status !== 'pending' && (
-                                                <Dropdown
-                                                    placement="leftStart"
-                                                    style={{ zIndex: 3 }}
-                                                    renderToggle={
-                                                        renderIconButton
-                                                    }
-                                                    noCaret
-                                                >
-                                                    <Dropdown.Item
-                                                        onClick={() =>
-                                                            handleDelete(id)
+                        ({ senderId: sender, id, message, time, status }) => {
+                            const resultOfWarningMessage = warningMessage(
+                                sender,
+                                message
+                            );
+                            !(resultOfWarningMessage === undefined) &&
+                                (message = resultOfWarningMessage);
+
+                            return (
+                                <div
+                                    key={id}
+                                    className={`message-block ${
+                                        sender.toString() ===
+                                        senderId.toString()
+                                            ? 'me'
+                                            : 'other'
+                                    }`}
+                                >
+                                    <div className="message">
+                                        <div className="content">
+                                            <p className="text">{message}</p>
+                                            {sender.toString() ===
+                                                senderId.toString() &&
+                                                status !== 'pending' && (
+                                                    <Dropdown
+                                                        placement="leftStart"
+                                                        style={{ zIndex: 3 }}
+                                                        renderToggle={
+                                                            renderIconButton
                                                         }
+                                                        noCaret
                                                     >
-                                                        Delete
-                                                    </Dropdown.Item>
-                                                    <Dropdown.Item
-                                                        onClick={() =>
-                                                            handleEdit(id)
-                                                        }
-                                                    >
-                                                        Edit
-                                                    </Dropdown.Item>
-                                                </Dropdown>
-                                            )}
-                                    </div>
-                                    <div
-                                        className={`status ${
-                                            status === 'failed'
-                                                ? 'text-red-600'
-                                                : 'text-white'
-                                        }`}
-                                    >
-                                        <MessageStatus
-                                            time={getTime(time)}
-                                            status={status ?? 'sent'}
-                                            iAmTheSender={
-                                                sender.toString() ===
-                                                senderId.toString()
-                                            }
-                                            onResend={() => handleResend(id)}
-                                        />
+                                                        <Dropdown.Item
+                                                            onClick={() =>
+                                                                handleDelete(id)
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item
+                                                            onClick={() =>
+                                                                handleEdit(id)
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </Dropdown.Item>
+                                                    </Dropdown>
+                                                )}
+                                        </div>
+                                        <div
+                                            className={`status ${
+                                                status === 'failed'
+                                                    ? 'text-red-600'
+                                                    : 'text-white'
+                                            }`}
+                                        >
+                                            <MessageStatus
+                                                time={getTime(time)}
+                                                status={status ?? 'sent'}
+                                                iAmTheSender={
+                                                    sender.toString() ===
+                                                    senderId.toString()
+                                                }
+                                                onResend={() =>
+                                                    handleResend(id)
+                                                }
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )
+                            );
+                        }
                     )}
                 </ScrollToBottom>
             </div>
