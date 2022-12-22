@@ -206,6 +206,11 @@ const Chat = () => {
         }
 
         const message = getMessage(id);
+
+        if (message.includes('Warning Message')) {
+            return
+        }
+        
         updateMessage(id, {
             ...message,
             status: 'pending',
@@ -315,6 +320,10 @@ const Chat = () => {
         inputRef.current.focus();
 
         const { message } = getMessage(id);
+        if (message.includes('Warning Message')) {
+            cancelEdit()
+            return;
+        }
         inputRef.current.value = message;
         setEditing({ isediting: true, messageID: id });
     };
