@@ -4,9 +4,7 @@ import PropTypes from 'prop-types';
 import { Tooltip, Whisper } from 'rsuite';
 
 // Icons
-import { BsChatDots } from 'react-icons/bs';
-import { RiUserSearchLine } from 'react-icons/ri';
-import { BiUserCircle, BiLogOut, BiCog } from 'react-icons/bi';
+import { Icon } from '@iconify/react';
 
 // Store
 import { useDialog } from 'src/context/DialogContext';
@@ -77,7 +75,7 @@ const NavBar = ({ className }) => {
                 'md:p-5',
                 'sticky bottom-0',
                 'md:flex',
-                'h-[70px]'
+                'h-[70px]',
             ])}
         >
             <div className="justify-between md:justify-center flex items-center md:flex-col flex-row h-full w-full gap-2 flex-nowrap overflow-auto md:h-full">
@@ -88,7 +86,11 @@ const NavBar = ({ className }) => {
                     speaker={<Tooltip>Search for random buddies</Tooltip>}
                 >
                     <NavLink to="/" className={getLinkStyle}>
-                        <RiUserSearchLine className={iconStyle} />
+                        <Icon
+                            icon="fluent:people-search-20-regular"
+                            color="white"
+                            className={iconStyle}
+                        />
                         {className}
                     </NavLink>
                 </Whisper>
@@ -99,7 +101,11 @@ const NavBar = ({ className }) => {
                     speaker={<Tooltip>My Chats</Tooltip>}
                 >
                     <NavLink to="/friends" className={getLinkStyle}>
-                        <BsChatDots className={iconStyle} />
+                        <Icon
+                            className={iconStyle}
+                            color="white"
+                            icon="ion:chatbubble-ellipses-outline"
+                        />
                     </NavLink>
                 </Whisper>
                 <Whisper
@@ -109,7 +115,11 @@ const NavBar = ({ className }) => {
                     speaker={<Tooltip>My Profile</Tooltip>}
                 >
                     <NavLink to="/profile" className={getLinkStyle}>
-                        <BiUserCircle className={iconStyle} />
+                        <Icon
+                            icon="fluent:person-circle-20-regular"
+                            color="white"
+                            className={iconStyle}
+                        />
                     </NavLink>
                 </Whisper>
                 <Whisper
@@ -119,7 +129,11 @@ const NavBar = ({ className }) => {
                     speaker={<Tooltip>System Settings</Tooltip>}
                 >
                     <NavLink to="/settings" className={getLinkStyle}>
-                        <BiCog className={iconStyle} />
+                        <Icon
+                            icon="ic:outline-settings"
+                            color="white"
+                            className={iconStyle}
+                        />
                     </NavLink>
                 </Whisper>
                 <Whisper
@@ -132,7 +146,11 @@ const NavBar = ({ className }) => {
                         className={linkStyle}
                         onClick={() => handleLogout()}
                     >
-                        <BiLogOut className={iconStyle} />
+                        <Icon
+                            className={iconStyle}
+                            icon="majesticons:logout-half-circle"
+                            color="white"
+                        />
                     </button>
                 </Whisper>
             </div>
