@@ -6,7 +6,7 @@ import { useApp } from 'src/context/AppContext';
 
 import { createClassesFromArray } from 'src/lib/utils';
 
-const centerElement = ' flex flex-col items-center justify-center';
+const centerElement = 'flex flex-col items-center justify-center';
 
 const Start = () => {
     const { app } = useApp();
@@ -22,10 +22,10 @@ const Start = () => {
             className={createClassesFromArray([
                 centerElement,
                 'bg-primary',
-                'min-w-[calc(100%-108px)]',
+                'min-w-[calc(100%-120px)]',
                 'text-white',
-                'md:min-h-screen',
-                'min-h-[calc(100vh-70px)]',
+                'min-h-full',
+                'md:min-h-screen'
             ])}
         >
             <RiUserSearchLine

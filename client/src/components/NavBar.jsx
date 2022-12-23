@@ -15,9 +15,8 @@ import { SocketContext } from 'context/Context';
 import { createClassesFromArray } from 'src/lib/utils';
 import { useApp } from 'src/context/AppContext';
 
-const linkStyle = `py-4 md:h-[80px] w-[100%] flex items-center justify-center hover:bg-primary p-6 rounded-[15px] `;
+const linkStyle = `md:h-[60px] w-full flex items-center justify-center hover:bg-primary rounded-[15px] `;
 const activeStyle = linkStyle + 'bg-primary shadow-2xl';
-const iconStyle = 'fill-[#f5f5f5] scale-[2]';
 
 const NavBar = ({ className }) => {
     const { auth, logout } = useAuth();
@@ -89,7 +88,8 @@ const NavBar = ({ className }) => {
                         <Icon
                             icon="fluent:people-search-20-regular"
                             color="white"
-                            className={iconStyle}
+                            height="24"
+                            width="24"
                         />
                         {className}
                     </NavLink>
@@ -98,13 +98,14 @@ const NavBar = ({ className }) => {
                     placement="auto"
                     controlId="control-id-hover"
                     trigger="hover"
-                    speaker={<Tooltip>My Chats</Tooltip>}
+                    speaker={<Tooltip>Friends</Tooltip>}
                 >
                     <NavLink to="/friends" className={getLinkStyle}>
                         <Icon
-                            className={iconStyle}
                             color="white"
-                            icon="ion:chatbubble-ellipses-outline"
+                            icon="la:user-friends" 
+                            height="24"
+                            width="24"
                         />
                     </NavLink>
                 </Whisper>
@@ -118,7 +119,8 @@ const NavBar = ({ className }) => {
                         <Icon
                             icon="fluent:person-circle-20-regular"
                             color="white"
-                            className={iconStyle}
+                            height="24"
+                            width="24"
                         />
                     </NavLink>
                 </Whisper>
@@ -126,13 +128,14 @@ const NavBar = ({ className }) => {
                     placement="auto"
                     controlId="control-id-hover"
                     trigger="hover"
-                    speaker={<Tooltip>System Settings</Tooltip>}
+                    speaker={<Tooltip>Settings</Tooltip>}
                 >
                     <NavLink to="/settings" className={getLinkStyle}>
                         <Icon
                             icon="ic:outline-settings"
                             color="white"
-                            className={iconStyle}
+                            height="24"
+                            width="24"
                         />
                     </NavLink>
                 </Whisper>
@@ -147,9 +150,10 @@ const NavBar = ({ className }) => {
                         onClick={() => handleLogout()}
                     >
                         <Icon
-                            className={iconStyle}
                             icon="majesticons:logout-half-circle"
                             color="white"
+                            height={24}
+                            width={24}
                         />
                     </button>
                 </Whisper>
