@@ -42,6 +42,7 @@ const Chat = () => {
 
     const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
     const inputRef = useRef('');
+
     const listOfBadWordsNotAllowed = [
         'sex',
         'porn',
@@ -208,9 +209,9 @@ const Chat = () => {
         const message = getMessage(id);
 
         if (message.includes('Warning Message')) {
-            return
+            return;
         }
-        
+
         updateMessage(id, {
             ...message,
             status: 'pending',
@@ -321,7 +322,7 @@ const Chat = () => {
 
         const { message } = getMessage(id);
         if (message.includes('Warning Message')) {
-            cancelEdit()
+            cancelEdit();
             return;
         }
         inputRef.current.value = message;
@@ -340,6 +341,17 @@ const Chat = () => {
         }
     }, 500);
 
+    const handleCopyToClipBoard = async (id) => {
+        const { message } = getMessage(id);
+        if (message.includes('Warning Message')) {
+            return;
+        }
+        if ('clipboard' in navigator) {
+            return await navigator.clipboard.writeText(message);
+        } else {
+            return document.execCommand('copy', true, message);
+        }
+    };
     const getTime = (time) => {
         return new Date(time).toLocaleTimeString();
     };
@@ -361,7 +373,7 @@ const Chat = () => {
                 </p>
                 <ScrollToBottom
                     initialScrollBehavior="auto"
-                    className="displayMessgaes h-[100%] max-h-[62vh] md:max-h-full overflow-y-scroll w-[100%] "
+                    className="displayMessgaes h-[100%] max-h-[70vh] md:max-h-full overflow-y-scroll w-[100%] "
                 >
                     {sortedMessages.map(
                         ({ senderId: sender, id, message, time, status }) => {
@@ -383,8 +395,14 @@ const Chat = () => {
                                     }`}
                                 >
                                     <div className="message">
-                                        <div className="content">
-                                            <p className="text">{message}</p>
+                                        <div
+                                            className={`content text ${
+                                                sender.toString() ===
+                                                    senderId.toString() &&
+                                                'justify-between'
+                                            }`}
+                                        >
+                                            <p>{message}</p>
                                             {sender.toString() ===
                                                 senderId.toString() &&
                                                 status !== 'pending' && (
@@ -394,7 +412,7 @@ const Chat = () => {
                                                         renderToggle={
                                                             renderIconButton
                                                         }
-                                                        noCaret
+                                                        NoCaret
                                                     >
                                                         <Dropdown.Item
                                                             onClick={() =>
@@ -409,6 +427,15 @@ const Chat = () => {
                                                             }
                                                         >
                                                             Edit
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item
+                                                            onClick={() =>
+                                                                handleCopyToClipBoard(
+                                                                    id
+                                                                )
+                                                            }
+                                                        >
+                                                            Copy
                                                         </Dropdown.Item>
                                                     </Dropdown>
                                                 )}
