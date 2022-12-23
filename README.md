@@ -73,8 +73,7 @@ This app is developed to make chatting much private and easy without stealing yo
   </table>
 
 ### 🖼️ Screenshot
-
-![image](https://user-images.githubusercontent.com/78784850/178471942-ce1aeb9f-4833-42d5-9ebc-8844cdc98082.png)
+![image](https://user-images.githubusercontent.com/78784850/209371680-aa61e57f-167a-4a7d-86f7-0f2455e60890.png)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
