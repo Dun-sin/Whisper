@@ -3,7 +3,7 @@ module.exports = {
     theme: {
         extend: {
             screens: {
-                mdl: { max: '768px' },
+                SmallerScreens: { max: '768px' },
             },
             colors: {
                 primary: '#011627',

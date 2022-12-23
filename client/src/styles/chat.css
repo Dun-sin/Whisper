@@ -29,7 +29,7 @@
     }
 
     .message-block .message {
-        @apply flex flex-col mb-[15px] min-w-[250px] mdl:max-w-[80%] max-w-[50%];
+        @apply flex flex-col mb-[15px] min-w-[250px] SmallerScreens:max-w-[80%] max-w-[50%];
     }
 
     .message-block.me .message .content {
