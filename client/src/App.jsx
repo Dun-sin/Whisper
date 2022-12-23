@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 // Store
@@ -17,23 +16,9 @@ import Settings from 'pages/Settings';
 
 function App() {
     const { isLoggedIn } = useAuth();
-    const [correctViewHeight, setCorrectViewHeight] = useState(
-        window.innerHeight * 0.01
-    );
-
-    // Set height for mobile so it doesn't get hidden in some browsers
-    useEffect(() => {
-        function setNewViewHeight() {
-            setCorrectViewHeight(window.innerHeight * 0.01)
-        }
-
-        window.addEventListener('resize', setNewViewHeight)
-
-        return () => window.removeEventListener('resize', setNewViewHeight)
-    }, []);
 
     return (
-        <div className={`flex flex-col-reverse md:flex-row max-h-[${correctViewHeight}px]`}>
+        <div className={`flex flex-col-reverse md:flex-row h-screen`}>
             {/* TODO: Create layouts */}
             {isLoggedIn && <NavBar />}
             <Routes>
