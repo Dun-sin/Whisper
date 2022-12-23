@@ -63,6 +63,7 @@ const BuddyMatcher = () => {
                 href="https://ctt.ac/US0h0"
                 target="_blank"
                 rel="noreferrer"
+                className='text-blue-500 underline'
               >
                 Tweet
               </a>{' '}
