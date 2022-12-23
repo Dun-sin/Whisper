@@ -47,6 +47,7 @@
         ]
     },
     "devDependencies": {
+        "@iconify/react": "^4.0.1",
         "@vitejs/plugin-react": "1.1.1",
         "autoprefixer": "^10.4.4",
         "dotenv": "^16.0.1",

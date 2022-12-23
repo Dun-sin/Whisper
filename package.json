@@ -26,11 +26,9 @@
   },
   "homepage": "https://github.com/Dun-sin/Whisper#readme",
   "dependencies": {
-    "uuid": "^9.0.0",
     "validator": "^13.7.0"
   },
   "devDependencies": {
-    "@iconify/react": "^4.0.1",
     "commitizen": "^4.2.6",
     "cz-conventional-changelog": "^3.3.0",
     "semantic-release": "^19.0.5"
