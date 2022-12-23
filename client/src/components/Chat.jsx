@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+/* eslint-disable react/prop-types */
 import { useEffect, useRef, useContext, useMemo, useState } from 'react';
 import { SocketContext } from 'context/Context';
 
@@ -23,7 +23,7 @@ import { useNotification } from 'src/lib/notification';
 import { useApp } from 'src/context/AppContext';
 
 let senderId;
-const Chat = () => {
+const Chat = ({ isAnonymous = false, currentChatIdForFriend }) => {
     const { app } = useApp();
     const { playNotification } = useNotification();
     const [editing, setEditing] = useState({
@@ -70,6 +70,10 @@ const Chat = () => {
     const messageExists = (id) => {
         return Boolean(getMessage(id));
     };
+
+    useEffect(() => {
+        console.log(currentChatIdForFriend, isAnonymous);
+    }, []);
 
     useEffect(() => {
         const newMessageHandler = (message) => {
@@ -187,14 +191,6 @@ const Chat = () => {
             }
 
             return false;
-        } finally {
-            // Socket.emit('privatemessage', message);
-            // addMessage({
-            //     id: senderId,
-            //     message,
-            //     time,
-            //     room: 'anon',
-            // });
         }
 
         return true;
@@ -208,9 +204,9 @@ const Chat = () => {
         const message = getMessage(id);
 
         if (message.includes('Warning Message')) {
-            return
+            return;
         }
-        
+
         updateMessage(id, {
             ...message,
             status: 'pending',
@@ -321,7 +317,7 @@ const Chat = () => {
 
         const { message } = getMessage(id);
         if (message.includes('Warning Message')) {
-            cancelEdit()
+            cancelEdit();
             return;
         }
         inputRef.current.value = message;
