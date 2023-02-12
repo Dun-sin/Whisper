@@ -329,6 +329,17 @@ const Chat = () => {
         setEditing({ isediting: true, messageID: id });
     };
 
+    const handleQuoteReply = (id) => {
+        inputRef.current.focus();
+
+        const { message } = getMessage(id);
+        if (message.includes('Warning Message')) {
+            cancelEdit();
+            return;
+        }
+        inputRef.current.value = '>' + message + '\n';
+    };
+
     const handleTypingStatus = debounce((e) => {
         if (e.target.value.length > 0) {
             socket
@@ -403,24 +414,18 @@ const Chat = () => {
                                             }`}
                                         >
                                             <p>{message}</p>
-                                            {sender.toString() ===
-                                                senderId.toString() &&
-                                                status !== 'pending' && (
-                                                    <Dropdown
-                                                        placement="leftStart"
-                                                        style={{ zIndex: 3 }}
-                                                        renderToggle={
-                                                            renderIconButton
-                                                        }
-                                                        NoCaret
-                                                    >
-                                                        <Dropdown.Item
-                                                            onClick={() =>
-                                                                handleDelete(id)
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </Dropdown.Item>
+                                            {status !== 'pending' && (
+                                                <Dropdown
+                                                    placement="leftStart"
+                                                    style={{ zIndex: 3 }}
+                                                    renderToggle={
+                                                        renderIconButton
+                                                    }
+                                                    NoCaret
+                                                >
+                                                    if(sender.toString() ===
+                                                    senderId.toString())
+                                                    {
                                                         <Dropdown.Item
                                                             onClick={() =>
                                                                 handleEdit(id)
@@ -428,17 +433,36 @@ const Chat = () => {
                                                         >
                                                             Edit
                                                         </Dropdown.Item>
+                                                    }
+                                                    <Dropdown.Item
+                                                        onClick={() =>
+                                                            handleCopyToClipBoard(
+                                                                id
+                                                            )
+                                                        }
+                                                    >
+                                                        Copy
+                                                    </Dropdown.Item>
+                                                    <Dropdown.Item
+                                                        onClick={() =>
+                                                            handleQuoteReply(id)
+                                                        }
+                                                    >
+                                                        Quote Reply
+                                                    </Dropdown.Item>
+                                                    if(sender.toString() ===
+                                                    senderId.toString())
+                                                    {
                                                         <Dropdown.Item
                                                             onClick={() =>
-                                                                handleCopyToClipBoard(
-                                                                    id
-                                                                )
+                                                                handleDelete(id)
                                                             }
                                                         >
-                                                            Copy
+                                                            Delete
                                                         </Dropdown.Item>
-                                                    </Dropdown>
-                                                )}
+                                                    }
+                                                </Dropdown>
+                                            )}
                                         </div>
                                         <div
                                             className={`status ${
