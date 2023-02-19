@@ -338,6 +338,7 @@ const Chat = () => {
             return;
         }
         inputRef.current.value = `${message} --> `;
+
     };
 
     const handleTypingStatus = debounce((e) => {
@@ -414,7 +415,7 @@ const Chat = () => {
                                             : 'other'
                                     }`}
                                 >
-                                    <div className="message">
+                                     <div className="message">
                                         <div
                                             className={`content text ${
                                                 sender.toString() ===
