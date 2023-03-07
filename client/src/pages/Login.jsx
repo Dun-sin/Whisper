@@ -23,19 +23,16 @@ const Login = () => {
             .then((res) => {
                 setIsLoggingIn(false);
                 if (res.status === 200) {
-                    console.log('done');
                     login({
                         loginType: 'email',
                         loginId: userID,
                         email,
                     });
-                } else {
-                    console.log('failed');
                 }
             })
             .catch((err) => {
-                console.log(err);
                 setIsLoggingIn(false);
+                throw Error(err);
             });
     }
 
@@ -78,7 +75,6 @@ const Login = () => {
                         Login Anonymously
                     </button>
                 </div>
-
             )}
         </div>
     );
