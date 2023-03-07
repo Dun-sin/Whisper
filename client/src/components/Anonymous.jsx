@@ -58,10 +58,8 @@ const Anonymous = ({ onChatClosed }) => {
             .emit('close', currentChatId, (err, chatClosed) => {
                 if (err) {
                     alert('An error occured whiles closing chat.');
-                    return err;
-
                     setAutoSearchAfterClose(false);
-                    return;
+                    return err;
                 }
 
                 if (chatClosed) {

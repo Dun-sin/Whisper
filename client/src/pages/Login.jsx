@@ -31,8 +31,8 @@ const Login = () => {
                 }
             })
             .catch((err) => {
-                throw Error(err);
                 setIsLoggingIn(false);
+                throw Error(err);
             });
     }
 
