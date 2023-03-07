@@ -21,7 +21,11 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
+  .then(() => {
+    console.log(`connected to mongodb`);
+  })
   .catch((e) => e);
+mongoose.set("strictQuery", false);
 
 const UserRouter = require("./controllers/userController");
 
@@ -57,4 +61,5 @@ app.use(cors());
 
 server.listen(HTTP_PORT, async () => {
   await init();
+  console.log(`connected to port ${HTTP_PORT}`);
 });

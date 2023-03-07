@@ -65,6 +65,8 @@ async function init() {
     const messages = {};
 
     for (const message of chat.messages) {
+      if (message.sender === null) return;
+
       messages[message._id.toString()] = {
         ...message.optimizedVersion,
         senderId: message.sender.emailOrLoginId,

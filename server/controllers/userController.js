@@ -1,7 +1,7 @@
 const UserRouter = require("express").Router();
 const validator = require("validator").default;
 
-const User = require("./models/UserSchema");
+const User = require("../models/UserSchema");
 
 const loginUser = async (req, res) => {
   const { email } = req.body;
