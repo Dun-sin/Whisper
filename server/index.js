@@ -98,6 +98,10 @@ app.post('/user/add', (req, res) => {
   @end-point: /user/find
 */
 app.get('/user/find', (req, res) => {
+  if (!req.user) {
+    res.status(401).send('Unauthorized');
+    return;
+  }
   User.find(req.query, (err, data) => {
     if (err) {
       console.log(err);
@@ -108,11 +112,29 @@ app.get('/user/find', (req, res) => {
         const user = {};
 
         user['id'] = data[0]._id.toString();
+        user['email'] = data[0].email.toString();
         res.status(200).send(JSON.stringify(user));
       }
     }
   });
 });
+
+// /*
+//   @method: get
+//   @end-point: /profile/:userId
+// */
+// app.get('/profile', (req, res) => {
+//   if (!req.user) {
+//     res.status(401).send('Unauthorized');
+//     return;
+//   }
+
+//   const user = req.user;
+
+//   res.render('profile', {
+//     user: user,
+//   });
+// });
 
 /**
  * this function will be triggred when ever the user from front-end will search
