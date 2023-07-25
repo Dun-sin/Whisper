@@ -8,11 +8,14 @@
   ],
   "scripts": {
     "start:server": "npm run start --workspace=server",
+    "install:server": "npm install --workspace=server",
+    "install:client": "npm install --workspace=client", 
     "start:client": "npm run start --workspace=client",
     "build:client": "npm run build --workspace=client",
     "lint:client": "npm run lint --workspace=client",
     "format: client": "npm run format --workspace=client",
     "start": "npm run start:server & npm run start:client",
+    "install": "npm run install:client && npm run install:server", 
     "semantic-release": "semantic-release --branches main"
   },
   "repository": {
