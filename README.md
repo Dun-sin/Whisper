@@ -107,7 +107,7 @@ Before installation, please make sure you have already installed the following t
 4. Install dependencies with `npm install`
 
    ```bash
-   npm install
+   npm run install
    ```
 
 5. Use `.env_sample` to configure the `.env` file for this project. For mongodb url use the localhost to test
