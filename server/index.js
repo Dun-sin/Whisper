@@ -119,6 +119,41 @@ app.get('/user/find', (req, res) => {
   });
 });
 
+/*
+  @method: get
+  @end-point: /updateProfile/:id
+*/
+app.put('/updateProfile/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { gender, age, aboutMe } = req.body;
+
+    // Check if the user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update the user profile fields if provided
+    if (gender) {
+      user.gender = gender;
+    }
+    if (age) {
+      user.age = age;
+    }
+    if (aboutMe) {
+      user.aboutMe = aboutMe;
+    }
+
+    // Save the updated user document
+    await user.save();
+
+    return res.status(200).json({ message: 'Profile updated successfully', user });
+  } catch (err) {
+    return res.status(500).json({ message: 'Internal server error', error: err });
+  }
+});
+
 // /*
 //   @method: get
 //   @end-point: /profile/:userId
