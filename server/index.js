@@ -120,7 +120,7 @@ app.get('/user/find', (req, res) => {
 });
 
 /*
-  @method: get
+  @method: put
   @end-point: /updateProfile/:id
 */
 app.put('/updateProfile/:id', async (req, res) => {
