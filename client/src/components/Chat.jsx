@@ -13,6 +13,7 @@ import { BiDotsVerticalRounded } from 'react-icons/bi';
 
 import { v4 as uuid } from 'uuid';
 import { debounce } from 'lodash';
+import MarkdownIt from 'markdown-it';
 
 import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';
@@ -71,6 +72,8 @@ const Chat = () => {
     const messageExists = (id) => {
         return Boolean(getMessage(id));
     };
+
+    const md = new MarkdownIt();
 
     useEffect(() => {
         const newMessageHandler = (message) => {
@@ -264,6 +267,8 @@ const Chat = () => {
             return;
         }
 
+        message = md.render(message);
+
         const splitMessage = message.split(' ');
         for (const word of splitMessage) {
             if (listOfBadWordsNotAllowed.includes(word)) {
@@ -402,7 +407,11 @@ const Chat = () => {
                                                 'justify-between'
                                             }`}
                                         >
-                                            <p>{message}</p>
+                                            <p
+                                                dangerouslySetInnerHTML={{
+                                                    __html: message,
+                                                }}
+                                            ></p>
                                             {sender.toString() ===
                                                 senderId.toString() &&
                                                 status !== 'pending' && (
