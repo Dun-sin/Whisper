@@ -120,6 +120,7 @@ app.get('/user/find', (req, res) => {
 });
 
 /*
+  This function will trigger when the user updates their profile information
   @method: put
   @end-point: /updateProfile/:id
 */
