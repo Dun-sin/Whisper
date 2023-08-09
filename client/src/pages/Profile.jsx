@@ -8,6 +8,7 @@ const Profile = () => {
         title: `capitalize text-white font-semibold text-2xl tracking-wider`,
         glassEffect: `bg-clip-padding backdrop-filter backdrop-blur-2xl bg-opacity-5 bg-gray-300 `,
         textArea: `text-white my-2 bg-transparent outline-none tracking-wider resize-none indent-2 p-2 rounded-xl h-28 w-full placeholder:tracking-widest`,
+        saveBtn: `border w-[350px] p-2 text-md rounded-xl my-4 border-green text-green hover:bg-green hover:text-white`,
         deleteBtn: `border w-[350px] p-2 text-md rounded-xl my-4 border-red text-red hover:bg-red hover:text-white`,
         inputSection: `flex justify-between tracking-wide`,
         label: `text-white`,
@@ -63,6 +64,7 @@ const Profile = () => {
                     </section>
                 </div>
             </section>
+            <button className={styles.saveBtn}>Save changes</button>
             <button className={styles.deleteBtn}>Delete My Account</button>
         </div>
     );
