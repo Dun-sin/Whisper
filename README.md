@@ -73,6 +73,7 @@ This app is developed to make chatting much private and easy without stealing yo
   </table>
 
 ### 🖼️ Screenshot
+
 ![image](https://user-images.githubusercontent.com/78784850/209371680-aa61e57f-167a-4a7d-86f7-0f2455e60890.png)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -104,24 +105,40 @@ Before installation, please make sure you have already installed the following t
    cd Whisper
    ```
 
-4. Install dependencies with `npm install`
+4. Navigate to the respective client and server directory
+
+```bash
+cd client
+```
+
+```bash
+cd server
+```
+
+5. Install dependencies with `npm install`
 
    ```bash
    npm install
    ```
 
-5. Use `.env_sample` to configure the `.env` file for this project. For mongodb url use the localhost to test
+6. Use `.env_sample` to configure the `.env` file for this project. For mongodb url use the localhost to test
+
    > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0  
    > Note: If using Docker, the MongoDB port is **27018**
 
-6. Run npm start in project root directory, this uses docker for the server part
+7. Run npm start in the client directory and npm dev:docker, this uses docker for the server part
 
-   ```bash
-   npm start
-   ```
-   > For those who do not wish to use Docker, here is another option -> [to start the project](https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md#starting-the-project-without-docker)
+```bash
+npm start
+```
 
-7. To test things out, you can open the same URL in two different browsers or open a private browsing window in the same browser. This allows you to connect to yourself. 
+```bash
+npm dev:docker
+```
+
+> For those who do not wish to use Docker, here is another option -> [to start the project](https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md#starting-the-project-without-docker)
+
+8. To test things out, you can open the same URL in two different browsers or open a private browsing window in the same browser. This allows you to connect to yourself.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
