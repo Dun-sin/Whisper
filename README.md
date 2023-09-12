@@ -118,7 +118,7 @@ cd server
 5. Install dependencies with `npm install`
 
    ```bash
-   npm run install
+   npm install
    ```
 
 6. Use `.env_sample` to configure the `.env` file for this project. For mongodb url use the localhost to test
@@ -126,7 +126,7 @@ cd server
    > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0  
    > Note: If using Docker, the MongoDB port is **27018**
 
-7. Run npm start in the client directory and npm dev:docker, this uses docker for the server part
+7. Run npm start in the client directory and npm dev:docker in the server directory, this uses docker for the server part
 
 ```bash
 npm start
