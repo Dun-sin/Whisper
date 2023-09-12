@@ -118,7 +118,7 @@ cd server
 5. Install dependencies with `npm install`
 
    ```bash
-   npm install
+   npm run install
    ```
 
 6. Use `.env_sample` to configure the `.env` file for this project. For mongodb url use the localhost to test
