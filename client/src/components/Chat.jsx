@@ -6,6 +6,7 @@ import 'styles/chat.css';
 
 import ScrollToBottom from 'react-scroll-to-bottom';
 import Dropdown from 'rsuite/Dropdown';
+import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 
 import { ImCancelCircle } from 'react-icons/im';
 import { IoSend } from 'react-icons/io5';
@@ -38,7 +39,8 @@ const Chat = () => {
         removeMessage,
         editText,
     } = useChat();
-    const { auth, logout } = useAuth();
+    const { authState, dispatchAuth } = useAuth();
+    const { logout } = useKindeAuth()
     const socket = useContext(SocketContext);
 
     const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
@@ -59,7 +61,7 @@ const Chat = () => {
         'cockfoam',
         'nigger',
     ];
-    senderId = auth.email ?? auth.loginId;
+    senderId = authState.email ?? authState.loginId;
 
     const getMessage = (id) => {
         if (!state[app.currentChatId]) {
@@ -75,13 +77,20 @@ const Chat = () => {
 
     const md = new MarkdownIt();
 
+    function logOut() {
+        dispatchAuth({
+            type: 'LOGOUT'
+        })
+        logout()
+    }
+
     useEffect(() => {
         const newMessageHandler = (message) => {
             try {
                 addMessage(message);
                 playNotification('newMessage');
             } catch {
-                logout();
+                logOut()
             }
         };
 
@@ -158,7 +167,7 @@ const Chat = () => {
                 status: 'pending',
             });
         } catch {
-            logout();
+            logOut();
             return false;
         }
 
@@ -173,7 +182,7 @@ const Chat = () => {
             try {
                 updateMessage(tmpId, sentMessage);
             } catch {
-                logout();
+                logOut();
                 return false;
             }
         } catch (e) {
@@ -187,7 +196,7 @@ const Chat = () => {
                     status: 'failed',
                 });
             } catch {
-                logout();
+                logOut();
             }
 
             return false;
@@ -271,6 +280,7 @@ const Chat = () => {
 
         const splitMessage = message.split(' ');
         for (const word of splitMessage) {
+            // We need a better way to implement this
             if (listOfBadWordsNotAllowed.includes(word)) {
                 message = 'Warning Message: send a warning to users';
             }
@@ -392,20 +402,18 @@ const Chat = () => {
                             return (
                                 <div
                                     key={id}
-                                    className={`message-block ${
-                                        sender.toString() ===
+                                    className={`message-block ${sender.toString() ===
                                         senderId.toString()
-                                            ? 'me'
-                                            : 'other'
-                                    }`}
+                                        ? 'me'
+                                        : 'other'
+                                        }`}
                                 >
                                     <div className="message">
                                         <div
-                                            className={`content text ${
-                                                sender.toString() ===
-                                                    senderId.toString() &&
+                                            className={`content text ${sender.toString() ===
+                                                senderId.toString() &&
                                                 'justify-between'
-                                            }`}
+                                                }`}
                                         >
                                             <p
                                                 dangerouslySetInnerHTML={{
@@ -450,11 +458,10 @@ const Chat = () => {
                                                 )}
                                         </div>
                                         <div
-                                            className={`status ${
-                                                status === 'failed'
-                                                    ? 'text-red-600'
-                                                    : 'text-white'
-                                            }`}
+                                            className={`status ${status === 'failed'
+                                                ? 'text-red-600'
+                                                : 'text-white'
+                                                }`}
                                         >
                                             <MessageStatus
                                                 time={getTime(time)}

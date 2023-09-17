@@ -1,10 +1,11 @@
 import { useContext, useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Tooltip, Whisper } from 'rsuite';
 
-// Icons
+
+import { Tooltip, Whisper } from 'rsuite';
 import { Icon } from '@iconify/react';
+import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 
 // Store
 import { useDialog } from 'src/context/DialogContext';
@@ -19,11 +20,20 @@ const linkStyle = `md:h-[60px] w-full flex items-center justify-center hover:bg-
 const activeStyle = linkStyle + 'bg-primary shadow-2xl';
 
 const NavBar = ({ className }) => {
-    const { auth, logout } = useAuth();
-    const { app } = useApp();
+    const { authState, dispatchAuth } = useAuth();
+    const { logout } = useKindeAuth()
     const socket = useContext(SocketContext);
+
+    const { app } = useApp();
     const location = useLocation();
     const { setDialog } = useDialog();
+
+    function logOut() {
+        dispatchAuth({
+            type: 'LOGOUT'
+        })
+        logout()
+    }
 
     const handleLogout = () => {
         setDialog({
@@ -32,16 +42,16 @@ const NavBar = ({ className }) => {
             noBtnText: 'Cancel',
             yesBtnText: 'Yes, log me out',
             handler: () => {
-                logout();
+                logOut();
                 if (socket.disconnected) {
                     socket.volatile.emit('logout', {
-                        email: auth.email,
-                        loginId: auth.loginId,
+                        email: authState.email,
+                        loginId: authState.loginId,
                     });
                 } else {
                     socket.emit('logout', {
-                        email: auth.email,
-                        loginId: auth.loginId,
+                        email: authState.email,
+                        loginId: authState.loginId,
                     });
                 }
             },
@@ -103,7 +113,7 @@ const NavBar = ({ className }) => {
                     <NavLink to="/friends" className={getLinkStyle}>
                         <Icon
                             color="white"
-                            icon="la:user-friends" 
+                            icon="la:user-friends"
                             height="24"
                             width="24"
                         />
