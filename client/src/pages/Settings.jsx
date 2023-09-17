@@ -8,11 +8,14 @@ import {
     Form,
     Message,
     Slider,
+    Toggle
 } from 'rsuite';
 
 import { useApp } from 'src/context/AppContext';
+import useAppTheme from 'src/hooks/useAppTheme';
 
 const Searching = () => {
+    const { setLightTheme, setDarkTheme } = useAppTheme()
     const {
         app,
         hasUnsavedSettings,
@@ -32,6 +35,8 @@ const Searching = () => {
      */
     const handleSubmit = () => {
         updateSettings();
+        if (settings.theme) { setDarkTheme() }
+        else { setLightTheme() }
     };
 
     const handleChange = (newSettings) => {
@@ -72,6 +77,15 @@ const Searching = () => {
                     <Form.HelpText tooltip>
                         Set the volume level for all your notifications
                     </Form.HelpText>
+                </Form.Group>
+                <Form.Group controlId="theme">
+                    <Form.ControlLabel>
+                        Dark Theme 
+                        <Form.HelpText tooltip>
+                            Toggle Dark/Light Theme
+                        </Form.HelpText>
+                    </Form.ControlLabel>
+                    <Form.Control value={settings.theme} accepter={Toggle} name="theme" checked={settings.theme} />
                 </Form.Group>
                 <Form.Group>
                     <ButtonToolbar className="flex justify-end">

@@ -1,4 +1,5 @@
 module.exports = {
+    darkMode: "class",
     content: ['./src/**/*.{js,jsx,ts,tsx}'],
     theme: {
         extend: {
@@ -6,10 +7,10 @@ module.exports = {
                 mdl: { max: '768px' },
             },
             colors: {
-                primary: '#011627',
-                secondary: '#162938',
-                highlight: '#FF9F1C',
-                red: '#FF3A46',
+                primary: 'hsl(var(--primary) / <alpha-value>)',
+                secondary: 'hsl(var(--secondary) / <alpha-value>)',
+                highlight: 'hsl(var(--highlight) / <alpha-value>)',
+                red: 'hsl(var(--red) / <alpha-value>)',
             },
         },
     },

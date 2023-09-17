@@ -2,6 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    /* active default dark mode */
+    :root {
+        --primary: 207deg 95% 8%;
+        --secondary: 206deg 44% 15%;
+        --highlight: 35deg 100% 55%;
+        --red: 356deg 100% 61%;
+    }
+
+    :root[data-theme="dark"] {
+        --primary: 207deg 95% 8%;
+        --secondary: 206deg 44% 15%;
+        --highlight: 35deg 100% 55%;
+        --red: 356deg 100% 61%;
+    }
+
+    :root[data-theme="light"] {
+        --primary: 207deg 95% 60%;
+        --secondary: 206deg 70% 45%;
+        --highlight: 35deg 100% 55%;
+        --red: 356deg 100% 61%;
+    }
+}
+
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',

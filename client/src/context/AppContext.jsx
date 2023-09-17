@@ -8,6 +8,7 @@ const initialState = {
     settings: {
         notificationsEnabled: true,
         notificationVolume: 10,
+        theme: true // Sets to dark theme by default on init
     },
     tmpSettings: null,
     currentChatId: null,
