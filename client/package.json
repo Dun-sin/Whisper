@@ -23,7 +23,6 @@
         "axios": "^1.4.0",
         "lodash": "^4.17.21",
         "markdown-it": "^13.0.1",
-        "mojoauth-web-sdk": "^1.1.9",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-icons": "^4.10.1",

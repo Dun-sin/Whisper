@@ -6,6 +6,7 @@ import 'styles/chat.css';
 
 import ScrollToBottom from 'react-scroll-to-bottom';
 import Dropdown from 'rsuite/Dropdown';
+import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 
 import { ImCancelCircle } from 'react-icons/im';
 import { IoSend } from 'react-icons/io5';
@@ -39,6 +40,7 @@ const Chat = () => {
         editText,
     } = useChat();
     const { authState, dispatchAuth } = useAuth();
+    const { logout } = useKindeAuth()
     const socket = useContext(SocketContext);
 
     const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
@@ -75,10 +77,11 @@ const Chat = () => {
 
     const md = new MarkdownIt();
 
-    function logout() {
+    function logOut() {
         dispatchAuth({
             type: 'LOGOUT'
         })
+        logout()
     }
 
     useEffect(() => {
@@ -87,7 +90,7 @@ const Chat = () => {
                 addMessage(message);
                 playNotification('newMessage');
             } catch {
-                logout()
+                logOut()
             }
         };
 
@@ -164,7 +167,7 @@ const Chat = () => {
                 status: 'pending',
             });
         } catch {
-            logout();
+            logOut();
             return false;
         }
 
@@ -179,7 +182,7 @@ const Chat = () => {
             try {
                 updateMessage(tmpId, sentMessage);
             } catch {
-                logout();
+                logOut();
                 return false;
             }
         } catch (e) {
@@ -193,7 +196,7 @@ const Chat = () => {
                     status: 'failed',
                 });
             } catch {
-                logout();
+                logOut();
             }
 
             return false;
@@ -277,6 +280,7 @@ const Chat = () => {
 
         const splitMessage = message.split(' ');
         for (const word of splitMessage) {
+            // We need a better way to implement this
             if (listOfBadWordsNotAllowed.includes(word)) {
                 message = 'Warning Message: send a warning to users';
             }

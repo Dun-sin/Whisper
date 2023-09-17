@@ -1,10 +1,11 @@
 import { useContext, useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Tooltip, Whisper } from 'rsuite';
 
-// Icons
+
+import { Tooltip, Whisper } from 'rsuite';
 import { Icon } from '@iconify/react';
+import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 
 // Store
 import { useDialog } from 'src/context/DialogContext';
@@ -20,15 +21,18 @@ const activeStyle = linkStyle + 'bg-primary shadow-2xl';
 
 const NavBar = ({ className }) => {
     const { authState, dispatchAuth } = useAuth();
-    const { app } = useApp();
+    const { logout } = useKindeAuth()
     const socket = useContext(SocketContext);
+
+    const { app } = useApp();
     const location = useLocation();
     const { setDialog } = useDialog();
 
-    function logout() {
+    function logOut() {
         dispatchAuth({
             type: 'LOGOUT'
         })
+        logout()
     }
 
     const handleLogout = () => {
@@ -38,7 +42,7 @@ const NavBar = ({ className }) => {
             noBtnText: 'Cancel',
             yesBtnText: 'Yes, log me out',
             handler: () => {
-                logout();
+                logOut();
                 if (socket.disconnected) {
                     socket.volatile.emit('logout', {
                         email: authState.email,
