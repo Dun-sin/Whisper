@@ -1,5 +1,12 @@
 import { cloneState } from './utils';
 
+export const initialState = {
+    isLoggedIn: false,
+    loginType: 'anonymous',
+    loginId: null,
+    email: null,
+};
+
 export default function authReducer(state, action) {
     const clonedState = cloneState(state);
 
@@ -13,14 +20,16 @@ export default function authReducer(state, action) {
                 loginType,
                 isLoggedIn: true,
             });
-            break;
+            // Save auth state to localStorage on each change
+            localStorage.setItem('auth', JSON.stringify(clonedState));
+            return clonedState;
         }
 
         case 'LOGOUT':
             localStorage.clear();
 
             return {
-                ...cloneState,
+                ...clonedState,
                 email: null,
                 loginId: null,
                 loginType: 'anonymous',
@@ -30,9 +39,4 @@ export default function authReducer(state, action) {
         default:
             throw new Error('No action provided!');
     }
-
-    // Save auth state to localStorage on each change
-    localStorage.setItem('auth', JSON.stringify(clonedState));
-
-    return clonedState;
 }

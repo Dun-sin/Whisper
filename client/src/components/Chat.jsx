@@ -38,7 +38,7 @@ const Chat = () => {
         removeMessage,
         editText,
     } = useChat();
-    const { auth, logout } = useAuth();
+    const { authState, dispatchAuth } = useAuth();
     const socket = useContext(SocketContext);
 
     const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
@@ -59,7 +59,7 @@ const Chat = () => {
         'cockfoam',
         'nigger',
     ];
-    senderId = auth.email ?? auth.loginId;
+    senderId = authState.email ?? authState.loginId;
 
     const getMessage = (id) => {
         if (!state[app.currentChatId]) {
@@ -75,13 +75,19 @@ const Chat = () => {
 
     const md = new MarkdownIt();
 
+    function logout() {
+        dispatchAuth({
+            type: 'LOGOUT'
+        })
+    }
+
     useEffect(() => {
         const newMessageHandler = (message) => {
             try {
                 addMessage(message);
                 playNotification('newMessage');
             } catch {
-                logout();
+                logout()
             }
         };
 
@@ -392,20 +398,18 @@ const Chat = () => {
                             return (
                                 <div
                                     key={id}
-                                    className={`message-block ${
-                                        sender.toString() ===
+                                    className={`message-block ${sender.toString() ===
                                         senderId.toString()
-                                            ? 'me'
-                                            : 'other'
-                                    }`}
+                                        ? 'me'
+                                        : 'other'
+                                        }`}
                                 >
                                     <div className="message">
                                         <div
-                                            className={`content text ${
-                                                sender.toString() ===
-                                                    senderId.toString() &&
+                                            className={`content text ${sender.toString() ===
+                                                senderId.toString() &&
                                                 'justify-between'
-                                            }`}
+                                                }`}
                                         >
                                             <p
                                                 dangerouslySetInnerHTML={{
@@ -450,11 +454,10 @@ const Chat = () => {
                                                 )}
                                         </div>
                                         <div
-                                            className={`status ${
-                                                status === 'failed'
-                                                    ? 'text-red-600'
-                                                    : 'text-white'
-                                            }`}
+                                            className={`status ${status === 'failed'
+                                                ? 'text-red-600'
+                                                : 'text-white'
+                                                }`}
                                         >
                                             <MessageStatus
                                                 time={getTime(time)}

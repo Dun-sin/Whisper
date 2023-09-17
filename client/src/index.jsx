@@ -1,17 +1,22 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
+import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import 'styles/index.css';
+
+
 import App from './App';
-import { AuthProvider } from './context/AuthContext';
-import { AppProvider } from './context/AppContext';
-import 'rsuite/dist/rsuite.min.css';
-import { socket, SocketContext } from 'context/Context';
-import { DialogProvider } from './context/DialogContext';
 import Dialog from './components/Dialog';
 
+import { AppProvider } from './context/AppContext';
+import { AuthProvider } from './context/AuthContext';
+import { socket, SocketContext } from 'context/Context';
+import { DialogProvider } from './context/DialogContext';
 
-const root = createRoot(document.getElementById('root'))
+import 'rsuite/dist/rsuite.min.css';
+import 'styles/index.css';
+
+
+const root = createRoot(document.getElementById('root'));
+
 root.render(<AuthProvider>
     <AppProvider>
         <Router>
@@ -23,4 +28,4 @@ root.render(<AuthProvider>
             </SocketContext.Provider>
         </Router>
     </AppProvider>
-</AuthProvider>)
+</AuthProvider>);

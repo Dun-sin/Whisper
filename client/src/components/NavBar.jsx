@@ -19,11 +19,17 @@ const linkStyle = `md:h-[60px] w-full flex items-center justify-center hover:bg-
 const activeStyle = linkStyle + 'bg-primary shadow-2xl';
 
 const NavBar = ({ className }) => {
-    const { auth, logout } = useAuth();
+    const { authState, dispatchAuth } = useAuth();
     const { app } = useApp();
     const socket = useContext(SocketContext);
     const location = useLocation();
     const { setDialog } = useDialog();
+
+    function logout() {
+        dispatchAuth({
+            type: 'LOGOUT'
+        })
+    }
 
     const handleLogout = () => {
         setDialog({
@@ -35,13 +41,13 @@ const NavBar = ({ className }) => {
                 logout();
                 if (socket.disconnected) {
                     socket.volatile.emit('logout', {
-                        email: auth.email,
-                        loginId: auth.loginId,
+                        email: authState.email,
+                        loginId: authState.loginId,
                     });
                 } else {
                     socket.emit('logout', {
-                        email: auth.email,
-                        loginId: auth.loginId,
+                        email: authState.email,
+                        loginId: authState.loginId,
                     });
                 }
             },
@@ -103,7 +109,7 @@ const NavBar = ({ className }) => {
                     <NavLink to="/friends" className={getLinkStyle}>
                         <Icon
                             color="white"
-                            icon="la:user-friends" 
+                            icon="la:user-friends"
                             height="24"
                             width="24"
                         />
