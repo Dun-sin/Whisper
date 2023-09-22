@@ -61,7 +61,7 @@ This app is developed to make chatting much private and easy without stealing yo
      <br>SocketIo
     </td>  
   <td align="Center" width="30%">
-  <a href="https://kinde.com/" target="_blank" rel="noreferrer"><img src="https://user-images.githubusercontent.com/78784850/179708079-25f0c6c7-ae9a-4c07-b5b3-e6dc1a1051c2.png" width="36" height="36" alt="Kinde"/></a>
+  <a href="https://kinde.com/" target="_blank" rel="noreferrer"><img src="https://pbs.twimg.com/profile_images/1577508370189520896/zAvyayM9_400x400.jpg" width="36" height="36" alt="Kinde"/></a>
      <br>Kinde
     </td>  
     <td align="Center" width="30%">      
