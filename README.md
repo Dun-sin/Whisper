@@ -61,8 +61,8 @@ This app is developed to make chatting much private and easy without stealing yo
      <br>SocketIo
     </td>  
   <td align="Center" width="30%">
-  <a href="https://mojoauth.com/" target="_blank" rel="noreferrer"><img src="https://user-images.githubusercontent.com/78784850/179708079-25f0c6c7-ae9a-4c07-b5b3-e6dc1a1051c2.png" width="36" height="36" alt="Mojo"/></a>
-     <br>Mojo
+  <a href="https://kinde.com/" target="_blank" rel="noreferrer"><img src="https://user-images.githubusercontent.com/78784850/179708079-25f0c6c7-ae9a-4c07-b5b3-e6dc1a1051c2.png" width="36" height="36" alt="Kinde"/></a>
+     <br>Kinde
     </td>  
     <td align="Center" width="30%">      
 <a href="https://tailwindcss.com/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/tailwindcss-colored.svg" width="36" height="36" alt="TailwindCSS" /></a> 
@@ -138,7 +138,7 @@ npm dev:docker
 
 > For those who do not wish to use Docker, here is another option -> [to start the project](https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md#starting-the-project-without-docker)
 
-8. To test things out, you can open the same URL in two different browsers or open a private browsing window in the same browser. This allows you to connect to yourself.
+8. To test things out, you can open the same URL in two different browsers or open a private browsing window in the same browser. This allows you to connect to yourself, use `login anonymously` if you aren't dealing with anything that uses user data else use `login` and open an account on kinde `https://kinde.com/` following the instructions for react implementation and replace it with the data from your kinde.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -160,14 +160,7 @@ Check out the website: [Whisper](https://WhisChat.vercel.app/)
 
 Click this button to run this project in Gitpod which comes with pre-configured environment.
 
-Work on Frontend <a href="https://gitpod.io/#type=client/https://github.com/Dun-sin/Whisper">
-<img
-    src="https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod"
-    alt="Contribute with Gitpod"
-  />
-</a>
-
-Work on Backend <a href="https://gitpod.io/#type=server/https://github.com/Dun-sin/Whisper">
+<a href="https://gitpod.io/#type=client/https://github.com/Dun-sin/Whisper">
 <img
     src="https://img.shields.io/badge/Contribute%20with-Gitpod-908a85?logo=gitpod"
     alt="Contribute with Gitpod"
