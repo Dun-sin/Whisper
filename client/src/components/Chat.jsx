@@ -18,11 +18,12 @@ import MarkdownIt from 'markdown-it';
 
 import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';
+import { useApp } from 'src/context/AppContext';
 
 import useChatUtils from 'src/lib/chat';
 import MessageStatus from './MessageStatus';
+import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
-import { useApp } from 'src/context/AppContext';
 
 let senderId;
 const Chat = () => {
@@ -46,21 +47,7 @@ const Chat = () => {
     const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
     const inputRef = useRef('');
 
-    const listOfBadWordsNotAllowed = [
-        'sex',
-        'porn',
-        'fuck',
-        'cock',
-        'titties',
-        'boner',
-        'muff',
-        'pussy',
-        'asshole',
-        'cunt',
-        'ass',
-        'cockfoam',
-        'nigger',
-    ];
+
     senderId = authState.email ?? authState.loginId;
 
     const getMessage = (id) => {
@@ -75,7 +62,11 @@ const Chat = () => {
         return Boolean(getMessage(id));
     };
 
-    const md = new MarkdownIt();
+    const md = new MarkdownIt({
+        html: false,
+        linkify: true,
+        typographer: true
+    });
 
     function logOut() {
         dispatchAuth({
@@ -247,6 +238,7 @@ const Chat = () => {
     };
 
     const warningMessage = (sender, message) => {
+        // TODO: Instrad of replacing the message we should add some kind of increment for the users to decide to see the message or not
         if (message.includes('Warning Message')) {
             if (senderId === sender) {
                 return (
@@ -272,11 +264,10 @@ const Chat = () => {
         socket.emit('typing', { chatId: app.currentChatId, isTyping: false });
         const d = new Date();
         let message = inputRef.current.value;
+
         if (message === '' || senderId === undefined || senderId === '123456') {
             return;
         }
-
-        message = md.render(message);
 
         const splitMessage = message.split(' ');
         for (const word of splitMessage) {
@@ -334,13 +325,16 @@ const Chat = () => {
 
     const handleEdit = (id) => {
         inputRef.current.focus();
-
         const { message } = getMessage(id);
+        console.log('first', message)
+
+
         if (message.includes('Warning Message')) {
             cancelEdit();
             return;
         }
         inputRef.current.value = message;
+
         setEditing({ isediting: true, messageID: id });
     };
 
@@ -399,6 +393,8 @@ const Chat = () => {
                             !(resultOfWarningMessage === undefined) &&
                                 (message = resultOfWarningMessage);
 
+
+
                             return (
                                 <div
                                     key={id}
@@ -415,11 +411,12 @@ const Chat = () => {
                                                 'justify-between'
                                                 }`}
                                         >
-                                            <p
-                                                dangerouslySetInnerHTML={{
-                                                    __html: message,
-                                                }}
-                                            ></p>
+
+                                            <span
+                                                dangerouslySetInnerHTML={{ __html: md.render(message) }}
+                                            />
+
+
                                             {sender.toString() ===
                                                 senderId.toString() &&
                                                 status !== 'pending' && (
@@ -480,6 +477,7 @@ const Chat = () => {
                             );
                         }
                     )}
+
                 </ScrollToBottom>
             </div>
             <form
