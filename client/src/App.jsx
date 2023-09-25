@@ -63,7 +63,6 @@ function App() {
             }}
         >
             <div className={`flex flex-col-reverse md:flex-row h-screen`}>
-                {/* TODO: Create layouts */}
                 {isLoggedIn && <NavBar />}
                 <Routes>
                     <Route

@@ -191,15 +191,7 @@ const Chat = () => {
             }
 
             return false;
-        } finally {
-            // Socket.emit('privatemessage', message);
-            // addMessage({
-            //     id: senderId,
-            //     message,
-            //     time,
-            //     room: 'anon',
-            // });
-        }
+        } 
 
         return true;
     };
@@ -209,31 +201,32 @@ const Chat = () => {
             return;
         }
 
-        const message = getMessage(id);
+        const messageObject = getMessage(id);
+        const { message } = messageObject
 
         if (message.includes('Warning Message')) {
             return;
         }
 
         updateMessage(id, {
-            ...message,
+            ...messageObject,
             status: 'pending',
         });
 
         try {
             const messageDeleted = await deleteMessage({
                 id,
-                chatId: message.room,
+                chatId: messageObject.room,
             });
 
             if (!messageDeleted) {
-                updateMessage(id, message);
+                updateMessage(id, messageObject);
                 return;
             }
 
-            removeMessage(id, message.room);
+            removeMessage(id, messageObject.room);
         } catch {
-            updateMessage(id, message);
+            updateMessage(id, messageObject);
         }
     };
 
@@ -271,7 +264,7 @@ const Chat = () => {
 
         const splitMessage = message.split(' ');
         for (const word of splitMessage) {
-            // We need a better way to implement this
+            // TODO: We need a better way to implement this
             if (listOfBadWordsNotAllowed.includes(word)) {
                 message = 'Warning Message: send a warning to users';
             }
@@ -326,8 +319,6 @@ const Chat = () => {
     const handleEdit = (id) => {
         inputRef.current.focus();
         const { message } = getMessage(id);
-        console.log('first', message)
-
 
         if (message.includes('Warning Message')) {
             cancelEdit();
@@ -378,7 +369,7 @@ const Chat = () => {
         <div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between">
             <div className="max-h-[67vh]">
                 <p className="text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center">
-                    Connected with a random User
+                    Connected with a random User{sortedMessages.length === 0 && ', Be the first to send {"Hello"}'}
                 </p>
                 <ScrollToBottom
                     initialScrollBehavior="auto"
