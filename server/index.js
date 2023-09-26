@@ -33,7 +33,7 @@ mongoose
 
 		console.log(`connected to mongodb`);
 	})
-	.catch((e) => console.log(e));
+	.catch((e) => console.error(e));
 
 const UserRouter = require('./controllers/userController');
 
@@ -45,6 +45,7 @@ const DeleteMessageHandler = require('./sockets/deleteMessage');
 const TypingHandler = require('./sockets/typing');
 const LogOutHandler = require('./sockets/logout');
 const CloseChatHandler = require('./sockets/close');
+const stopSearch = require('./sockets/stopSearch');
 
 app.use(express.json());
 app.use(cors());
@@ -63,6 +64,7 @@ io.on('connection', (socket) => {
 	TypingHandler(socket);
 	LogOutHandler(io, socket);
 	CloseChatHandler(socket);
+	stopSearch(socket);
 });
 
 server.listen(HTTP_PORT, async () => {
