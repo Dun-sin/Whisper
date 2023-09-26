@@ -5,6 +5,7 @@ labels:
   [
     "feature",
     "enhancement",
+    "hacktoberfest"
   ]
 body:
   - type: textarea

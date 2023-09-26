@@ -1,28 +1,28 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "private": true,
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "docker compose up -d && nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.1",
-    "express": "^4.17.3",
-    "heroku": "^7.60.2",
-    "mongodb": "^4.6.0",
-    "mongoose": "^6.3.4",
-    "nodemon": "^2.0.20",
-    "npm": "^8.13.2",
-    "socket.io": "^4.4.1"
-  },
-  "engines": {
-    "node": "16.x",
-    "npm": "8.x"
-  }
+	"name": "server",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"start": "nodemon index.js",
+		"dev": "nodemon index.js",
+		"dev:docker": "docker compose up -d && nodemon index.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Dun-sin/Whisper/blob/main/server"
+	},
+	"author": "Dun-sin",
+	"license": "ISC",
+	"dependencies": {
+		"cors": "^2.8.5",
+		"dotenv": "^16.3.1",
+		"express": "^4.18.2",
+		"mongodb": "^5.7.0",
+		"mongoose": "^7.4.3",
+		"nodemon": "^2.0.20",
+		"socket.io": "^4.7.2",
+		"validator": "^13.11.0"
+	}
 }

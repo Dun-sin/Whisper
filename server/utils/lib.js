@@ -1,8 +1,8 @@
 const { Socket } = require('socket.io');
 const mongoose = require('mongoose');
-const ActiveUser = require('./models/ActiveUserModel');
-const Chat = require('./models/ChatModel');
-const Message = require('./models/MessageModel');
+const ActiveUser = require('../models/ActiveUserModel');
+const Chat = require('../models/ChatModel');
+const Message = require('../models/MessageModel');
 
 /**
  * @typedef {{
@@ -65,6 +65,8 @@ async function init() {
 		const messages = {};
 
 		for (const message of chat.messages) {
+			if (message.sender === null) return;
+
 			messages[message._id.toString()] = {
 				...message.optimizedVersion,
 				senderId: message.sender.emailOrLoginId,
@@ -107,6 +109,8 @@ async function createChat(users) {
 
 	const chatId = _chat._id.toString();
 
+	// this shouldn't happen as now new users are added to active users collection instead of users collection.
+	// find a way to take users from users and fill it in active users.
 	for (let i = 0; i < users.length; i++) {
 		const { email, loginId } = users[i];
 		const user = await ActiveUser.create({
@@ -243,7 +247,7 @@ async function addMessage(
 		...(
 			await Message.create({
 				message: message,
-				sender: mongoose.Types.ObjectId(sender.id),
+				sender: new mongoose.Types.ObjectId(sender.id),
 				type,
 				createdAt: new Date(time),
 			})

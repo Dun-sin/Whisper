@@ -1,11 +1,14 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
+import { KindeProvider } from "@kinde-oss/kinde-auth-react"
+
 // Store
 import { useAuth } from 'context/AuthContext';
 
 // Components
-import ProtectedRoutes from 'components/ProtectedRoutes';
 import NavBar from 'components/NavBar';
+import ProtectedRoutes from 'components/ProtectedRoutes';
+import { api } from 'src/lib/axios';
 
 // Pages
 import Start from 'pages/Start';
@@ -14,33 +17,75 @@ import ComingSoon from 'pages/ComingSoon';
 import Login from 'pages/Login';
 import Settings from 'pages/Settings';
 
+
+const clientID = import.meta.env.VITE_IMPORTANT;
+
 function App() {
-    const { isLoggedIn } = useAuth();
+    const { isLoggedIn, dispatchAuth } = useAuth();
+
+
+    async function loginWithEmail(email) {
+        try {
+            const response = await api.post('/login', {
+                email,
+            });
+
+            if (response.status === 200) {
+                const data = await response.data;
+                const userID = data.id;
+
+                dispatchAuth({
+                    type: 'LOGIN',
+                    payload: {
+                        loginType: 'email',
+                        loginId: userID,
+                        email
+                    },
+                })
+            } else {
+                throw new Error('Login failed');
+            }
+        } catch (err) {
+            console.error('Error logging in:', err);
+        }
+    }
+
 
     return (
-        <div className={`flex flex-col-reverse md:flex-row h-screen`}>
-            {/* TODO: Create layouts */}
-            {isLoggedIn && <NavBar />}
-            <Routes>
-                <Route
-                    exact
-                    path="/"
-                    element={<ProtectedRoutes isLoggedIn={isLoggedIn} />}
-                >
-                    <Route exact path="/" element={<Start />} />
-                    <Route exact path="/founduser" element={<Searching />} />
-                    <Route exact path="/friends" element={<ComingSoon />} />
-                    <Route exact path="/profile" element={<ComingSoon />} />
-                    <Route exact path="/settings" element={<Settings />} />
-                </Route>
+        <KindeProvider
+            clientId={clientID}
+            domain="https://whisper.kinde.com"
+            logoutUri={window.location.origin}
+            redirectUri={window.location.origin + '/login'}
+            onRedirectCallback={(user) => {
+                loginWithEmail(user.email);
 
-                <Route
-                    exact
-                    path="/login"
-                    element={isLoggedIn ? <Navigate to="/" /> : <Login />}
-                />
-            </Routes>
-        </div>
+            }}
+        >
+            <div className={`flex flex-col-reverse md:flex-row h-screen`}>
+                {isLoggedIn && <NavBar />}
+                <Routes>
+                    <Route
+                        exact
+                        path="/"
+                        element={<ProtectedRoutes isLoggedIn={isLoggedIn} />}
+                    >
+                        <Route exact path="/" element={<Start />} />
+                        <Route exact path="/founduser" element={<Searching />} />
+                        <Route exact path="/friends" element={<ComingSoon />} />
+                        <Route exact path="/profile" element={<ComingSoon />} />
+                        <Route exact path="/settings" element={<Settings />} />
+                    </Route>
+
+                    <Route
+                        exact
+                        path="/login"
+                        element={isLoggedIn ? <Navigate to="/" /> : <Login />}
+                    />
+                </Routes>
+            </div>
+        </KindeProvider>
+
     );
 }
 

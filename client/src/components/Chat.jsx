@@ -6,6 +6,7 @@ import 'styles/chat.css';
 
 import ScrollToBottom from 'react-scroll-to-bottom';
 import Dropdown from 'rsuite/Dropdown';
+import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 
 import { ImCancelCircle } from 'react-icons/im';
 import { IoSend } from 'react-icons/io5';
@@ -13,14 +14,16 @@ import { BiDotsVerticalRounded } from 'react-icons/bi';
 
 import { v4 as uuid } from 'uuid';
 import { debounce } from 'lodash';
+import MarkdownIt from 'markdown-it';
 
 import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';
+import { useApp } from 'src/context/AppContext';
 
 import useChatUtils from 'src/lib/chat';
 import MessageStatus from './MessageStatus';
+import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
-import { useApp } from 'src/context/AppContext';
 
 let senderId;
 const Chat = () => {
@@ -37,28 +40,15 @@ const Chat = () => {
         removeMessage,
         editText,
     } = useChat();
-    const { auth, logout } = useAuth();
+    const { authState, dispatchAuth } = useAuth();
+    const { logout } = useKindeAuth()
     const socket = useContext(SocketContext);
 
     const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
     const inputRef = useRef('');
 
-    const listOfBadWordsNotAllowed = [
-        'sex',
-        'porn',
-        'fuck',
-        'cock',
-        'titties',
-        'boner',
-        'muff',
-        'pussy',
-        'asshole',
-        'cunt',
-        'ass',
-        'cockfoam',
-        'nigger',
-    ];
-    senderId = auth.email ?? auth.loginId;
+
+    senderId = authState.email ?? authState.loginId;
 
     const getMessage = (id) => {
         if (!state[app.currentChatId]) {
@@ -72,13 +62,26 @@ const Chat = () => {
         return Boolean(getMessage(id));
     };
 
+    const md = new MarkdownIt({
+        html: false,
+        linkify: true,
+        typographer: true
+    });
+
+    function logOut() {
+        dispatchAuth({
+            type: 'LOGOUT'
+        })
+        logout()
+    }
+
     useEffect(() => {
         const newMessageHandler = (message) => {
             try {
                 addMessage(message);
                 playNotification('newMessage');
             } catch {
-                logout();
+                logOut()
             }
         };
 
@@ -155,7 +158,7 @@ const Chat = () => {
                 status: 'pending',
             });
         } catch {
-            logout();
+            logOut();
             return false;
         }
 
@@ -170,7 +173,7 @@ const Chat = () => {
             try {
                 updateMessage(tmpId, sentMessage);
             } catch {
-                logout();
+                logOut();
                 return false;
             }
         } catch (e) {
@@ -184,19 +187,11 @@ const Chat = () => {
                     status: 'failed',
                 });
             } catch {
-                logout();
+                logOut();
             }
 
             return false;
-        } finally {
-            // Socket.emit('privatemessage', message);
-            // addMessage({
-            //     id: senderId,
-            //     message,
-            //     time,
-            //     room: 'anon',
-            // });
-        }
+        } 
 
         return true;
     };
@@ -206,35 +201,37 @@ const Chat = () => {
             return;
         }
 
-        const message = getMessage(id);
+        const messageObject = getMessage(id);
+        const { message } = messageObject
 
         if (message.includes('Warning Message')) {
             return;
         }
 
         updateMessage(id, {
-            ...message,
+            ...messageObject,
             status: 'pending',
         });
 
         try {
             const messageDeleted = await deleteMessage({
                 id,
-                chatId: message.room,
+                chatId: messageObject.room,
             });
 
             if (!messageDeleted) {
-                updateMessage(id, message);
+                updateMessage(id, messageObject);
                 return;
             }
 
-            removeMessage(id, message.room);
+            removeMessage(id, messageObject.room);
         } catch {
-            updateMessage(id, message);
+            updateMessage(id, messageObject);
         }
     };
 
     const warningMessage = (sender, message) => {
+        // TODO: Instrad of replacing the message we should add some kind of increment for the users to decide to see the message or not
         if (message.includes('Warning Message')) {
             if (senderId === sender) {
                 return (
@@ -260,12 +257,14 @@ const Chat = () => {
         socket.emit('typing', { chatId: app.currentChatId, isTyping: false });
         const d = new Date();
         let message = inputRef.current.value;
+
         if (message === '' || senderId === undefined || senderId === '123456') {
             return;
         }
 
         const splitMessage = message.split(' ');
         for (const word of splitMessage) {
+            // TODO: We need a better way to implement this
             if (listOfBadWordsNotAllowed.includes(word)) {
                 message = 'Warning Message: send a warning to users';
             }
@@ -319,13 +318,14 @@ const Chat = () => {
 
     const handleEdit = (id) => {
         inputRef.current.focus();
-
         const { message } = getMessage(id);
+
         if (message.includes('Warning Message')) {
             cancelEdit();
             return;
         }
         inputRef.current.value = message;
+
         setEditing({ isediting: true, messageID: id });
     };
 
@@ -390,7 +390,7 @@ const Chat = () => {
         <div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between">
             <div className="max-h-[67vh]">
                 <p className="text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center">
-                    Connected with a random User
+                    Connected with a random User{sortedMessages.length === 0 && ', Be the first to send {"Hello"}'}
                 </p>
                 <ScrollToBottom
                     initialScrollBehavior="auto"
@@ -405,25 +405,30 @@ const Chat = () => {
                             !(resultOfWarningMessage === undefined) &&
                                 (message = resultOfWarningMessage);
 
+
+
                             return (
                                 <div
                                     key={id}
-                                    className={`message-block ${
-                                        sender.toString() ===
+                                    className={`message-block ${sender.toString() ===
                                         senderId.toString()
-                                            ? 'me'
-                                            : 'other'
-                                    }`}
+                                        ? 'me'
+                                        : 'other'
+                                        }`}
                                 >
                                      <div className="message">
                                         <div
-                                            className={`content text ${
-                                                sender.toString() ===
-                                                    senderId.toString() &&
+                                            className={`content text ${sender.toString() ===
+                                                senderId.toString() &&
                                                 'justify-between'
-                                            }`}
+                                                }`}
                                         >
-                                            <p>{message}</p>
+
+                                            <span
+                                                dangerouslySetInnerHTML={{ __html: md.render(message) }}
+                                            />
+
+
                                             {sender.toString() ===
                                                 senderId.toString() &&
                                                 status !== 'pending' && (
@@ -507,11 +512,10 @@ const Chat = () => {
                                                 )}
                                         </div>
                                         <div
-                                            className={`status ${
-                                                status === 'failed'
-                                                    ? 'text-red-600'
-                                                    : 'text-white'
-                                            }`}
+                                            className={`status ${status === 'failed'
+                                                ? 'text-red-600'
+                                                : 'text-white'
+                                                }`}
                                         >
                                             <MessageStatus
                                                 time={getTime(time)}
@@ -530,6 +534,7 @@ const Chat = () => {
                             );
                         }
                     )}
+
                 </ScrollToBottom>
             </div>
             <form
