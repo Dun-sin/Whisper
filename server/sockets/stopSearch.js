@@ -1,8 +1,12 @@
-const { delWaitingUser } = require("../lib");
+const { delWaitingUser } = require('../utils/lib');
 
 module.exports = (socket) => {
-  socket.on("stop_search", async ({ loginId, email }) => {
-    await delWaitingUser(email ?? loginId);
-    socket.emit("stop_search_success");
-  });
+	try {
+		socket.on('stop_search', async ({ loginId, email }) => {
+			delWaitingUser(email ?? loginId);
+			socket.emit('stop_search_success');
+		});
+	} catch (err) {
+		console.error(err);
+	}
 };
