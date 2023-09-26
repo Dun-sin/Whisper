@@ -446,7 +446,7 @@ const Chat = () => {
                                             />
 
 
-                                            {sender.toString() ===
+                                             {sender.toString() ===
                                                 senderId.toString() &&
                                                 status !== 'pending' && (
                                                     <Dropdown
@@ -491,61 +491,6 @@ const Chat = () => {
                                                             }
                                                         >
                                                             Delete
-                                                        </Dropdown.Item>
-                                                    </Dropdown>
-                                                )}
-                                            {sender.toString() !==
-                                                senderId.toString() &&
-                                                status !== 'pending' && (
-                                                    <Dropdown
-                                                        placement="rightStart"
-                                                        style={{
-                                                            zIndex: 'auto',
-                                                        }}
-                                                        renderToggle={
-                                                            renderIconButtonReceiver
-                                                        }
-                                                        NoCaret
-                                                    >
-                                                        <Dropdown.Item
-                                                            onClick={() =>
-                                                                handleDelete(id)
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </Dropdown.Item>
-                                                    </Dropdown>
-                                                )}
-                                            {sender.toString() !==
-                                                senderId.toString() &&
-                                                status !== 'pending' && (
-                                                    <Dropdown
-                                                        placement="rightStart"
-                                                        style={{
-                                                            zIndex: 'auto',
-                                                        }}
-                                                        renderToggle={
-                                                            renderIconButtonReceiver
-                                                        }
-                                                        NoCaret
-                                                    >
-                                                        <Dropdown.Item
-                                                            onClick={() =>
-                                                                handleCopyToClipBoard(
-                                                                    id
-                                                                )
-                                                            }
-                                                        >
-                                                            Copy
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item
-                                                            onClick={() =>
-                                                                handleQuoteReply(
-                                                                    id
-                                                                )
-                                                            }
-                                                        >
-                                                            Quote Reply
                                                         </Dropdown.Item>
                                                     </Dropdown>
                                                 )}
