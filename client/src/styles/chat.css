@@ -37,11 +37,11 @@
     }
 
     .message-block .message .content {
-        @apply bg-red rounded-[20px] p-[15px] break-all w-full flex gap-2 items-center;
+        @apply bg-red rounded-[18px] p-[15px] break-all will-change-auto flex gap-2 items-center;
     }
 
     .message-block .message .status {
-        @apply px-[20px] text-[12px] flex gap-2 items-center;
+        @apply px-[10px] text-[12px] flex gap-2 items-center;
     }
 
     .message .content h1,
