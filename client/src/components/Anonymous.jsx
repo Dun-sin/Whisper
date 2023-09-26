@@ -115,7 +115,7 @@ const Anonymous = ({ onChatClosed }) => {
                 'text-white',
             ])}
         >
-            <div className="flex items-center justify-between border-b-[2px] px-5 border-secondary h-[100px] w-[100%]">
+            <div className="flex items-center justify-between border-b-[2px] px-5 border-secondary h-[10%] w-[100%]">
                 <div className="md:hidden">
                     <Whisper
                         placement="auto"
@@ -157,7 +157,7 @@ const Anonymous = ({ onChatClosed }) => {
                     centerItems,
                     'flex-col',
                     'w-[90%]',
-                    'h-[calc(100%-100px)]',
+                    'h-[calc(100%-10%)]',
                     'mt-auto',
                 ])}
             >

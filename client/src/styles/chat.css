@@ -33,11 +33,15 @@
     }
 
     .message-block.me .message .content {
-        @apply bg-secondary;
+        @apply bg-secondary rounded-l-md;
+    }
+
+    .message-block.other .message .content {
+        @apply rounded-r-md;
     }
 
     .message-block .message .content {
-        @apply bg-red rounded-[18px] p-[15px] break-all will-change-auto flex gap-2 items-center;
+        @apply bg-red p-3 break-all will-change-auto flex gap-6 items-center;
     }
 
     .message-block .message .status {
@@ -73,5 +77,9 @@
         list-style-type: lower-latin !important;
         list-style-position: inside !important;
         margin-left: 15px !important;
+    }
+
+    blockquote {
+        @apply px-2 my-4 border-l-4 border-gray-600;
     }
 }
