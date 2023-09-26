@@ -25,11 +25,11 @@
     }
 
     .message-block.me blockquote {
-        @apply bg-red    
+        @apply bg-red;
     }
     
     .message-block.other blockquote {
-        @apply bg-secondary
+        @apply bg-secondary;
     }
 
     .message-block.other {
