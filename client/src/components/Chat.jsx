@@ -307,6 +307,7 @@ const Chat = () => {
 `;
         inputRef.current.value = quotedMessage;
         setIsQuoteReply(true)
+
     };
 
     const handleTypingStatus = debounce((e) => {
@@ -432,7 +433,7 @@ const Chat = () => {
                                         : 'other'
                                         }`}
                                 >
-                                    <div className="message">
+                                     <div className="message">
                                         <div
                                             className={`content text ${sender.toString() ===
                                                 senderId.toString() &&
@@ -484,6 +485,28 @@ const Chat = () => {
                                                         >
                                                             Quote Reply
                                                         </Dropdown.Item>
+                                                        <Dropdown.Item
+                                                            onClick={() =>
+                                                                handleDelete(id)
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </Dropdown.Item>
+                                                    </Dropdown>
+                                                )}
+                                            {sender.toString() !==
+                                                senderId.toString() &&
+                                                status !== 'pending' && (
+                                                    <Dropdown
+                                                        placement="rightStart"
+                                                        style={{
+                                                            zIndex: 'auto',
+                                                        }}
+                                                        renderToggle={
+                                                            renderIconButtonReceiver
+                                                        }
+                                                        NoCaret
+                                                    >
                                                         <Dropdown.Item
                                                             onClick={() =>
                                                                 handleDelete(id)
