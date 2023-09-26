@@ -33,6 +33,7 @@ const Chat = () => {
         isediting: false,
         messageID: null,
     });
+    const [isQuoteReply, setIsQuoteReply] = useState(false)
     const {
         messages: state,
         addMessage,
@@ -45,6 +46,7 @@ const Chat = () => {
     const socket = useContext(SocketContext);
 
     const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
+
     const inputRef = useRef('');
 
 
@@ -75,36 +77,6 @@ const Chat = () => {
         logout()
     }
 
-    useEffect(() => {
-        const newMessageHandler = (message) => {
-            try {
-                addMessage(message);
-                playNotification('newMessage');
-            } catch {
-                logOut()
-            }
-        };
-
-        const deleteMessageHandler = ({ id, chatId }) => {
-            removeMessage(id, chatId);
-        };
-
-        const editMessageHandler = ({ id, chatId, newMessage }) => {
-            editText(id, chatId, newMessage);
-        };
-
-        // This is used to recive message form other user.
-        socket.on('receive_message', newMessageHandler);
-        socket.on('delete_message', deleteMessageHandler);
-        socket.on('edit_message', editMessageHandler);
-
-        return () => {
-            socket.off('receive_message', newMessageHandler);
-            socket.off('delete_message', deleteMessageHandler);
-            socket.off('edit_message', editMessageHandler);
-        };
-    }, []);
-
     const cancelEdit = () => {
         inputRef.current.value = '';
         setEditing({ isediting: false, messageID: null });
@@ -113,21 +85,6 @@ const Chat = () => {
             .emit('typing', { chatId: app.currentChatId, isTyping: false });
     };
 
-    // Clear chat when escape is pressed
-    useEffect(() => {
-        const keyDownHandler = (event) => {
-            if (event.key === 'Escape' && editing.isediting) {
-                event.preventDefault();
-                cancelEdit();
-            }
-        };
-
-        document.addEventListener('keydown', keyDownHandler);
-
-        return () => {
-            document.removeEventListener('keydown', keyDownHandler);
-        };
-    }, [editing]);
 
     const sortedMessages = useMemo(
         () =>
@@ -258,9 +215,16 @@ const Chat = () => {
         const d = new Date();
         let message = inputRef.current.value;
 
+        if (!isQuoteReply) {
+            const cleanedText = message.replace(/>+/g, '');
+            message = cleanedText
+        }
+
         if (message === '' || senderId === undefined || senderId === '123456') {
             return;
         }
+
+        setIsQuoteReply(false)
 
         const splitMessage = message.split(' ');
         for (const word of splitMessage) {
@@ -329,6 +293,22 @@ const Chat = () => {
         setEditing({ isediting: true, messageID: id });
     };
 
+    const handleQuoteReply = (id) => {
+        inputRef.current.focus();
+
+        const { message } = getMessage(id);
+        if (message.includes('Warning Message')) {
+            cancelEdit();
+            return;
+        }
+
+        const quotedMessage = `> ${message}
+        
+`;
+        inputRef.current.value = quotedMessage;
+        setIsQuoteReply(true)
+    };
+
     const handleTypingStatus = debounce((e) => {
         if (e.target.value.length > 0) {
             socket
@@ -365,15 +345,72 @@ const Chat = () => {
         );
     };
 
+    const renderIconButtonReceiver = (props) => {
+        return (
+            <BiDotsVerticalRounded
+                {...props}
+                className="fill-white scale-[1.8]"
+            />
+        );
+    };
+
+    // Clear chat when escape is pressed
+    useEffect(() => {
+        const keyDownHandler = (event) => {
+            if (event.key === 'Escape' && editing.isediting) {
+                event.preventDefault();
+                cancelEdit();
+            }
+        };
+
+        document.addEventListener('keydown', keyDownHandler);
+
+        return () => {
+            document.removeEventListener('keydown', keyDownHandler);
+        };
+    }, [editing]);
+
+    useEffect(() => {
+        const newMessageHandler = (message) => {
+            try {
+                addMessage(message);
+                playNotification('newMessage');
+            } catch {
+                logOut()
+            }
+        };
+
+        const deleteMessageHandler = ({ id, chatId }) => {
+            removeMessage(id, chatId);
+        };
+
+        const editMessageHandler = ({ id, chatId, newMessage }) => {
+            editText(id, chatId, newMessage);
+        };
+
+        // This is used to recive message form other user.
+        socket.on('receive_message', newMessageHandler);
+        socket.on('delete_message', deleteMessageHandler);
+        socket.on('edit_message', editMessageHandler);
+
+        return () => {
+            socket.off('receive_message', newMessageHandler);
+            socket.off('delete_message', deleteMessageHandler);
+            socket.off('edit_message', editMessageHandler);
+        };
+    }, []);
+
+
+
     return (
-        <div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between">
+        <div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6">
             <div className="max-h-[67vh]">
                 <p className="text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center">
                     Connected with a random User{sortedMessages.length === 0 && ', Be the first to send {"Hello"}'}
                 </p>
                 <ScrollToBottom
                     initialScrollBehavior="auto"
-                    className="displayMessgaes h-[100%] max-h-[70vh] md:max-h-full overflow-y-scroll w-[100%] "
+                    className="h-[100%] max-h-[70vh] md:max-h-full overflow-y-scroll w-full scroll-smooth"
                 >
                     {sortedMessages.map(
                         ({ senderId: sender, id, message, time, status }) => {
@@ -413,7 +450,9 @@ const Chat = () => {
                                                 status !== 'pending' && (
                                                     <Dropdown
                                                         placement="leftStart"
-                                                        style={{ zIndex: 3 }}
+                                                        style={{
+                                                            zIndex: 'auto',
+                                                        }}
                                                         renderToggle={
                                                             renderIconButton
                                                         }
@@ -421,18 +460,12 @@ const Chat = () => {
                                                     >
                                                         <Dropdown.Item
                                                             onClick={() =>
-                                                                handleDelete(id)
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item
-                                                            onClick={() =>
                                                                 handleEdit(id)
                                                             }
                                                         >
                                                             Edit
                                                         </Dropdown.Item>
+
                                                         <Dropdown.Item
                                                             onClick={() =>
                                                                 handleCopyToClipBoard(
@@ -441,6 +474,55 @@ const Chat = () => {
                                                             }
                                                         >
                                                             Copy
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item
+                                                            onClick={() =>
+                                                                handleQuoteReply(
+                                                                    id
+                                                                )
+                                                            }
+                                                        >
+                                                            Quote Reply
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item
+                                                            onClick={() =>
+                                                                handleDelete(id)
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </Dropdown.Item>
+                                                    </Dropdown>
+                                                )}
+                                            {sender.toString() !==
+                                                senderId.toString() &&
+                                                status !== 'pending' && (
+                                                    <Dropdown
+                                                        placement="rightStart"
+                                                        style={{
+                                                            zIndex: 'auto',
+                                                        }}
+                                                        renderToggle={
+                                                            renderIconButtonReceiver
+                                                        }
+                                                        NoCaret
+                                                    >
+                                                        <Dropdown.Item
+                                                            onClick={() =>
+                                                                handleCopyToClipBoard(
+                                                                    id
+                                                                )
+                                                            }
+                                                        >
+                                                            Copy
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item
+                                                            onClick={() =>
+                                                                handleQuoteReply(
+                                                                    id
+                                                                )
+                                                            }
+                                                        >
+                                                            Quote Reply
                                                         </Dropdown.Item>
                                                     </Dropdown>
                                                 )}
@@ -475,10 +557,10 @@ const Chat = () => {
                 className="flex justify-center items-center mt-[40px]"
                 onSubmit={handleSubmit}
             >
-                <div className="w-[100%] flex items-center justify-between bg-secondary rounded-[15px]">
-                    <input
+                <div className="w-full flex items-center justify-between bg-secondary rounded-l-md">
+                    <textarea
                         placeholder="Send a Message....."
-                        className="h-[65px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] pl-[22px] pr-[22px] text-[18px]"
+                        className="h-[45px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] text-[18px] placeholder-shown:align-middle"
                         ref={inputRef}
                         onChange={handleTypingStatus}
                     />
@@ -491,7 +573,7 @@ const Chat = () => {
                 </div>
                 <button
                     type="submit"
-                    className="bg-[#FF9F1C] h-[65px] w-[70px] flex justify-center items-center rounded-[10px]"
+                    className="bg-[#FF9F1C] h-[47px] w-[70px] flex justify-center items-center rounded-r-md"
                 >
                     <IoSend className="fill-primary scale-[2]" />
                 </button>
