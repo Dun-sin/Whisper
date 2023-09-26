@@ -139,7 +139,6 @@ const BuddyMatcher = () => {
         });
 
         socket.on('stop_search_success', () => {
-            console.log('stopping search stop socket')
             setIsStoppingSearch(false);
             endSearch();
             navigate('/');
