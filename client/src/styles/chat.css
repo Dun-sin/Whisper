@@ -24,6 +24,14 @@
         @apply items-start;
     }
 
+    .message-block.me blockquote {
+        @apply bg-red;
+    }
+    
+    .message-block.other blockquote {
+        @apply bg-secondary;
+    }
+
     .message-block.other {
         @apply justify-start;
     }
