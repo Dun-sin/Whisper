@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// user schema 
+// User schema
 const UserSchema = new mongoose.Schema({
 	email: {
 		type: String,
@@ -8,16 +8,24 @@ const UserSchema = new mongoose.Schema({
 	},
 	gender: {
 		type: String,
+		enum: ['Male', 'Female', 'Unknown'],
 		required: false,
-	  },
-	  age: {
+		default: 'Unknown',
+	},
+	age: {
 		type: Number,
 		required: false,
-	  },
-	  aboutMe: {
+		default: null,
+	},
+	username: {
 		type: String,
 		required: false,
-	  },
+		default: 'Anonymous',
+	},
+	aboutMe: {
+		type: String,
+		required: false,
+	},
 });
 
 UserSchema.index({ email: 1 }, { unique: true });

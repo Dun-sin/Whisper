@@ -51,7 +51,6 @@ function App() {
         }
     }
 
-
     return (
         <KindeProvider
             clientId={clientID}
@@ -60,7 +59,6 @@ function App() {
             redirectUri={window.location.origin + '/login'}
             onRedirectCallback={(user) => {
                 loginWithEmail(user.email);
-
             }}
         >
             <div className={`flex flex-col-reverse md:flex-row h-screen`}>
