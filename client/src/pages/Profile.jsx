@@ -9,15 +9,16 @@ import { api } from 'src/lib/axios';
 import { createClassesFromArray } from 'src/lib/utils';
 
 const Profile = () => {
-    const [username, setUsername] = useState('anonymous')
+    const [username, setUsername] = useState('Anonymous')
 
-    const { email, dispatchAuth } = useAuth();
+    const { authState, dispatchAuth } = useAuth();
     const { logout } = useKindeAuth()
 
     const aboutRef = useRef(null)
     const genderRef = useRef(null)
     const ageRef = useRef(null)
 
+    const { email } = authState
 
     const getProfileData = async (email) => {
         try {
@@ -25,7 +26,7 @@ const Profile = () => {
             const { aboutMe, age, gender, username } = response.data
 
             setUsername(username);
-            aboutRef.current.value = aboutMe;
+            aboutRef.current.value = aboutMe || ''
             ageRef.current.value = age
             genderRef.current.value = gender
         } catch (error) {
