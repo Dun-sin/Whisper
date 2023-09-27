@@ -505,28 +505,6 @@ const Chat = () => {
                                                     >
                                                         <Dropdown.Item
                                                             onClick={() =>
-                                                                handleDelete(id)
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </Dropdown.Item>
-                                                    </Dropdown>
-                                                )}
-                                            {sender.toString() !==
-                                                senderId.toString() &&
-                                                status !== 'pending' && (
-                                                    <Dropdown
-                                                        placement="rightStart"
-                                                        style={{
-                                                            zIndex: 'auto',
-                                                        }}
-                                                        renderToggle={
-                                                            renderIconButtonReceiver
-                                                        }
-                                                        NoCaret
-                                                    >
-                                                        <Dropdown.Item
-                                                            onClick={() =>
                                                                 handleCopyToClipBoard(
                                                                     id
                                                                 )
