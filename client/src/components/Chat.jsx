@@ -13,7 +13,7 @@ import { IoSend } from 'react-icons/io5';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
 
 import { v4 as uuid } from 'uuid';
-import { debounce } from 'lodash';
+import { throttle } from 'lodash';
 import MarkdownIt from 'markdown-it';
 
 import { useChat } from 'src/context/ChatContext';
@@ -310,15 +310,11 @@ const Chat = () => {
 
     };
 
-    const handleTypingStatus = debounce((e) => {
+    const handleTypingStatus = throttle((e) => {
         if (e.target.value.length > 0) {
             socket
                 .timeout(5000)
                 .emit('typing', { chatId: app.currentChatId, isTyping: true });
-        } else {
-            socket
-                .timeout(10000)
-                .emit('typing', { chatId: app.currentChatId, isTyping: false });
         }
     }, 500);
 
