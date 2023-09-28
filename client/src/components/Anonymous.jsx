@@ -211,3 +211,4 @@ export default Anonymous;
 Anonymous.propTypes = {
     onChatClosed: PropTypes.func,
 };
+

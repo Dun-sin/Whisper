@@ -22,6 +22,7 @@ export default function authReducer(state, action) {
             });
             // Save auth state to localStorage on each change
             localStorage.setItem('auth', JSON.stringify(clonedState));
+
             return clonedState;
         }
 
@@ -39,4 +40,5 @@ export default function authReducer(state, action) {
         default:
             throw new Error('No action provided!');
     }
+
 }
