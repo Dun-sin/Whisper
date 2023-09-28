@@ -24,6 +24,7 @@ import useChatUtils from 'src/lib/chat';
 import MessageStatus from './MessageStatus';
 import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
+import { CHAT_EVENTS } from '../../constants';
 
 let senderId;
 const Chat = () => {
@@ -82,7 +83,7 @@ const Chat = () => {
         setEditing({ isediting: false, messageID: null });
         socket
             .timeout(10000)
-            .emit('typing', { chatId: app.currentChatId, isTyping: false });
+            .emit(CHAT_EVENTS.NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
     };
 
 
@@ -148,7 +149,7 @@ const Chat = () => {
             }
 
             return false;
-        } 
+        }
 
         return true;
     };
@@ -211,7 +212,7 @@ const Chat = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        socket.emit('typing', { chatId: app.currentChatId, isTyping: false });
+        socket.emit(CHAT_EVENTS.NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
         const d = new Date();
         let message = inputRef.current.value;
 
@@ -314,7 +315,7 @@ const Chat = () => {
         if (e.target.value.length > 0) {
             socket
                 .timeout(5000)
-                .emit('typing', { chatId: app.currentChatId, isTyping: true });
+                .emit(CHAT_EVENTS.NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
         }
     }, 500);
 
@@ -386,14 +387,14 @@ const Chat = () => {
         };
 
         // This is used to recive message form other user.
-        socket.on('receive_message', newMessageHandler);
-        socket.on('delete_message', deleteMessageHandler);
-        socket.on('edit_message', editMessageHandler);
+        socket.on(CHAT_EVENTS.NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+        socket.on(CHAT_EVENTS.NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+        socket.on(CHAT_EVENTS.NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
 
         return () => {
-            socket.off('receive_message', newMessageHandler);
-            socket.off('delete_message', deleteMessageHandler);
-            socket.off('edit_message', editMessageHandler);
+            socket.off(CHAT_EVENTS.NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+            socket.off(CHAT_EVENTS.NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+            socket.off(CHAT_EVENTS.NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
         };
     }, []);
 
@@ -429,7 +430,7 @@ const Chat = () => {
                                         : 'other'
                                         }`}
                                 >
-                                     <div className="message">
+                                    <div className="message">
                                         <div
                                             className={`content text ${sender.toString() ===
                                                 senderId.toString() &&

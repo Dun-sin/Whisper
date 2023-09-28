@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-
+import { CHAT_EVENTS } from '../../constants.js'
 // Rsuite
 import { Dropdown, IconButton, Tooltip, Whisper } from 'rsuite';
 import { Icon } from '@rsuite/icons';
@@ -41,7 +41,7 @@ const Anonymous = ({ onChatClosed }) => {
     const { closeChat } = useChat();
     const { setDialog } = useDialog();
 
-    socket.on('display', ({ isTyping, chatId }) => {
+    socket.on(CHAT_EVENTS.NEW_EVENT_DISPLAY, ({ isTyping, chatId }) => {
         // eslint-disable-next-line curly
         if (chatId !== currentChatId) return;
         if (!isTyping) {
@@ -72,7 +72,7 @@ const Anonymous = ({ onChatClosed }) => {
 
         socket
             .timeout(30000)
-            .emit('close', currentChatId, (err, chatClosed) => {
+            .emit(CHAT_EVENTS.NEW_EVENT_CLOSE, currentChatId, (err, chatClosed) => {
                 if (err) {
                     alert('An error occured whiles closing chat.');
                     setAutoSearchAfterClose(false);
@@ -122,9 +122,9 @@ const Anonymous = ({ onChatClosed }) => {
 
     useEffect(() => {
         const newMessageEvents = [
-            'receive_message',
-            'delete_message',
-            'edit_message',
+            CHAT_EVENTS.NEW_EVENT_RECEIVE_MESSAGE,
+            CHAT_EVENTS.NEW_EVENT_DELETE_MESSAGE,
+            CHAT_EVENTS.NEW_EVENT_EDIT_MESSAGE,
         ];
 
         function onNewMessage() {
