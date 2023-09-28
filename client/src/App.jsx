@@ -70,7 +70,8 @@ function App() {
                         element={<ProtectedRoutes isLoggedIn={isLoggedIn} />}
                     >
                         <Route exact path="/" element={<Start />} />
-                        {/* TODO: Sepreate searching and foundUser into different routes */}
+                        {/* TODO: Sepreate searching 
+                        and foundUser into different routes */}
                         <Route exact path="/founduser" element={<Searching />} />
                         <Route exact path="/friends" element={<ComingSoon />} />
                         <Route exact path="/profile" element={<Profile />} />

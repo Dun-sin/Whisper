@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import { useEffect, useRef, useContext, useMemo, useState } from 'react';
 import { SocketContext } from 'context/Context';
+import useKeyPress from 'src/hooks/useKeyPress';
 
 import 'styles/chat.css';
 
@@ -263,6 +264,25 @@ const Chat = () => {
             inputRef.current.focus();
         }
     };
+
+    const handleSendWithCtrlEnter = (event) => {
+        const d = new Date();
+        const message = inputRef.current.value;
+       
+        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+            doSend({
+                senderId,
+                room: app.currentChatId,
+                message,
+                time: d.getTime(),
+            }); // Call your function to send the message
+        }
+      };
+    
+      // Use the useKeyPress hook to listen for Ctrl + Enter keypress
+      useKeyPress(['Control', 'Meta', 'Enter'], handleSendWithCtrlEnter);
+    
+    
 
     const handleResend = (id) => {
         if (!messageExists(id)) {
