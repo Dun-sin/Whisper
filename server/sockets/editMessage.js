@@ -1,8 +1,9 @@
+const { CHAT_EVENTS } = require("../constants");
 const { getActiveUser, editMessage } = require("../utils/lib");
 
 module.exports = (socket) => {
   socket.on(
-    "edit_message",
+    CHAT_EVENTS.NEW_EVENT_EDIT_MESSAGE,
     async (
       { id: messageId, chatId, newMessage },
       messageWasEditedSuccessfully
@@ -23,7 +24,7 @@ module.exports = (socket) => {
 
       socket.broadcast
         .to(chatId)
-        .emit("edit_message", { id: messageId, chatId, newMessage });
+        .emit(CHAT_EVENTS.NEW_EVENT_EDIT_MESSAGE, { id: messageId, chatId, newMessage });
       messageWasEditedSuccessfully(messageEditted);
     }
   );
