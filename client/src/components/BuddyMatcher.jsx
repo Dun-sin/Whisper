@@ -51,9 +51,9 @@ const BuddyMatcher = () => {
             return;
         }
 
+        startSearch()
+        setLoadingText(defaultLoadingText)
         socket.connect()
-
-        startNewSearch()
     }
 
     useEffect(() => {
