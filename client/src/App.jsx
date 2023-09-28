@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
-import { KindeProvider } from "@kinde-oss/kinde-auth-react"
+import { KindeProvider } from '@kinde-oss/kinde-auth-react';
 
 // Store
 import { useAuth } from 'context/AuthContext';
@@ -17,13 +17,11 @@ import ComingSoon from 'pages/ComingSoon';
 import Login from 'pages/Login';
 import Settings from 'pages/Settings';
 
-
 const clientID = import.meta.env.VITE_IMPORTANT;
 import Profile from './pages/Profile';
 
 function App() {
     const { isLoggedIn, dispatchAuth } = useAuth();
-
 
     async function loginWithEmail(email) {
         try {
@@ -40,9 +38,9 @@ function App() {
                     payload: {
                         loginType: 'email',
                         loginId: userID,
-                        email
+                        email,
                     },
-                })
+                });
             } else {
                 throw new Error('Login failed');
             }
@@ -56,7 +54,7 @@ function App() {
             clientId={clientID}
             domain="https://whisper.kinde.com"
             logoutUri={window.location.origin}
-            redirectUri={window.location.origin + '/login'}
+            redirectUri={window.location.origin}
             onRedirectCallback={(user) => {
                 loginWithEmail(user.email);
             }}
@@ -71,7 +69,11 @@ function App() {
                     >
                         <Route exact path="/" element={<Start />} />
                         {/* TODO: Sepreate searching and foundUser into different routes */}
-                        <Route exact path="/founduser" element={<Searching />} />
+                        <Route
+                            exact
+                            path="/founduser"
+                            element={<Searching />}
+                        />
                         <Route exact path="/friends" element={<ComingSoon />} />
                         <Route exact path="/profile" element={<Profile />} />
                         <Route exact path="/settings" element={<Settings />} />
@@ -85,7 +87,6 @@ function App() {
                 </Routes>
             </div>
         </KindeProvider>
-
     );
 }
 

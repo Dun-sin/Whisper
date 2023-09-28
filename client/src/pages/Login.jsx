@@ -7,9 +7,8 @@ const centerStuffs = `flex flex-col justify-center items-center`;
 const userID = Math.random().toFixed(12).toString(36).slice(2);
 
 const Login = () => {
-    const { dispatchAuth } = useAuth()
-    const { login, isLoading } = useKindeAuth()
-
+    const { dispatchAuth } = useAuth();
+    const { login, isLoading } = useKindeAuth();
 
     function loginAnonymously() {
         dispatchAuth({
@@ -29,9 +28,9 @@ const Login = () => {
             {isLoading ? (
                 <div className="uppercase py-5">Processing Login</div>
             ) : (
-                <div className='flex gap-3 items-center'>
+                <div className="flex gap-3 items-center">
                     <button
-                        className='py-3 px-6 bg-secondary'
+                        className="py-3 px-6 bg-secondary"
                         disabled={isLoading}
                         onClick={login}
                     >
