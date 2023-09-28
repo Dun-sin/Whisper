@@ -1,13 +1,15 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useRef } from 'react';
 import { ThreeDots } from 'react-loading-icons';
+import {PiPlugsLight} from 'react-icons/pi'
 import { SocketContext } from 'context/Context';
 
 import Anonymous from 'components/Anonymous';
 import { useAuth } from 'src/context/AuthContext';
 import { useChat } from 'src/context/ChatContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useNotification } from 'src/lib/notification';
 import { useApp } from 'src/context/AppContext';
+import { isExplicitDisconnection } from 'src/lib/utils';
 
 const stoppingSearchLoadingText = <p>Stopping the search</p>;
 const BuddyMatcher = () => {
@@ -16,6 +18,8 @@ const BuddyMatcher = () => {
     const { authState } = useAuth();
     const { createChat, closeChat, closeAllChats } = useChat();
     const { startSearch, endSearch, app } = useApp();
+    const [disconnected, setDisconnected] = useState(false);
+    const reconnectAttempts = useRef(0);
 
     const [isStoppingSearch, setIsStoppingSearch] = useState(false);
     const socket = useContext(SocketContext);
@@ -28,7 +32,10 @@ const BuddyMatcher = () => {
     const startNewSearch = () => {
         startSearch();
         setLoadingText(defaultLoadingText);
-        socket.emit('join', { loginId: authState.loginId, email: authState.email });
+        socket.volatile.emit('join', {
+            loginId: authState.loginId,
+            email: authState.email,
+        });
     };
 
     const handleStopSearch = () => {
@@ -39,8 +46,17 @@ const BuddyMatcher = () => {
         setIsStoppingSearch(true);
     };
 
-    useEffect(() => {
+    function handleReconnect() {
+        if (socket.connected) {
+            return;
+        }
 
+        socket.connect()
+
+        startNewSearch()
+    }
+
+    useEffect(() => {
         setLoadingText(
             isStoppingSearch ? stoppingSearchLoadingText : defaultLoadingText
         );
@@ -63,7 +79,7 @@ const BuddyMatcher = () => {
                                 href="https://ctt.ac/US0h0"
                                 target="_blank"
                                 rel="noreferrer"
-                                className='text-blue-500 underline'
+                                className="text-blue-500 underline"
                             >
                                 Tweet
                             </a>{' '}
@@ -109,7 +125,11 @@ const BuddyMatcher = () => {
         socket.on('connect', () => {
             // Here server will be informed that user is searching for
             // another user
-            socket.emit('join', { loginId: authState.loginId, email: authState.email });
+            socket.emit('join', {
+                loginId: authState.loginId,
+                email: authState.email,
+            });
+            setDisconnected(false);
         });
         socket.connected && socket.emit('adding', { userID });
         socket.emit('createRoom', `${userID}-in-search`);
@@ -144,13 +164,51 @@ const BuddyMatcher = () => {
             navigate('/');
         });
 
+        function disconnect() {
+            reconnectAttempts.current = 0
+            if (app.currentChatId) {
+                return;
+            }
+            
+            socket.disconnect();
+            setDisconnected(true);
+            endSearch();
+        }
+
+        function onDisconnect(reason) {
+            if (isExplicitDisconnection(reason)) {
+                return;
+            }
+
+            disconnect();
+        }
+
+        function onReconnectAttempt(attempts) {
+            reconnectAttempts.current = attempts;
+        }
+
+        function onReconnectError() {
+            if (reconnectAttempts.current >= 3) {
+                disconnect();
+            }
+        }
+
+        socket.on('disconnect', onDisconnect);
+        socket.io.on('reconnect_attempt', onReconnectAttempt);
+        socket.io.on('reconnect_error', onReconnectError);
+
         return () => {
             socket
                 .off('connect')
                 .off('joined')
                 .off('chat_restore')
                 .off('close')
-                .off('inactive');
+                .off('inactive')
+                .off('disconnect', onDisconnect)
+
+            socket.io
+                .off('reconnect_attempt', onReconnectAttempt)
+                .off('reconnect_error', onReconnectError);
             socket.disconnect();
         };
     }, []);
@@ -169,6 +227,26 @@ const BuddyMatcher = () => {
                     Stop
                 </button>
             )}
+        </div>
+    ) : disconnected ? (
+        <div className="flex flex-col w-full justify-center items-center h-full bg-primary">
+            <PiPlugsLight className='text-secondary text-8xl' />
+            <p className="text-lg text-center text-white">
+                Sorry, it seems you&apos;re not connected
+            </p>
+            <div className='flex flex-col sm:flex-row gap-1 sm:gap-4 text-[1.5em] mt-4 font-medium items-center'>
+                <button
+                    onClick={handleReconnect}
+                    className={
+                        'hover:no-underline hover:text-black text-black w-[8em] h-[2.3em] rounded-[30px] bg-[#FF9F1C] flex flex-col items-center justify-center'
+                    }
+                >
+                    Try again
+                </button>
+                <Link to="/" className="underline text-white hover:text-white text-lg">
+                    Return Home
+                </Link>
+            </div>
         </div>
     ) : (
         <Anonymous onChatClosed={startNewSearch} />
