@@ -19,7 +19,7 @@ import { useDialog } from 'src/context/DialogContext';
 import Chat from 'components/Chat';
 import { createClassesFromArray } from 'src/lib/utils';
 
-import useKeyPress from 'src/hooks/useKeyPress';
+import { useKeyPressBuilder } from 'src/hooks/useKeyPress';
 
 const centerItems = `flex items-center justify-center`;
 
@@ -117,8 +117,17 @@ const Anonymous = ({ onChatClosed }) => {
         });
     };
 
-    useKeyPress(['c'], () => handleClose());
-    useKeyPress(['n'], () => handleClose(true));
+    useKeyPressBuilder()
+        .withKeys(['x'])
+        .withModifiers(['ctrl', 'shift'])
+        .withCallback(() => handleClose())
+        .build();
+        
+    useKeyPressBuilder()
+        .withKeys(['n'])
+        .withModifiers(['ctrl'])
+        .withCallback(() => handleClose(true))
+        .build();
 
     useEffect(() => {
         const newMessageEvents = [
