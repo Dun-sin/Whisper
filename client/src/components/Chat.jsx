@@ -24,7 +24,7 @@ import useChatUtils from 'src/lib/chat';
 import MessageStatus from './MessageStatus';
 import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
-import { CHAT_EVENTS } from '../../constants';
+import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE, NEW_EVENT_TYPING } from '../../constants';
 
 let senderId;
 const Chat = () => {
@@ -83,7 +83,7 @@ const Chat = () => {
         setEditing({ isediting: false, messageID: null });
         socket
             .timeout(10000)
-            .emit(CHAT_EVENTS.NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
+            .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
     };
 
 
@@ -212,7 +212,7 @@ const Chat = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        socket.emit(CHAT_EVENTS.NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
+        socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
         const d = new Date();
         let message = inputRef.current.value;
 
@@ -315,7 +315,7 @@ const Chat = () => {
         if (e.target.value.length > 0) {
             socket
                 .timeout(5000)
-                .emit(CHAT_EVENTS.NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
+                .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
         }
     }, 500);
 
@@ -387,14 +387,14 @@ const Chat = () => {
         };
 
         // This is used to recive message form other user.
-        socket.on(CHAT_EVENTS.NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
-        socket.on(CHAT_EVENTS.NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-        socket.on(CHAT_EVENTS.NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+        socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+        socket.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+        socket.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
 
         return () => {
-            socket.off(CHAT_EVENTS.NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
-            socket.off(CHAT_EVENTS.NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-            socket.off(CHAT_EVENTS.NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+            socket.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+            socket.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+            socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
         };
     }, []);
 

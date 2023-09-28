@@ -15,7 +15,7 @@ import { SocketContext } from 'context/Context';
 // Lib
 import { createClassesFromArray } from 'src/lib/utils';
 import { useApp } from 'src/context/AppContext';
-import { CHAT_EVENTS } from '../../constants';
+import { NEW_EVENT_LOGOUT } from '../../constants';
 
 const linkStyle = `md:h-[60px] w-full flex items-center justify-center hover:bg-primary rounded-[15px] `;
 const activeStyle = linkStyle + 'bg-primary shadow-2xl';
@@ -45,12 +45,12 @@ const NavBar = ({ className }) => {
             handler: () => {
                 logOut();
                 if (socket.disconnected) {
-                    socket.volatile.emit(CHAT_EVENTS.NEW_EVENT_LOGOUT, {
+                    socket.volatile.emit(NEW_EVENT_LOGOUT, {
                         email: authState.email,
                         loginId: authState.loginId,
                     });
                 } else {
-                    socket.emit(CHAT_EVENTS.NEW_EVENT_LOGOUT, {
+                    socket.emit(NEW_EVENT_LOGOUT, {
                         email: authState.email,
                         loginId: authState.loginId,
                     });

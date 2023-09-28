@@ -1,8 +1,8 @@
-const { CHAT_EVENTS } = require("../constants");
+const { NEW_EVENT_CLOSE, NEW_EVENT_INACTIVE } = require("../constants");
 const { getActiveUser, chatExists, closeChat } = require("../utils/lib");
 
 module.exports = (socket) => {
-  socket.on(CHAT_EVENTS.NEW_EVENT_CLOSE, async (chatId, setChatClosed) => {
+  socket.on(NEW_EVENT_CLOSE, async (chatId, setChatClosed) => {
     const user = getActiveUser({
       socketId: socket.id,
     });
@@ -15,9 +15,9 @@ module.exports = (socket) => {
     const inactiveList = await closeChat(chatId);
 
     setChatClosed(true);
-    socket.broadcast.to(chatId).emit(CHAT_EVENTS.NEW_EVENT_CLOSE, chatId);
+    socket.broadcast.to(chatId).emit(NEW_EVENT_CLOSE, chatId);
     inactiveList.forEach((emailOrLoginId) => {
-      socket.broadcast.to(emailOrLoginId).emit(CHAT_EVENTS.NEW_EVENT_INACTIVE);
+      socket.broadcast.to(emailOrLoginId).emit(NEW_EVENT_INACTIVE);
     });
   });
 };

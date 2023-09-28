@@ -2,7 +2,7 @@
  * @typedef {import('socket.io-client').Socket} Socket
  */
 
-import { CHAT_EVENTS } from '../../constants';
+import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_SEND_MESSAGE } from '../../constants';
 
 /**
  *
@@ -18,7 +18,7 @@ export default function useChatUtils(socket) {
 
             socket
                 .timeout(30000)
-                .emit(CHAT_EVENTS.NEW_EVENT_SEND_MESSAGE, message, (err, sentMessage) => {
+                .emit(NEW_EVENT_SEND_MESSAGE, message, (err, sentMessage) => {
                     if (err) {
                         reject(err);
                         return;
@@ -39,7 +39,7 @@ export default function useChatUtils(socket) {
             socket
                 .timeout(30000)
                 .emit(
-                    CHAT_EVENTS.NEW_EVENT_DELETE_MESSAGE,
+                    NEW_EVENT_DELETE_MESSAGE,
                     { id, chatId },
                     (err, messageDeleted) => {
                         if (err) {
@@ -63,7 +63,7 @@ export default function useChatUtils(socket) {
             socket
                 .timeout(30000)
                 .emit(
-                    CHAT_EVENTS.NEW_EVENT_EDIT_MESSAGE,
+                    NEW_EVENT_EDIT_MESSAGE,
                     { id, chatId, newMessage },
                     (err, messageEdited) => {
                         if (err) {

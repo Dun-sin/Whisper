@@ -1,9 +1,9 @@
-const { CHAT_EVENTS } = require("../constants");
+const { NEW_EVENT_DELETE_MESSAGE } = require("../constants");
 const { getActiveUser, removeMessage } = require("../utils/lib");
 
 module.exports = (socket) => {
   socket.on(
-    CHAT_EVENTS.NEW_EVENT_DELETE_MESSAGE,
+    NEW_EVENT_DELETE_MESSAGE,
     async ({ id: messageId, chatId }, messageWasDeletedSuccessfully) => {
       const user = getActiveUser({
         socketId: socket.id,
@@ -18,7 +18,7 @@ module.exports = (socket) => {
 
       socket.broadcast
         .to(chatId)
-        .emit(CHAT_EVENTS.NEW_EVENT_DELETE_MESSAGE, { id: messageId, chatId });
+        .emit(NEW_EVENT_DELETE_MESSAGE, { id: messageId, chatId });
       messageWasDeletedSuccessfully(messageDeleted);
     }
   );

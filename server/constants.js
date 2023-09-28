@@ -18,4 +18,4 @@ const CHAT_EVENTS = {
     NEW_EVENT_ADDING: 'adding',
     NEW_EVENT_CREATE_ROOM: 'createRoom'
 }
-module.exports = { CHAT_EVENTS }
+module.exports = CHAT_EVENTS
