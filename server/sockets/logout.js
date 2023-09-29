@@ -1,4 +1,4 @@
-const { NEW_EVENT_LOGOUT, NEW_EVENT_INACTIVE } = require("../constants");
+const { NEW_EVENT_LOGOUT, NEW_EVENT_INACTIVE } = require("../../constants.json");
 const { getActiveUser, delWaitingUser } = require("../utils/lib");
 
 module.exports = (io, socket) => {

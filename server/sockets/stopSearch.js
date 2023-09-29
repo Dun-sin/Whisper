@@ -1,4 +1,4 @@
-const { NEW_EVENT_STOP_SEARCH, NEW_EVENT_STOP_SEARCH_SUCCESS } = require('../constants');
+const { NEW_EVENT_STOP_SEARCH, NEW_EVENT_STOP_SEARCH_SUCCESS } = require('../../constants.json');
 const { delWaitingUser } = require('../utils/lib');
 
 module.exports = (socket) => {

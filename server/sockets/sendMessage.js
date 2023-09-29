@@ -1,4 +1,4 @@
-const { NEW_EVENT_SEND_MESSAGE, NEW_EVENT_SEND_FAILED, NEW_EVENT_RECEIVE_MESSAGE } = require("../constants");
+const { NEW_EVENT_SEND_MESSAGE, NEW_EVENT_SEND_FAILED, NEW_EVENT_RECEIVE_MESSAGE } = require("../../constants.json");
 const { addMessage, getActiveUser } = require("../utils/lib");
 
 module.exports = (socket) => {

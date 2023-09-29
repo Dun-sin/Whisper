@@ -1,4 +1,4 @@
-const { NEW_EVENT_TYPING, NEW_EVENT_DISPLAY } = require("../constants");
+const { NEW_EVENT_TYPING, NEW_EVENT_DISPLAY } = require("../../constants.json");
 
 module.exports = (socket) => {
   socket.on(NEW_EVENT_TYPING, ({ chatId, isTyping }) => {

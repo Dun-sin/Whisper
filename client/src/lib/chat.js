@@ -2,7 +2,7 @@
  * @typedef {import('socket.io-client').Socket} Socket
  */
 
-import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_SEND_MESSAGE } from '../../constants';
+import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_SEND_MESSAGE } from '../../../constants.json';
 
 /**
  *

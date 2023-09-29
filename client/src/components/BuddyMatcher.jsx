@@ -8,7 +8,7 @@ import { useChat } from 'src/context/ChatContext';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from 'src/lib/notification';
 import { useApp } from 'src/context/AppContext';
-import { NEW_EVENT_ADDING, NEW_EVENT_CHAT_RESTORE, NEW_EVENT_CLOSE, NEW_EVENT_CREATE_ROOM, NEW_EVENT_INACTIVE, NEW_EVENT_JOIN, NEW_EVENT_JOINED, NEW_EVENT_STOP_SEARCH, NEW_EVENT_STOP_SEARCH_SUCCESS } from '../../constants';
+import { NEW_EVENT_ADDING, NEW_EVENT_CHAT_RESTORE, NEW_EVENT_CLOSE, NEW_EVENT_CREATE_ROOM, NEW_EVENT_INACTIVE, NEW_EVENT_JOIN, NEW_EVENT_JOINED, NEW_EVENT_STOP_SEARCH, NEW_EVENT_STOP_SEARCH_SUCCESS } from '../../../constants.json';
 
 const stoppingSearchLoadingText = <p>Stopping the search</p>;
 const BuddyMatcher = () => {
@@ -46,7 +46,6 @@ const BuddyMatcher = () => {
             isStoppingSearch ? stoppingSearchLoadingText : defaultLoadingText
         );
     }, [isStoppingSearch]);
-
     useEffect(() => {
         if (loadingText === defaultLoadingText) {
             timeout = setTimeout(() => {
