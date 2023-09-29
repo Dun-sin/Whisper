@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -31,6 +31,10 @@ const Anonymous = ({ onChatClosed }) => {
     const [autoSearchAfterClose, setAutoSearchAfterClose] = useState(false);
     const autoSearchRef = useRef();
     autoSearchRef.current = autoSearchAfterClose;
+    /**
+     * @type {React.MutableRefObject<null | ReturnType<setTimeout>>}
+     */
+    const typingStatusTimeoutRef = useRef(null);
 
     const navigate = useNavigate();
     const socket = useContext(SocketContext);
@@ -40,7 +44,20 @@ const Anonymous = ({ onChatClosed }) => {
     socket.on('display', ({ isTyping, chatId }) => {
         // eslint-disable-next-line curly
         if (chatId !== currentChatId) return;
-        isTyping ? setIsTyping(true) : setIsTyping(false);
+        if (!isTyping) {
+            setIsTyping(false);
+            return;
+        }
+
+        setIsTyping(true);
+
+        if (typingStatusTimeoutRef.current) {
+            clearTimeout(typingStatusTimeoutRef.current);
+        }
+
+        typingStatusTimeoutRef.current = setTimeout(() => {
+            setIsTyping(false);
+        }, 3000);
     });
 
     const closeChatHandler = (autoSearch = false) => {
@@ -102,6 +119,28 @@ const Anonymous = ({ onChatClosed }) => {
 
     useKeyPress(['c'], () => handleClose());
     useKeyPress(['n'], () => handleClose(true));
+
+    useEffect(() => {
+        const newMessageEvents = [
+            'receive_message',
+            'delete_message',
+            'edit_message',
+        ];
+
+        function onNewMessage() {
+            setIsTyping(false)
+        }
+
+        newMessageEvents.forEach((event) => {
+            socket.on(event, onNewMessage);
+        });
+
+        return () => {
+            newMessageEvents.forEach((event) => {
+                socket.off(event, onNewMessage);
+            });
+        };
+    }, []);
 
     return (
         <div
@@ -172,3 +211,4 @@ export default Anonymous;
 Anonymous.propTypes = {
     onChatClosed: PropTypes.func,
 };
+
