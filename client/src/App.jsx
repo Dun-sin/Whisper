@@ -54,7 +54,7 @@ function App() {
             clientId={clientID}
             domain="https://whisper.kinde.com"
             logoutUri={window.location.origin}
-            redirectUri={window.location.origin}
+            redirectUri={window.location.origin + '/login'}
             onRedirectCallback={(user) => {
                 loginWithEmail(user.email);
             }}
