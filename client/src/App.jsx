@@ -19,6 +19,7 @@ import Settings from 'pages/Settings';
 
 
 const clientID = import.meta.env.VITE_IMPORTANT;
+import Profile from './pages/Profile';
 
 function App() {
     const { isLoggedIn, dispatchAuth } = useAuth();
@@ -50,7 +51,6 @@ function App() {
         }
     }
 
-
     return (
         <KindeProvider
             clientId={clientID}
@@ -59,7 +59,6 @@ function App() {
             redirectUri={window.location.origin + '/login'}
             onRedirectCallback={(user) => {
                 loginWithEmail(user.email);
-
             }}
         >
             <div className={`flex flex-col-reverse md:flex-row h-screen`}>
@@ -74,7 +73,7 @@ function App() {
                         {/* TODO: Sepreate searching and foundUser into different routes */}
                         <Route exact path="/founduser" element={<Searching />} />
                         <Route exact path="/friends" element={<ComingSoon />} />
-                        <Route exact path="/profile" element={<ComingSoon />} />
+                        <Route exact path="/profile" element={<Profile />} />
                         <Route exact path="/settings" element={<Settings />} />
                     </Route>
 
