@@ -15,6 +15,7 @@ import { SocketContext } from 'context/Context';
 // Lib
 import { createClassesFromArray } from 'src/lib/utils';
 import { useApp } from 'src/context/AppContext';
+import { NEW_EVENT_LOGOUT } from '../../../constants.json';
 
 const linkStyle = `md:h-[60px] w-full flex items-center justify-center hover:bg-primary rounded-[15px] `;
 const activeStyle = linkStyle + 'bg-primary shadow-2xl';
@@ -44,12 +45,12 @@ const NavBar = ({ className }) => {
             handler: () => {
                 logOut();
                 if (socket.disconnected) {
-                    socket.volatile.emit('logout', {
+                    socket.volatile.emit(NEW_EVENT_LOGOUT, {
                         email: authState.email,
                         loginId: authState.loginId,
                     });
                 } else {
-                    socket.emit('logout', {
+                    socket.emit(NEW_EVENT_LOGOUT, {
                         email: authState.email,
                         loginId: authState.loginId,
                     });
