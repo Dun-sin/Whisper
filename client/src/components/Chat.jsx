@@ -437,11 +437,9 @@ const Chat = () => {
                                                 'justify-between'
                                                 }`}
                                         >
-
-                                            <span
+                                            {typeof message === 'string' ? <span
                                                 dangerouslySetInnerHTML={{ __html: md.render(message) }}
-                                            />
-
+                                            /> : message}
 
                                             {sender.toString() ===
                                                 senderId.toString() &&
