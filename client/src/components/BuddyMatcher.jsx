@@ -8,6 +8,7 @@ import { useChat } from 'src/context/ChatContext';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from 'src/lib/notification';
 import { useApp } from 'src/context/AppContext';
+import { NEW_EVENT_ADDING, NEW_EVENT_CHAT_RESTORE, NEW_EVENT_CLOSE, NEW_EVENT_CREATE_ROOM, NEW_EVENT_INACTIVE, NEW_EVENT_JOIN, NEW_EVENT_JOINED, NEW_EVENT_STOP_SEARCH, NEW_EVENT_STOP_SEARCH_SUCCESS } from '../../../constants.json';
 
 const stoppingSearchLoadingText = <p>Stopping the search</p>;
 const BuddyMatcher = () => {
@@ -28,11 +29,11 @@ const BuddyMatcher = () => {
     const startNewSearch = () => {
         startSearch();
         setLoadingText(defaultLoadingText);
-        socket.emit('join', { loginId: authState.loginId, email: authState.email });
+        socket.emit(NEW_EVENT_JOIN, { loginId: authState.loginId, email: authState.email });
     };
 
     const handleStopSearch = () => {
-        socket.emit('stop_search', {
+        socket.emit(NEW_EVENT_STOP_SEARCH, {
             loginId: authState.loginId,
             email: authState.email,
         });
@@ -45,7 +46,6 @@ const BuddyMatcher = () => {
             isStoppingSearch ? stoppingSearchLoadingText : defaultLoadingText
         );
     }, [isStoppingSearch]);
-
     useEffect(() => {
         if (loadingText === defaultLoadingText) {
             timeout = setTimeout(() => {
@@ -88,7 +88,7 @@ const BuddyMatcher = () => {
             socket.connect();
         }
 
-        socket.on('close', (chatId) => {
+        socket.on(NEW_EVENT_CLOSE, (chatId) => {
             endSearch();
             closeChat(chatId);
             playNotification('chatClosed');
@@ -109,20 +109,20 @@ const BuddyMatcher = () => {
         socket.on('connect', () => {
             // Here server will be informed that user is searching for
             // another user
-            socket.emit('join', { loginId: authState.loginId, email: authState.email });
+            socket.emit(NEW_EVENT_JOIN, { loginId: authState.loginId, email: authState.email });
         });
-        socket.connected && socket.emit('adding', { userID });
-        socket.emit('createRoom', `${userID}-in-search`);
+        socket.connected && socket.emit(NEW_EVENT_ADDING, { userID });
+        socket.emit(NEW_EVENT_CREATE_ROOM, `${userID}-in-search`);
         // From here will get the info from server that user has joined the room
 
-        socket.on('joined', ({ roomId, userIds }) => {
+        socket.on(NEW_EVENT_JOINED, ({ roomId, userIds }) => {
             playNotification('buddyPaired');
 
             createChat(roomId, userIds);
             endSearch(roomId);
         });
 
-        socket.on('chat_restore', ({ chats, currentChatId }) => {
+        socket.on(NEW_EVENT_CHAT_RESTORE, ({ chats, currentChatId }) => {
             Object.values(chats).forEach((chat) => {
                 createChat(
                     chat.id,
@@ -134,11 +134,11 @@ const BuddyMatcher = () => {
             endSearch(currentChatId);
         });
 
-        socket.on('inactive', () => {
+        socket.on(NEW_EVENT_INACTIVE, () => {
             closeAllChats();
         });
 
-        socket.on('stop_search_success', () => {
+        socket.on(NEW_EVENT_STOP_SEARCH_SUCCESS, () => {
             setIsStoppingSearch(false);
             endSearch();
             navigate('/');
@@ -147,10 +147,10 @@ const BuddyMatcher = () => {
         return () => {
             socket
                 .off('connect')
-                .off('joined')
-                .off('chat_restore')
-                .off('close')
-                .off('inactive');
+                .off(NEW_EVENT_JOINED)
+                .off(NEW_EVENT_CHAT_RESTORE)
+                .off(NEW_EVENT_CLOSE)
+                .off(NEW_EVENT_INACTIVE);
             socket.disconnect();
         };
     }, []);

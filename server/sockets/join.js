@@ -1,3 +1,4 @@
+const { NEW_EVENT_JOIN, NEW_EVENT_JOINED, NEW_EVENT_CHAT_RESTORE } = require('../../constants.json');
 const {
 	isUserActive,
 	addToWaitingList,
@@ -18,14 +19,14 @@ const matchMaker = async (io) => {
 	while (getWaitingUserLen() > 1) {
 		const chat = await createChat(getRandomPairFromWaitingList());
 
-		io.to(chat.id).emit('joined', {
+		io.to(chat.id).emit(NEW_EVENT_JOINED, {
 			roomId: chat.id,
 			userIds: chat.userIds,
 		});
 	}
 };
 module.exports = (io, socket) => {
-	socket.on('join', ({ loginId, email }) => {
+	socket.on(NEW_EVENT_JOIN, ({ loginId, email }) => {
 		/**
 		 * This is necessary to enable us send notifications to users
 		 * using multiple devices to chat
@@ -61,7 +62,7 @@ module.exports = (io, socket) => {
 			});
 
 			// Then return all chat messages
-			socket.emit('chat_restore', {
+			socket.emit(NEW_EVENT_CHAT_RESTORE, {
 				chats,
 				currentChatId: user.currentChatId,
 			});
