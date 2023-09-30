@@ -266,16 +266,11 @@ const Chat = () => {
     };
 
     const handleSendWithCtrlEnter = (event) => {
-        const d = new Date();
-        const message = inputRef.current.value;
+ 
        
         if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
-            doSend({
-                senderId,
-                room: app.currentChatId,
-                message,
-                time: d.getTime(),
-            }); // Call your function to send the message
+            event.preventDefault();
+            handleSubmit(event);
         }
       };
     
