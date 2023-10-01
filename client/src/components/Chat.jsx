@@ -24,6 +24,7 @@ import useChatUtils from 'src/lib/chat';
 import MessageStatus from './MessageStatus';
 import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
+import { createBrowserNotification } from 'src/lib/browserNotification';
 
 let senderId;
 const Chat = () => {
@@ -148,7 +149,7 @@ const Chat = () => {
             }
 
             return false;
-        } 
+        }
 
         return true;
     };
@@ -372,6 +373,7 @@ const Chat = () => {
             try {
                 addMessage(message);
                 playNotification('newMessage');
+                createBrowserNotification('You received a new message on Whisper', message)
             } catch {
                 logOut()
             }
@@ -429,7 +431,7 @@ const Chat = () => {
                                         : 'other'
                                         }`}
                                 >
-                                     <div className="message">
+                                    <div className="message">
                                         <div
                                             className={`content text ${sender.toString() ===
                                                 senderId.toString() &&
