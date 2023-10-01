@@ -13,6 +13,6 @@ export const createBrowserNotification = (title, body) => {
   }
 
   new Notification(title, {
-    body, icon: '../../public/favicon.ico',
+    body, icon: '/favicon.ico',
   })
 }
