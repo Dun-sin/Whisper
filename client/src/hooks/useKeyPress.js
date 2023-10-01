@@ -1,30 +1,15 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
-const isShortcut = (event, keys, options) => {
-    const ctrlOrCmdPressed = event.ctrlKey || event.metaKey;
-    const shiftPressed = event.shiftKey;
-    const altPressed = event.altKey;
-
-    return keys.some((key) => {
-        const keyMatch = event.key.toLowerCase() === key;
-
-        if (keyMatch) {
-            const modifiersMatch =
-                (!options.useCtrl || ctrlOrCmdPressed) &&
-                (!options.useShift || shiftPressed) &&
-                (!options.useAlt || altPressed);
-
-            return modifiersMatch;
-        }
-
-        return false;
-    });
+export const ShortcutFlags = {
+    ctrl: 1,
+    shift: 2,
+    alt: 4,
 };
 
 const useKeyPress = (
     keys,
     callback,
-    options = { useCtrl: true, useShift: false, useAlt: false },
+    modifiers = ShortcutFlags.ctrl,
     node = null
 ) => {
     const callbackRef = useRef(callback);
@@ -32,13 +17,30 @@ const useKeyPress = (
         callbackRef.current = callback;
     });
 
+    const isShortcut = (event, keys) => {
+        const pressedFlags =
+            (event.altKey && ShortcutFlags.alt) |
+            (event.shiftKey && ShortcutFlags.shift) |
+            ((event.ctrlKey || event.metaKey) && ShortcutFlags.ctrl);
+
+        return keys.some((key) => {
+            const keyMatch = event.key.toLowerCase() === key;
+
+            if (keyMatch) {
+                return pressedFlags === modifiers;
+            }
+
+            return false;
+        });
+    };
+
     const handleKeyPress = useCallback(
         (event) => {
-            if (isShortcut(event, keys, options)) {
+            if (isShortcut(event, keys)) {
                 callbackRef.current(event);
             }
         },
-        [keys, options]
+        [keys]
     );
 
     useEffect(() => {
@@ -56,46 +58,4 @@ const useKeyPress = (
     }, [handleKeyPress, node]);
 };
 
-class KeyPressBuilder {
-    constructor() {
-        this.keys = [];
-        this.modifiers = [];
-        this.callback = null;
-        this.node = null;
-    }
-
-    withKeys(keys) {
-        this.keys = keys;
-        return this;
-    }
-
-    withModifiers(modifiers) {
-        this.modifiers = modifiers;
-        return this;
-    }
-
-    withCallback(callback) {
-        this.callback = callback;
-        return this;
-    }
-
-    withNode(node) {
-        this.node = node;
-        return this;
-    }
-
-    build() {
-        return useKeyPress(
-            this.keys,
-            this.callback,
-            {
-                useCtrl: this.modifiers.includes('ctrl'),
-                useShift: this.modifiers.includes('shift'),
-                useAlt: this.modifiers.includes('alt'),
-            },
-            this.node
-        )
-    }
-}
-
-export const useKeyPressBuilder = () => new KeyPressBuilder();
+export default useKeyPress;
