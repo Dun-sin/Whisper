@@ -215,7 +215,7 @@ const Chat = () => {
 
         socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
         const d = new Date();
-        let message = inputRef.current.value;
+        let message = inputRef.current.value.trim();        // Trim the message to remove the extra spaces
 
         if (!isQuoteReply) {
             const cleanedText = message.replace(/>+/g, '');
