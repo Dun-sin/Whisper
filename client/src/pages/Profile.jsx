@@ -78,6 +78,52 @@ const Profile = () => {
         getProfileData(email)
     }, [])
 
+    const [getemail, setEmail] = useState('')
+
+    const handle = async () => {
+        // Getting user id from localstorage
+        const id = JSON.parse(localStorage.getItem('auth')).loginId;
+        console.log(id);
+        // Checking if the email is valid using regex
+        const emailRegex = /\S+@\S+\.\S+/;
+        if (!emailRegex.test(getemail)) {
+          // Checking if the user is an anonymous user
+          const auth = JSON.parse(localStorage.getItem('auth'));
+          if (auth.loginType === 'anonymous') {
+            // Handling anonymous user login 
+            const data = {
+              email: getemail,
+              loginId: id,
+            };
+            try {
+              const response = await api.post('/login', data);
+              console.log(response.data.message);
+              // Updating the login object in local storage with the new user ID
+              const newAuth = { ...auth, loginId: response.data.userId };
+              localStorage.setItem('auth', JSON.stringify(newAuth));
+              // Updating the user info in local storage with the new data
+              localStorage.setItem('userInfo', JSON.stringify(response.data.userInfo));
+            } catch (error) {
+              console.error(error);
+            }
+          } else {
+            // Handling new user login
+            const data = {
+              email: getemail,
+              loginId: id,
+            };
+            try {
+              const response = await api.post('/login', data);
+              console.log(response.data.message);
+              // Updating the user info in local storage with the new data
+              localStorage.setItem('userInfo', JSON.stringify(response.data.userInfo));
+            } catch (error) {
+              console.error(error);
+            }
+          }
+        }
+      };
+
     return (
         <div
             className={createClassesFromArray(
@@ -93,7 +139,15 @@ const Profile = () => {
             )}
         >
             {
-                JSON.parse(localStorage.getItem('auth')).loginType === 'anonymous' ? <h1 className='text-2xl font-bold'>Please Create an Account</h1> : <>
+                JSON.parse(localStorage.getItem('auth')).loginType === 'anonymous' ? <>
+                <h1 className='text-2xl font-bold'>Please Create an Account</h1> 
+                <input type="email" placeholder='Enter your email' className=' border-2 border-gray-500 rounded-xl p-2 w-[300px] text-black
+                ' onChange={(e) => setEmail(e.target.value)}/>
+                <button className='' onClick={handle}>Create Account</button>
+                </>
+
+
+                : <>
                     <section className='min-w-[300px] max-w-[400px] w-[40%] px-10 py-8 rounded-2xl flex flex-col justify-center items-center bg-clip-padding backdrop-filter backdrop-blur-2xl bg-opacity-5 bg-gray-300'>
                         <HiUserCircle className='text-highlight h-20 w-20' />
 
