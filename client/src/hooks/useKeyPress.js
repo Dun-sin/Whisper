@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
+// An object defining flags for various keyboard shortcut modifiers.
 export const ShortcutFlags = {
     ctrl: 1,
     shift: 2,
@@ -18,6 +19,7 @@ const useKeyPress = (
     });
 
     const isShortcut = (event) => {
+        // Generate a bitmask for the currently pressed key.
         const pressedFlags =
             (event.altKey && ShortcutFlags.alt) |
             (event.shiftKey && ShortcutFlags.shift) |
@@ -27,6 +29,7 @@ const useKeyPress = (
             const keyMatch = event.key.toLowerCase() === key;
 
             if (keyMatch) {
+                // Verify if both the bitmask argument and the pressed bitmask are identical.
                 return pressedFlags === modifiers;
             }
 
