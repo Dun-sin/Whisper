@@ -141,12 +141,9 @@ const Profile = () => {
             {
                 JSON.parse(localStorage.getItem('auth')).loginType === 'anonymous' ? <>
                 <h1 className='text-2xl font-bold'>Please Create an Account</h1> 
-                <input type="email" placeholder='Enter your email' className=' border-2 border-gray-500 rounded-xl p-2 w-[300px] text-black
-                ' onChange={(e) => setEmail(e.target.value)}/>
-                <button className='' onClick={handle}>Create Account</button>
+                <input type="email" placeholder='Enter your email' className='  rounded-xl p-2 w-[300px] text-black outline-none' onChange={(e) => setEmail(e.target.value)}/>
+                <button className='   p-2 w-[300px] text-white bg-orange-500 outline-none rounded-xl' onClick={handle}>Create Account</button>
                 </>
-
-
                 : <>
                     <section className='min-w-[300px] max-w-[400px] w-[40%] px-10 py-8 rounded-2xl flex flex-col justify-center items-center bg-clip-padding backdrop-filter backdrop-blur-2xl bg-opacity-5 bg-gray-300'>
                         <HiUserCircle className='text-highlight h-20 w-20' />
