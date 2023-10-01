@@ -374,7 +374,8 @@ const Chat = () => {
             try {
                 addMessage(message);
                 playNotification('newMessage');
-                createBrowserNotification('You received a new message on Whisper', message)
+                createBrowserNotification(
+                    'You received a new message on Whisper', message.message)
             } catch {
                 logOut()
             }
