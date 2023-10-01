@@ -17,7 +17,7 @@ const useKeyPress = (
         callbackRef.current = callback;
     });
 
-    const isShortcut = (event, keys) => {
+    const isShortcut = (event) => {
         const pressedFlags =
             (event.altKey && ShortcutFlags.alt) |
             (event.shiftKey && ShortcutFlags.shift) |
@@ -36,7 +36,7 @@ const useKeyPress = (
 
     const handleKeyPress = useCallback(
         (event) => {
-            if (isShortcut(event, keys)) {
+            if (isShortcut(event)) {
                 callbackRef.current(event);
             }
         },
