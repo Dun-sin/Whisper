@@ -1,5 +1,5 @@
-const { NEW_EVENT_LOGOUT, NEW_EVENT_INACTIVE } = require("../../constants.json");
-const { getActiveUser, delWaitingUser } = require("../utils/lib");
+const { NEW_EVENT_LOGOUT, NEW_EVENT_INACTIVE, NEW_EVENT_CLOSE } = require("../../constants.json");
+const { getActiveUser, delWaitingUser, closeChat } = require("../utils/lib");
 
 module.exports = (io, socket) => {
   socket.on(NEW_EVENT_LOGOUT, async ({ loginId, email }) => {
@@ -13,15 +13,13 @@ module.exports = (io, socket) => {
       return;
     }
 
-    // User is an anonymous user, so close all active chats
-    if (!user.email) {
-      for (const chatId of user.chatIds) {
-        const inactiveList = await closeChat(chatId);
-        io.to(chatId).emit(NEW_EVENT_CLOSE, chatId);
-        inactiveList.forEach((emailOrLoginId) => {
-          socket.broadcast.to(emailOrLoginId).emit(NEW_EVENT_INACTIVE);
-        });
-      }
+    // Close active chats, if user logs out
+    for (const chatId of user.chatIds) {
+      const inactiveList = await closeChat(chatId);
+      io.to(chatId).emit(NEW_EVENT_CLOSE, chatId);
+      inactiveList.forEach((emailOrLoginId) => {
+        socket.broadcast.to(emailOrLoginId).emit(NEW_EVENT_INACTIVE);
+      });
     }
   });
 };
