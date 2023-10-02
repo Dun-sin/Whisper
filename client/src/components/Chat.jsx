@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import { useEffect, useRef, useContext, useMemo, useState } from 'react';
 import { SocketContext } from 'context/Context';
+import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
 
 import 'styles/chat.css';
 
@@ -265,6 +266,17 @@ const Chat = () => {
             inputRef.current.focus();
         }
     };
+    
+    // Define a new function to handle "Ctrl + Enter" key press
+    const handleCtrlEnter = (e) => {
+			if (e.ctrlKey && e.key === 'Enter') {
+					handleSubmit(e);
+			}
+	};
+
+	// Use the useKeyPress hook to listen for "Ctrl + Enter" key press
+	useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
+    
 
     const handleResend = (id) => {
         if (!messageExists(id)) {
