@@ -19,7 +19,7 @@ import { useDialog } from 'src/context/DialogContext';
 import Chat from 'components/Chat';
 import { createClassesFromArray } from 'src/lib/utils';
 
-import useKeyPress from 'src/hooks/useKeyPress';
+import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
 
 const centerItems = `flex items-center justify-center`;
 
@@ -117,8 +117,8 @@ const Anonymous = ({ onChatClosed }) => {
         });
     };
 
-    useKeyPress(['c'], () => handleClose());
-    useKeyPress(['n'], () => handleClose(true));
+    useKeyPress(['x'], () => handleClose(), ShortcutFlags.ctrl | ShortcutFlags.shift);
+    useKeyPress(['n'], () => handleClose(true), ShortcutFlags.ctrl);
 
     useEffect(() => {
         const newMessageEvents = [

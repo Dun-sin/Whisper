@@ -6,6 +6,8 @@ import { useApp } from 'src/context/AppContext';
 
 import { createClassesFromArray } from 'src/lib/utils';
 
+import { requestBrowserNotificationPermissions } from 'src/lib/browserNotification';
+
 const centerElement = 'flex flex-col items-center justify-center';
 
 const Start = () => {
@@ -16,6 +18,9 @@ const Start = () => {
         if (app.isSearching) {
             navigate('/founduser');
         }
+
+        requestBrowserNotificationPermissions();
+
     }, []);
     return (
         <div

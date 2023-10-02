@@ -16,6 +16,13 @@
 
 - Don't work on the main branch, create your own branch by following the instructions [here](#-how-to-make-a-pull-request)
 
+- If there's no activity on an issue/pull request in one week, it gets closed and the person can't have it resigned to them, make sure to give updates on things so maintainers don't think you aren't doing anything. 
+
+
+
+
+
+
 - Fill out issue and pull request(PR) templates properly, if you don't know how, check out previous issues/PR to know how they are filled, this video👇🏾 or [this](#-how-to-fill-a-pull-request-templatetext)
 
 #### 👌🏾 How to fill a pull request template(video)

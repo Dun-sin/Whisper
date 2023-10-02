@@ -26,6 +26,7 @@ import MessageStatus from './MessageStatus';
 import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
 import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE, NEW_EVENT_TYPING } from '../../../constants.json';
+import { createBrowserNotification } from 'src/lib/browserNotification';
 
 let senderId;
 const Chat = () => {
@@ -215,7 +216,7 @@ const Chat = () => {
 
         socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
         const d = new Date();
-        let message = inputRef.current.value;
+        let message = inputRef.current.value.trim();        // Trim the message to remove the extra spaces
 
         if (!isQuoteReply) {
             const cleanedText = message.replace(/>+/g, '');
@@ -388,6 +389,8 @@ const Chat = () => {
             try {
                 addMessage(message);
                 playNotification('newMessage');
+                createBrowserNotification(
+                    'You received a new message on Whisper', message.message)
             } catch {
                 logOut()
             }
@@ -452,11 +455,9 @@ const Chat = () => {
                                                 'justify-between'
                                                 }`}
                                         >
-
-                                            <span
+                                            {typeof message === 'string' ? <span
                                                 dangerouslySetInnerHTML={{ __html: md.render(message) }}
-                                            />
-
+                                            /> : message}
 
                                             {sender.toString() ===
                                                 senderId.toString() &&
