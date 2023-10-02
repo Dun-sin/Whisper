@@ -417,10 +417,9 @@ const Chat = ({isTyping}) => {
 
     const [lastMessageTime, setLastMessageTime] = useState(null)
     const [delay, setDelay] = useState(1000);
+    
     const checkPartnerResponse = () => {
-        console.log("first")
         const currentTime = new Date().getTime();
-
         if (lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold) {
             createBrowserNotification("Your partner appears to be inactive. You can always search for a new buddy.");
             setDelay(null)
@@ -435,7 +434,6 @@ const Chat = ({isTyping}) => {
     },[isTyping])
 
     useInterval(checkPartnerResponse,delay)
-
 
     return (
         <div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6">
