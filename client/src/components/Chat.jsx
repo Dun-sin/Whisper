@@ -27,9 +27,11 @@ import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
 import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE, NEW_EVENT_TYPING } from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
-
+import { useInterval } from 'src/hooks/useInterval';
+import PropTypes from 'prop-types';
+const inactiveTimeThreshold = 90000 // In ms
 let senderId;
-const Chat = () => {
+const Chat = ({isTyping}) => {
     const { app } = useApp();
     const { playNotification } = useNotification();
     const [editing, setEditing] = useState({
@@ -413,6 +415,26 @@ const Chat = () => {
         };
     }, []);
 
+    const [lastMessageTime, setLastMessageTime] = useState(null)
+    const [delay, setDelay] = useState(1000);
+    const checkPartnerResponse = () => {
+        console.log("first")
+        const currentTime = new Date().getTime();
+
+        if (lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold) {
+            createBrowserNotification("Your partner appears to be inactive. You can always search for a new buddy.");
+            setDelay(null)
+        }
+    };
+
+    useEffect(()=>{
+        setLastMessageTime(sortedMessages.filter((e)=>e.senderId !== senderId).pop()?.time)
+    },[sortedMessages])
+    useEffect(()=>{
+        setLastMessageTime(new Date().getTime())
+    },[isTyping])
+
+    useInterval(checkPartnerResponse,delay)
 
 
     return (
@@ -594,3 +616,7 @@ const Chat = () => {
 };
 
 export default Chat;
+
+Chat.propTypes = {
+    isTyping: PropTypes.Boolean,
+};
