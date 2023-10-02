@@ -213,59 +213,55 @@ const Chat = () => {
     // Here whenever user will submit message it will be send to the server
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
+        // Emit a typing event to indicate the user has stopped typing
         socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
-        const d = new Date();
-        let message = inputRef.current.value.trim();        // Trim the message to remove the extra spaces
-
-        if (!isQuoteReply) {
-            const cleanedText = message.replace(/>+/g, '');
-            message = cleanedText
-        }
-
-        if (message === '' || senderId === undefined || senderId === '123456') {
+    
+        const currentTime = new Date().getTime();
+    
+        let message = inputRef.current.value.trim();
+    
+        if (isQuoteReply && message === '') {
             return;
         }
-
-        setIsQuoteReply(false)
-
-        const splitMessage = message.split(' ');
-        for (const word of splitMessage) {
-            // TODO: We need a better way to implement this
-            if (listOfBadWordsNotAllowed.includes(word)) {
-                message = 'Warning Message: send a warning to users';
-            }
-        }
-
-        if (editing.isediting === true) {
-            try {
-                await editMessage({
-                    id: editing.messageID,
-                    chatId: app.currentChatId,
-                    newMessage: message,
-                });
-                editText(editing.messageID, app.currentChatId, message);
-                const messageObject = getMessage(editing.messageID);
-                updateMessage(editing.messageID, messageObject);
-            } catch {
-                setEditing({ isediting: false, messageID: null });
-                return;
-            }
-            setEditing({ isediting: false, messageID: null });
-        } else {
-            doSend({
-                senderId,
-                room: app.currentChatId,
-                message,
-                time: d.getTime(),
-            });
-        }
-
-        if (inputRef.current) {
+    
+        if (message !== '' && senderId !== undefined && senderId !== '123456') {
             inputRef.current.value = '';
+    
             inputRef.current.focus();
+    
+            if (editing.isediting === true) {
+                try {
+                    await editMessage({
+                        id: editing.messageID,
+                        chatId: app.currentChatId,
+                        newMessage: message,
+                    });
+    
+                    // Update the message in the chat context
+                    editText(editing.messageID, app.currentChatId, message);
+                    const messageObject = getMessage(editing.messageID);
+                    updateMessage(editing.messageID, messageObject);
+                } catch {
+                    setEditing({ isediting: false, messageID: null });
+                    return;
+                }
+                setEditing({ isediting: false, messageID: null });
+            } else {
+                const messageSent = await doSend({
+                    senderId,
+                    room: app.currentChatId,
+                    message,
+                    time: currentTime,
+                });
+    
+                if (!messageSent) {
+                    logOut();
+                }
+            }
         }
     };
+    
     
     // Define a new function to handle "Ctrl + Enter" key press
     const handleCtrlEnter = (e) => {
