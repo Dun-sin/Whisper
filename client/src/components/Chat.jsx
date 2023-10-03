@@ -28,7 +28,10 @@ import { useNotification } from 'src/lib/notification';
 import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE, NEW_EVENT_TYPING } from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 
+const inactiveTimeThreshold = 180000 // 3 mins delay
 let senderId;
+let inactiveTimeOut;
+
 const Chat = () => {
     const { app } = useApp();
     const { playNotification } = useNotification();
@@ -51,6 +54,8 @@ const Chat = () => {
     const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
 
     const inputRef = useRef('');
+
+    const [lastMessageTime, setLastMessageTime] = useState(null)
 
 
     senderId = authState.email ?? authState.loginId;
@@ -412,7 +417,23 @@ const Chat = () => {
             socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
         };
     }, []);
+    
+    const checkPartnerResponse = () => {
+        const currentTime = new Date().getTime();
+        const isInactive = lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold;
+        if (isInactive) {
+            createBrowserNotification("your partner isn't responding, want to leave?");
+        }
+    };
 
+    useEffect(()=>{
+        const newLastMessageTime = sortedMessages.filter((message) => message.senderId !== senderId).pop()?.time;
+        if(newLastMessageTime !== lastMessageTime){
+            setLastMessageTime(newLastMessageTime);
+            clearTimeout(inactiveTimeOut);
+            inactiveTimeOut = setTimeout(checkPartnerResponse,inactiveTimeThreshold);
+        }
+    },[sortedMessages])
 
 
     return (
