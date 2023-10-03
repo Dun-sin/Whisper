@@ -427,7 +427,7 @@ const Chat = () => {
     };
 
     useEffect(()=>{
-        const newLastMessageTime = sortedMessages.filter((e)=>e.senderId !== senderId).pop()?.time
+        const newLastMessageTime = sortedMessages.filter((message) => message.senderId !== senderId).pop()?.time;
         if(newLastMessageTime !== lastMessageTime){
             setLastMessageTime(newLastMessageTime);
             clearTimeout(inactiveTimeOut);
