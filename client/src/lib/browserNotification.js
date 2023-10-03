@@ -12,6 +12,10 @@ export const createBrowserNotification = (title, body) => {
     return
   }
 
+	if (document.visibilityState === 'visible' && document.hasFocus()) {
+    return
+  }
+
   new Notification(title, {
     body, icon: '/favicon.ico',
   })
