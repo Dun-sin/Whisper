@@ -11,7 +11,11 @@ export const createBrowserNotification = (title, body) => {
   if (Notification.permission === 'denied') {
     return
   }
-
+	
+	if (document.visibilityState === 'visible') {
+    return
+  }
+	
   new Notification(title, {
     body, icon: '/favicon.ico',
   })
