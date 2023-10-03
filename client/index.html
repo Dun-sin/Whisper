@@ -1,35 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
-        <meta
-            name="description"
-            content="A FUN application that allows you to chat in secret"
-        />
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Whisper is a fun web application to have a chat with a friend or random people online with safety." />
+    <meta name="keywords" content="whisper, whischat, whisper chat app, whischat application, chat with friend, chat with random, safe chat, chat anonymously" />
+    <meta name="theme-color" content="#011627" />
 
-        <meta
-            property="og:title"
-            content="A FUN application that allows you to chat in secret"
-        />
-        <meta property="og:url" content="https://whischat.vercel.app/" />
-        <meta
-            property="og:image"
-            content="https://user-images.githubusercontent.com/78784850/197270573-e4b9ff29-c4ba-4deb-a108-1d3ee7a0a9b2.jpg"
-        />
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Whisper | Chat Application" />
+    <meta property="og:description" content="Whisper is a fun web application to have a chat with a friend or random people online with safety." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://whischat.vercel.app/" />
+    <meta property="og:site_name" content="Whisper | Chat Application" />
+    <meta property="og:image" content="https://user-images.githubusercontent.com/78784850/197270573-e4b9ff29-c4ba-4deb-a108-1d3ee7a0a9b2.jpg" />
 
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="manifest" href="/manifest.json" />
+    <!-- Favicons -->
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="shortcut" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/favicon.ico">
+    <link rel="manifest" href="/manifest.json" />
 
-        <title>Whisper</title>
-    </head>
-    <body>
-        <noscript>You need to enable JavaScript to run this app.</noscript>
-        <div id="root"></div>
-        <div id="portal"></div>
-        <script type="module" src="/src/index.jsx"></script>
-        <!--
+    <!-- Structured Data for Google Search -->
+    <script type="application/ld+json">
+        {
+          "@context": "http://schema.org",
+          "@type": "WebSite",
+          "url": "https://whischat.vercel.app/",
+          "name": "Whisper | Chat Application",
+          "description": "Whisper is a fun web application to have a chat with a friend or random people online with safety.",
+          "keywords": "whisper, whischat, whisper chat app, whischat application, chat with friend, chat with random, safe chat, chat anonymously",
+          "image": "https://user-images.githubusercontent.com/78784850/197270573-e4b9ff29-c4ba-4deb-a108-1d3ee7a0a9b2.jpg"
+        }
+    </script>
+
+    <title>Whisper | Chat Application</title>
+</head>
+
+<body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <div id="portal"></div>
+    <script type="module" src="/src/index.jsx"></script>
+    <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
 
@@ -38,5 +51,6 @@
 
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
-    --></body>
+    -->
+</body>
 </html>
