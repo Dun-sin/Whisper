@@ -200,7 +200,7 @@ const Anonymous = ({ onChatClosed }) => {
                     'mt-auto',
                 ])}
             >
-                <Chat isTyping={isTyping} />
+                <Chat />
             </div>
         </div>
     );

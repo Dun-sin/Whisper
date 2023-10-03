@@ -28,10 +28,9 @@ import { useNotification } from 'src/lib/notification';
 import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE, NEW_EVENT_TYPING } from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 import { useInterval } from 'src/hooks/useInterval';
-import PropTypes from 'prop-types';
-const inactiveTimeThreshold = 90000 // In ms
+const inactiveTimeThreshold = 180000 // 3 mins delay
 let senderId;
-const Chat = ({isTyping}) => {
+const Chat = () => {
     const { app } = useApp();
     const { playNotification } = useNotification();
     const [editing, setEditing] = useState({
@@ -53,6 +52,9 @@ const Chat = ({isTyping}) => {
     const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
 
     const inputRef = useRef('');
+
+    const [lastMessageTime, setLastMessageTime] = useState(null)
+    const [delay, setDelay] = useState(1000);
 
 
     senderId = authState.email ?? authState.loginId;
@@ -414,14 +416,11 @@ const Chat = ({isTyping}) => {
             socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
         };
     }, []);
-
-    const [lastMessageTime, setLastMessageTime] = useState(null)
-    const [delay, setDelay] = useState(1000);
     
     const checkPartnerResponse = () => {
         const currentTime = new Date().getTime();
         if (lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold) {
-            createBrowserNotification("Your partner appears to be inactive. You can always search for a new buddy.");
+            createBrowserNotification("your partner isn't responding, want to leave?");
             setDelay(null)
         }
     };
@@ -429,9 +428,6 @@ const Chat = ({isTyping}) => {
     useEffect(()=>{
         setLastMessageTime(sortedMessages.filter((e)=>e.senderId !== senderId).pop()?.time)
     },[sortedMessages])
-    useEffect(()=>{
-        setLastMessageTime(new Date().getTime())
-    },[isTyping])
 
     useInterval(checkPartnerResponse,delay)
 
@@ -614,7 +610,3 @@ const Chat = ({isTyping}) => {
 };
 
 export default Chat;
-
-Chat.propTypes = {
-    isTyping: PropTypes.Boolean,
-};
