@@ -1,4 +1,5 @@
-require('dotenv').config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env_sample") });
 
 const express = require('express');
 const app = express();
