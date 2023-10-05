@@ -40,6 +40,7 @@ const Chat = () => {
         messageID: null,
     });
     const [isQuoteReply, setIsQuoteReply] = useState(false)
+    const [message, setMessage] = useState('');
     const {
         messages: state,
         addMessage,
@@ -329,12 +330,21 @@ const Chat = () => {
 
     };
 
+    const adjustTextareaHeight = () => {
+        if (inputRef.current) {
+          inputRef.current.style.height = '45px';
+          inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
+        }
+      };
+
     const handleTypingStatus = throttle((e) => {
         if (e.target.value.length > 0) {
             socket
                 .timeout(5000)
                 .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
         }
+        setMessage(e.target.value);
+        adjustTextareaHeight();
     }, 500);
 
     const handleCopyToClipBoard = async (id) => {
@@ -589,13 +599,15 @@ const Chat = () => {
                 className="flex justify-center items-center mt-[40px]"
                 onSubmit={handleSubmit}
             >
-                <div className="w-full flex items-center justify-between bg-secondary rounded-l-md">
-                    <textarea
-                        placeholder="Send a Message....."
-                        className="h-[45px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] text-[18px] placeholder-shown:align-middle"
-                        ref={inputRef}
-                        onChange={handleTypingStatus}
-                    />
+                  <div className="w-full flex items-center justify-between bg-secondary rounded-l-md" id='message-input-container'>
+                <textarea
+                    placeholder="Send a Message..."
+                    id="message-input"
+                    className="h-[45px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] py-[10px] text-[16px] placeholder-shown:align-middle"
+                    ref={inputRef}
+                    value={message}
+                    onChange={handleTypingStatus}
+               />
                     {editing.isediting && (
                         <ImCancelCircle
                             onClick={cancelEdit}

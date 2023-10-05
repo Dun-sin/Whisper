@@ -66,6 +66,16 @@
         font-weight: revert !important;
     }
 
+    .message-input-container {
+        max-height: 150px; 
+      }
+      
+      #message-input {
+        min-height: 40px; 
+        max-height: 100px; 
+        overflow-y: scroll;
+      }
+
     .message .content ul {
         list-style-type: disc !important;
         list-style-position: inside !important;
