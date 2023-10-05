@@ -56,6 +56,10 @@
         @apply px-[10px] text-[12px] flex gap-2 items-center;
     }
 
+    .editingMessage {
+        @apply border-orange-400 border-b-4;
+    }
+
     .message .content h1,
     h2,
     h3,

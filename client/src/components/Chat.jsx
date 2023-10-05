@@ -468,10 +468,12 @@ const Chat = () => {
                                 >
                                     <div className="message">
                                         <div
-                                            className={`content text ${sender.toString() ===
-                                                senderId.toString() &&
-                                                'justify-between'
-                                                }`}
+                                            className={`
+                                              content
+                                              text
+                                              ${sender.toString() === senderId.toString() && 'justify-between'}
+                                              ${id === editing.messageID && 'editingMessage'}
+                                            `}
                                         >
                                             {typeof message === 'string' ? <span
                                                 dangerouslySetInnerHTML={{ __html: md.render(message) }}
