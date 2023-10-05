@@ -433,14 +433,14 @@ const Chat = () => {
         }
     };
 
-    useEffect(() => {
+    useEffect(()=>{
         const newLastMessageTime = sortedMessages.filter((message) => message.senderId !== senderId).pop()?.time;
-        if (newLastMessageTime !== lastMessageTime) {
+        if(newLastMessageTime !== lastMessageTime){
             setLastMessageTime(newLastMessageTime);
             clearTimeout(inactiveTimeOut);
-            inactiveTimeOut = setTimeout(checkPartnerResponse, inactiveTimeThreshold);
+            inactiveTimeOut = setTimeout(checkPartnerResponse,inactiveTimeThreshold);
         }
-    }, [sortedMessages])
+    },[sortedMessages])
 
 
     return (
