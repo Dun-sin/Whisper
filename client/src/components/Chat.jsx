@@ -40,6 +40,7 @@ const Chat = () => {
         messageID: null,
     });
     const [isQuoteReply, setIsQuoteReply] = useState(false)
+    const [quoteMessage, setQuoteMessage] = useState(null)
     const {
         messages: state,
         addMessage,
@@ -231,8 +232,14 @@ const Chat = () => {
         if (message === '' || senderId === undefined || senderId === '123456') {
             return;
         }
+        
+        if (isQuoteReply && message.trim() === quoteMessage.trim()) {
+            return;
+        }
+        
 
         setIsQuoteReply(false)
+        setQuoteMessage(null)
 
         const splitMessage = message.split(' ');
         for (const word of splitMessage) {
@@ -271,17 +278,17 @@ const Chat = () => {
             inputRef.current.focus();
         }
     };
-    
+
     // Define a new function to handle "Ctrl + Enter" key press
     const handleCtrlEnter = (e) => {
-			if (e.ctrlKey && e.key === 'Enter') {
-					handleSubmit(e);
-			}
-	};
+        if (e.ctrlKey && e.key === 'Enter') {
+            handleSubmit(e);
+        }
+    };
 
-	// Use the useKeyPress hook to listen for "Ctrl + Enter" key press
-	useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
-    
+    // Use the useKeyPress hook to listen for "Ctrl + Enter" key press
+    useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
+
 
     const handleResend = (id) => {
         if (!messageExists(id)) {
@@ -326,7 +333,7 @@ const Chat = () => {
 `;
         inputRef.current.value = quotedMessage;
         setIsQuoteReply(true)
-
+        setQuoteMessage(quotedMessage)
     };
 
     const handleTypingStatus = throttle((e) => {
@@ -417,7 +424,7 @@ const Chat = () => {
             socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
         };
     }, []);
-    
+
     const checkPartnerResponse = () => {
         const currentTime = new Date().getTime();
         const isInactive = lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold;
@@ -426,14 +433,14 @@ const Chat = () => {
         }
     };
 
-    useEffect(()=>{
+    useEffect(() => {
         const newLastMessageTime = sortedMessages.filter((message) => message.senderId !== senderId).pop()?.time;
-        if(newLastMessageTime !== lastMessageTime){
+        if (newLastMessageTime !== lastMessageTime) {
             setLastMessageTime(newLastMessageTime);
             clearTimeout(inactiveTimeOut);
-            inactiveTimeOut = setTimeout(checkPartnerResponse,inactiveTimeThreshold);
+            inactiveTimeOut = setTimeout(checkPartnerResponse, inactiveTimeThreshold);
         }
-    },[sortedMessages])
+    }, [sortedMessages])
 
 
     return (
