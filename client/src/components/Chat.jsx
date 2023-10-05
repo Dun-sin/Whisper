@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import { useEffect, useRef, useContext, useMemo, useState } from 'react';
 import { SocketContext } from 'context/Context';
+import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
 
 import 'styles/chat.css';
 
@@ -24,8 +25,13 @@ import useChatUtils from 'src/lib/chat';
 import MessageStatus from './MessageStatus';
 import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
+import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE, NEW_EVENT_TYPING } from '../../../constants.json';
+import { createBrowserNotification } from 'src/lib/browserNotification';
 
+const inactiveTimeThreshold = 180000 // 3 mins delay
 let senderId;
+let inactiveTimeOut;
+
 const Chat = () => {
     const { app } = useApp();
     const { playNotification } = useNotification();
@@ -34,6 +40,7 @@ const Chat = () => {
         messageID: null,
     });
     const [isQuoteReply, setIsQuoteReply] = useState(false)
+    const [quoteMessage, setQuoteMessage] = useState(null)
     const {
         messages: state,
         addMessage,
@@ -48,6 +55,8 @@ const Chat = () => {
     const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
 
     const inputRef = useRef('');
+
+    const [lastMessageTime, setLastMessageTime] = useState(null)
 
 
     senderId = authState.email ?? authState.loginId;
@@ -82,7 +91,7 @@ const Chat = () => {
         setEditing({ isediting: false, messageID: null });
         socket
             .timeout(10000)
-            .emit('typing', { chatId: app.currentChatId, isTyping: false });
+            .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
     };
 
 
@@ -148,7 +157,7 @@ const Chat = () => {
             }
 
             return false;
-        } 
+        }
 
         return true;
     };
@@ -211,9 +220,9 @@ const Chat = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        socket.emit('typing', { chatId: app.currentChatId, isTyping: false });
+        socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
         const d = new Date();
-        let message = inputRef.current.value;
+        let message = inputRef.current.value.trim();        // Trim the message to remove the extra spaces
 
         if (!isQuoteReply) {
             const cleanedText = message.replace(/>+/g, '');
@@ -223,8 +232,14 @@ const Chat = () => {
         if (message === '' || senderId === undefined || senderId === '123456') {
             return;
         }
+        
+        if (isQuoteReply && message.trim() === quoteMessage.trim()) {
+            return;
+        }
+        
 
         setIsQuoteReply(false)
+        setQuoteMessage(null)
 
         const splitMessage = message.split(' ');
         for (const word of splitMessage) {
@@ -263,6 +278,17 @@ const Chat = () => {
             inputRef.current.focus();
         }
     };
+
+    // Define a new function to handle "Ctrl + Enter" key press
+    const handleCtrlEnter = (e) => {
+        if (e.ctrlKey && e.key === 'Enter') {
+            handleSubmit(e);
+        }
+    };
+
+    // Use the useKeyPress hook to listen for "Ctrl + Enter" key press
+    useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
+
 
     const handleResend = (id) => {
         if (!messageExists(id)) {
@@ -307,14 +333,14 @@ const Chat = () => {
 `;
         inputRef.current.value = quotedMessage;
         setIsQuoteReply(true)
-
+        setQuoteMessage(quotedMessage)
     };
 
     const handleTypingStatus = throttle((e) => {
         if (e.target.value.length > 0) {
             socket
                 .timeout(5000)
-                .emit('typing', { chatId: app.currentChatId, isTyping: true });
+                .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
         }
     }, 500);
 
@@ -372,6 +398,8 @@ const Chat = () => {
             try {
                 addMessage(message);
                 playNotification('newMessage');
+                createBrowserNotification(
+                    'You received a new message on Whisper', message.message)
             } catch {
                 logOut()
             }
@@ -386,17 +414,33 @@ const Chat = () => {
         };
 
         // This is used to recive message form other user.
-        socket.on('receive_message', newMessageHandler);
-        socket.on('delete_message', deleteMessageHandler);
-        socket.on('edit_message', editMessageHandler);
+        socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+        socket.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+        socket.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
 
         return () => {
-            socket.off('receive_message', newMessageHandler);
-            socket.off('delete_message', deleteMessageHandler);
-            socket.off('edit_message', editMessageHandler);
+            socket.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+            socket.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+            socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
         };
     }, []);
 
+    const checkPartnerResponse = () => {
+        const currentTime = new Date().getTime();
+        const isInactive = lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold;
+        if (isInactive) {
+            createBrowserNotification("your partner isn't responding, want to leave?");
+        }
+    };
+
+    useEffect(()=>{
+        const newLastMessageTime = sortedMessages.filter((message) => message.senderId !== senderId).pop()?.time;
+        if(newLastMessageTime !== lastMessageTime){
+            setLastMessageTime(newLastMessageTime);
+            clearTimeout(inactiveTimeOut);
+            inactiveTimeOut = setTimeout(checkPartnerResponse,inactiveTimeThreshold);
+        }
+    },[sortedMessages])
 
 
     return (
@@ -429,18 +473,16 @@ const Chat = () => {
                                         : 'other'
                                         }`}
                                 >
-                                     <div className="message">
+                                    <div className="message">
                                         <div
                                             className={`content text ${sender.toString() ===
                                                 senderId.toString() &&
                                                 'justify-between'
                                                 }`}
                                         >
-
-                                            <span
+                                            {typeof message === 'string' ? <span
                                                 dangerouslySetInnerHTML={{ __html: md.render(message) }}
-                                            />
-
+                                            /> : message}
 
                                             {sender.toString() ===
                                                 senderId.toString() &&

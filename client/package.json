@@ -7,7 +7,7 @@
         "start": "vite",
         "build": "vite build",
         "lint": "eslint --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --fix src",
-        "format": "prettier .  --write",
+        "format": "prettier --write .",
         "prepare": "cd .. && husky install client/.husky"
     },
     "author": "",
@@ -48,6 +48,7 @@
         "lint-staged": "^14.0.1",
         "postcss": "^8.4.27",
         "prettier": "^3.0.1",
+        "prop-types": "^15.8.1",
         "tailwindcss": "^3.3.3",
         "vite": "^4.4.9",
         "vite-plugin-eslint": "^1.8.1"

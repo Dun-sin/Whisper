@@ -10,6 +10,7 @@ import { createClassesFromArray } from 'src/lib/utils';
 
 const Profile = () => {
     const [username, setUsername] = useState('Anonymous')
+    const [profileResponse, setProfileResponse] = useState()
 
     const { authState, dispatchAuth } = useAuth();
     const { logout } = useKindeAuth()
@@ -48,6 +49,7 @@ const Profile = () => {
         try {
             const response = await api.post('/profile', data)
             console.log(response.data.message)
+            setProfileResponse(response.data)
         } catch (error) {
             console.error(error)
         }
@@ -144,6 +146,7 @@ const Profile = () => {
                     </section >
                     <button className='border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-green text-green hover:bg-green hover:text-white' onClick={handleUpdateProfile}>Save changes</button>
                     <button className='border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-red text-red hover:bg-red hover:text-white' onClick={handleDeleteAccount}>Delete My Account</button>
+                    {profileResponse ? <div><p className='text-green-300'>Profile Updated!</p></div> : null}
                 </>
             }
         </div>

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-
+import { NEW_EVENT_CLOSE, NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_DISPLAY, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE } from '../../../constants.json'
 // Rsuite
 import { Dropdown, IconButton, Tooltip, Whisper } from 'rsuite';
 import { Icon } from '@rsuite/icons';
@@ -19,7 +19,7 @@ import { useDialog } from 'src/context/DialogContext';
 import Chat from 'components/Chat';
 import { createClassesFromArray, isExplicitDisconnection } from 'src/lib/utils';
 
-import useKeyPress from 'src/hooks/useKeyPress';
+import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
 
 const centerItems = `flex items-center justify-center`;
 
@@ -42,7 +42,7 @@ const Anonymous = ({ onChatClosed }) => {
     const { closeChat } = useChat();
     const { setDialog } = useDialog();
 
-    socket.on('display', ({ isTyping, chatId }) => {
+    socket.on(NEW_EVENT_DISPLAY, ({ isTyping, chatId }) => {
         // eslint-disable-next-line curly
         if (chatId !== currentChatId) return;
         if (!isTyping) {
@@ -73,7 +73,7 @@ const Anonymous = ({ onChatClosed }) => {
 
         socket
             .timeout(30000)
-            .emit('close', currentChatId, (err, chatClosed) => {
+            .emit(NEW_EVENT_CLOSE, currentChatId, (err, chatClosed) => {
                 if (err) {
                     alert('An error occured whiles closing chat.');
                     setAutoSearchAfterClose(false);
@@ -118,14 +118,14 @@ const Anonymous = ({ onChatClosed }) => {
         });
     };
 
-    useKeyPress(['c'], () => handleClose());
-    useKeyPress(['n'], () => handleClose(true));
+    useKeyPress(['x'], () => handleClose(), ShortcutFlags.ctrl | ShortcutFlags.shift);
+    useKeyPress(['n'], () => handleClose(true), ShortcutFlags.ctrl);
 
     useEffect(() => {
         const newMessageEvents = [
-            'receive_message',
-            'delete_message',
-            'edit_message',
+            NEW_EVENT_RECEIVE_MESSAGE,
+            NEW_EVENT_DELETE_MESSAGE,
+            NEW_EVENT_EDIT_MESSAGE,
         ];
 
         const connectionEvents = {
