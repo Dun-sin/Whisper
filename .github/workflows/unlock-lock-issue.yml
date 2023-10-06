@@ -24,7 +24,7 @@ jobs:
       if: steps.unlocked.outputs.unlocked != 'true' && steps.locked.outputs.locked != 'true'
       run: |
         echo "Locking the issue..."
-        gh issue lock ${{ github.event.issue.number }} --lock-reason "Awaiting Approval"
+        gh issue lock ${{ github.event.issue.number }}
         gh issue comment ${{ github.event.issue.number }} --body "To reduce notifications, issues are locked until they are valid/approved and to be assigned. In the meantime, read the contributing guidelines -> [CONTRIBUTING.md](https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md)"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
