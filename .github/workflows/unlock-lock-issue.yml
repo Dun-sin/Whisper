@@ -1,4 +1,4 @@
-name: "lock/unlock issue"
+name: Lock Issue and Assign Labels
 
 on:
   issues:
@@ -6,7 +6,7 @@ on:
 
 permissions:
   issues: write
-
+  
 jobs:
   action:
     runs-on: ubuntu-latest
@@ -15,3 +15,4 @@ jobs:
         with:
           process-only: issues
           config-path: .github/config/lock_unlock_issue.yml
+          github-token: ${{ secrets.GITHUB_TOKEN }}
