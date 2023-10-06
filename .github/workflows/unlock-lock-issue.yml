@@ -2,44 +2,17 @@ name: Lock Issue and Assign Labels
 
 on:
   issues:
-    types:
-      - opened
-      - unlocked
+    types: labeled
 
+permissions:
+  issues: write
+  
 jobs:
-  lockAndAssignLabels:
+  action:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Check if issue is already locked
-      id: locked
-      run: echo ::set-output name=locked::$(gh issue view ${{ github.event.issue.number }} --json locked -q '.locked')
-      continue-on-error: true
-
-    - name: Check if issue was just unlocked
-      id: unlocked
-      run: echo ::set-output name=unlocked::${{ github.event_name == 'unlocked' }}
-
-    - name: Lock Issue
-      if: steps.unlocked.outputs.unlocked != 'true' && steps.locked.outputs.locked != 'true'
-      run: |
-        echo "Locking the issue..."
-        gh issue lock ${{ github.event.issue.number }}
-        gh issue comment ${{ github.event.issue.number }} --body "To reduce notifications, issues are locked until they are valid/approved and to be assigned. In the meantime, read the contributing guidelines -> [CONTRIBUTING.md](https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md)"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Assign Labels
-      if: steps.unlocked.outputs.unlocked != 'true' && steps.locked.outputs.locked != 'true'
-      run: |
-        if [[ "${{ github.event_name }}" == "opened" ]]; then
-          echo "Assigning '🚦 status: awaiting approval' label..."
-          gh issue add-label ${{ github.event.issue.number }} "🚦 status: awaiting approval"
-        elif [[ "${{ github.event_name }}" == "unlocked" ]]; then
-          echo "Assigning '🏁 status: ready for dev' label..."
-          gh issue remove-label ${{ github.event.issue.number }} "🚦 status: awaiting approval"
-          gh issue add-label ${{ github.event.issue.number }} "🏁 status: ready for dev"
-          gh issue comment ${{ github.event.issue.number }} --body "The issue has been unlocked and is now ready for dev. If you would like to work on this issue, you can comment to have it assigned to you."
-        fi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: dessant/label-actions@v3
+        with:
+          process-only: issues
+          config-path: .github/config/issue-lock-unlock.yml
+          github-token: ${{ secrets.GITHUB_TOKEN }}
