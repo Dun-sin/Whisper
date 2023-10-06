@@ -1,28 +1,22 @@
 # Table of content
 
-- [Rules](#rules)
+- [guidelines](#guidelines)
 - [Skills needed to contribute](#-prerequisite-skills-to-contribute)
 - [How to contribute](#-how-to-contribute)
 
-## Rules
-
-- Don't create a pull request on an issue that doesn't exist, create an issue first and if the changes you are proposing are said to be okay, you can go ahead and create a pull request
-
+## Guidelines
+### Issues guidelines
 - Don't work on anything unless you are assigned, if you make a pull request without being assigned to that issue, it will be closed without being merged
-
 - Don't work on more than one issue at a time, this is so that you don't make a huge pull request and others can have opportunities to work on another issue while you work on something else
 
-- Do read the `readme.md` file
-
+### Pull Request guidelines
+- Don't create a pull request on an issue that doesn't exist, create an issue first and if the changes you are proposing are said to be okay, you can go ahead and create a pull request
 - Don't work on the main branch, create your own branch by following the instructions [here](#-how-to-make-a-pull-request)
+- If you are working on the backend, share a screenrecording of your working software
 
+### General guidelines
+- Do read the `readme.md` file
 - If there's no activity on an issue/pull request in one week, it gets closed and the person can't have it resigned to them, make sure to give updates on things so maintainers don't think you aren't doing anything. 
-
-
-
-
-
-
 - Fill out issue and pull request(PR) templates properly, if you don't know how, check out previous issues/PR to know how they are filled, this video👇🏾 or [this](#-how-to-fill-a-pull-request-templatetext)
 
 #### 👌🏾 How to fill a pull request template(video)
@@ -79,76 +73,3 @@
   nodemon index.js
   ```
   > Note: you must have gotten past step 5 in ["Installation"](https://github.com/Dun-sin/Whisper#%EF%B8%8F-installation) part of the readme file
-
-## 🌟 HOW TO MAKE A PULL REQUEST:
-
-1. Start by making a Fork of the [Whisper](https://github.com/Dun-sin/Whisper) repository. Click on the <a href="https://github.com/Dun-sin/Whisper/fork"><img src="https://i.imgur.com/G4z1kEe.png" height="21" width="21"></a>Fork symbol at the top right corner.
-
-2. Clone your new fork of the repository in the terminal/CLI on your computer with the following command:
-
-```bash
-git clone https://github.com/<your-github-username>/Whisper
-```
-
-3. Navigate to the newly created Whisper project directory:
-
-```bash
-cd Whisper
-```
-
-4. Set upstream command:
-
-```bash
-git remote add upstream https://github.com/Dun-sin/Whisper.git
-```
-
-5. Create a new branch:
-
-```bash
-git checkout -b YourBranchName
-```
-
-6. Sync your fork or your local repository with the origin repository:
-
-- In your forked repository, click on "Fetch upstream"
-- Click "Fetch and merge"
-
-### Alternatively, Git CLI way to Sync forked repository with origin repository:
-
-```bash
-git fetch upstream
-```
-
-```bash
-git merge upstream/main
-```
-
-### [Github Docs](https://docs.github.com/en/github/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-on-github) for Syncing
-
-7. Make your changes to the source code.
-
-8. Stage your changes and commit:
-
-⚠️ Make sure not to commit package.json or package-lock.json file
-
-```bash
-git cz
-```
-
-9. Push your local commits to the remote repository:
-
-```bash
-git push origin YourBranchName
-```
-
-10. Create a [Pull Request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request)!
-
-11. Congratulations! You've made your first contribution to [Whisper](https://github.com/Dun-sin/Whisper/graphs/contributors)!
-
-🏆 After this, the maintainers will review the PR and will merge it if it helps move the Whisper project forward. Otherwise, it will be given constructive feedback and suggestions for the changes needed to add the PR to the codebase.
-
----
-
-## 💥 Issues
-
-In order to discuss changes, you are welcome to [open an issue](https://github.com/Dun-sin/Whisper/issues/new/choose) about what you would like to contribute. Enhancements are always encouraged and appreciated.
