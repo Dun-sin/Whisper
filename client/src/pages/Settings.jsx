@@ -50,12 +50,34 @@ const Searching = () => {
             className="flex justify-center items-center flex-col min-w-[calc(100%-120px)] p-2 gap-5 bg-white dark:bg-primary min-h-full"
         >
             <Form onSubmit={handleSubmit} onChange={handleChange}>
-                <Divider className="text-primary dark:text-white">Dark Mode</Divider>
+                <Divider className="text-primary dark:text-white">Mode</Divider>
                 <ButtonToolbar>
                     <Dropdown
                         active
                         appearance='primary'
-                        title="Dark Mode"
+                        title={darkMode ?
+                            <div className='flex items-center'>
+                                <Icon
+                                    className='mr-2'
+                                    icon="ic:round-dark-mode"
+                                    color="primary"
+                                    height="14"
+                                    width="14"
+                                />
+                                <p>Dark</p>
+                            </div>
+                            :
+                            <div className='flex items-center'>
+                                <Icon
+                                    className='mr-2'
+                                    icon="entypo:light-up"
+                                    color="primary"
+                                    height="14"
+                                    width="14"
+                                />
+                                <p>Light</p>
+                            </div>
+                        }
                         activeKey={darkMode ? "dark" : "light"}
                         onSelect={(eventKey) => {
                             setDarkMode(
@@ -63,6 +85,18 @@ const Searching = () => {
                             )
                         }}
                     >
+                        <Dropdown.Item
+                            eventKey="dark"
+                            icon={<Icon
+                                icon="ic:round-dark-mode"
+                                color="primary"
+                                height="14"
+                                width="14"
+                            />}
+                            className='grid grid-cols-2 items-center pr-10'
+                        >
+                            Dark
+                        </Dropdown.Item>
                         <Dropdown.Item
                             eventKey="light"
                             icon={<Icon
@@ -72,21 +106,9 @@ const Searching = () => {
                                 height="14"
                                 width="14"
                             />}
-                            className='grid grid-cols-2 items-center pr-16'
+                            className='grid grid-cols-2 items-center pr-10'
                         >
                             Light
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                            eventKey="dark"
-                            icon={<Icon
-                                icon="ic:round-dark-mode"
-                                color="primary"
-                                height="14"
-                                width="14"
-                            />}
-                            className='grid grid-cols-2 items-center pr-16'
-                        >
-                            Dark
                         </Dropdown.Item>
                     </Dropdown>
                 </ButtonToolbar>
