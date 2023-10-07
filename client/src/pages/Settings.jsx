@@ -6,11 +6,16 @@ import {
     Checkbox,
     Divider,
     Form,
+    Dropdown,
     Message,
     Slider,
 } from 'rsuite';
 
+import { Icon } from '@iconify/react';
+
 import { useApp } from 'src/context/AppContext';
+
+import { useDarkMode } from 'src/context/DarkModeContext';
 
 const Searching = () => {
     const {
@@ -38,12 +43,55 @@ const Searching = () => {
         updateTmpSettings(newSettings);
     };
 
+    const { darkMode, setDarkMode } = useDarkMode();
+
     return (
         <div
-            className="flex justify-center items-center flex-col min-w-[calc(100%-120px)] p-2 gap-5 bg-primary min-h-full"
+            className="flex justify-center items-center flex-col min-w-[calc(100%-120px)] p-2 gap-5 bg-white dark:bg-primary min-h-full"
         >
             <Form onSubmit={handleSubmit} onChange={handleChange}>
-                <Divider className="text-white">Notifications</Divider>
+                <Divider className="text-primary dark:text-white">Dark Mode</Divider>
+                <ButtonToolbar>
+                    <Dropdown
+                        active
+                        appearance='primary'
+                        title="Dark Mode"
+                        activeKey={darkMode ? "dark" : "light"}
+                        onSelect={(eventKey) => {
+                            setDarkMode(
+                                eventKey === "dark" ? true : false
+                            )
+                        }}
+                    >
+                        <Dropdown.Item
+                            eventKey="light"
+                            icon={<Icon
+                                className='mr-2'
+                                icon="entypo:light-up"
+                                color="primary"
+                                height="14"
+                                width="14"
+                            />}
+                            className='grid grid-cols-2 items-center pr-16'
+                        >
+                            Light
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                            eventKey="dark"
+                            icon={<Icon
+                                icon="ic:round-dark-mode"
+                                color="primary"
+                                height="14"
+                                width="14"
+                            />}
+                            className='grid grid-cols-2 items-center pr-16'
+                        >
+                            Dark
+                        </Dropdown.Item>
+                    </Dropdown>
+                </ButtonToolbar>
+
+                <Divider className="text-primary dark:text-white">Notifications</Divider>
                 <Form.Group controlId="notifications-enabled">
                     <Form.Control
                         name="notificationsEnabled"
@@ -86,6 +134,7 @@ const Searching = () => {
                         <Button
                             type="submit"
                             appearance="primary"
+                            active
                             disabled={!hasUnsavedSettings}
                         >
                             Update Settings

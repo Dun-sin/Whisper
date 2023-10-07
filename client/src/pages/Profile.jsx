@@ -83,20 +83,22 @@ const Profile = () => {
     return (
         <div
             className={createClassesFromArray(
-                'bg-primary',
+                'bg-white',
+                'dark:bg-primary',
                 'md:min-w-[calc(100%-120px)]',
                 'flex items-center',
                 'justify-center',
                 'flex-col',
                 'md:min-h-screen',
                 'min-h-[calc(100vh-70px)]',
-                'text-white',
+                'text-primary',
+                'dark:text-white',
                 'gap-3'
             )}
         >
             {
                 JSON.parse(localStorage.getItem('auth')).loginType === 'anonymous' ? <h1 className='text-2xl font-bold'>Please Create an Account</h1> : <>
-                    <section className='min-w-[300px] max-w-[400px] w-[40%] px-10 py-8 rounded-2xl flex flex-col justify-center items-center bg-clip-padding backdrop-filter backdrop-blur-2xl bg-opacity-5 bg-gray-300'>
+                    <section className='min-w-[300px] max-w-[400px] w-[40%] px-10 py-8 rounded-2xl flex flex-col justify-center items-center bg-clip-padding backdrop-filter backdrop-blur-2xl bg-gray-100 dark:bg-opacity-5 dark:bg-gray-300'>
                         <HiUserCircle className='text-highlight h-20 w-20' />
 
                         <input
@@ -108,7 +110,7 @@ const Profile = () => {
 
                         <div className='w-full flex flex-col gap-4'>
                             <textarea
-                                className='bg-clip-padding backdrop-filter backdrop-blur-2xl bg-opacity-5 border  text-white my-2 bg-transparent outline-none tracking-wider resize-none indent-2 p-2 rounded-xl h-28 w-full placeholder:tracking-widest placeholder:text-center'
+                                className='bg-clip-padding backdrop-filter backdrop-blur-2xl bg-opacity-5 border border-primary dark:border-white text-white my-2 bg-transparent outline-none tracking-wider resize-none indent-2 p-2 rounded-xl h-28 w-full placeholder:tracking-widest placeholder:text-center'
                                 placeholder="Write something about you..."
                                 ref={aboutRef}
                             />
@@ -116,13 +118,13 @@ const Profile = () => {
                                 <div
                                     className='border-b-2 border-gray-700 pb-2 flex justify-between tracking-wide items-center'
                                 >
-                                    <label className='text-white' htmlFor="gender">
+                                    <label className='text-primary dark:text-white' htmlFor="gender">
                                         Gender
                                     </label>
                                     <select
                                         id="genderSelect"
                                         ref={genderRef}
-                                        className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
+                                        className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 bg-transparent dark:bg-gray-700 border-gray-600 placeholder-gray-400 text-primary dark:text-white"
                                         defaultValue='Unknown'
                                     >
                                         <option value="Unknown">Unknown</option>
@@ -131,7 +133,7 @@ const Profile = () => {
                                     </select>
                                 </div>
                                 <div className='flex justify-between tracking-wide items-center'>
-                                    <label className='text-white' htmlFor="age">
+                                    <label className='text-primary dark:text-white' htmlFor="age">
                                         Age
                                     </label>
                                     <input
@@ -144,7 +146,7 @@ const Profile = () => {
                             </section>
                         </div>
                     </section >
-                    <button className='border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-green text-green hover:bg-green hover:text-white' onClick={handleUpdateProfile}>Save changes</button>
+                    <button className='border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-primary text-primary hover:bg-primary hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-primary' onClick={handleUpdateProfile}>Save changes</button>
                     <button className='border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-red text-red hover:bg-red hover:text-white' onClick={handleDeleteAccount}>Delete My Account</button>
                     {profileResponse ? <div><p className='text-green-300'>Profile Updated!</p></div> : null}
                 </>

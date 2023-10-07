@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect, useRef } from 'react';
 import { ThreeDots } from 'react-loading-icons';
-import {PiPlugsLight} from 'react-icons/pi'
+import { PiPlugsLight } from 'react-icons/pi'
 import { SocketContext } from 'context/Context';
 
 import Anonymous from 'components/Anonymous';
@@ -33,7 +33,7 @@ const BuddyMatcher = () => {
     const startNewSearch = () => {
         startSearch();
         setLoadingText(defaultLoadingText);
-      
+
         socket.volatile.emit(NEW_EVENT_JOIN, {
             loginId: authState.loginId,
             email: authState.email,
@@ -170,7 +170,7 @@ const BuddyMatcher = () => {
             if (app.currentChatId) {
                 return;
             }
-            
+
             socket.disconnect();
             setDisconnected(true);
             endSearch();
@@ -216,9 +216,9 @@ const BuddyMatcher = () => {
     }, []);
 
     return app.isSearching || !app.currentChatId ? (
-        <div className="flex w-full justify-center items-center min-h-[calc(100vh-70px)] flex-col bg-primary">
+        <div className="flex w-full justify-center items-center min-h-[calc(100vh-70px)] flex-col bg-white dark:bg-primary">
             <ThreeDots fill="rgb(255 159 28)" />
-            <div className="text-lg text-center text-white">{loadingText}</div>
+            <div className="text-lg text-center text-primary dark:text-white">{loadingText}</div>
             {!isStoppingSearch && (
                 <button
                     onClick={handleStopSearch}

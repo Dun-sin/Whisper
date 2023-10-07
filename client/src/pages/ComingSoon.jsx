@@ -5,14 +5,16 @@ const ComingSoon = () => {
     return (
         <div
             className={createClassesFromArray(
-                'bg-primary',
+                'bg-white',
+                'dark:bg-primary',
                 'md:min-w-[calc(100%-120px)]',
                 'flex items-center',
                 'justify-center',
                 'flex-col',
                 'md:min-h-screen',
                 'min-h-[calc(100vh-70px)]',
-                'text-white',
+                'text-primary',
+                'dark:text-white',
                 'text-[calc(1.2vh+1.2vh+1.2vmin)]'
             )}
         >

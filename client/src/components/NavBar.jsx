@@ -80,7 +80,6 @@ const NavBar = ({ className }) => {
                 'md:flex-col',
                 'flex-row',
                 'justify-center',
-                'shadow-[0_0_100px_0_rgba(0,0,0,1)]',
                 'p-2',
                 'md:p-5',
                 'sticky bottom-0',

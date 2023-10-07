@@ -24,14 +24,14 @@ const Login = () => {
 
     return (
         <div
-            className={`bg-primary h-[100vh] w-[100vw] text-white ${centerStuffs}`}
+            className={`bg-white dark:bg-primary h-[100vh] w-[100vw] text-primary dark:text-white ${centerStuffs}`}
         >
             {isLoading ? (
                 <div className="uppercase py-5">Processing Login</div>
             ) : (
                 <div className='flex gap-3 items-center'>
                     <button
-                        className='py-3 px-6 bg-secondary'
+                        className='py-3 px-6 bg-gray-100 dark:bg-secondary'
                         disabled={isLoading}
                         onClick={login}
                     >
@@ -40,7 +40,7 @@ const Login = () => {
                     <button
                         disabled={isLoading}
                         onClick={loginAnonymously}
-                        className={`disabled:bg-slate-700 text-white pt-[2px] font-light cursor-pointer hover:underline ${centerStuffs}`}
+                        className={`disabled:bg-slate-700 dark:text-white pt-[2px] font-light cursor-pointer hover:underline ${centerStuffs}`}
                     >
                         Login Anonymously
                     </button>
