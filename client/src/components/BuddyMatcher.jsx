@@ -213,7 +213,7 @@ const BuddyMatcher = () => {
 
             socket.disconnect();
         };
-    }, []);
+    }, [app.currentChatId]);
 
     return app.isSearching || !app.currentChatId ? (
         <div className="flex w-full justify-center items-center min-h-[calc(100vh-70px)] flex-col bg-primary">
