@@ -4,6 +4,7 @@ import { KindeProvider } from "@kinde-oss/kinde-auth-react"
 
 // Store
 import { useAuth } from 'context/AuthContext';
+import { useApp } from 'src/context/AppContext';
 
 // Components
 import NavBar from 'components/NavBar';
@@ -25,9 +26,9 @@ import { useDarkMode } from './context/DarkModeContext';
 
 function App() {
     const { isLoggedIn, dispatchAuth } = useAuth();
-
+    const { loadUserSettings } = useApp();
+    
     const { darkMode } = useDarkMode();
-
 
     async function loginWithEmail(email) {
         try {
@@ -47,6 +48,12 @@ function App() {
                         email
                     },
                 })
+                try {
+                    const userData = await api.get(`/profile/${email}`);
+                    loadUserSettings(userData.data?.settings);
+                } catch (error) {
+                    console.error('Error loading user data:', error);
+                }
             } else {
                 throw new Error('Login failed');
             }
