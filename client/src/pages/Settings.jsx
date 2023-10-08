@@ -14,6 +14,8 @@ import {
 import { Icon } from '@iconify/react';
 
 import { useApp } from 'src/context/AppContext';
+import { useAuth } from 'src/context/AuthContext';
+import { api } from 'src/lib/axios';
 
 import { useDarkMode } from 'src/context/DarkModeContext';
 
@@ -25,18 +27,34 @@ const Searching = () => {
         updateTmpSettings,
         cancelSettingsUpdate,
     } = useApp();
+    const { authState } = useAuth();
+
     const settings = useMemo(() => {
         return app.tmpSettings
             ? { ...app.settings, ...app.tmpSettings }
             : app.settings;
     });
 
+    const updateUserSettings = async () => {
+        const data = {
+            email: authState?.email,
+            settings
+        };
+        try {
+            const response = await api.post('/profile', data);
+            console.log(response.data.message);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     /**
      *
      * @param {Event | SubmitEvent} e
      */
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         updateSettings();
+        await updateUserSettings();
     };
 
     const handleChange = (newSettings) => {

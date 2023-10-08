@@ -9,6 +9,7 @@ import { useChat } from 'src/context/ChatContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { useNotification } from 'src/lib/notification';
 import { useApp } from 'src/context/AppContext';
+import { createBrowserNotification } from 'src/lib/browserNotification';
 import { isExplicitDisconnection } from 'src/lib/utils';
 import { NEW_EVENT_ADDING, NEW_EVENT_CHAT_RESTORE, NEW_EVENT_CLOSE, NEW_EVENT_CREATE_ROOM, NEW_EVENT_INACTIVE, NEW_EVENT_JOIN, NEW_EVENT_JOINED, NEW_EVENT_STOP_SEARCH, NEW_EVENT_STOP_SEARCH_SUCCESS } from '../../../constants.json';
 
@@ -138,7 +139,7 @@ const BuddyMatcher = () => {
 
         socket.on(NEW_EVENT_JOINED, ({ roomId, userIds }) => {
             playNotification('buddyPaired');
-
+            createBrowserNotification("Let's Chat :)","You've found a match, don't keep your Partner waiting ⌛")
             createChat(roomId, userIds);
             endSearch(roomId);
         });
@@ -213,7 +214,7 @@ const BuddyMatcher = () => {
 
             socket.disconnect();
         };
-    }, []);
+    }, [app.currentChatId]);
 
     return app.isSearching || !app.currentChatId ? (
         <div className="flex w-full justify-center items-center min-h-[calc(100vh-70px)] flex-col bg-white dark:bg-primary">

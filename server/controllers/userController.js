@@ -62,7 +62,7 @@ const getProfile = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-        const { username, aboutMe, gender, age, email } = req.body;
+        const { username, aboutMe, gender, age, email, settings } = req.body;
 
         try {
                 // Find the user by email
@@ -72,11 +72,12 @@ const updateProfile = async (req, res) => {
                         return res.status(404).json({ error: 'User not found' });
                 }
 
-                // Update user's profile with provided fields or defaults
-                user.username = username || 'Anonymous';
-                user.aboutMe = aboutMe || null;
-                user.gender = gender || 'Unknown';
-                user.age = age || null;
+                // Update user's profile with provided fields or the User fields or defaults
+                user.username = username || user.username || 'Anonymous';
+                user.aboutMe = aboutMe || user.aboutMe || null;
+                user.gender = gender || user.gender || 'Unknown';
+                user.age = age || user.age || null;
+                user.settings = settings || user.settings;
 
                 // Save the updated user profile
                 await user.save();
