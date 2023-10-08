@@ -3,125 +3,117 @@ const validator = require('validator').default;
 
 const User = require('../models/UserSchema');
 
+// Defining separate email validation middleware
+const emailValidator = (req, res, next) => {
+        const { email } = req.body;
+
+        if (typeof email !== 'string' || !validator.isEmail(email)) {
+                return res.status(406).json({
+                        message: 'Email is invalid',
+                });
+        } else {
+                next();
+        }
+};
+
 const loginUser = async (req, res) => {
-	const { email } = req.body;
+        const { email } = req.body;
 
-	if (typeof email !== 'string' || !validator.isEmail(email)) {
-		res.status(406).json({
-			message: 'Email is invalid',
-		});
+        try {
+                let findUser = await User.findOne({ email });
 
-		return;
-	}
+                if (!findUser) {
+                        const newUser = await User.create({ email });
 
-	try {
-		let findUser = await User.findOne({ email });
+                        res.status(200).json({
+                                id: newUser._id,
+                        });
 
-		if (!findUser) {
-			const newUser = await User.create({ email });
+                        return;
+                }
 
-			res.status(200).json({
-				id: newUser._id,
-			});
-
-			return;
-		}
-
-		res.status(200).json({
-			id: findUser._id,
-		});
-	} catch (err) {
-		res.status(500).json({
-			message: 'An error occured whiles logging in',
-		});
-	}
+                res.status(200).json({
+                        id: findUser._id,
+                });
+        } catch (err) {
+                res.status(500).json({
+                        message: 'An error occured while logging in',
+                });
+        }
 };
 
 const getProfile = async (req, res) => {
-	try {
-		const { email } = req.params;
+        try {
+                const { email } = req.params;
 
-		// Find the user by email
-		const user = await User.findOne({ email });
+                // Find the user by email
+                const user = await User.findOne({ email });
 
-		if (!user) {
-			return res.status(404).json({ error: 'User not found' });
-		}
+                if (!user) {
+                        return res.status(404).json({ error: 'User not found' });
+                }
 
-		// Send the user profile data as JSON response
-		res.status(200).json(user);
-	} catch (error) {
-		console.error('Error fetching user profile:', error);
-		res.status(500).json({ error: 'Internal server error' });
-	}
+                // Send the user profile data as JSON response
+                res.status(200).json(user);
+        } catch (error) {
+                console.error('Error fetching user profile:', error);
+                res.status(500).json({ error: 'Internal server error' });
+        }
 };
 
 const updateProfile = async (req, res) => {
-	const { username, aboutMe, gender, age, email } = req.body;
+        const { username, aboutMe, gender, age, email } = req.body;
 
-	if (typeof email !== 'string' || !validator.isEmail(email)) {
-		res.status(406).json({
-			message: 'Email is invalid',
-		});
+        try {
+                // Find the user by email
+                const user = await User.findOne({ email });
 
-		return;
-	}
+                if (!user) {
+                        return res.status(404).json({ error: 'User not found' });
+                }
 
-	try {
-		// Find the user by email
-		const user = await User.findOne({ email });
+                // Update user's profile with provided fields or defaults
+                user.username = username || 'Anonymous';
+                user.aboutMe = aboutMe || null;
+                user.gender = gender || 'Unknown';
+                user.age = age || null;
 
-		if (!user) {
-			return res.status(404).json({ error: 'User not found' });
-		}
+                // Save the updated user profile
+                await user.save();
 
-		// Update user's profile with provided fields or defaults
-		user.username = username || 'Anonymous';
-		user.aboutMe = aboutMe || null;
-		user.gender = gender || 'Unknown';
-		user.age = age || null;
-
-		// Save the updated user profile
-		await user.save();
-
-		return res.status(200).json({ message: 'Profile updated successfully' });
-	} catch (error) {
-		console.error(error);
-		return res.status(500).json({ error: 'Internal server error' });
-	}
+                return res.status(200).json({ message: 'Profile updated successfully' });
+        } catch (error) {
+                console.error(error);
+                return res.status(500).json({ error: 'Internal server error' });
+        }
 };
 
 const deleteUser = async (req, res) => {
-	const { email } = req.body;
+        const { email } = req.body;
 
-	if (typeof email !== 'string' || !validator.isEmail(email)) {
-		res.status(406).json({
-			message: 'Email is invalid',
-		});
+        try {
+                // Find the user by email
+                const user = await User.findOne({ email });
 
-		return;
-	}
-	try {
-		// Find the user by email
-		const user = await User.findOne({ email });
+                if (!user) {
+                        return res.status(404).json({ error: 'User not found' });
+                }
 
-		if (!user) {
-			return res.status(404).json({ error: 'User not found' });
-		}
+                // Delete the user
+                await user.deleteOne();
 
-		// Delete the user
-		await user.deleteOne();
-
-		return res.status(200).json({ message: 'User deleted successfully' });
-	} catch (error) {
-		console.error(error);
-		return res.status(500).json({ error: 'Internal server error' });
-	}
+                return res.status(200).json({ message: 'User deleted successfully' });
+        } catch (error) {
+                console.error(error);
+                return res.status(500).json({ error: 'Internal server error' });
+        }
 };
 
-UserRouter.route('/login').post(loginUser);
-UserRouter.route('/profile').post(updateProfile);
+UserRouter.route('/login').post(emailValidator, loginUser);
+UserRouter.route('/profile').post(emailValidator, updateProfile);
 UserRouter.route('/profile/:email').get(getProfile);
-UserRouter.route('/deleteUser').delete(deleteUser);
+UserRouter.route('/deleteUser').delete(emailValidator, deleteUser);   //Email validation applied to the required request handlers
 
 module.exports = UserRouter;
+
+

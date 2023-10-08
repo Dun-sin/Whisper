@@ -28,7 +28,10 @@ import { useNotification } from 'src/lib/notification';
 import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE, NEW_EVENT_TYPING } from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 
+const inactiveTimeThreshold = 180000 // 3 mins delay
 let senderId;
+let inactiveTimeOut;
+
 const Chat = () => {
     const { app } = useApp();
     const { playNotification } = useNotification();
@@ -37,6 +40,7 @@ const Chat = () => {
         messageID: null,
     });
     const [isQuoteReply, setIsQuoteReply] = useState(false)
+    const [quoteMessage, setQuoteMessage] = useState(null)
     const {
         messages: state,
         addMessage,
@@ -51,6 +55,8 @@ const Chat = () => {
     const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
 
     const inputRef = useRef('');
+
+    const [lastMessageTime, setLastMessageTime] = useState(null)
 
 
     senderId = authState.email ?? authState.loginId;
@@ -226,8 +232,14 @@ const Chat = () => {
         if (message === '' || senderId === undefined || senderId === '123456') {
             return;
         }
+        
+        if (isQuoteReply && message.trim() === quoteMessage.trim()) {
+            return;
+        }
+        
 
         setIsQuoteReply(false)
+        setQuoteMessage(null)
 
         const splitMessage = message.split(' ');
         for (const word of splitMessage) {
@@ -266,17 +278,17 @@ const Chat = () => {
             inputRef.current.focus();
         }
     };
-    
+
     // Define a new function to handle "Ctrl + Enter" key press
     const handleCtrlEnter = (e) => {
-			if (e.ctrlKey && e.key === 'Enter') {
-					handleSubmit(e);
-			}
-	};
+        if (e.ctrlKey && e.key === 'Enter') {
+            handleSubmit(e);
+        }
+    };
 
-	// Use the useKeyPress hook to listen for "Ctrl + Enter" key press
-	useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
-    
+    // Use the useKeyPress hook to listen for "Ctrl + Enter" key press
+    useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
+
 
     const handleResend = (id) => {
         if (!messageExists(id)) {
@@ -321,7 +333,7 @@ const Chat = () => {
 `;
         inputRef.current.value = quotedMessage;
         setIsQuoteReply(true)
-
+        setQuoteMessage(quotedMessage)
     };
 
     const handleTypingStatus = throttle((e) => {
@@ -413,6 +425,22 @@ const Chat = () => {
         };
     }, []);
 
+    const checkPartnerResponse = () => {
+        const currentTime = new Date().getTime();
+        const isInactive = lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold;
+        if (isInactive) {
+            createBrowserNotification("your partner isn't responding, want to leave?");
+        }
+    };
+
+    useEffect(()=>{
+        const newLastMessageTime = sortedMessages.filter((message) => message.senderId !== senderId).pop()?.time;
+        if(newLastMessageTime !== lastMessageTime){
+            setLastMessageTime(newLastMessageTime);
+            clearTimeout(inactiveTimeOut);
+            inactiveTimeOut = setTimeout(checkPartnerResponse,inactiveTimeThreshold);
+        }
+    },[sortedMessages])
 
 
     return (

@@ -17,7 +17,7 @@ import { useDialog } from 'src/context/DialogContext';
 
 // Components
 import Chat from 'components/Chat';
-import { createClassesFromArray } from 'src/lib/utils';
+import { createClassesFromArray, isExplicitDisconnection } from 'src/lib/utils';
 
 import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
 
@@ -29,6 +29,7 @@ const Anonymous = ({ onChatClosed }) => {
     const currentChatIdRef = useRef(currentChatId);
     const [isTyping, setIsTyping] = useState(false);
     const [autoSearchAfterClose, setAutoSearchAfterClose] = useState(false);
+    const [disconnected, setDisconnected] = useState(false);
     const autoSearchRef = useRef();
     autoSearchRef.current = autoSearchAfterClose;
     /**
@@ -127,8 +128,22 @@ const Anonymous = ({ onChatClosed }) => {
             NEW_EVENT_EDIT_MESSAGE,
         ];
 
+        const connectionEvents = {
+            connect: () => {
+                setDisconnected(false);
+            },
+
+            disconnect: (reason) => {
+                setDisconnected(!isExplicitDisconnection(reason));
+            },
+        };
+
         function onNewMessage() {
-            setIsTyping(false)
+            setIsTyping(false);
+        }
+
+        for (const event in connectionEvents) {
+            socket.on(event, connectionEvents[event]);
         }
 
         newMessageEvents.forEach((event) => {
@@ -139,6 +154,10 @@ const Anonymous = ({ onChatClosed }) => {
             newMessageEvents.forEach((event) => {
                 socket.off(event, onNewMessage);
             });
+
+            for (const event in connectionEvents) {
+                socket.off(event, connectionEvents[event]);
+            }
         };
     }, []);
 
@@ -150,10 +169,15 @@ const Anonymous = ({ onChatClosed }) => {
                 'md:min-w-[calc(100%-108px)]',
                 'min-w-full',
                 'flex-col',
-                'h-screen',
+                'h-full',
                 'text-white',
             ])}
         >
+            {disconnected && (
+                <div className="bg-red w-full text-center">
+                    You&apos;ve lost your connection.
+                </div>
+            )}
             <div className="flex items-center justify-between border-b-[2px] px-5 border-secondary h-[10%] w-[100%]">
                 <div className="md:hidden">
                     <Whisper
@@ -196,8 +220,8 @@ const Anonymous = ({ onChatClosed }) => {
                     centerItems,
                     'flex-col',
                     'w-[90%]',
-                    'h-[calc(100%-10%)]',
-                    'mt-auto',
+                    'h-full',
+                    'flex-auto',
                 ])}
             >
                 <Chat />
@@ -211,4 +235,3 @@ export default Anonymous;
 Anonymous.propTypes = {
     onChatClosed: PropTypes.func,
 };
-
