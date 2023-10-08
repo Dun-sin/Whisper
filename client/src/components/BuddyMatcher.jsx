@@ -118,7 +118,7 @@ const BuddyMatcher = () => {
 
         socket.on(NEW_EVENT_JOINED, ({ roomId, userIds }) => {
             playNotification('buddyPaired');
-            createBrowserNotification("Let's Chat :)","You've found a match, don't keep your friend waiting ⌛")
+            createBrowserNotification("Let's Chat :)","You've found a match, don't keep your Partner waiting ⌛")
             createChat(roomId, userIds);
             endSearch(roomId);
         });
