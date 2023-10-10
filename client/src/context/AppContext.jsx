@@ -66,6 +66,16 @@ export const AppProvider = ({ children }) => {
         });
     }
 
+    function loadUserSettings(settings) {
+        if (!settings) {
+            return;
+        }
+        dispatch({
+            type: 'UPDATE_SETTINGS',
+            payload: settings,
+        });
+    }
+
     function updateTmpSettings(newSettings) {
         dispatch({
             type: 'UPDATE_TMP_SETTINGS',
@@ -104,6 +114,7 @@ export const AppProvider = ({ children }) => {
                 cancelSettingsUpdate,
                 startSearch,
                 endSearch,
+                loadUserSettings
             }}
         >
             {children}
