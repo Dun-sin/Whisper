@@ -30,6 +30,7 @@ const Start = () => {
                 'min-w-[calc(100%-120px)]',
                 'text-white',
                 'min-h-full',
+                'space-y-3'
             ])}
         >
             <RiUserSearchLine
@@ -51,6 +52,7 @@ const Start = () => {
                     'text-black',
                     'text-[1.5em]',
                     'bg-[#FF9F1C]',
+                    'hover:bg-[#fbbb60]',
                     'w-[8em]',
                     'h-[2.3em]',
                     'mt-[-5px]',
