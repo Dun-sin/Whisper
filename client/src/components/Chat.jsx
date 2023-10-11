@@ -2,31 +2,23 @@
 import { useEffect, useRef, useContext, useMemo, useState } from 'react';
 import { SocketContext } from 'context/Context';
 import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
-
 import 'styles/chat.css';
-
+import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import Dropdown from 'rsuite/Dropdown';
-import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
-
 import { ImCancelCircle } from 'react-icons/im';
 import { IoSend } from 'react-icons/io5';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
-
-import { v4 as uuid } from 'uuid';
 import { throttle } from 'lodash';
 import MarkdownIt from 'markdown-it';
-
 import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';
 import { useApp } from 'src/context/AppContext';
-
-import useChatUtils from 'src/lib/chat';
 import MessageStatus from './MessageStatus';
-import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
 import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE, NEW_EVENT_TYPING } from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
+import ChatHelper from './ChatHelper'; // Refactor class file for all functions
 
 const inactiveTimeThreshold = 180000 // 3 mins delay
 let senderId;
@@ -44,34 +36,19 @@ const Chat = () => {
     const {
         messages: state,
         addMessage,
-        updateMessage,
         removeMessage,
         editText,
     } = useChat();
-    const { authState, dispatchAuth } = useAuth();
-    const { logout } = useKindeAuth()
+    const { authState } = useAuth();
     const socket = useContext(SocketContext);
-
-    const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
 
     const inputRef = useRef('');
 
     const [lastMessageTime, setLastMessageTime] = useState(null)
-
+    // Creating Instance of ChatHelper
+    const chatFunctions = new ChatHelper(setEditing, socket, inputRef, isQuoteReply, quoteMessage, setIsQuoteReply, setQuoteMessage, editing, lastMessageTime);
 
     senderId = authState.email ?? authState.loginId;
-
-    const getMessage = (id) => {
-        if (!state[app.currentChatId]) {
-            return null;
-        }
-
-        return state[app.currentChatId].messages[id];
-    };
-
-    const messageExists = (id) => {
-        return Boolean(getMessage(id));
-    };
 
     const md = new MarkdownIt({
         html: false,
@@ -79,24 +56,7 @@ const Chat = () => {
         typographer: true
     });
 
-    function logOut() {
-        dispatchAuth({
-            type: 'LOGOUT'
-        })
-        logout()
-    }
-
-    const cancelEdit = () => {
-        inputRef.current.value = '';
-        setEditing({ isediting: false, messageID: null });
-        socket
-            .timeout(10000)
-            .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
-    };
-
-
-    const sortedMessages = useMemo(
-        () =>
+    const sortedMessages = useMemo(() => 
             Object.values(state[app.currentChatId]?.messages ?? {})?.sort(
                 (a, b) => {
                     const da = new Date(a.time),
@@ -107,122 +67,18 @@ const Chat = () => {
         [state, app.currentChatId]
     );
 
-    const doSend = async ({
-        senderId,
-        room,
-        tmpId = uuid(),
-        message,
-        time,
-    }) => {
-        try {
-            addMessage({
-                senderId,
-                room,
-                id: tmpId,
-                message,
-                time,
-                status: 'pending',
-            });
-        } catch {
-            logOut();
-            return false;
-        }
 
-        try {
-            const sentMessage = await sendMessage({
-                senderId,
-                message,
-                time,
-                chatId: room,
-            });
-
-            try {
-                updateMessage(tmpId, sentMessage);
-            } catch {
-                logOut();
-                return false;
-            }
-        } catch (e) {
-            try {
-                updateMessage(tmpId, {
-                    senderId,
-                    room,
-                    id: tmpId,
-                    message,
-                    time,
-                    status: 'failed',
-                });
-            } catch {
-                logOut();
-            }
-
-            return false;
-        }
-
-        return true;
-    };
-
-    const handleDelete = async (id) => {
-        if (!messageExists(id)) {
-            return;
-        }
-
-        const messageObject = getMessage(id);
-        const { message } = messageObject
-
-        if (message.includes('Warning Message')) {
-            return;
-        }
-
-        updateMessage(id, {
-            ...messageObject,
-            status: 'pending',
-        });
-
-        try {
-            const messageDeleted = await deleteMessage({
-                id,
-                chatId: messageObject.room,
-            });
-
-            if (!messageDeleted) {
-                updateMessage(id, messageObject);
-                return;
-            }
-
-            removeMessage(id, messageObject.room);
-        } catch {
-            updateMessage(id, messageObject);
-        }
-    };
-
-    const warningMessage = (sender, message) => {
-        // TODO: Instrad of replacing the message we should add some kind of increment for the users to decide to see the message or not
-        if (message.includes('Warning Message')) {
-            if (senderId === sender) {
-                return (
-                    <span className="text-red">
-                        ADMIN MESSAGE: You are trying to send a bad word!
-                    </span>
-                );
-            } else {
-                return (
-                    <span className="text-black">
-                        ADMIN MESSAGE: The person you are chatting with is
-                        trying to send a bad word!
-                    </span>
-                );
-            }
-        }
-    };
+    // Use the useKeyPress hook to listen for "Ctrl + Enter" key press
+    useKeyPress(['Enter'], chatFunctions.handleCtrlEnter, ShortcutFlags.ctrl);
 
     // Here whenever user will submit message it will be send to the server
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
+        socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, 
+            isTyping: false });
         const d = new Date();
-        let message = inputRef.current.value.trim();        // Trim the message to remove the extra spaces
+        // Trim the message to remove the extra spaces
+        let message = inputRef.current.value.trim();        
 
         if (!isQuoteReply) {
             const cleanedText = message.replace(/>+/g, '');
@@ -251,21 +107,22 @@ const Chat = () => {
 
         if (editing.isediting === true) {
             try {
-                await editMessage({
+                await chatFunctions.editMessage({
                     id: editing.messageID,
                     chatId: app.currentChatId,
                     newMessage: message,
                 });
-                editText(editing.messageID, app.currentChatId, message);
-                const messageObject = getMessage(editing.messageID);
-                updateMessage(editing.messageID, messageObject);
+                editText(editing.messageID, 
+                    app.currentChatId, message);
+                const messageObject = chatFunctions.getMessage(editing.messageID);
+                chatFunctions.updateMessage(editing.messageID, messageObject);
             } catch {
                 setEditing({ isediting: false, messageID: null });
                 return;
             }
             setEditing({ isediting: false, messageID: null });
         } else {
-            doSend({
+            chatFunctions.doSend({
                 senderId,
                 room: app.currentChatId,
                 message,
@@ -279,63 +136,6 @@ const Chat = () => {
         }
     };
 
-    // Define a new function to handle "Ctrl + Enter" key press
-    const handleCtrlEnter = (e) => {
-        if (e.ctrlKey && e.key === 'Enter') {
-            handleSubmit(e);
-        }
-    };
-
-    // Use the useKeyPress hook to listen for "Ctrl + Enter" key press
-    useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
-
-
-    const handleResend = (id) => {
-        if (!messageExists(id)) {
-            return;
-        }
-
-        const { senderId, room, message, time } = getMessage(id);
-
-        doSend({
-            senderId,
-            room,
-            message,
-            time,
-            tmpId: id,
-        });
-    };
-
-    const handleEdit = (id) => {
-        inputRef.current.focus();
-        const { message } = getMessage(id);
-
-        if (message.includes('Warning Message')) {
-            cancelEdit();
-            return;
-        }
-        inputRef.current.value = message;
-
-        setEditing({ isediting: true, messageID: id });
-    };
-
-    const handleQuoteReply = (id) => {
-        inputRef.current.focus();
-
-        const { message } = getMessage(id);
-        if (message.includes('Warning Message')) {
-            cancelEdit();
-            return;
-        }
-
-        const quotedMessage = `> ${message}
-        
-`;
-        inputRef.current.value = quotedMessage;
-        setIsQuoteReply(true)
-        setQuoteMessage(quotedMessage)
-    };
-
     const handleTypingStatus = throttle((e) => {
         if (e.target.value.length > 0) {
             socket
@@ -344,19 +144,28 @@ const Chat = () => {
         }
     }, 500);
 
-    const handleCopyToClipBoard = async (id) => {
-        const { message } = getMessage(id);
-        if (message.includes('Warning Message')) {
-            return;
-        }
-        if ('clipboard' in navigator) {
-            return await navigator.clipboard.writeText(message);
-        } else {
-            return document.execCommand('copy', true, message);
-        }
-    };
     const getTime = (time) => {
         return new Date(time).toLocaleTimeString();
+    };
+
+    const warningMessage = (sender, message) => {
+        // TODO: Instrad of replacing the message we should add some kind of increment for the users to decide to see the message or not
+        if (message.includes('Warning Message')) {
+            if (senderId === sender) {
+                return (
+                    <span className="text-red">
+                        ADMIN MESSAGE: You are trying to send a bad word!
+                    </span>
+                );
+            } else {
+                return (
+                    <span className="text-black">
+                        ADMIN MESSAGE: The person you are chatting with is
+                        trying to send a bad word!
+                    </span>
+                );
+            }
+        }
     };
 
     const renderIconButton = (props) => {
@@ -382,7 +191,7 @@ const Chat = () => {
         const keyDownHandler = (event) => {
             if (event.key === 'Escape' && editing.isediting) {
                 event.preventDefault();
-                cancelEdit();
+                chatFunctions.cancelEdit();
             }
         };
 
@@ -401,7 +210,7 @@ const Chat = () => {
                 createBrowserNotification(
                     'You received a new message on Whisper', message.message)
             } catch {
-                logOut()
+                chatFunctions.logOut()
             }
         };
 
@@ -425,20 +234,12 @@ const Chat = () => {
         };
     }, []);
 
-    const checkPartnerResponse = () => {
-        const currentTime = new Date().getTime();
-        const isInactive = lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold;
-        if (isInactive) {
-            createBrowserNotification("your partner isn't responding, want to leave?");
-        }
-    };
-
     useEffect(()=>{
         const newLastMessageTime = sortedMessages.filter((message) => message.senderId !== senderId).pop()?.time;
         if(newLastMessageTime !== lastMessageTime){
             setLastMessageTime(newLastMessageTime);
             clearTimeout(inactiveTimeOut);
-            inactiveTimeOut = setTimeout(checkPartnerResponse,inactiveTimeThreshold);
+            inactiveTimeOut = setTimeout(chatFunctions.checkPartnerResponse,inactiveTimeThreshold);
         }
     },[sortedMessages])
 
@@ -499,7 +300,7 @@ const Chat = () => {
                                                     >
                                                         <Dropdown.Item
                                                             onClick={() =>
-                                                                handleEdit(id)
+                                                                chatFunctions.handleEdit(id)
                                                             }
                                                         >
                                                             Edit
@@ -507,7 +308,7 @@ const Chat = () => {
 
                                                         <Dropdown.Item
                                                             onClick={() =>
-                                                                handleCopyToClipBoard(
+                                                                chatFunctions.handleCopyToClipBoard(
                                                                     id
                                                                 )
                                                             }
@@ -516,7 +317,7 @@ const Chat = () => {
                                                         </Dropdown.Item>
                                                         <Dropdown.Item
                                                             onClick={() =>
-                                                                handleQuoteReply(
+                                                                chatFunctions.handleQuoteReply(
                                                                     id
                                                                 )
                                                             }
@@ -525,7 +326,7 @@ const Chat = () => {
                                                         </Dropdown.Item>
                                                         <Dropdown.Item
                                                             onClick={() =>
-                                                                handleDelete(id)
+                                                                chatFunctions.handleDelete(id)
                                                             }
                                                         >
                                                             Delete
@@ -547,7 +348,7 @@ const Chat = () => {
                                                     >
                                                         <Dropdown.Item
                                                             onClick={() =>
-                                                                handleCopyToClipBoard(
+                                                                chatFunctions.handleCopyToClipBoard(
                                                                     id
                                                                 )
                                                             }
@@ -556,7 +357,7 @@ const Chat = () => {
                                                         </Dropdown.Item>
                                                         <Dropdown.Item
                                                             onClick={() =>
-                                                                handleQuoteReply(
+                                                                chatFunctions.handleQuoteReply(
                                                                     id
                                                                 )
                                                             }
@@ -580,7 +381,7 @@ const Chat = () => {
                                                     senderId.toString()
                                                 }
                                                 onResend={() =>
-                                                    handleResend(id)
+                                                    chatFunctions.handleResend(id)
                                                 }
                                             />
                                         </div>
@@ -605,7 +406,7 @@ const Chat = () => {
                     />
                     {editing.isediting && (
                         <ImCancelCircle
-                            onClick={cancelEdit}
+                            onClick={chatFunctions.cancelEdit}
                             className="fill-white mr-5 scale-[1.3] cursor-pointer"
                         />
                     )}
