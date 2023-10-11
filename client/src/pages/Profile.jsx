@@ -83,7 +83,7 @@ const Profile = () => {
     return (
         <div
             className={createClassesFromArray(
-                'bg-white',
+                'bg-alice-blue',
                 'dark:bg-primary',
                 'md:min-w-[calc(100%-120px)]',
                 'flex items-center',

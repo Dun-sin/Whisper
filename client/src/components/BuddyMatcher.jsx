@@ -217,7 +217,7 @@ const BuddyMatcher = () => {
     }, [app.currentChatId]);
 
     return app.isSearching || !app.currentChatId ? (
-        <div className="flex w-full justify-center items-center min-h-[calc(100vh-70px)] flex-col bg-white dark:bg-primary">
+        <div className="flex w-full justify-center items-center min-h-[calc(100vh-70px)] flex-col bg-alice-blue dark:bg-primary">
             <ThreeDots fill="rgb(255 159 28)" />
             <div className="text-lg text-center text-primary dark:text-white">{loadingText}</div>
             {!isStoppingSearch && (

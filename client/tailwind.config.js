@@ -11,6 +11,7 @@ module.exports = {
                 secondary: '#162938',
                 highlight: '#FF9F1C',
                 red: '#FF3A46',
+                'alice-blue': '#EDF7FF'
             },
         },
     },
