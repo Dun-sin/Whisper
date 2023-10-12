@@ -15,9 +15,5 @@
     "NEW_EVENT_TYPING": "typing",
     "NEW_EVENT_DISPLAY": "display",
     "NEW_EVENT_ADDING": "adding",
-    "NEW_EVENT_CREATE_ROOM": "createRoom",
-    "OK": 200,
-    "NOT_FOUND": 404,
-    "NOT_ACCEPTABLE": 406,
-    "INTERNAL_SERVER_ERROR": 500
+    "NEW_EVENT_CREATE_ROOM": "createRoom"
 }

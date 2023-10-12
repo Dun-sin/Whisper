@@ -3,7 +3,7 @@ const validator = require('validator').default;
 
 const User = require('../models/UserSchema');
 
-const { OK, NOT_FOUND, NOT_ACCEPTABLE, INTERNAL_SERVER_ERROR } = require('../../constants.json');
+const { OK, NOT_FOUND, NOT_ACCEPTABLE, INTERNAL_SERVER_ERROR } = require('../httpStatusCodes.js');
 
 // Defining separate email validation middleware
 const emailValidator = (req, res, next) => {
