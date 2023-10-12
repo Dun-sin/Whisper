@@ -110,7 +110,7 @@ const Profile = () => {
 
                         <div className='w-full flex flex-col gap-4'>
                             <textarea
-                                className='bg-clip-padding backdrop-filter backdrop-blur-2xl bg-opacity-5 border border-primary dark:border-white text-white my-2 bg-transparent outline-none tracking-wider resize-none indent-2 p-2 rounded-xl h-28 w-full placeholder:tracking-widest placeholder:text-center'
+                                className='bg-clip-padding backdrop-filter backdrop-blur-2xl bg-opacity-5 border border-primary dark:border-white text-secondary dark:text-white my-2 bg-transparent outline-none tracking-wider resize-none indent-2 p-2 rounded-xl h-28 w-full placeholder:tracking-widest placeholder:text-center'
                                 placeholder="Write something about you..."
                                 ref={aboutRef}
                             />
