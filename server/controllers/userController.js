@@ -3,12 +3,14 @@ const validator = require('validator').default;
 
 const User = require('../models/UserSchema');
 
+const { OK, NOT_FOUND, NOT_ACCEPTABLE, INTERNAL_SERVER_ERROR } = require('../httpStatusCodes.js');
+
 // Defining separate email validation middleware
 const emailValidator = (req, res, next) => {
         const { email } = req.body;
 
         if (typeof email !== 'string' || !validator.isEmail(email)) {
-                return res.status(406).json({
+                return res.status(NOT_ACCEPTABLE).json({
                         message: 'Email is invalid',
                 });
         } else {
@@ -25,18 +27,18 @@ const loginUser = async (req, res) => {
                 if (!findUser) {
                         const newUser = await User.create({ email });
 
-                        res.status(200).json({
+                        res.status(OK).json({
                                 id: newUser._id,
                         });
 
                         return;
                 }
 
-                res.status(200).json({
+                res.status(OK).json({
                         id: findUser._id,
                 });
         } catch (err) {
-                res.status(500).json({
+                res.status(INTERNAL_SERVER_ERROR).json({
                         message: 'An error occured while logging in',
                 });
         }
@@ -50,14 +52,14 @@ const getProfile = async (req, res) => {
                 const user = await User.findOne({ email });
 
                 if (!user) {
-                        return res.status(404).json({ error: 'User not found' });
+                        return res.status(NOT_FOUND).json({ error: 'User not found' });
                 }
 
                 // Send the user profile data as JSON response
-                res.status(200).json(user);
+                res.status(OK).json(user);
         } catch (error) {
                 console.error('Error fetching user profile:', error);
-                res.status(500).json({ error: 'Internal server error' });
+                res.status(INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
         }
 };
 
@@ -69,7 +71,7 @@ const updateProfile = async (req, res) => {
                 const user = await User.findOne({ email });
 
                 if (!user) {
-                        return res.status(404).json({ error: 'User not found' });
+                        return res.status(NOT_FOUND).json({ error: 'User not found' });
                 }
 
                 // Update user's profile with provided fields or the User fields or defaults
@@ -82,10 +84,10 @@ const updateProfile = async (req, res) => {
                 // Save the updated user profile
                 await user.save();
 
-                return res.status(200).json({ message: 'Profile updated successfully' });
+                return res.status(OK).json({ message: 'Profile updated successfully' });
         } catch (error) {
                 console.error(error);
-                return res.status(500).json({ error: 'Internal server error' });
+                return res.status(INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
         }
 };
 
@@ -97,16 +99,16 @@ const deleteUser = async (req, res) => {
                 const user = await User.findOne({ email });
 
                 if (!user) {
-                        return res.status(404).json({ error: 'User not found' });
+                        return res.status(NOT_FOUND).json({ error: 'User not found' });
                 }
 
                 // Delete the user
                 await user.deleteOne();
 
-                return res.status(200).json({ message: 'User deleted successfully' });
+                return res.status(OK).json({ message: 'User deleted successfully' });
         } catch (error) {
                 console.error(error);
-                return res.status(500).json({ error: 'Internal server error' });
+                return res.status(INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
         }
 };
 
