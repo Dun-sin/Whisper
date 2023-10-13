@@ -139,6 +139,12 @@ const Profile = () => {
                                         placeholder="19"
                                         className='outline-none bg-transparent text-right'
                                         ref={ageRef}
+                                        min="1"
+                                        onBlur={(e) => {
+                                            if (e.target.value < 1){
+                                                e.target.value = "1"
+                                            }
+                                        }}
                                     />
                                 </div>
                             </section>
