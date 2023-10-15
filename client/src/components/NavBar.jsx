@@ -43,7 +43,6 @@ const NavBar = ({ className }) => {
             noBtnText: 'Cancel',
             yesBtnText: 'Yes, log me out',
             handler: () => {
-                logOut();
                 if (socket.disconnected) {
                     socket.volatile.emit(NEW_EVENT_LOGOUT, {
                         email: authState.email,
@@ -55,6 +54,7 @@ const NavBar = ({ className }) => {
                         loginId: authState.loginId,
                     });
                 }
+                logOut();
             },
         });
     };
