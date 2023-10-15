@@ -144,7 +144,7 @@ const Profile = () => {
                             </section>
                         </div>
                     </section >
-                    <button className='border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-green text-green hover:bg-green hover:text-white' onClick={handleUpdateProfile}>Save changes</button>
+                    <button className='border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-green-500 text-green-500 hover:bg-green-500 hover:text-white' onClick={handleUpdateProfile}>Save changes</button>
                     <button className='border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-red text-red hover:bg-red hover:text-white' onClick={handleDeleteAccount}>Delete My Account</button>
                     {profileResponse ? <div><p className='text-green-300'>Profile Updated!</p></div> : null}
                 </>
