@@ -8,8 +8,8 @@ export function useDarkMode() {
 }
 
 export function DarkModeProvider({ children }) {
-	  const defaultMode = JSON.parse(window.localStorage.getItem("darkMode"));
-	  const [darkMode, setDarkMode] = useState(() => (defaultMode === undefined || defaultMode === null) ? true : defaultMode );    
+    const defaultMode = JSON.parse(window.localStorage.getItem("darkMode"));
+    const [darkMode, setDarkMode] = useState(defaultMode !== undefined ? defaultMode : true);
 
     useEffect(() => {
         window.localStorage.setItem('darkMode', JSON.stringify(darkMode))
