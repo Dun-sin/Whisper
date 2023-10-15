@@ -1,10 +1,17 @@
-const { NEW_EVENT_SEND_MESSAGE, NEW_EVENT_SEND_FAILED, NEW_EVENT_RECEIVE_MESSAGE } = require("../../constants.json");
+const {
+  NEW_EVENT_SEND_MESSAGE,
+  NEW_EVENT_SEND_FAILED,
+  NEW_EVENT_RECEIVE_MESSAGE,
+} = require("../../constants.json");
 const { addMessage, getActiveUser } = require("../utils/lib");
 
 module.exports = (socket) => {
   socket.on(
     NEW_EVENT_SEND_MESSAGE,
-    async ({ senderId, message, time, chatId }, returnMessageToSender) => {
+    async (
+      { senderId, message, time, chatId, replyTo },
+      returnMessageToSender
+    ) => {
       // Below line is just a failed message simulator for testing purposes.
 
       // const rndInt = Math.floor(Math.random() * 6) + 1;
@@ -34,6 +41,7 @@ module.exports = (socket) => {
         time,
         senderId,
         type: "message",
+        replyTo: replyTo ?? null,
       });
 
       const messageDetails = {
@@ -44,7 +52,9 @@ module.exports = (socket) => {
 
       returnMessageToSender(messageDetails);
 
-      socket.broadcast.to(chatId).emit(NEW_EVENT_RECEIVE_MESSAGE, messageDetails);
+      socket.broadcast
+        .to(chatId)
+        .emit(NEW_EVENT_RECEIVE_MESSAGE, messageDetails);
     }
   );
 };
