@@ -140,7 +140,7 @@ const Profile = () => {
                                         className='outline-none bg-transparent text-right'
                                         ref={ageRef}
                                         min="1"
-                                        onBlur={(e) => {
+                                        onChange={(e) => {
                                             if (e.target.value < 1){
                                                 e.target.value = "1"
                                             }
