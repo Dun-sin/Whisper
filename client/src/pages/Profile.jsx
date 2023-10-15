@@ -139,6 +139,7 @@ const Profile = () => {
                                         placeholder="19"
                                         className='outline-none bg-transparent text-right'
                                         ref={ageRef}
+                                        min="0" // Added the min attribute to disallow negative values
                                     />
                                 </div>
                             </section>
