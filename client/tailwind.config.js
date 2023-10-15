@@ -11,7 +11,7 @@ module.exports = {
                 secondary: '#162938',
                 highlight: '#FF9F1C',
                 red: '#FF3A46',
-                'light': '#EDF7FF'
+                'light': '#f0f8ff'
             },
         },
     },
