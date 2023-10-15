@@ -73,7 +73,7 @@ const Searching = () => {
                                 />
                                 <Form.ControlLabel className='text-white text-base font-normal'>MODE</Form.ControlLabel>
                             </div>
-                            <Form.HelpText className='text-zinc-600 text-xs'>
+                            <Form.HelpText className='text-zinc-600 text-xs' style={{ color: '#ffffff'}}>
                                 Light/Dark mode
                             </Form.HelpText>
                         </div>
@@ -117,7 +117,7 @@ const Searching = () => {
                                 />
                                 <Form.ControlLabel className='text-white text-base font-normal'>NOTIFICATION</Form.ControlLabel>
                             </div>
-                            <Form.HelpText className='text-zinc-600 text-xs'>
+                            <Form.HelpText className='text-zinc-600 text-xs' style={{ color: '#ffffff'}}>
                                 Enable/Disable notifications
                             </Form.HelpText>
                         </div>
@@ -144,7 +144,7 @@ const Searching = () => {
                             />
                             <Form.ControlLabel className='text-white text-base font-normal'>VOLUME LEVEL</Form.ControlLabel>
                         </div>
-                        <Form.HelpText className='text-zinc-600 text-xs mb-4'>
+                        <Form.HelpText className='text-zinc-600 text-xs mb-4' style={{ color: '#ffffff'}}>
                             Set the volume level for all your notifications
                         </Form.HelpText>
                         <Form.Control
