@@ -40,6 +40,7 @@ const Chat = () => {
         messageID: null,
     });
     const [isQuoteReply, setIsQuoteReply] = useState(false)
+    const [message, setMessage] = useState('');
     const [quoteMessage, setQuoteMessage] = useState(null)
     const {
         messages: state,
@@ -336,12 +337,26 @@ const Chat = () => {
         setQuoteMessage(quotedMessage)
     };
 
+    const adjustTextareaHeight = () => {
+        if (inputRef.current) {
+          const minTextareaHeight = '45px';
+          const currentScrollHeight = inputRef.current.scrollHeight + 'px';
+          
+          inputRef.current.style.height = Math.max(
+            parseInt(minTextareaHeight),
+            parseInt(currentScrollHeight)
+          ) + 'px';
+        }
+      };
+
     const handleTypingStatus = throttle((e) => {
         if (e.target.value.length > 0) {
             socket
                 .timeout(5000)
                 .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
         }
+        setMessage(e.target.value);
+        adjustTextareaHeight();
     }, 500);
 
     const handleCopyToClipBoard = async (id) => {
@@ -363,7 +378,7 @@ const Chat = () => {
         return (
             <BiDotsVerticalRounded
                 {...props}
-                className="fill-primary scale-[1.8]"
+                className="fill-white scale-[1.8]"
             />
         );
     };
@@ -596,11 +611,12 @@ const Chat = () => {
                 className="flex justify-center items-center mt-[40px]"
                 onSubmit={handleSubmit}
             >
-                <div className="w-full flex items-center justify-between bg-secondary rounded-l-md">
+                <div className="w-full flex items-center justify-between bg-secondary rounded-l-md max-h-[150px]">
                     <textarea
                         placeholder="Send a Message....."
-                        className="h-[45px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] text-[18px] placeholder-shown:align-middle"
+                        className="h-[45px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] py-[10px] text-[18px] placeholder-shown:align-middle min-h-[40px] max-h-[100px] overflow-y-scroll"
                         ref={inputRef}
+                        value={message}
                         onChange={handleTypingStatus}
                     />
                     {editing.isediting && (

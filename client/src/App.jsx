@@ -22,9 +22,13 @@ import Settings from 'pages/Settings';
 const clientID = import.meta.env.VITE_IMPORTANT;
 import Profile from './pages/Profile';
 
+import { useDarkMode } from './context/DarkModeContext';
+
 function App() {
     const { isLoggedIn, dispatchAuth } = useAuth();
     const { loadUserSettings } = useApp();
+    
+    const { darkMode } = useDarkMode();
 
     async function loginWithEmail(email) {
         try {
@@ -68,7 +72,7 @@ function App() {
                 loginWithEmail(user.email);
             }}
         >
-            <div className={`flex flex-col-reverse md:flex-row h-screen`}>
+            <div className={`flex flex-col-reverse md:flex-row h-screen ${darkMode && 'dark'}`}>
                 {isLoggedIn && <NavBar />}
                 <Routes>
                     <Route

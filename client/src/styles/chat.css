@@ -9,7 +9,7 @@
 
 @layer components {
     .message-block {
-        @apply w-full flex;
+        @apply w-full flex text-white;
     }
 
     .message-block.me {
