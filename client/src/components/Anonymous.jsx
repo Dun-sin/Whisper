@@ -165,7 +165,7 @@ const Anonymous = ({ onChatClosed }) => {
         <div
             className={createClassesFromArray([
                 centerItems,
-                'bg-alice-blue',
+                'bg-light',
                 'dark:bg-primary',
                 'md:min-w-[calc(100%-108px)]',
                 'min-w-full',
