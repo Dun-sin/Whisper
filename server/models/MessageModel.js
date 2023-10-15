@@ -17,6 +17,10 @@ const MessageSchema = new Schema(
             type: String,
             default: 'message',
         },
+        replyTo: {
+            type: Schema.Types.Mixed,
+            default: null,
+        }
     },
     {
         timestamps: true,
@@ -29,6 +33,7 @@ const MessageSchema = new Schema(
                         time: this.createdAt.getTime(),
                         type: this.type,
                         senderId: '',
+                        replyTo: this.replyTo
                     };
                 },
             },
