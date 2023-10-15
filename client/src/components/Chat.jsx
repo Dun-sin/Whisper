@@ -378,7 +378,7 @@ const Chat = () => {
         return (
             <BiDotsVerticalRounded
                 {...props}
-                className="fill-primary scale-[1.8]"
+                className="fill-white scale-[1.8]"
             />
         );
     };

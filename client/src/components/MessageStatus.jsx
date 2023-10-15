@@ -18,7 +18,7 @@ export default function MessageStatus({
         }
     };
     return (
-        <>
+        <div className='flex items-center space-x-1.5 text-secondary dark:text-white'>
             <span>{time}</span>
             {iAmTheSender && (
                 <>
@@ -40,7 +40,7 @@ export default function MessageStatus({
                     )}
                 </>
             )}
-        </>
+        </div>
     );
 }
 

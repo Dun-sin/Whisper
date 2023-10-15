@@ -26,9 +26,11 @@ const Start = () => {
         <div
             className={createClassesFromArray([
                 centerElement,
-                'bg-primary',
+                'bg-light',
+                'dark:bg-primary',
                 'min-w-[calc(100%-120px)]',
-                'text-white',
+                'text-primary',
+                'dark:text-white',
                 'min-h-full',
             ])}
         >

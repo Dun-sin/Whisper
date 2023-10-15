@@ -13,19 +13,22 @@ import { DialogProvider } from './context/DialogContext';
 
 import 'rsuite/dist/rsuite.min.css';
 import 'styles/index.css';
+import { DarkModeProvider } from './context/DarkModeContext';
 
 
 const root = createRoot(document.getElementById('root'));
 
-root.render(<AuthProvider>
-    <AppProvider>
-        <Router>
-            <SocketContext.Provider value={socket}>
-                <DialogProvider>
-                    <App />
-                    <Dialog />
-                </DialogProvider>
-            </SocketContext.Provider>
-        </Router>
-    </AppProvider>
-</AuthProvider>);
+root.render(<DarkModeProvider>
+    <AuthProvider>
+        <AppProvider>
+            <Router>
+                <SocketContext.Provider value={socket}>
+                    <DialogProvider>
+                        <App />
+                        <Dialog />
+                    </DialogProvider>
+                </SocketContext.Provider>
+            </Router>
+        </AppProvider>
+    </AuthProvider>
+</DarkModeProvider>);
