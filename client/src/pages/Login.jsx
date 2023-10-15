@@ -24,7 +24,7 @@ const Login = () => {
 
     return (
         <div
-            className={`bg-alice-blue dark:bg-primary h-[100vh] w-[100vw] text-primary dark:text-white ${centerStuffs}`}
+            className={`bg-light dark:bg-primary h-[100vh] w-[100vw] text-primary dark:text-white ${centerStuffs}`}
         >
             {isLoading ? (
                 <div className="uppercase py-5">Processing Login</div>
