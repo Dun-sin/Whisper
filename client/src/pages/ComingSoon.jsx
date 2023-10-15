@@ -5,7 +5,7 @@ const ComingSoon = () => {
     return (
         <div
             className={createClassesFromArray(
-                'bg-alice-blue',
+                'bg-light',
                 'dark:bg-primary',
                 'md:min-w-[calc(100%-120px)]',
                 'flex items-center',
