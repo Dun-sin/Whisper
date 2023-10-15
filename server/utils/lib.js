@@ -231,7 +231,7 @@ function chatExists(chatId) {
  */
 async function addMessage(
   chatId,
-  { message, time, senderId, type = "message", replyTo = null }
+  { message, time, senderId, type = "message", replyTo = null },
 ) {
   const sender = getActiveUser(senderId);
 
@@ -264,7 +264,7 @@ async function addMessage(
       $push: {
         messages: optimizedMessage.id,
       },
-    }
+    },
   );
 
   chats[chatId].messages[optimizedMessage.id] = optimizedMessage;
@@ -401,7 +401,7 @@ function addToWaitingList({ loginId, email, socket }) {
 
         return Reflect.get(...arguments);
       },
-    }
+    },
   );
 }
 

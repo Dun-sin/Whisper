@@ -4,94 +4,94 @@
 
 /* width */
 ::-webkit-scrollbar {
-	width: 0px;
+    width: 0px;
 }
 
 @layer components {
-	.message-block {
-		@apply w-full flex text-white;
-	}
+    .message-block {
+        @apply w-full flex text-white;
+    }
 
-	.message-block.me {
-		@apply justify-end;
-	}
+    .message-block.me {
+        @apply justify-end;
+    }
 
-	.message-block.me .message {
-		@apply items-end;
-	}
+    .message-block.me .message {
+        @apply items-end;
+    }
 
-	.message-block.other .message {
-		@apply items-start;
-	}
+    .message-block.other .message {
+        @apply items-start;
+    }
 
-	.message-block.me blockquote {
-		@apply bg-red;
-	}
+    .message-block.me blockquote {
+        @apply bg-red;
+    }
 
-	.message-block.other blockquote {
-		@apply bg-secondary;
-	}
+    .message-block.other blockquote {
+        @apply bg-secondary;
+    }
 
-	.message-block.other {
-		@apply justify-start;
-	}
+    .message-block.other {
+        @apply justify-start;
+    }
 
-	.message-block .message {
-		@apply flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%];
-	}
+    .message-block .message {
+        @apply flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%];
+    }
 
-	.message-block.me .message .content {
-		@apply bg-secondary rounded-l-md;
-	}
+    .message-block.me .message .content {
+        @apply bg-secondary rounded-l-md;
+    }
 
-	.message-block.other .message .content {
-		@apply rounded-r-md;
-	}
+    .message-block.other .message .content {
+        @apply rounded-r-md;
+    }
 
-	.message-block .message .content {
-		@apply bg-red p-3 break-all will-change-auto flex gap-6 items-center;
-	}
+    .message-block .message .content {
+        @apply bg-red p-3 break-all will-change-auto flex gap-6 items-center;
+    }
 
-	.content--reply * {
-		@apply m-0 p-0;
-	}
+    .content--reply * {
+        @apply m-0 p-0;
+    }
 
-	.message-block .message .status {
-		@apply px-[10px] text-[12px] flex gap-2 items-center;
-	}
+    .message-block .message .status {
+        @apply px-[10px] text-[12px] flex gap-2 items-center;
+    }
 
-	.message .content h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		font-size: revert !important;
-		font-weight: revert !important;
-	}
+    .message .content h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-size: revert !important;
+        font-weight: revert !important;
+    }
 
-	.message .content ul {
-		list-style-type: disc !important;
-		list-style-position: inside !important;
-	}
-	ol {
-		list-style: decimal !important;
-		list-style-position: inside !important;
-	}
-	ul ul,
-	ol ul {
-		list-style-type: circle !important;
-		list-style-position: inside !important;
-		margin-left: 15px !important;
-	}
-	ol ol,
-	ul ol {
-		list-style-type: lower-latin !important;
-		list-style-position: inside !important;
-		margin-left: 15px !important;
-	}
+    .message .content ul {
+        list-style-type: disc !important;
+        list-style-position: inside !important;
+    }
+    ol {
+        list-style: decimal !important;
+        list-style-position: inside !important;
+    }
+    ul ul,
+    ol ul {
+        list-style-type: circle !important;
+        list-style-position: inside !important;
+        margin-left: 15px !important;
+    }
+    ol ol,
+    ul ol {
+        list-style-type: lower-latin !important;
+        list-style-position: inside !important;
+        margin-left: 15px !important;
+    }
 
-	blockquote {
-		@apply px-2 my-4 border-l-4 border-gray-600;
-	}
+    blockquote {
+        @apply px-2 my-4 border-l-4 border-gray-600;
+    }
 }
