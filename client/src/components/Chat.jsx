@@ -322,6 +322,7 @@ const Chat = () => {
 
         if (inputRef.current) {
             inputRef.current.value = '';
+            setMessage('');
             inputRef.current.focus();
         }
 
