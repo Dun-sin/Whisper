@@ -27,16 +27,11 @@ import useChatUtils from 'src/lib/chat';
 import MessageStatus from './MessageStatus';
 import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
-import {
-    NEW_EVENT_DELETE_MESSAGE,
-    NEW_EVENT_EDIT_MESSAGE,
-    NEW_EVENT_RECEIVE_MESSAGE,
-    NEW_EVENT_TYPING,
-} from '../../../constants.json';
+import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE, NEW_EVENT_TYPING } from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 import { createClassesFromArray } from 'src/lib/utils';
 
-const inactiveTimeThreshold = 180000; // 3 mins delay
+const inactiveTimeThreshold = 180000 // 3 mins delay
 let senderId;
 let inactiveTimeOut;
 
@@ -47,19 +42,26 @@ const Chat = () => {
         isediting: false,
         messageID: null,
     });
-    const [isQuoteReply, setIsQuoteReply] = useState(false);
+    const [isQuoteReply, setIsQuoteReply] = useState(false)
     const [message, setMessage] = useState('');
-    const [quoteMessage, setQuoteMessage] = useState(null);
-    const { messages: state, addMessage, updateMessage, removeMessage, editText } = useChat();
+    const [quoteMessage, setQuoteMessage] = useState(null)
+    const {
+        messages: state,
+        addMessage,
+        updateMessage,
+        removeMessage,
+        editText,
+    } = useChat();
     const { authState, dispatchAuth } = useAuth();
-    const { logout } = useKindeAuth();
+    const { logout } = useKindeAuth()
     const socket = useContext(SocketContext);
 
     const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
 
     const inputRef = useRef('');
 
-    const [lastMessageTime, setLastMessageTime] = useState(null);
+    const [lastMessageTime, setLastMessageTime] = useState(null)
+
 
     senderId = authState.email ?? authState.loginId;
 
@@ -78,14 +80,14 @@ const Chat = () => {
     const md = new MarkdownIt({
         html: false,
         linkify: true,
-        typographer: true,
+        typographer: true
     });
 
     function logOut() {
         dispatchAuth({
-            type: 'LOGOUT',
-        });
-        logout();
+            type: 'LOGOUT'
+        })
+        logout()
     }
 
     const cancelEdit = () => {
@@ -96,13 +98,16 @@ const Chat = () => {
             .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
     };
 
+
     const sortedMessages = useMemo(
         () =>
-            Object.values(state[app.currentChatId]?.messages ?? {})?.sort((a, b) => {
-                const da = new Date(a.time),
-                    db = new Date(b.time);
-                return da - db;
-            }),
+            Object.values(state[app.currentChatId]?.messages ?? {})?.sort(
+                (a, b) => {
+                    const da = new Date(a.time),
+                        db = new Date(b.time);
+                    return da - db;
+                }
+            ),
         [state, app.currentChatId]
     );
 
@@ -144,11 +149,14 @@ const Chat = () => {
         );
     }
 
-    useEffect(() => {
-        console.log(currentReplyMessageId);
-    }, [currentReplyMessageId]);
-
-    const doSend = async ({ senderId, room, tmpId = uuid(), message, time, replyTo = null }) => {
+    const doSend = async ({
+        senderId,
+        room,
+        tmpId = uuid(),
+        message,
+        time,
+        replyTo = null
+    }) => {
         try {
             addMessage({
                 senderId,
@@ -157,7 +165,7 @@ const Chat = () => {
                 message,
                 time,
                 status: 'pending',
-                replyTo,
+                replyTo
             });
         } catch {
             logOut();
@@ -170,7 +178,7 @@ const Chat = () => {
                 message,
                 time,
                 chatId: room,
-                replyTo,
+                replyTo
             });
 
             try {
@@ -188,7 +196,7 @@ const Chat = () => {
                     message,
                     time,
                     status: 'failed',
-                    replyTo,
+                    replyTo
                 });
             } catch {
                 logOut();
@@ -206,7 +214,7 @@ const Chat = () => {
         }
 
         const messageObject = getMessage(id);
-        const { message } = messageObject;
+        const { message } = messageObject
 
         if (message.includes('Warning Message')) {
             return;
@@ -246,8 +254,8 @@ const Chat = () => {
             } else {
                 return (
                     <span className="text-black">
-                        ADMIN MESSAGE: The person you are chatting with is trying to send a bad
-                        word!
+                        ADMIN MESSAGE: The person you are chatting with is
+                        trying to send a bad word!
                     </span>
                 );
             }
@@ -260,23 +268,24 @@ const Chat = () => {
 
         socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
         const d = new Date();
-        let message = inputRef.current.value.trim(); // Trim the message to remove the extra spaces
+        let message = inputRef.current.value.trim();        // Trim the message to remove the extra spaces
 
         if (!isQuoteReply) {
             const cleanedText = message.replace(/>+/g, '');
-            message = cleanedText;
+            message = cleanedText
         }
 
         if (message === '' || senderId === undefined || senderId === '123456') {
             return;
         }
-
+        
         if (isQuoteReply && message.trim() === quoteMessage.trim()) {
             return;
         }
+        
 
-        setIsQuoteReply(false);
-        setQuoteMessage(null);
+        setIsQuoteReply(false)
+        setQuoteMessage(null)
 
         const splitMessage = message.split(' ');
         for (const word of splitMessage) {
@@ -307,7 +316,7 @@ const Chat = () => {
                 room: app.currentChatId,
                 message,
                 time: d.getTime(),
-                replyTo: currentReplyMessageId,
+                replyTo: currentReplyMessageId
             });
         }
 
@@ -329,12 +338,13 @@ const Chat = () => {
     // Use the useKeyPress hook to listen for "Ctrl + Enter" key press
     useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
 
+
     const handleResend = (id) => {
         if (!messageExists(id)) {
             return;
         }
 
-        const { senderId, room, message, time } = getMessage(id);
+        const { senderId, room, message, time, replyTo } = getMessage(id);
 
         doSend({
             senderId,
@@ -342,6 +352,7 @@ const Chat = () => {
             message,
             time,
             tmpId: id,
+            replyTo
         });
     };
 
@@ -371,19 +382,21 @@ const Chat = () => {
         
 `;
         inputRef.current.value = quotedMessage;
-        setIsQuoteReply(true);
-        setQuoteMessage(quotedMessage);
+        setIsQuoteReply(true)
+        setQuoteMessage(quotedMessage)
     };
 
     const adjustTextareaHeight = () => {
         if (inputRef.current) {
-            const minTextareaHeight = '45px';
-            const currentScrollHeight = inputRef.current.scrollHeight + 'px';
-
-            inputRef.current.style.height =
-                Math.max(parseInt(minTextareaHeight), parseInt(currentScrollHeight)) + 'px';
+          const minTextareaHeight = '45px';
+          const currentScrollHeight = inputRef.current.scrollHeight + 'px';
+          
+          inputRef.current.style.height = Math.max(
+            parseInt(minTextareaHeight),
+            parseInt(currentScrollHeight)
+          ) + 'px';
         }
-    };
+      };
 
     const handleTypingStatus = throttle((e) => {
         if (e.target.value.length > 0) {
@@ -411,11 +424,21 @@ const Chat = () => {
     };
 
     const renderIconButton = (props) => {
-        return <BiDotsVerticalRounded {...props} className="fill-white scale-[1.8]" />;
+        return (
+            <BiDotsVerticalRounded
+                {...props}
+                className="fill-white scale-[1.8]"
+            />
+        );
     };
 
     const renderIconButtonReceiver = (props) => {
-        return <BiDotsVerticalRounded {...props} className="fill-white scale-[1.8]" />;
+        return (
+            <BiDotsVerticalRounded
+                {...props}
+                className="fill-white scale-[1.8]"
+            />
+        );
     };
 
     // Clear chat when escape is pressed
@@ -439,9 +462,10 @@ const Chat = () => {
             try {
                 addMessage(message);
                 playNotification('newMessage');
-                createBrowserNotification('You received a new message on Whisper', message.message);
+                createBrowserNotification(
+                    'You received a new message on Whisper', message.message)
             } catch {
-                logOut();
+                logOut()
             }
         };
 
@@ -473,23 +497,21 @@ const Chat = () => {
         }
     };
 
-    useEffect(() => {
-        const newLastMessageTime = sortedMessages
-            .filter((message) => message.senderId !== senderId)
-            .pop()?.time;
-        if (newLastMessageTime !== lastMessageTime) {
+    useEffect(()=>{
+        const newLastMessageTime = sortedMessages.filter((message) => message.senderId !== senderId).pop()?.time;
+        if(newLastMessageTime !== lastMessageTime){
             setLastMessageTime(newLastMessageTime);
             clearTimeout(inactiveTimeOut);
-            inactiveTimeOut = setTimeout(checkPartnerResponse, inactiveTimeThreshold);
+            inactiveTimeOut = setTimeout(checkPartnerResponse,inactiveTimeThreshold);
         }
-    }, [sortedMessages]);
+    },[sortedMessages])
+
 
     return (
         <div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6">
             <div className="max-h-[67vh]">
                 <p className="text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center">
-                    Connected with a random User
-                    {sortedMessages.length === 0 && ', Be the first to send {"Hello"}'}
+                    Connected with a random User{sortedMessages.length === 0 && ', Be the first to send {"Hello"}'}
                 </p>
                 <ScrollToBottom
                     initialScrollBehavior="auto"
@@ -497,12 +519,16 @@ const Chat = () => {
                 >
                     {sortedMessages.map(
                         ({ senderId: sender, id, message, time, status, replyTo }) => {
-                            const resultOfWarningMessage = warningMessage(sender, message);
+                            const resultOfWarningMessage = warningMessage(
+                                sender,
+                                message
+                            );
                             !(resultOfWarningMessage === undefined) &&
                                 (message = resultOfWarningMessage);
                             const repliedMessage = replyTo
                                 ? state[app.currentChatId]?.messages?.[replyTo] ?? null
                                 : null;
+
 
                             return (
                                 <div
@@ -522,8 +548,7 @@ const Chat = () => {
                                         <div
                                             className={createClassesFromArray(
                                                 'max-w-[80%] md:max-w-[50%] min-w-[10px] flex gap-2 items-center',
-                                                sender.toString() === senderId.toString() &&
-                                                    'self-end',
+                                                sender.toString() === senderId.toString() && 'self-end',
                                                 repliedMessage && 'cursor-pointer'
                                             )}
                                             onClick={() => viewRepliedMessage(replyTo)}
@@ -563,55 +588,59 @@ const Chat = () => {
                                         </div>
                                     )}
                                     <div
-                                        className={createClassesFromArray(
-                                            'message-block w-full',
-                                            sender.toString() === senderId.toString()
-                                                ? 'me'
-                                                : 'other'
-                                        )}
+                                        className={`message-block ${sender.toString() ===
+                                            senderId.toString()
+                                            ? 'me'
+                                            : 'other'
+                                            }`}
                                     >
                                         <div className="message">
                                             <div
-                                                className={`content text ${
-                                                    sender.toString() === senderId.toString() &&
+                                                className={`content text ${sender.toString() ===
+                                                    senderId.toString() &&
                                                     'justify-between'
-                                                }`}
+                                                    }`}
                                             >
-                                                {typeof message === 'string' ? (
-                                                    <span
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: md.render(message),
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    message
-                                                )}
+                                                {typeof message === 'string' ? <span
+                                                    dangerouslySetInnerHTML={{ __html: md.render(message) }}
+                                                /> : message}
 
-                                                {sender.toString() === senderId.toString() &&
+                                                {sender.toString() ===
+                                                    senderId.toString() &&
                                                     status !== 'pending' && (
                                                         <Dropdown
                                                             placement="leftStart"
                                                             style={{
                                                                 zIndex: 'auto',
                                                             }}
-                                                            renderToggle={renderIconButton}
+                                                            renderToggle={
+                                                                renderIconButton
+                                                            }
                                                             NoCaret
                                                         >
                                                             <Dropdown.Item
-                                                                onClick={() => handleEdit(id)}
+                                                                onClick={() =>
+                                                                    handleEdit(id)
+                                                                }
                                                             >
                                                                 Edit
                                                             </Dropdown.Item>
 
                                                             <Dropdown.Item
                                                                 onClick={() =>
-                                                                    handleCopyToClipBoard(id)
+                                                                    handleCopyToClipBoard(
+                                                                        id
+                                                                    )
                                                                 }
                                                             >
                                                                 Copy
                                                             </Dropdown.Item>
                                                             <Dropdown.Item
-                                                                onClick={() => handleQuoteReply(id)}
+                                                                onClick={() =>
+                                                                    handleQuoteReply(
+                                                                        id
+                                                                    )
+                                                                }
                                                             >
                                                                 Quote Reply
                                                             </Dropdown.Item>
@@ -621,31 +650,42 @@ const Chat = () => {
                                                                 Reply
                                                             </Dropdown.Item>
                                                             <Dropdown.Item
-                                                                onClick={() => handleDelete(id)}
+                                                                onClick={() =>
+                                                                    handleDelete(id)
+                                                                }
                                                             >
                                                                 Delete
                                                             </Dropdown.Item>
                                                         </Dropdown>
                                                     )}
-                                                {sender.toString() !== senderId.toString() &&
+                                                {sender.toString() !==
+                                                    senderId.toString() &&
                                                     status !== 'pending' && (
                                                         <Dropdown
                                                             placement="rightStart"
                                                             style={{
                                                                 zIndex: 'auto',
                                                             }}
-                                                            renderToggle={renderIconButtonReceiver}
+                                                            renderToggle={
+                                                                renderIconButtonReceiver
+                                                            }
                                                             NoCaret
                                                         >
                                                             <Dropdown.Item
                                                                 onClick={() =>
-                                                                    handleCopyToClipBoard(id)
+                                                                    handleCopyToClipBoard(
+                                                                        id
+                                                                    )
                                                                 }
                                                             >
                                                                 Copy
                                                             </Dropdown.Item>
                                                             <Dropdown.Item
-                                                                onClick={() => handleQuoteReply(id)}
+                                                                onClick={() =>
+                                                                    handleQuoteReply(
+                                                                        id
+                                                                    )
+                                                                }
                                                             >
                                                                 Quote Reply
                                                             </Dropdown.Item>
@@ -658,19 +698,21 @@ const Chat = () => {
                                                     )}
                                             </div>
                                             <div
-                                                className={`status ${
-                                                    status === 'failed'
-                                                        ? 'text-red-600'
-                                                        : 'text-white'
-                                                }`}
+                                                className={`status ${status === 'failed'
+                                                    ? 'text-red-600'
+                                                    : 'text-white'
+                                                    }`}
                                             >
                                                 <MessageStatus
                                                     time={getTime(time)}
                                                     status={status ?? 'sent'}
                                                     iAmTheSender={
-                                                        sender.toString() === senderId.toString()
+                                                        sender.toString() ===
+                                                        senderId.toString()
                                                     }
-                                                    onResend={() => handleResend(id)}
+                                                    onResend={() =>
+                                                        handleResend(id)
+                                                    }
                                                 />
                                             </div>
                                         </div>
@@ -679,6 +721,7 @@ const Chat = () => {
                             );
                         }
                     )}
+
                 </ScrollToBottom>
             </div>
             <form
