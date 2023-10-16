@@ -18,3 +18,17 @@ export function isExplicitDisconnection(reason) {
 
     return explicitReasons.includes(reason);
 }
+
+/**
+ * Sets ui color scheme to system specific color theme
+ * @returns {boolean} Returns true if the system default is set to dark mode.
+ */
+export function defaultThemeBasedOnSystemPreference() {
+    const darkTheme = window.matchMedia("(prefers-color-scheme: dark)");
+    if (darkTheme.matches) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
