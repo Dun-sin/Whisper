@@ -76,10 +76,10 @@ const Searching = () => {
                                     width="18"
                                     className='mr-1.5'
                                 />
-                                <Form.ControlLabel className='text-white text-base font-normal'>MODE</Form.ControlLabel>
+                                <Form.ControlLabel className='text-white text-base font-normal'>THEME</Form.ControlLabel>
                             </div>
                             <Form.HelpText className='text-zinc-600 text-xs text-white'>
-                                {darkMode ? 'Dark' : 'Light' } mode
+                                {darkMode ? 'Dark' : 'Light' } theme
                             </Form.HelpText>
                         </div>
                         <div className='flex items-center'>
