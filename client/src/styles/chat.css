@@ -53,7 +53,8 @@
     }
 
     .content--reply * {
-        @apply m-0 p-0;
+        margin: 0px;
+        padding: 0px;
     }
 
     .message-block .message .status {
