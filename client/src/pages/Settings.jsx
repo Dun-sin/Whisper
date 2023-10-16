@@ -87,7 +87,7 @@ const Searching = () => {
                                 className='flex justify-end items-center'
                                 name="theme"
                                 accepter={Toggle}
-																checked={settings.theme}
+																checked={settings.theme ?? true}
         												onChange={setDarkMode}
 																value={!settings.theme}
                                 checkedChildren={
