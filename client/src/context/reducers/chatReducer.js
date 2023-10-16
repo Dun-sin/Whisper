@@ -28,7 +28,12 @@ export default function chatReducer(state, action) {
         }
 
         case 'CREATE_CHAT': {
-            const { chatId, userIds, messages = {}, createdAt = new Date() } = action.payload;
+            const {
+                chatId,
+                userIds,
+                messages = {},
+                createdAt = new Date(),
+            } = action.payload;
 
             clonedState[chatId] = {
                 userIds,
@@ -53,7 +58,8 @@ export default function chatReducer(state, action) {
         }
 
         case 'ADD_MESSAGE': {
-            const { senderId, room, id, message, time, status, replyTo } = action.payload;
+            const { senderId, room, id, message, time, status, replyTo = null } =
+                action.payload;
 
             if (!clonedState[room]) {
                 throw new Error('Room not found!');
@@ -66,7 +72,7 @@ export default function chatReducer(state, action) {
                 message,
                 time,
                 status,
-                replyTo,
+                replyTo
             };
             break;
         }
