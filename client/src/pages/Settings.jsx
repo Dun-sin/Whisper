@@ -45,7 +45,6 @@ const Searching = () => {
 	const handleChange = (newSettings) => {
 		updateTmpSettings(newSettings);
 	};
-	console.log(settings.theme);
 	return (
 		<div className="flex justify-center items-center flex-col min-w-[calc(100%-120px)] p-2 gap-5 bg-light dark:bg-primary min-h-full">
 			<div className="w-[35%] min-w-[300px] h-[85%] bg-primary bg-opacity-30 rounded-3xl px-14 py-20 border border-slate-800">
