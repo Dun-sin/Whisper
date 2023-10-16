@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import PropTypes from "prop-types"
+import { defaultThemeBasedOnSystemPreference } from "../lib/utils"
 
 const DarkModeContext = createContext()
 
@@ -8,7 +9,7 @@ export function useDarkMode() {
 }
 
 export function DarkModeProvider({ children }) {
-    const defaultMode = JSON.parse(window.localStorage.getItem("darkMode"));
+    const defaultMode = defaultThemeBasedOnSystemPreference();
     const [darkMode, setDarkMode] = useState(defaultMode !== null ? defaultMode : true);
 
     useEffect(() => {
