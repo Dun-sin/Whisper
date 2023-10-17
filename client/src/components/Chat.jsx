@@ -275,9 +275,10 @@ const Chat = () => {
         }
 
         if (inputRef.current) {
-            inputRef.current.value = '';
-            inputRef.current.focus();
-        }
+					inputRef.current.value = ''; 
+					setMessage(''); 
+					inputRef.current.focus();
+				}
     };
 
     // Define a new function to handle "Ctrl + Enter" key press
