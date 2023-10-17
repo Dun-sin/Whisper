@@ -3,8 +3,6 @@ import { useEffect, useRef, useContext, useMemo, useState } from 'react';
 import { SocketContext } from 'context/Context';
 import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
 
-import 'styles/chat.css';
-
 import ScrollToBottom from 'react-scroll-to-bottom';
 import Dropdown from 'rsuite/Dropdown';
 import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
@@ -485,17 +483,21 @@ const Chat = () => {
                             return (
                                 <div
                                     key={id}
-                                    className={`message-block ${sender.toString() ===
+                                    className={`w-full flex text-white ${sender.toString() ===
                                         senderId.toString()
-                                        ? 'me'
-                                        : 'other'
+                                        ? 'justify-end'
+                                        : 'justify-start'
                                         }`}
                                 >
-                                    <div className="message">
+                                    <div className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${sender.toString() ===
+                                        senderId.toString()
+                                        ? 'items-end'
+                                        : 'items-start'
+                                        }`}>
                                         <div
-                                            className={`content text ${sender.toString() ===
-                                                senderId.toString() &&
-                                                'justify-between'
+                                            className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${sender.toString() ===
+                                                senderId.toString() ?
+                                                'justify-between bg-secondary rounded-l-md' : 'rounded-r-md'
                                                 }`}
                                         >
                                             {typeof message === 'string' ? <span
@@ -585,7 +587,7 @@ const Chat = () => {
                                                 )}
                                         </div>
                                         <div
-                                            className={`status ${status === 'failed'
+                                            className={`px-[10px] text-[12px] flex gap-2 items-center ${status === 'failed'
                                                 ? 'text-red-600'
                                                 : 'text-white'
                                                 }`}
