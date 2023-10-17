@@ -171,7 +171,7 @@ const Searching = () => {
 					</Form.Group>
 					<Divider className="border border-gray-500 my-2 sm:my-4 md:my-7"></Divider>
 					<Form.Group>
-						<Animation.Bounce in={hasUnsavedSettings}>
+						{hasUnsavedSettings && <Animation.Bounce in={hasUnsavedSettings}>
 							<div className="w-[100%] flex justify-end mb-3.5 text-xs items-center">
 								<Icon
 									className="text-highlight"
@@ -183,7 +183,7 @@ const Searching = () => {
 									Warning: You have unsaved settings
 								</p>
 							</div>
-						</Animation.Bounce>
+						</Animation.Bounce>}
 						<ButtonToolbar className="flex md:justify-end justify-center">
 							<Animation.Fade in={hasUnsavedSettings}>
 								<Button
