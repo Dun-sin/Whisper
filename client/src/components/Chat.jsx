@@ -624,6 +624,7 @@ const Chat = () => {
                     />
                     <EmojiPicker
                         onEmojiPick={setMessage}
+                        focusInput={() => inputRef.current.focus()}
                     />
                     {editing.isediting && (
                         <ImCancelCircle

@@ -4,31 +4,35 @@ import { MdOutlineEmojiEmotions } from "react-icons/md";
 import { useDarkMode } from 'src/context/DarkModeContext';
 import PropTypes from 'prop-types';
 
-export default function EmojiPicker({onEmojiPick}){
+export default function EmojiPicker({onEmojiPick, focusInput}){
     const { darkMode } = useDarkMode();
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
-    const hndleEmojiClick = (emoji) => {
-        onEmojiPick(prev => prev + emoji.emoji);
+    
+    const onClosePicker = () => {
         setShowEmojiPicker(false);
+        focusInput();
     };
-
-  return (
-    <>
-        <MdOutlineEmojiEmotions
-            onClick={()=>setShowEmojiPicker(!showEmojiPicker)}
-            className="fill-white mr-5 scale-[1.3] cursor-pointer"
-        />
-        {showEmojiPicker && <>
-            <div 
-                aria-hidden
-                className='fixed inset-0 z-10'
-                onClick={() => setShowEmojiPicker(false)}
+    
+    const hndleEmojiClick = (emojiData) => {
+        onEmojiPick(prev => prev + emojiData.emoji);
+        onClosePicker();
+    };
+    
+    return (
+        <>
+            <MdOutlineEmojiEmotions
+                onClick={() => setShowEmojiPicker(true)}
+                className="fill-white mr-5 scale-[1.3] cursor-pointer"
             />
-            <div
-                className='absolute bottom-[calc(100%+16px)] left-0 right-0 z-20 flex justify-end'
-            >
-                <div className='w-[min(100%,350px)]'>
+            {showEmojiPicker && <>
+                <div 
+                    aria-hidden
+                    className='fixed inset-0 z-10'
+                    onClick={onClosePicker}
+                />
+                <div
+                    className='absolute bottom-[calc(100%+16px)] right-0 z-20 w-[min(100%,350px)]'
+                >
                     <ReactEmojiPicker
                         width='100%'
                         theme={darkMode ? 'dark' : 'light'}
@@ -38,12 +42,12 @@ export default function EmojiPicker({onEmojiPick}){
                         searchDisabled
                     />
                 </div>
-            </div>
-        </>}
-    </>
-  )
+            </>}
+        </>
+    )
 }
 
 EmojiPicker.propTypes = {
     onEmojiPick: PropTypes.func,
+    focusInput: PropTypes.func,
 };
