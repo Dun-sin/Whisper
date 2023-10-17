@@ -177,7 +177,6 @@ const Searching = () => {
                                 <p className="dark:text-highlight text-red text-lg">Warning: You have unsaved settings</p>
                             </div>
                         </Animation.Bounce>}
-
                         <ButtonToolbar className="flex justify-end">
                             <Animation.Fade in={hasUnsavedSettings}>
                                 <Button
