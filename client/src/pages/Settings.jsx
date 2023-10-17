@@ -127,7 +127,7 @@ const Searching = () => {
 									NOTIFICATION
 								</Form.ControlLabel>
 							</div>
-							<Form.HelpText className="text-zinc-600 text-xs">
+							<Form.HelpText className="text-zinc-600 text-xs text-white">
 								Enable/Disable notifications
 							</Form.HelpText>
 						</div>
