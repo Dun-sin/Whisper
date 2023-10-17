@@ -233,11 +233,11 @@ const Chat = () => {
         if (message === '' || senderId === undefined || senderId === '123456') {
             return;
         }
-        
+
         if (isQuoteReply && message.trim() === quoteMessage.trim()) {
             return;
         }
-        
+
 
         setIsQuoteReply(false)
         setQuoteMessage(null)
@@ -275,10 +275,10 @@ const Chat = () => {
         }
 
         if (inputRef.current) {
-					inputRef.current.value = ''; 
-					setMessage(''); 
-					inputRef.current.focus();
-				}
+            inputRef.current.value = '';
+            setMessage('');
+            inputRef.current.focus();
+        }
     };
 
     // Define a new function to handle "Ctrl + Enter" key press
@@ -340,15 +340,15 @@ const Chat = () => {
 
     const adjustTextareaHeight = () => {
         if (inputRef.current) {
-          const minTextareaHeight = '45px';
-          const currentScrollHeight = inputRef.current.scrollHeight + 'px';
-          
-          inputRef.current.style.height = Math.max(
-            parseInt(minTextareaHeight),
-            parseInt(currentScrollHeight)
-          ) + 'px';
+            const minTextareaHeight = '45px';
+            const currentScrollHeight = inputRef.current.scrollHeight + 'px';
+
+            inputRef.current.style.height = Math.max(
+                parseInt(minTextareaHeight),
+                parseInt(currentScrollHeight)
+            ) + 'px';
         }
-      };
+    };
 
     const handleTypingStatus = throttle((e) => {
         if (e.target.value.length > 0) {
@@ -449,14 +449,14 @@ const Chat = () => {
         }
     };
 
-    useEffect(()=>{
+    useEffect(() => {
         const newLastMessageTime = sortedMessages.filter((message) => message.senderId !== senderId).pop()?.time;
-        if(newLastMessageTime !== lastMessageTime){
+        if (newLastMessageTime !== lastMessageTime) {
             setLastMessageTime(newLastMessageTime);
             clearTimeout(inactiveTimeOut);
-            inactiveTimeOut = setTimeout(checkPartnerResponse,inactiveTimeThreshold);
+            inactiveTimeOut = setTimeout(checkPartnerResponse, inactiveTimeThreshold);
         }
-    },[sortedMessages])
+    }, [sortedMessages])
 
 
     return (
@@ -617,13 +617,16 @@ const Chat = () => {
                 onSubmit={handleSubmit}
             >
                 <div className="w-full flex items-center justify-between bg-secondary rounded-l-md max-h-[150px] relative">
-                    <textarea
-                        placeholder="Send a Message....."
-                        className="h-[45px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] py-[10px] text-[18px] placeholder-shown:align-middle min-h-[40px] max-h-[100px] overflow-y-scroll"
-                        ref={inputRef}
-                        value={message}
-                        onChange={handleTypingStatus}
-                    />
+                    <div className='w-full'>
+                        <textarea
+                            placeholder="Send a Message....."
+                            className="h-[45px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] py-[10px] text-[18px] placeholder-shown:align-middle min-h-[40px] max-h-[100px] overflow-y-scroll"
+                            ref={inputRef}
+                            value={message}
+                            onChange={handleTypingStatus}
+                        />
+                        <p className='pl-6 pb-1' >Click Ctrl + Enter to Send</p>
+                    </div>
                     <EmojiPicker
                         onEmojiPick={setMessage}
                         focusInput={() => inputRef.current.focus()}
