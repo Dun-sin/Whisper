@@ -12,7 +12,7 @@ import { socket, SocketContext } from 'context/Context';
 import { DialogProvider } from './context/DialogContext';
 
 import 'rsuite/dist/rsuite.min.css';
-import 'styles/index.css';
+import './index.css';
 import { DarkModeProvider } from './context/DarkModeContext';
 
 
