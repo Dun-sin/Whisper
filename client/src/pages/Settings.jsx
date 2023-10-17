@@ -78,7 +78,7 @@ const Searching = () => {
 									MODE
 								</Form.ControlLabel>
 							</div>
-							<Form.HelpText className="text-zinc-600 text-xs">
+							<Form.HelpText className="text-zinc-600 text-xs text-white">
 								{darkMode ? 'Dark' : 'Light'} mode
 							</Form.HelpText>
 						</div>
