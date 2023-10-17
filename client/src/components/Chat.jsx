@@ -11,7 +11,6 @@ import { ImCancelCircle } from 'react-icons/im';
 import { IoSend } from 'react-icons/io5';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
 
-import { v4 as uuid } from 'uuid';
 import { throttle } from 'lodash';
 import MarkdownIt from 'markdown-it';
 
@@ -25,6 +24,9 @@ import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
 import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE, NEW_EVENT_TYPING } from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
+import { logOut, getMessage, cancelEdit, handleResend,
+    doSend, handleDelete, handleEdit, handleQuoteReply,
+     handleCopyToClipBoard, checkPartnerResponse} from './ChatHelper';
 
 const inactiveTimeThreshold = 180000 // 3 mins delay
 let senderId;
@@ -60,39 +62,11 @@ const Chat = () => {
 
     senderId = authState.email ?? authState.loginId;
 
-    const getMessage = (id) => {
-        if (!state[app.currentChatId]) {
-            return null;
-        }
-
-        return state[app.currentChatId].messages[id];
-    };
-
-    const messageExists = (id) => {
-        return Boolean(getMessage(id));
-    };
-
     const md = new MarkdownIt({
         html: false,
         linkify: true,
         typographer: true
     });
-
-    function logOut() {
-        dispatchAuth({
-            type: 'LOGOUT'
-        })
-        logout()
-    }
-
-    const cancelEdit = () => {
-        inputRef.current.value = '';
-        setEditing({ isediting: false, messageID: null });
-        socket
-            .timeout(10000)
-            .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
-    };
-
 
     const sortedMessages = useMemo(
         () =>
@@ -105,95 +79,6 @@ const Chat = () => {
             ),
         [state, app.currentChatId]
     );
-
-    const doSend = async ({
-        senderId,
-        room,
-        tmpId = uuid(),
-        message,
-        time,
-    }) => {
-        try {
-            addMessage({
-                senderId,
-                room,
-                id: tmpId,
-                message,
-                time,
-                status: 'pending',
-            });
-        } catch {
-            logOut();
-            return false;
-        }
-
-        try {
-            const sentMessage = await sendMessage({
-                senderId,
-                message,
-                time,
-                chatId: room,
-            });
-
-            try {
-                updateMessage(tmpId, sentMessage);
-            } catch {
-                logOut();
-                return false;
-            }
-        } catch (e) {
-            try {
-                updateMessage(tmpId, {
-                    senderId,
-                    room,
-                    id: tmpId,
-                    message,
-                    time,
-                    status: 'failed',
-                });
-            } catch {
-                logOut();
-            }
-
-            return false;
-        }
-
-        return true;
-    };
-
-    const handleDelete = async (id) => {
-        if (!messageExists(id)) {
-            return;
-        }
-
-        const messageObject = getMessage(id);
-        const { message } = messageObject
-
-        if (message.includes('Warning Message')) {
-            return;
-        }
-
-        updateMessage(id, {
-            ...messageObject,
-            status: 'pending',
-        });
-
-        try {
-            const messageDeleted = await deleteMessage({
-                id,
-                chatId: messageObject.room,
-            });
-
-            if (!messageDeleted) {
-                updateMessage(id, messageObject);
-                return;
-            }
-
-            removeMessage(id, messageObject.room);
-        } catch {
-            updateMessage(id, messageObject);
-        }
-    };
 
     const warningMessage = (sender, message) => {
         // TODO: Instrad of replacing the message we should add some kind of increment for the users to decide to see the message or not
@@ -256,7 +141,7 @@ const Chat = () => {
                     newMessage: message,
                 });
                 editText(editing.messageID, app.currentChatId, message);
-                const messageObject = getMessage(editing.messageID);
+                const messageObject = getMessage(state, app.currentChatId, editing.messageID);
                 updateMessage(editing.messageID, messageObject);
             } catch {
                 setEditing({ isediting: false, messageID: null });
@@ -269,7 +154,7 @@ const Chat = () => {
                 room: app.currentChatId,
                 message,
                 time: d.getTime(),
-            });
+            }, addMessage, dispatchAuth, logout, sendMessage, updateMessage);
         }
 
         if (inputRef.current) {
@@ -288,53 +173,6 @@ const Chat = () => {
 
     // Use the useKeyPress hook to listen for "Ctrl + Enter" key press
     useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
-
-
-    const handleResend = (id) => {
-        if (!messageExists(id)) {
-            return;
-        }
-
-        const { senderId, room, message, time } = getMessage(id);
-
-        doSend({
-            senderId,
-            room,
-            message,
-            time,
-            tmpId: id,
-        });
-    };
-
-    const handleEdit = (id) => {
-        inputRef.current.focus();
-        const { message } = getMessage(id);
-
-        if (message.includes('Warning Message')) {
-            cancelEdit();
-            return;
-        }
-        inputRef.current.value = message;
-
-        setEditing({ isediting: true, messageID: id });
-    };
-
-    const handleQuoteReply = (id) => {
-        inputRef.current.focus();
-
-        const { message } = getMessage(id);
-        if (message.includes('Warning Message')) {
-            cancelEdit();
-            return;
-        }
-
-        const quotedMessage = `> ${message}
-        
-`;
-        inputRef.current.value = quotedMessage;
-        setIsQuoteReply(true)
-        setQuoteMessage(quotedMessage)
-    };
 
     const adjustTextareaHeight = () => {
         if (inputRef.current) {
@@ -358,17 +196,6 @@ const Chat = () => {
         adjustTextareaHeight();
     }, 500);
 
-    const handleCopyToClipBoard = async (id) => {
-        const { message } = getMessage(id);
-        if (message.includes('Warning Message')) {
-            return;
-        }
-        if ('clipboard' in navigator) {
-            return await navigator.clipboard.writeText(message);
-        } else {
-            return document.execCommand('copy', true, message);
-        }
-    };
     const getTime = (time) => {
         return new Date(time).toLocaleTimeString();
     };
@@ -396,7 +223,7 @@ const Chat = () => {
         const keyDownHandler = (event) => {
             if (event.key === 'Escape' && editing.isediting) {
                 event.preventDefault();
-                cancelEdit();
+                cancelEdit(inputRef, setEditing, socket, app.currentChatId);
             }
         };
 
@@ -415,7 +242,7 @@ const Chat = () => {
                 createBrowserNotification(
                     'You received a new message on Whisper', message.message)
             } catch {
-                logOut()
+                logOut(dispatchAuth, logout)
             }
         };
 
@@ -439,20 +266,14 @@ const Chat = () => {
         };
     }, []);
 
-    const checkPartnerResponse = () => {
-        const currentTime = new Date().getTime();
-        const isInactive = lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold;
-        if (isInactive) {
-            createBrowserNotification("your partner isn't responding, want to leave?");
-        }
-    };
-
     useEffect(()=>{
         const newLastMessageTime = sortedMessages.filter((message) => message.senderId !== senderId).pop()?.time;
         if(newLastMessageTime !== lastMessageTime){
             setLastMessageTime(newLastMessageTime);
             clearTimeout(inactiveTimeOut);
-            inactiveTimeOut = setTimeout(checkPartnerResponse,inactiveTimeThreshold);
+            inactiveTimeOut = setTimeout(() => {
+                checkPartnerResponse(lastMessageTime, inactiveTimeThreshold, createBrowserNotification)
+            },inactiveTimeThreshold);
         }
     },[sortedMessages])
 
@@ -517,7 +338,7 @@ const Chat = () => {
                                                     >
                                                         <Dropdown.Item
                                                             onClick={() =>
-                                                                handleEdit(id)
+                                                                handleEdit(id, inputRef, state, app.currentChatId, setEditing, socket)
                                                             }
                                                         >
                                                             Edit
@@ -526,7 +347,7 @@ const Chat = () => {
                                                         <Dropdown.Item
                                                             onClick={() =>
                                                                 handleCopyToClipBoard(
-                                                                    id
+                                                                    id, state, app.currentChatId
                                                                 )
                                                             }
                                                         >
@@ -535,7 +356,7 @@ const Chat = () => {
                                                         <Dropdown.Item
                                                             onClick={() =>
                                                                 handleQuoteReply(
-                                                                    id
+                                                                    id, inputRef, state, app.currentChatId, setIsQuoteReply, setQuoteMessage, setEditing, socket
                                                                 )
                                                             }
                                                         >
@@ -543,7 +364,7 @@ const Chat = () => {
                                                         </Dropdown.Item>
                                                         <Dropdown.Item
                                                             onClick={() =>
-                                                                handleDelete(id)
+                                                                handleDelete(state, app.currentChatId, id, updateMessage, deleteMessage, removeMessage)
                                                             }
                                                         >
                                                             Delete
@@ -566,7 +387,7 @@ const Chat = () => {
                                                         <Dropdown.Item
                                                             onClick={() =>
                                                                 handleCopyToClipBoard(
-                                                                    id
+                                                                    id, state, app.currentChatId
                                                                 )
                                                             }
                                                         >
@@ -575,7 +396,7 @@ const Chat = () => {
                                                         <Dropdown.Item
                                                             onClick={() =>
                                                                 handleQuoteReply(
-                                                                    id
+                                                                    id, inputRef, state, app.currentChatId, setIsQuoteReply, setQuoteMessage, setEditing, socket
                                                                 )
                                                             }
                                                         >
@@ -598,7 +419,8 @@ const Chat = () => {
                                                     senderId.toString()
                                                 }
                                                 onResend={() =>
-                                                    handleResend(id)
+                                                    handleResend(state, app.currentChatId, id,
+                                                        addMessage, dispatchAuth, logout, sendMessage, updateMessage)
                                                 }
                                             />
                                         </div>
@@ -624,7 +446,7 @@ const Chat = () => {
                     />
                     {editing.isediting && (
                         <ImCancelCircle
-                            onClick={cancelEdit}
+                            onClick={() => cancelEdit(inputRef, setEditing, socket, app.currentChatId)}
                             className="fill-white mr-5 scale-[1.3] cursor-pointer"
                         />
                     )}
