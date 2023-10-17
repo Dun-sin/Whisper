@@ -156,7 +156,7 @@ const Searching = () => {
 								VOLUME LEVEL
 							</Form.ControlLabel>
 						</div>
-						<Form.HelpText className="text-zinc-600 text-xs mb-4">
+						<Form.HelpText className="text-zinc-600 text-xs mb-4 text-white">
 							Set the volume level for all your notifications
 						</Form.HelpText>
 						<Form.Control
