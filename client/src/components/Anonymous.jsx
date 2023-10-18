@@ -119,7 +119,7 @@ const Anonymous = ({ onChatClosed }) => {
     };
 
     useKeyPress(['x'], () => handleClose(), ShortcutFlags.ctrl | ShortcutFlags.shift);
-    useKeyPress(['n'], () => handleClose(true), ShortcutFlags.ctrl);
+    useKeyPress(['n'], () => handleClose(true), ShortcutFlags.ctrl | ShortcutFlags.alt);
 
     useEffect(() => {
         const newMessageEvents = [
