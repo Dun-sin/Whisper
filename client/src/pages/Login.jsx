@@ -10,15 +10,15 @@ const Login = () => {
 
 
     function loginAnonymously() {
-         dispatchAuth({
-             type: 'LOGIN',
-             payload: {
-                 loginType: 'anonymous',
-                 loginId: userID,
-                 email: null,
-             },
-         });
-     }
+        dispatchAuth({
+            type: 'LOGIN',
+            payload: {
+                loginType: 'anonymous',
+                loginId: userID,
+                email: null,
+            },
+        });
+    }
 
     return (
         <div
