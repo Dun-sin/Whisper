@@ -209,12 +209,19 @@ const Anonymous = ({ onChatClosed }) => {
                     noCaret
                 >
                     <Dropdown.Item onClick={() => handleClose()}>
-                        Close Chat
+                        <div className="flex items-center space-between">
+                        <p>Close Chat</p>
+                        <p className="text-gray-500 text-xs pl-2">Ctrl + Shift + X</p>
+                        </div>
                     </Dropdown.Item>
 
                     <Dropdown.Item onClick={() => handleClose(true)}>
-                        Find a new buddy
+                        <div className="flex items-center space-between">
+                        <p>Find a new buddy</p>
+                        <p className="text-gray-500 text-xs pl-2">Ctrl + Alt + N</p>
+                        </div>
                     </Dropdown.Item>
+
                 </Dropdown>
             </div>
             <div
