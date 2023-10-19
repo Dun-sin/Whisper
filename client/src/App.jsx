@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-
+import { useEffect } from 'react';
 import { KindeProvider } from "@kinde-oss/kinde-auth-react"
 
 // Store
@@ -24,10 +24,19 @@ import Profile from './pages/Profile';
 
 import { useDarkMode } from './context/DarkModeContext';
 
+
 function App() {
     const { isLoggedIn, dispatchAuth } = useAuth();
     const { loadUserSettings } = useApp();
-    
+
+    useEffect(()=>{
+
+        function handleOnBeforeUnload(event){
+            event.preventDefault();
+            return(event.returnValue='');
+        };
+        window.addEventListener('beforeunload',handleOnBeforeUnload,{capture: true})
+    })
     const { darkMode } = useDarkMode();
 
     async function loginWithEmail(email) {
