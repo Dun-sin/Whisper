@@ -120,6 +120,7 @@ const BuddyMatcher = () => {
                 return;
             }
 
+            createBrowserNotification('Chat Closed', 'This chat is closed! Would you like to search for a new buddy?');
             startNewSearch();
         });
 
