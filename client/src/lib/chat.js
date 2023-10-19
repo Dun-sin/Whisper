@@ -2,84 +2,82 @@
  * @typedef {import('socket.io-client').Socket} Socket
  */
 
-import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_SEND_MESSAGE } from '../../../constants.json';
+import {
+	NEW_EVENT_DELETE_MESSAGE,
+	NEW_EVENT_EDIT_MESSAGE,
+	NEW_EVENT_SEND_MESSAGE,
+} from '../../../constants.json';
 
 /**
  *
  * @param {Socket} socket
  */
 export default function useChatUtils(socket) {
-    function sendMessage(message) {
-        return new Promise((resolve, reject) => {
-            if (!socket.connected) {
-                reject(null);
-                return;
-            }
+	function sendMessage(message) {
+		return new Promise((resolve, reject) => {
+			if (!socket.connected) {
+				reject(null);
+				return;
+			}
 
-            socket
-                .timeout(30000)
-                .emit(NEW_EVENT_SEND_MESSAGE, message, (err, sentMessage) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-
-                    resolve(sentMessage);
-                });
-        });
-    }
-
-    function deleteMessage({ id, chatId }) {
-        return new Promise((resolve, reject) => {
-            if (!socket.connected) {
-                reject(null);
-                return;
-            }
-
-            socket
-                .timeout(30000)
-                .emit(
-                    NEW_EVENT_DELETE_MESSAGE,
-                    { id, chatId },
-                    (err, messageDeleted) => {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
-
-                        resolve(messageDeleted);
-                    }
-                );
-        });
-    }
-
-    function editMessage({ id, chatId, newMessage, oldMessage, isEdited }) {
-			return new Promise((resolve, reject) => {
-				if (!socket.connected) {
-					reject(null);
+			socket.timeout(30000).emit(NEW_EVENT_SEND_MESSAGE, message, (err, sentMessage) => {
+				if (err) {
+					reject(err);
 					return;
 				}
 
-				socket
-					.timeout(30000)
-					.emit(
-						NEW_EVENT_EDIT_MESSAGE,
-						{ id, chatId, newMessage, oldMessage, isEdited },
-						(err, messageEdited) => {
-							if (err) {
-								reject(err);
-								return;
-							}
-
-							resolve(messageEdited);
-						}
-					);
+				resolve(sentMessage);
 			});
-		}
+		});
+	}
 
-    return {
-        sendMessage,
-        deleteMessage,
-        editMessage,
-    };
+	function deleteMessage({ id, chatId }) {
+		return new Promise((resolve, reject) => {
+			if (!socket.connected) {
+				reject(null);
+				return;
+			}
+
+			socket
+				.timeout(30000)
+				.emit(NEW_EVENT_DELETE_MESSAGE, { id, chatId }, (err, messageDeleted) => {
+					if (err) {
+						reject(err);
+						return;
+					}
+
+					resolve(messageDeleted);
+				});
+		});
+	}
+
+	function editMessage({ id, chatId, newMessage, oldMessage, isEdited }) {
+		return new Promise((resolve, reject) => {
+			if (!socket.connected) {
+				reject(null);
+				return;
+			}
+
+			socket
+				.timeout(30000)
+				.emit(
+					NEW_EVENT_EDIT_MESSAGE,
+					{ id, chatId, newMessage, oldMessage, isEdited },
+					(err, messageEdited) => {
+						if (err) {
+							reject(err);
+							return;
+						}
+
+						resolve(messageEdited);
+					}
+				);
+		});
+	}
+
+	return {
+		sendMessage,
+		deleteMessage,
+		editMessage,
+	};
 }

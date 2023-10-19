@@ -6,7 +6,7 @@ import { flattenDeep, uniq } from 'lodash';
  * @returns
  */
 export function createClassesFromArray(...classes) {
-    return uniq(flattenDeep(classes)).filter(Boolean).join(' ');
+	return uniq(flattenDeep(classes)).filter(Boolean).join(' ');
 }
 
 /**
@@ -14,7 +14,7 @@ export function createClassesFromArray(...classes) {
  * @param {string} reason Reason for socket disconnection
  */
 export function isExplicitDisconnection(reason) {
-    const explicitReasons = ['io server disconnect', 'io client disconnect'];
+	const explicitReasons = ['io server disconnect', 'io client disconnect'];
 
-    return explicitReasons.includes(reason);
+	return explicitReasons.includes(reason);
 }
