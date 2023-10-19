@@ -59,6 +59,7 @@ const Chat = () => {
 
     const [lastMessageTime, setLastMessageTime] = useState(null)
 
+    const [focusTextArea, setFocusTextArea] = useState(false)
 
     senderId = authState.email ?? authState.loginId;
 
@@ -351,7 +352,7 @@ const Chat = () => {
       };
 
     const handleTypingStatus = throttle((e) => {
-        if (e.target.value.length > 0) {
+if (e.target.value.length > 0) {
             socket
                 .timeout(5000)
                 .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
@@ -618,11 +619,13 @@ const Chat = () => {
             >
                 <div className="w-full flex items-center justify-between bg-secondary rounded-l-md max-h-[150px] relative">
                     <textarea
-                        placeholder="Send a Message....."
+                       placeholder={focusTextArea ? 'Press Ctrl + Enter to send message':'Type a message...'}
                         className="h-[45px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] py-[10px] text-[18px] placeholder-shown:align-middle min-h-[40px] max-h-[100px] overflow-y-scroll"
                         ref={inputRef}
                         value={message}
                         onChange={handleTypingStatus}
+                        onFocus={() => setFocusTextArea(true)}
+                        onBlur={() => setFocusTextArea(false)}
                     />
                     <EmojiPicker
                         onEmojiPick={setMessage}
