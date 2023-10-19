@@ -289,7 +289,7 @@ async function removeMessage(chatId, messageId) {
 	return true;
 }
 
-async function editMessage(chatId, { id, message }) {
+async function editMessage(chatId, { id, message, oldMessage }) {
 	if (!chats[chatId]) {
 		return false;
 	}
@@ -299,9 +299,21 @@ async function editMessage(chatId, { id, message }) {
 	}
 
 	try {
-		await Message.updateOne({ _id: id }, { $set: { message } });
+		await Message.findOneAndUpdate(
+			{ _id: id },
+			{
+				$set: { message, isEdited: true },
+				$push: { oldMessages: oldMessage },
+			},
+			{ new: true },
+		);
 
 		chats[chatId].messages[id].message = message;
+		chats[chatId].messages[id].isEdited = true;
+		if (!Array.isArray(chats[chatId].messages[id].oldMessages)) {
+			chats[chatId].messages[id].oldMessages = [];
+		}
+		chats[chatId].messages[id].oldMessages.push(oldMessage);
 	} catch {
 		return false;
 	}
