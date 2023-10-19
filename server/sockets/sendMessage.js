@@ -1,5 +1,9 @@
-const { NEW_EVENT_SEND_MESSAGE, NEW_EVENT_SEND_FAILED, NEW_EVENT_RECEIVE_MESSAGE } = require("../../constants.json");
-const { addMessage, getActiveUser } = require("../utils/lib");
+const {
+  NEW_EVENT_SEND_MESSAGE,
+  NEW_EVENT_SEND_FAILED,
+  NEW_EVENT_RECEIVE_MESSAGE,
+} = require('../../constants.json');
+const { addMessage, getActiveUser } = require('../utils/lib');
 
 module.exports = (socket) => {
   socket.on(
@@ -19,8 +23,8 @@ module.exports = (socket) => {
       if (!user) {
         socket.emit(NEW_EVENT_SEND_FAILED, {
           message:
-            "Hmmm. It seems your login session has expired. " +
-            "Re-login and try again",
+            'Hmmm. It seems your login session has expired. ' +
+            'Re-login and try again',
         });
 
         return;
@@ -33,18 +37,20 @@ module.exports = (socket) => {
         message,
         time,
         senderId,
-        type: "message",
+        type: 'message',
       });
 
       const messageDetails = {
         ...sentMessage,
         room: chatId,
-        status: "sent",
+        status: 'sent',
       };
 
       returnMessageToSender(messageDetails);
 
-      socket.broadcast.to(chatId).emit(NEW_EVENT_RECEIVE_MESSAGE, messageDetails);
+      socket.broadcast
+        .to(chatId)
+        .emit(NEW_EVENT_RECEIVE_MESSAGE, messageDetails);
     }
   );
 };

@@ -28,14 +28,6 @@
 		"no-unreachable": "warn",
 		"no-unreachable-loop": "warn",
 		"block-scoped-var": "error",
-		"capitalized-comments": [
-			"error",
-			"always",
-			{
-				"ignoreInlineComments": true,
-				"ignoreConsecutiveComments": true
-			}
-		],
 		"class-methods-use-this": [
 			"error",
 			{
@@ -105,7 +97,6 @@
 		"react/jsx-uses-react": "error",
 		"react/react-in-jsx-scope": "off",
 		"react/jsx-boolean-value": "error",
-		"react/jsx-fragments": ["warn", "syntax"],
-		"spaced-comment": "error"
+		"react/jsx-fragments": ["warn", "syntax"]
 	}
 }
