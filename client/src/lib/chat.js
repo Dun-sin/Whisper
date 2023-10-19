@@ -53,29 +53,29 @@ export default function useChatUtils(socket) {
         });
     }
 
-    function editMessage({ id, chatId, newMessage }) {
-        return new Promise((resolve, reject) => {
-            if (!socket.connected) {
-                reject(null);
-                return;
-            }
+    function editMessage({ id, chatId, newMessage, oldMessage, isEdited }) {
+			return new Promise((resolve, reject) => {
+				if (!socket.connected) {
+					reject(null);
+					return;
+				}
 
-            socket
-                .timeout(30000)
-                .emit(
-                    NEW_EVENT_EDIT_MESSAGE,
-                    { id, chatId, newMessage },
-                    (err, messageEdited) => {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
+				socket
+					.timeout(30000)
+					.emit(
+						NEW_EVENT_EDIT_MESSAGE,
+						{ id, chatId, newMessage, oldMessage, isEdited },
+						(err, messageEdited) => {
+							if (err) {
+								reject(err);
+								return;
+							}
 
-                        resolve(messageEdited);
-                    }
-                );
-        });
-    }
+							resolve(messageEdited);
+						}
+					);
+			});
+		}
 
     return {
         sendMessage,

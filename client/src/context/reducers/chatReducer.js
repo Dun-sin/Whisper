@@ -77,18 +77,29 @@ export default function chatReducer(state, action) {
         }
 
         case 'UPDATE_MESSAGE': {
-            const { id, message } = action.payload;
+            const { id, message, isEdited } = action.payload;
 
-            if (!clonedState[message.room]) {
-                throw new Error('Room not found!');
-            }
+						if (!clonedState[message.room]) {
+							throw new Error('Room not found!');
+						}
 
-            if (id !== message.id) {
-                delete clonedState[message.room].messages[id];
-            }
+						if (id !== message.id) {
+							delete clonedState[message.room].messages[id];
+						}
 
-            clonedState[message.room].messages[message.id] = message;
-            break;
+						const room = message.room;
+						const messageId = message.id;
+						const updatedMessage = message;
+
+				// Assign the message to the cloned state
+				clonedState[room].messages[messageId] = updatedMessage;
+
+				// Update the 'isEdited' property
+				if (isEdited === undefined || isEdited === null) {
+					break
+				}
+				clonedState[room].messages[messageId].isEdited = isEdited;
+				break;
         }
 
         case 'REMOVE_MESSAGE': {
@@ -103,12 +114,17 @@ export default function chatReducer(state, action) {
         }
 
         case 'EDIT_TEXT': {
-            const { id, room, newText } = action.payload;
+            const { id, room, newText, oldMessage } = action.payload;
             if (!clonedState[room]) {
                 break;
             }
 
             clonedState[room].messages[id].message = newText;
+				clonedState[room].messages[id].isEdited = true;
+				if (!Array.isArray(clonedState[room].messages[id].oldMessages)) {
+					clonedState[room].messages[id].oldMessages = [];
+				}
+				clonedState[room].messages[id].oldMessages.push(oldMessage);
             break;
         }
         default:

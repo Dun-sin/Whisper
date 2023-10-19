@@ -9,7 +9,8 @@ import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 
 import { ImCancelCircle } from 'react-icons/im';
 import { IoSend } from 'react-icons/io5';
-import { BiDotsVerticalRounded } from 'react-icons/bi';
+import { AiFillCaretDown } from 'react-icons/ai'
+import { BiDotsVerticalRounded, BiSolidEditAlt } from 'react-icons/bi';
 
 import { v4 as uuid } from 'uuid';
 import { throttle } from 'lodash';
@@ -42,6 +43,8 @@ const Chat = () => {
     const [isQuoteReply, setIsQuoteReply] = useState(false)
     const [message, setMessage] = useState('');
     const [quoteMessage, setQuoteMessage] = useState(null)
+	const [openPreviousMessages, setOpenPreviousMessages] = useState(null)
+
     const {
         messages: state,
         addMessage,
@@ -251,20 +254,23 @@ const Chat = () => {
         }
 
         if (editing.isediting === true) {
-            try {
-                await editMessage({
-                    id: editing.messageID,
-                    chatId: app.currentChatId,
-                    newMessage: message,
-                });
-                editText(editing.messageID, app.currentChatId, message);
-                const messageObject = getMessage(editing.messageID);
-                updateMessage(editing.messageID, messageObject);
-            } catch {
-                setEditing({ isediting: false, messageID: null });
-                return;
-            }
-            setEditing({ isediting: false, messageID: null });
+					try {
+						const oldMessage = getMessage(editing.messageID).message
+						await editMessage({
+							id: editing.messageID,
+							chatId: app.currentChatId,
+							newMessage: message,
+							oldMessage,
+						});
+						editText(editing.messageID, app.currentChatId, message, oldMessage);
+						const messageObject = getMessage(editing.messageID);
+
+						updateMessage(editing.messageID, messageObject, true);
+					} catch {
+						setEditing({ isediting: false, messageID: null });
+						return;
+					}
+					setEditing({ isediting: false, messageID: null });
         } else {
             doSend({
                 senderId,
@@ -425,9 +431,9 @@ const Chat = () => {
             removeMessage(id, chatId);
         };
 
-        const editMessageHandler = ({ id, chatId, newMessage }) => {
-            editText(id, chatId, newMessage);
-        };
+			const editMessageHandler = ({ id, chatId, newMessage, oldMessage }) => {
+				editText(id, chatId, newMessage, oldMessage);
+			};
 
         // This is used to recive message form other user.
         socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
@@ -449,6 +455,14 @@ const Chat = () => {
         }
     };
 
+	const openPreviousEdit = (messageId) => {
+		if (openPreviousMessages === messageId) {
+			setOpenPreviousMessages(null);
+		} else {
+			setOpenPreviousMessages(messageId);
+		}
+	};
+
     useEffect(()=>{
         const newLastMessageTime = sortedMessages.filter((message) => message.senderId !== senderId).pop()?.time;
         if(newLastMessageTime !== lastMessageTime){
@@ -467,10 +481,10 @@ const Chat = () => {
                 </p>
                 <ScrollToBottom
                     initialScrollBehavior="auto"
-                    className="h-[100%] max-h-[70vh] md:max-h-full overflow-y-scroll w-full scroll-smooth"
+						className="h-[100%] md:max-h-full overflow-y-scroll w-full scroll-smooth"
                 >
                     {sortedMessages.map(
-                        ({ senderId: sender, id, message, time, status }) => {
+											({ senderId: sender, id, message, time, status, isEdited, oldMessages }) => {
                             const resultOfWarningMessage = warningMessage(
                                 sender,
                                 message
@@ -483,7 +497,7 @@ const Chat = () => {
                             return (
                                 <div
                                     key={id}
-                                    className={`w-full flex text-white ${sender.toString() ===
+																className={`w-full flex text-white relative ${sender.toString() ===
                                         senderId.toString()
                                         ? 'justify-end'
                                         : 'justify-start'
@@ -585,26 +599,56 @@ const Chat = () => {
                                                         </Dropdown.Item>
                                                     </Dropdown>
                                                 )}
-                                        </div>
-                                        <div
-                                            className={`px-[10px] text-[12px] flex gap-2 items-center ${status === 'failed'
-                                                ? 'text-red-600'
-                                                : 'text-white'
-                                                }`}
-                                        >
-                                            <MessageStatus
-                                                time={getTime(time)}
-                                                status={status ?? 'sent'}
-                                                iAmTheSender={
-                                                    sender.toString() ===
-                                                    senderId.toString()
-                                                }
-                                                onResend={() =>
-                                                    handleResend(id)
-                                                }
-                                            />
-                                        </div>
-                                    </div>
+																	</div>
+																	<div className={`flex gap-2 items-center ${sender.toString() ===
+																		senderId.toString()
+																		? 'flex-row'
+																		: 'flex-row-reverse'
+																		}`}>
+																		<div
+																			className={`text-[12px] ${status === 'failed'
+																				? 'text-red-600'
+																				: 'text-white'
+																				}`}
+																		>
+																			<MessageStatus
+																				time={getTime(time)}
+																				status={status ?? 'sent'}
+																				iAmTheSender={
+																					sender.toString() ===
+																					senderId.toString()
+																				}
+																				onResend={() =>
+																					handleResend(id)
+																				}
+																			/>
+
+																		</div>
+																		<div>
+																			{isEdited && <div className={`cursor-pointer flex items-center gap ${sender.toString() ===
+																				senderId.toString()
+																				? 'flex-row'
+																				: 'flex-row-reverse'
+																				}`} onClick={() => openPreviousEdit(id)}>
+																				<BiSolidEditAlt className="fill-white scale-110" />
+																				<AiFillCaretDown className="fill-white scale-75" />
+																			</div>}
+																			{(isEdited && (openPreviousMessages === id)) &&
+																				(<div className={`absolute ${sender.toString() ===
+																					senderId.toString()
+																					? 'right-10'
+																					: 'left-10'
+																					} top-12 bg-highlight px-4 py-2 gap flex flex-col rounded-md w-[100px]`}>
+																					<p className='text-center font-bold underline text-lg'>Old</p>
+																					<div className='flex flex-col'>
+																						{(oldMessages !== undefined && Array.isArray(oldMessages)) && oldMessages.map((message, index) => (
+																							<span key={index} className='text-base'>{message}</span>
+																						))}
+																					</div>
+																				</div>)}
+																		</div>
+																	</div>
+																</div>
                                 </div>
                             );
                         }
