@@ -582,16 +582,16 @@ const Chat = () => {
                                                             }
                                                         >
                                                             Quote Reply
-                                                            <Dropdown.Item
-                                                                onClick={() => 
-                                                                    console.log(
-                                                                        'blocking'
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    Block
                                                         </Dropdown.Item>
-                                                        </Dropdown.Item>
+                                                        <Dropdown.Item
+                                                             onClick={() => 
+                                                                console.log(
+                                                                    'blocking'
+                                                                    )
+                                                                }
+                                                            >
+                                                        Block
+                                                    </Dropdown.Item>
                                                     </Dropdown>
                                                 )}
                                         </div>
