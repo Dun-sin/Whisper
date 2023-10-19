@@ -22,7 +22,7 @@ const Login = () => {
 
     return (
         <div
-            className={`bg-light dark:bg-primary h-[100dvh] w-[100vw] text-primary dark:text-white flex`}
+            className={`bg-light dark:bg-primary h-[100vh] w-[100vw] text-primary dark:text-white flex`}
         >
 					<div className='h-full w-full max-w-[1750px] flex'>
 						<div className='flex items-center justify-center flex-col sm:w-2/4 w-full gap-4 px-4'>
