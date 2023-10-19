@@ -583,6 +583,15 @@ const Chat = () => {
                                                         >
                                                             Quote Reply
                                                         </Dropdown.Item>
+                                                        <Dropdown.Item
+                                                            onClick={() => 
+                                                                console.log(
+                                                                    'blocking'
+                                                                )
+                                                            }
+                                                        >
+                                                            Block
+                                                        </Dropdown.Item>
                                                     </Dropdown>
                                                 )}
                                         </div>
