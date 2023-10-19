@@ -11,29 +11,29 @@ const mongoose = require('mongoose');
 
 const { Server } = require('socket.io');
 const io = new Server(server, {
-	cors: { origin: '*' },
-	reconnectionAttempts: 5,
+  cors: { origin: '*' },
+  reconnectionAttempts: 5,
 });
 const { init } = require('./utils/lib');
 
 mongoose.set('strictQuery', false);
 mongoose
-	.connect(process.env.MongoDB_URL, {
-		useNewUrlParser: true,
-		useUnifiedTopology: true,
-	})
-	.then(() => {
-		init()
-			.then((done) => {
-				console.log('sorted the search');
-			})
-			.catch((error) => {
-				console.log(error);
-			});
+  .connect(process.env.MongoDB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    init()
+      .then((done) => {
+        console.log('sorted the search');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
-		console.log(`connected to mongodb`);
-	})
-	.catch((e) => console.error(e));
+    console.log(`connected to mongodb`);
+  })
+  .catch((e) => console.error(e));
 
 const UserRouter = require('./controllers/userController');
 
@@ -53,20 +53,20 @@ app.use(UserRouter);
 
 // triggers when a user is connected to a socket
 io.on('connection', (socket) => {
-	/**
-	 * This event is emitted once the user clicks on the Start button or
-	 * navigates to the /founduser route
-	 */
-	JoinHandler(io, socket);
-	SendMessageHandler(socket);
-	EditMessageHandler(socket);
-	DeleteMessageHandler(socket);
-	TypingHandler(socket);
-	LogOutHandler(io, socket);
-	CloseChatHandler(socket);
-	stopSearch(socket);
+  /**
+   * This event is emitted once the user clicks on the Start button or
+   * navigates to the /founduser route
+   */
+  JoinHandler(io, socket);
+  SendMessageHandler(socket);
+  EditMessageHandler(socket);
+  DeleteMessageHandler(socket);
+  TypingHandler(socket);
+  LogOutHandler(io, socket);
+  CloseChatHandler(socket);
+  stopSearch(socket);
 });
 
 server.listen(HTTP_PORT, async () => {
-	console.log(`connected to port ${HTTP_PORT}`);
+  console.log(`connected to port ${HTTP_PORT}`);
 });
