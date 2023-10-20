@@ -12,6 +12,11 @@ const MessageSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    containsBadword: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
     oldMessages: {
       type: Array,
     },
@@ -36,6 +41,9 @@ const MessageSchema = new Schema(
             time: this.createdAt.getTime(),
             type: this.type,
             senderId: '',
+            isEdited: this.isEdited,
+            containsBadword: this.containsBadword,
+            oldMessages: this.oldMessages,
           };
         },
       },

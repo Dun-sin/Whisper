@@ -292,7 +292,7 @@ function chatExists(chatId) {
  */
 async function addMessage(
   chatId,
-  { message, time, senderId, type = 'message' }
+  { message, time, senderId, type = 'message', containsBadword }
 ) {
   const sender = getActiveUser(senderId);
 
@@ -311,6 +311,7 @@ async function addMessage(
         sender: new mongoose.Types.ObjectId(sender.id),
         type,
         createdAt: new Date(time),
+        containsBadword,
       })
     ).optimizedVersion,
     senderId,
