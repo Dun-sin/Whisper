@@ -152,7 +152,7 @@ const Profile = () => {
 						</div>
 					</section>
 					<button
-						className="border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-primary text-primary hover:bg-primary hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-primary"
+						className="border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-green-500 text-green-500 hover:bg-green-500 hover:text-white dark:border-green-500 dark:text-green-500 dark:hover:bg-green-500 dark:hover:text-white"
 						onClick={handleUpdateProfile}
 					>
 						Save changes
