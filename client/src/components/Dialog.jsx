@@ -50,7 +50,7 @@ const Dialog = ({ ...rest }) => {
 
 				<div className="flex justify-end gap-2 mt-6">
 					<button
-						className="hover:opacity-80 text-white px-4 py-2 rounded-lg bg-gray-100 dark:bg-primary text-primary dark:text-white"
+						className="hover:opacity-80 text-white px-4 py-2 rounded-lg bg-gray-500 dark:bg-primary text-primary dark:text-white"
 						onClick={handleNoClick}
 					>
 						{noBtnText || 'Cancel'}
