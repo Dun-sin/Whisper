@@ -1,7 +1,13 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { NEW_EVENT_CLOSE, NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_DISPLAY, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE } from '../../../constants.json'
+import {
+	NEW_EVENT_CLOSE,
+	NEW_EVENT_DELETE_MESSAGE,
+	NEW_EVENT_DISPLAY,
+	NEW_EVENT_EDIT_MESSAGE,
+	NEW_EVENT_RECEIVE_MESSAGE,
+} from '../../../constants.json';
 // Rsuite
 import { Dropdown, IconButton, Tooltip, Whisper } from 'rsuite';
 import { Icon } from '@rsuite/icons';
@@ -242,5 +248,5 @@ const Anonymous = ({ onChatClosed }) => {
 export default Anonymous;
 
 Anonymous.propTypes = {
-    onChatClosed: PropTypes.func,
+	onChatClosed: PropTypes.func,
 };

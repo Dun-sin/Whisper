@@ -4,72 +4,59 @@ import PropTypes from 'prop-types';
 import authReducer, { initialState } from './reducers/authReducer';
 
 const AuthContext = createContext({
-    ...initialState,
+	...initialState,
 });
 
 export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within a ContentProvider');
-    }
-    return context;
+	const context = useContext(AuthContext);
+	if (!context) {
+		throw new Error('useAuth must be used within a ContentProvider');
+	}
+	return context;
 };
 
 const initializeAuthState = (defaultState) => {
-    try {
-        const persistedState = JSON.parse(localStorage.getItem('auth'));
+	try {
+		const persistedState = JSON.parse(localStorage.getItem('auth'));
 
-        if (!persistedState) {
-            return defaultState;
-        }
+		if (!persistedState) {
+			return defaultState;
+		}
 
-        /**
-         * TODO: Validate loginId to be a valid uuid using the uuid
-         *       library from npm
-         */
-        if (
-            !persistedState.loginId &&
-            persistedState.isLoggedIn === true
-        ) {
-            // User is trying to hack app by manipulating localStorage
-            throw new Error('Gotcha! :D');
-        }
+		/**
+		 * TODO: Validate loginId to be a valid uuid using the uuid
+		 *       library from npm
+		 */
+		if (!persistedState.loginId && persistedState.isLoggedIn === true) {
+			// User is trying to hack app by manipulating localStorage
+			throw new Error('Gotcha! :D');
+		}
 
-        return persistedState;
-    } catch {
-        return defaultState;
-    }
-}
+		return persistedState;
+	} catch {
+		return defaultState;
+	}
+};
 
 export const AuthProvider = ({ children }) => {
-    const [authState, dispatchAuth] = useReducer(
-        authReducer,
-        initialState,
-        initializeAuthState
-    );
+	const [authState, dispatchAuth] = useReducer(authReducer, initialState, initializeAuthState);
 
-    const isLoggedIn = useMemo(() => {
-        return authState.isLoggedIn && authState.loginId !== null;
-    }, [authState.isLoggedIn, authState.loginId]);
+	const isLoggedIn = useMemo(() => {
+		return authState.isLoggedIn && authState.loginId !== null;
+	}, [authState.isLoggedIn, authState.loginId]);
 
-    const contextValue = {
-        authState, dispatchAuth, isLoggedIn
-    }
+	const contextValue = {
+		authState,
+		dispatchAuth,
+		isLoggedIn,
+	};
 
-    return (
-        <AuthContext.Provider
-            value={contextValue}
-        >
-            {children}
-        </AuthContext.Provider>
-    );
+	return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
-
 
 AuthProvider.propTypes = {
-    children: PropTypes.node.isRequired,
+	children: PropTypes.node.isRequired,
 };
-
 
 /**
  * Changed the state from a boolean type to an object. This helps improve

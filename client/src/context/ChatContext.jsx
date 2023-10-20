@@ -19,123 +19,117 @@ import chatReducer from './reducers/chatReducer';
 const initialState = {};
 
 const ChatContext = createContext({
-    ...initialState,
-    deleteMessage: () => undefined,
-    addMessage: () => undefined,
-    updateMessage: () => undefined,
-    createChat: () => undefined,
-    removeMessage: () => undefined,
-    closeChat: () => undefined,
+	...initialState,
+	deleteMessage: () => undefined,
+	addMessage: () => undefined,
+	updateMessage: () => undefined,
+	createChat: () => undefined,
+	removeMessage: () => undefined,
+	closeChat: () => undefined,
 });
 
 export const useChat = () => {
-    return useContext(ChatContext);
+	return useContext(ChatContext);
 };
 
 export const ChatProvider = ({ children }) => {
-    const [state, dispatch] = useReducer(
-        chatReducer,
-        initialState,
-        (defaultState) => {
-            try {
-                const persistedState = JSON.parse(
-                    localStorage.getItem('chats')
-                );
+	const [state, dispatch] = useReducer(chatReducer, initialState, (defaultState) => {
+		try {
+			const persistedState = JSON.parse(localStorage.getItem('chats'));
 
-                if (!persistedState) {
-                    return defaultState;
-                }
+			if (!persistedState) {
+				return defaultState;
+			}
 
-                return persistedState;
-            } catch {
-                return defaultState;
-            }
-        }
-    );
+			return persistedState;
+		} catch {
+			return defaultState;
+		}
+	});
 
-    /**
-     *
-     * @param {Message} message
-     */
-    function addMessage(message) {
-        dispatch({
-            type: 'ADD_MESSAGE',
-            payload: message,
-        });
-    }
+	/**
+	 *
+	 * @param {Message} message
+	 */
+	function addMessage(message) {
+		dispatch({
+			type: 'ADD_MESSAGE',
+			payload: message,
+		});
+	}
 
-    /**
-     * @param {string} id
-     * @param {Message} message
-     */
-    function updateMessage(id, message) {
-        dispatch({
-            type: 'UPDATE_MESSAGE',
-            payload: { id, message },
-        });
-    }
+	/**
+	 * @param {string} id
+	 * @param {Message} message
+	 */
+	function updateMessage(id, message, isEdited) {
+		dispatch({
+			type: 'UPDATE_MESSAGE',
+			payload: { id, message, isEdited },
+		});
+	}
 
-    /**
-     *
-     * @param {string} chatId
-     * @param {string[]} userIds
-     * @param {{[key: string]: Message}} messages
-     * @param { string | number | Date } createdAt
-     */
-    function createChat(chatId, userIds, messages, createdAt) {
-        dispatch({
-            type: 'CREATE_CHAT',
-            payload: { chatId, userIds, messages, createdAt },
-        });
-    }
+	/**
+	 *
+	 * @param {string} chatId
+	 * @param {string[]} userIds
+	 * @param {{[key: string]: Message}} messages
+	 * @param { string | number | Date } createdAt
+	 */
+	function createChat(chatId, userIds, messages, createdAt) {
+		dispatch({
+			type: 'CREATE_CHAT',
+			payload: { chatId, userIds, messages, createdAt },
+		});
+	}
 
-    function removeMessage(id, chatId) {
-        dispatch({
-            type: 'REMOVE_MESSAGE',
-            payload: { id, room: chatId },
-        });
-    }
+	function removeMessage(id, chatId) {
+		dispatch({
+			type: 'REMOVE_MESSAGE',
+			payload: { id, room: chatId },
+		});
+	}
 
-    function editText(id, chatId, newText) {
-        dispatch({
-            type: 'EDIT_TEXT',
-            payload: { id, room: chatId, newText }
-        })
-    }
+	function editText(id, chatId, newText, oldMessage) {
+		dispatch({
+			type: 'EDIT_TEXT',
+			payload: { id, room: chatId, newText, oldMessage },
+		});
+	}
 
-    function closeChat(chatId) {
-        dispatch({
-            type: 'CLOSE_CHAT',
-            payload: { chatId },
-        });
-    }
+	function closeChat(chatId) {
+		dispatch({
+			type: 'CLOSE_CHAT',
+			payload: { chatId },
+		});
+	}
 
-    function closeAllChats() {
-        dispatch({
-            type: 'CLOSE_ALL_CHATS',
-            payload: {},
-        });
-    }
+	function closeAllChats() {
+		dispatch({
+			type: 'CLOSE_ALL_CHATS',
+			payload: {},
+		});
+	}
 
-    return (
-        <ChatContext.Provider
-            value={{
-                messages: state,
-                addMessage,
-                updateMessage,
-                createChat,
-                removeMessage,
-                editText,
-                closeChat,
-                closeAllChats,
-            }}
-        >
-            {children}
-        </ChatContext.Provider>
-    );
+	return (
+		<ChatContext.Provider
+			value={{
+				messages: state,
+				addMessage,
+				updateMessage,
+				createChat,
+				removeMessage,
+				editText,
+				closeChat,
+				closeAllChats,
+			}}
+		>
+			{children}
+		</ChatContext.Provider>
+	);
 };
 
 // Eslint forced me to do this :(
 ChatProvider.propTypes = {
-    children: PropTypes.node.isRequired,
+	children: PropTypes.node.isRequired,
 };

@@ -1,15 +1,9 @@
 /* eslint-disable max-len */
 import { useEffect, useRef, useContext, useMemo, useState } from 'react';
 import { SocketContext } from 'context/Context';
-import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
 
 import ScrollToBottom from 'react-scroll-to-bottom';
-import Dropdown from 'rsuite/Dropdown';
 import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
-
-import { ImCancelCircle } from 'react-icons/im';
-import { IoSend } from 'react-icons/io5';
-import { BiDotsVerticalRounded } from 'react-icons/bi';
 
 import { v4 as uuid } from 'uuid';
 import { throttle } from 'lodash';
@@ -19,16 +13,31 @@ import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';
 import { useApp } from 'src/context/AppContext';
 
-import useChatUtils from 'src/lib/chat';
+import useChatUtils from 'src/lib/chatSocket';
 import MessageStatus from './MessageStatus';
 import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
-import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE, NEW_EVENT_TYPING } from '../../../constants.json';
+import {
+	NEW_EVENT_DELETE_MESSAGE,
+	NEW_EVENT_EDIT_MESSAGE,
+	NEW_EVENT_RECEIVE_MESSAGE,
+	NEW_EVENT_TYPING,
+} from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 
-import EmojiPicker from './EmojiPicker';
+import chatHelper,
+{
+	adjustTextareaHeight,
+	checkPartnerResponse,
+	getTime
+} from '../lib/chatHelper';
 
-const inactiveTimeThreshold = 180000 // 3 mins delay
+import MessageInput from './Chat/MessageInput';
+import DropDownOptions from './Chat/DropDownOption';
+import PreviousMessages from './Chat/PreviousMessages';
+
+
+const inactiveTimeThreshold = 180000; // 3 mins delay
 let senderId;
 let inactiveTimeOut;
 
