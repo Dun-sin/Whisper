@@ -121,6 +121,7 @@ const BuddyMatcher = () => {
 				return;
 			}
 
+			createBrowserNotification('Chat Closed', 'Your buddy left the chat');
 			startNewSearch();
 		});
 
