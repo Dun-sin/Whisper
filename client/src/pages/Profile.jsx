@@ -7,6 +7,8 @@ import { useAuth } from 'context/AuthContext';
 
 import { api } from 'src/lib/axios';
 import { createClassesFromArray } from 'src/lib/utils';
+import { useNavigate } from 'react-router-dom';
+
 
 const Profile = () => {
 	const [username, setUsername] = useState('Anonymous');
@@ -14,6 +16,7 @@ const Profile = () => {
 
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
+	const navigate = useNavigate();
 
 	const aboutRef = useRef(null);
 	const genderRef = useRef(null);
@@ -96,7 +99,73 @@ const Profile = () => {
 			)}
 		>
 			{JSON.parse(localStorage.getItem('auth')).loginType === 'anonymous' ? (
-				<h1 className="text-2xl font-bold">Please Create an Account</h1>
+				<>
+					<label onClick={logOut} className='text-primary text-md rounded-xl border-red text-red'>
+						You login anonymously. Please login to edit your profile.
+					</label>
+					<section className="min-w-[300px] max-w-[400px] w-[40%] px-10 py-8 rounded-2xl flex flex-col justify-center items-center bg-clip-padding backdrop-filter backdrop-blur-2xl bg-gray-100 dark:bg-opacity-5 dark:bg-gray-300">
+						<HiUserCircle className="text-highlight h-20 w-20" />
+
+						<text className="outline-none bg-transparent w-fit text-center text-2xl placeholder:text-2xl placeholder:text-white">
+							Anonymous
+						</text>
+
+						<div className="w-full flex flex-col gap-4">
+							<textarea
+								disabled="true"
+								className="bg-clip-padding backdrop-filter backdrop-blur-2xl bg-opacity-5 border border-primary dark:border-white text-secondary dark:text-white my-2 bg-transparent outline-none tracking-wider resize-none indent-2 p-2 rounded-xl h-28 w-full placeholder:tracking-widest placeholder:text-center"
+								placeholder="Please login to write about you!"
+								ref={aboutRef}
+							/>
+							<section className="text-lg">
+								<div className="border-b-2 border-gray-700 pb-2 flex justify-between tracking-wide items-center">
+									<label className="text-primary dark:text-white" htmlFor="gender">
+										Gender
+									</label>
+									<select
+										id="genderSelect"
+										ref={genderRef}
+										className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 bg-transparent dark:bg-gray-700 border-gray-600 placeholder-gray-400 text-primary dark:text-white"
+										defaultValue="Unknown"
+										disabled="true"
+									>
+										<option value="Unknown">Unknown</option>
+									</select>
+								</div>
+								<div className="flex justify-between tracking-wide items-center">
+									<label className="text-primary dark:text-white" htmlFor="age">
+										Age
+									</label>
+									<input
+										disabled="true"
+										type="number"
+										placeholder="19"
+										className="outline-none bg-transparent text-right"
+										ref={ageRef}
+										min="1"
+										onChange={(e) => {
+											if (e.target.value < 1) {
+												e.target.value = '1';
+											}
+										}}
+									/>
+								</div>
+							</section>
+						</div>
+					</section>
+					<button
+						className="border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-primary text-primary hover:bg-primary hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-primary"
+						onClick={logOut}
+					>
+						Login
+					</button>
+					<button
+						className="border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-highlight text-highlight hover:bg-highlight hover:text-white"
+						onClick={()=>navigate("/")}
+					>
+						Search For Someone
+					</button>
+				</>
 			) : (
 				<>
 					<section className="min-w-[300px] max-w-[400px] w-[40%] px-10 py-8 rounded-2xl flex flex-col justify-center items-center bg-clip-padding backdrop-filter backdrop-blur-2xl bg-gray-100 dark:bg-opacity-5 dark:bg-gray-300">
