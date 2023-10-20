@@ -9,7 +9,8 @@ import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 
 import { ImCancelCircle } from 'react-icons/im';
 import { IoSend } from 'react-icons/io5';
-import { BiDotsVerticalRounded } from 'react-icons/bi';
+import { AiFillCaretDown } from 'react-icons/ai';
+import { BiDotsVerticalRounded, BiSolidEditAlt } from 'react-icons/bi';
 
 import { v4 as uuid } from 'uuid';
 import { throttle } from 'lodash';
@@ -23,627 +24,584 @@ import useChatUtils from 'src/lib/chat';
 import MessageStatus from './MessageStatus';
 import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
-import { NEW_EVENT_DELETE_MESSAGE, NEW_EVENT_EDIT_MESSAGE, NEW_EVENT_RECEIVE_MESSAGE, NEW_EVENT_TYPING } from '../../../constants.json';
+import {
+	NEW_EVENT_DELETE_MESSAGE,
+	NEW_EVENT_EDIT_MESSAGE,
+	NEW_EVENT_RECEIVE_MESSAGE,
+	NEW_EVENT_TYPING,
+} from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 
 import EmojiPicker from './EmojiPicker';
 
-const inactiveTimeThreshold = 180000 // 3 mins delay
+const inactiveTimeThreshold = 180000; // 3 mins delay
 let senderId;
 let inactiveTimeOut;
 
 const Chat = () => {
-    const { app } = useApp();
-    const { playNotification } = useNotification();
-    const [editing, setEditing] = useState({
-        isediting: false,
-        messageID: null,
-    });
-    const [isQuoteReply, setIsQuoteReply] = useState(false)
-    const [message, setMessage] = useState('');
-    const [quoteMessage, setQuoteMessage] = useState(null)
-    const {
-        messages: state,
-        addMessage,
-        updateMessage,
-        removeMessage,
-        editText,
-    } = useChat();
-    const { authState, dispatchAuth } = useAuth();
-    const { logout } = useKindeAuth()
-    const socket = useContext(SocketContext);
+	const { app } = useApp();
+	const { playNotification } = useNotification();
+	const [editing, setEditing] = useState({
+		isediting: false,
+		messageID: null,
+	});
+	const [isQuoteReply, setIsQuoteReply] = useState(false);
+	const [message, setMessage] = useState('');
+	const [quoteMessage, setQuoteMessage] = useState(null);
+	const [openPreviousMessages, setOpenPreviousMessages] = useState(null);
 
-    const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
+	const { messages: state, addMessage, updateMessage, removeMessage, editText } = useChat();
+	const { authState, dispatchAuth } = useAuth();
+	const { logout } = useKindeAuth();
+	const socket = useContext(SocketContext);
 
-    const inputRef = useRef('');
+	const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
 
-    const [lastMessageTime, setLastMessageTime] = useState(null)
+	const inputRef = useRef('');
 
+	const [lastMessageTime, setLastMessageTime] = useState(null);
 
-    senderId = authState.email ?? authState.loginId;
+	senderId = authState.email ?? authState.loginId;
 
-    const getMessage = (id) => {
-        if (!state[app.currentChatId]) {
-            return null;
-        }
+	const getMessage = (id) => {
+		if (!state[app.currentChatId]) {
+			return null;
+		}
 
-        return state[app.currentChatId].messages[id];
-    };
+		return state[app.currentChatId].messages[id];
+	};
 
-    const messageExists = (id) => {
-        return Boolean(getMessage(id));
-    };
+	const messageExists = (id) => {
+		return Boolean(getMessage(id));
+	};
 
-    const md = new MarkdownIt({
-        html: false,
-        linkify: true,
-        typographer: true
-    });
+	const md = new MarkdownIt({
+		html: false,
+		linkify: true,
+		typographer: true,
+	});
 
-    function logOut() {
-        dispatchAuth({
-            type: 'LOGOUT'
-        })
-        logout()
-    }
+	function logOut() {
+		dispatchAuth({
+			type: 'LOGOUT',
+		});
+		logout();
+	}
 
-    const cancelEdit = () => {
-        inputRef.current.value = '';
-        setEditing({ isediting: false, messageID: null });
-        socket
-            .timeout(10000)
-            .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
-    };
+	const cancelEdit = () => {
+		inputRef.current.value = '';
+		setEditing({ isediting: false, messageID: null });
+		socket.timeout(10000).emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
+	};
 
+	const sortedMessages = useMemo(
+		() =>
+			Object.values(state[app.currentChatId]?.messages ?? {})?.sort((a, b) => {
+				const da = new Date(a.time),
+					db = new Date(b.time);
+				return da - db;
+			}),
+		[state, app.currentChatId]
+	);
 
-    const sortedMessages = useMemo(
-        () =>
-            Object.values(state[app.currentChatId]?.messages ?? {})?.sort(
-                (a, b) => {
-                    const da = new Date(a.time),
-                        db = new Date(b.time);
-                    return da - db;
-                }
-            ),
-        [state, app.currentChatId]
-    );
+	const doSend = async ({ senderId, room, tmpId = uuid(), message, time }) => {
+		try {
+			addMessage({
+				senderId,
+				room,
+				id: tmpId,
+				message,
+				time,
+				status: 'pending',
+			});
+		} catch {
+			logOut();
+			return false;
+		}
 
-    const doSend = async ({
-        senderId,
-        room,
-        tmpId = uuid(),
-        message,
-        time,
-    }) => {
-        try {
-            addMessage({
-                senderId,
-                room,
-                id: tmpId,
-                message,
-                time,
-                status: 'pending',
-            });
-        } catch {
-            logOut();
-            return false;
-        }
+		try {
+			const sentMessage = await sendMessage({
+				senderId,
+				message,
+				time,
+				chatId: room,
+			});
 
-        try {
-            const sentMessage = await sendMessage({
-                senderId,
-                message,
-                time,
-                chatId: room,
-            });
+			try {
+				updateMessage(tmpId, sentMessage);
+			} catch {
+				logOut();
+				return false;
+			}
+		} catch (e) {
+			try {
+				updateMessage(tmpId, {
+					senderId,
+					room,
+					id: tmpId,
+					message,
+					time,
+					status: 'failed',
+				});
+			} catch {
+				logOut();
+			}
 
-            try {
-                updateMessage(tmpId, sentMessage);
-            } catch {
-                logOut();
-                return false;
-            }
-        } catch (e) {
-            try {
-                updateMessage(tmpId, {
-                    senderId,
-                    room,
-                    id: tmpId,
-                    message,
-                    time,
-                    status: 'failed',
-                });
-            } catch {
-                logOut();
-            }
+			return false;
+		}
 
-            return false;
-        }
+		return true;
+	};
 
-        return true;
-    };
+	const handleDelete = async (id) => {
+		if (!messageExists(id)) {
+			return;
+		}
 
-    const handleDelete = async (id) => {
-        if (!messageExists(id)) {
-            return;
-        }
+		const messageObject = getMessage(id);
+		const { message } = messageObject;
 
-        const messageObject = getMessage(id);
-        const { message } = messageObject
+		if (message.includes('Warning Message')) {
+			return;
+		}
 
-        if (message.includes('Warning Message')) {
-            return;
-        }
+		updateMessage(id, {
+			...messageObject,
+			status: 'pending',
+		});
 
-        updateMessage(id, {
-            ...messageObject,
-            status: 'pending',
-        });
+		try {
+			const messageDeleted = await deleteMessage({
+				id,
+				chatId: messageObject.room,
+			});
 
-        try {
-            const messageDeleted = await deleteMessage({
-                id,
-                chatId: messageObject.room,
-            });
+			if (!messageDeleted) {
+				updateMessage(id, messageObject);
+				return;
+			}
 
-            if (!messageDeleted) {
-                updateMessage(id, messageObject);
-                return;
-            }
+			removeMessage(id, messageObject.room);
+		} catch {
+			updateMessage(id, messageObject);
+		}
+	};
 
-            removeMessage(id, messageObject.room);
-        } catch {
-            updateMessage(id, messageObject);
-        }
-    };
+	const warningMessage = (sender, message) => {
+		// TODO: Instrad of replacing the message we should add some kind of increment for the users to decide to see the message or not
+		if (message.includes('Warning Message')) {
+			if (senderId === sender) {
+				return <span className="text-red">ADMIN MESSAGE: You are trying to send a bad word!</span>;
+			} else {
+				return (
+					<span className="text-black">
+						ADMIN MESSAGE: The person you are chatting with is trying to send a bad word!
+					</span>
+				);
+			}
+		}
+	};
 
-    const warningMessage = (sender, message) => {
-        // TODO: Instrad of replacing the message we should add some kind of increment for the users to decide to see the message or not
-        if (message.includes('Warning Message')) {
-            if (senderId === sender) {
-                return (
-                    <span className="text-red">
-                        ADMIN MESSAGE: You are trying to send a bad word!
-                    </span>
-                );
-            } else {
-                return (
-                    <span className="text-black">
-                        ADMIN MESSAGE: The person you are chatting with is
-                        trying to send a bad word!
-                    </span>
-                );
-            }
-        }
-    };
+	// Here whenever user will submit message it will be send to the server
+	const handleSubmit = async (e) => {
+		e.preventDefault();
 
-    // Here whenever user will submit message it will be send to the server
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+		socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
+		const d = new Date();
+		let message = inputRef.current.value.trim(); // Trim the message to remove the extra spaces
 
-        socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
-        const d = new Date();
-        let message = inputRef.current.value.trim();        // Trim the message to remove the extra spaces
+		if (!isQuoteReply) {
+			const cleanedText = message.replace(/>+/g, '');
+			message = cleanedText;
+		}
 
-        if (!isQuoteReply) {
-            const cleanedText = message.replace(/>+/g, '');
-            message = cleanedText
-        }
+		if (message === '' || senderId === undefined || senderId === '123456') {
+			return;
+		}
 
-        if (message === '' || senderId === undefined || senderId === '123456') {
-            return;
-        }
-        
-        if (isQuoteReply && message.trim() === quoteMessage.trim()) {
-            return;
-        }
-        
+		if (isQuoteReply && message.trim() === quoteMessage.trim()) {
+			return;
+		}
 
-        setIsQuoteReply(false)
-        setQuoteMessage(null)
+		setIsQuoteReply(false);
+		setQuoteMessage(null);
 
-        const splitMessage = message.split(' ');
-        for (const word of splitMessage) {
-            // TODO: We need a better way to implement this
-            if (listOfBadWordsNotAllowed.includes(word)) {
-                message = 'Warning Message: send a warning to users';
-            }
-        }
+		const splitMessage = message.split(' ');
+		for (const word of splitMessage) {
+			// TODO: We need a better way to implement this
+			if (listOfBadWordsNotAllowed.includes(word)) {
+				message = 'Warning Message: send a warning to users';
+			}
+		}
 
-        if (editing.isediting === true) {
-            try {
-                await editMessage({
-                    id: editing.messageID,
-                    chatId: app.currentChatId,
-                    newMessage: message,
-                });
-                editText(editing.messageID, app.currentChatId, message);
-                const messageObject = getMessage(editing.messageID);
-                updateMessage(editing.messageID, messageObject);
-            } catch {
-                setEditing({ isediting: false, messageID: null });
-                return;
-            }
-            setEditing({ isediting: false, messageID: null });
-        } else {
-            doSend({
-                senderId,
-                room: app.currentChatId,
-                message,
-                time: d.getTime(),
-            });
-        }
+		if (editing.isediting === true) {
+			try {
+				const oldMessage = getMessage(editing.messageID).message;
+				await editMessage({
+					id: editing.messageID,
+					chatId: app.currentChatId,
+					newMessage: message,
+					oldMessage,
+				});
+				editText(editing.messageID, app.currentChatId, message, oldMessage);
+				const messageObject = getMessage(editing.messageID);
 
-        if (inputRef.current) {
-					inputRef.current.value = ''; 
-					setMessage(''); 
-					inputRef.current.focus();
-				}
-    };
+				updateMessage(editing.messageID, messageObject, true);
+			} catch {
+				setEditing({ isediting: false, messageID: null });
+				return;
+			}
+			setEditing({ isediting: false, messageID: null });
+		} else {
+			doSend({
+				senderId,
+				room: app.currentChatId,
+				message,
+				time: d.getTime(),
+			});
+		}
 
-    // Define a new function to handle "Ctrl + Enter" key press
-    const handleCtrlEnter = (e) => {
-        if (e.ctrlKey && e.key === 'Enter') {
-            handleSubmit(e);
-        }
-    };
+		if (inputRef.current) {
+			inputRef.current.value = '';
+			setMessage('');
+			inputRef.current.focus();
+		}
+	};
 
-    // Use the useKeyPress hook to listen for "Ctrl + Enter" key press
-    useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
+	// Define a new function to handle "Ctrl + Enter" key press
+	const handleCtrlEnter = (e) => {
+		if (e.ctrlKey && e.key === 'Enter') {
+			handleSubmit(e);
+		}
+	};
 
+	// Use the useKeyPress hook to listen for "Ctrl + Enter" key press
+	useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
 
-    const handleResend = (id) => {
-        if (!messageExists(id)) {
-            return;
-        }
+	const handleResend = (id) => {
+		if (!messageExists(id)) {
+			return;
+		}
 
-        const { senderId, room, message, time } = getMessage(id);
+		const { senderId, room, message, time } = getMessage(id);
 
-        doSend({
-            senderId,
-            room,
-            message,
-            time,
-            tmpId: id,
-        });
-    };
+		doSend({
+			senderId,
+			room,
+			message,
+			time,
+			tmpId: id,
+		});
+	};
 
-    const handleEdit = (id) => {
-        inputRef.current.focus();
-        const { message } = getMessage(id);
+	const handleEdit = (id) => {
+		inputRef.current.focus();
+		const { message } = getMessage(id);
 
-        if (message.includes('Warning Message')) {
-            cancelEdit();
-            return;
-        }
-        inputRef.current.value = message;
+		if (message.includes('Warning Message')) {
+			cancelEdit();
+			return;
+		}
+		inputRef.current.value = message;
 
-        setEditing({ isediting: true, messageID: id });
-    };
+		setEditing({ isediting: true, messageID: id });
+	};
 
-    const handleQuoteReply = (id) => {
-        inputRef.current.focus();
+	const handleQuoteReply = (id) => {
+		inputRef.current.focus();
 
-        const { message } = getMessage(id);
-        if (message.includes('Warning Message')) {
-            cancelEdit();
-            return;
-        }
+		const { message } = getMessage(id);
+		if (message.includes('Warning Message')) {
+			cancelEdit();
+			return;
+		}
 
-        const quotedMessage = `> ${message}
+		const quotedMessage = `> ${message}
         
 `;
-        inputRef.current.value = quotedMessage;
-        setIsQuoteReply(true)
-        setQuoteMessage(quotedMessage)
-    };
+		inputRef.current.value = quotedMessage;
+		setIsQuoteReply(true);
+		setQuoteMessage(quotedMessage);
+	};
 
-    const adjustTextareaHeight = () => {
-        if (inputRef.current) {
-          const minTextareaHeight = '45px';
-          const currentScrollHeight = inputRef.current.scrollHeight + 'px';
-          
-          inputRef.current.style.height = Math.max(
-            parseInt(minTextareaHeight),
-            parseInt(currentScrollHeight)
-          ) + 'px';
-        }
-      };
+	const adjustTextareaHeight = () => {
+		if (inputRef.current) {
+			const minTextareaHeight = '45px';
+			const currentScrollHeight = inputRef.current.scrollHeight + 'px';
 
-    const handleTypingStatus = throttle((e) => {
-        if (e.target.value.length > 0) {
-            socket
-                .timeout(5000)
-                .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
-        }
-        setMessage(e.target.value);
-        adjustTextareaHeight();
-    }, 500);
+			inputRef.current.style.height =
+				Math.max(parseInt(minTextareaHeight), parseInt(currentScrollHeight)) + 'px';
+		}
+	};
 
-    const handleCopyToClipBoard = async (id) => {
-        const { message } = getMessage(id);
-        if (message.includes('Warning Message')) {
-            return;
-        }
-        if ('clipboard' in navigator) {
-            return await navigator.clipboard.writeText(message);
-        } else {
-            return document.execCommand('copy', true, message);
-        }
-    };
-    const getTime = (time) => {
-        return new Date(time).toLocaleTimeString();
-    };
+	const handleTypingStatus = throttle((e) => {
+		if (e.target.value.length > 0) {
+			socket.timeout(5000).emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
+		}
+		setMessage(e.target.value);
+		adjustTextareaHeight();
+	}, 500);
 
-    const renderIconButton = (props) => {
-        return (
-            <BiDotsVerticalRounded
-                {...props}
-                className="fill-white scale-[1.8]"
-            />
-        );
-    };
+	const handleCopyToClipBoard = async (id) => {
+		const { message } = getMessage(id);
+		if (message.includes('Warning Message')) {
+			return;
+		}
+		if ('clipboard' in navigator) {
+			return await navigator.clipboard.writeText(message);
+		} else {
+			return document.execCommand('copy', true, message);
+		}
+	};
+	const getTime = (time) => {
+		return new Date(time).toLocaleTimeString();
+	};
 
-    const renderIconButtonReceiver = (props) => {
-        return (
-            <BiDotsVerticalRounded
-                {...props}
-                className="fill-white scale-[1.8]"
-            />
-        );
-    };
+	const renderIconButton = (props) => {
+		return <BiDotsVerticalRounded {...props} className="fill-white scale-[1.8]" />;
+	};
 
-    // Clear chat when escape is pressed
-    useEffect(() => {
-        const keyDownHandler = (event) => {
-            if (event.key === 'Escape' && editing.isediting) {
-                event.preventDefault();
-                cancelEdit();
-            }
-        };
+	const renderIconButtonReceiver = (props) => {
+		return <BiDotsVerticalRounded {...props} className="fill-white scale-[1.8]" />;
+	};
 
-        document.addEventListener('keydown', keyDownHandler);
+	// Clear chat when escape is pressed
+	useEffect(() => {
+		const keyDownHandler = (event) => {
+			if (event.key === 'Escape' && editing.isediting) {
+				event.preventDefault();
+				cancelEdit();
+			}
+		};
 
-        return () => {
-            document.removeEventListener('keydown', keyDownHandler);
-        };
-    }, [editing]);
+		document.addEventListener('keydown', keyDownHandler);
 
-    useEffect(() => {
-        const newMessageHandler = (message) => {
-            try {
-                addMessage(message);
-                playNotification('newMessage');
-                createBrowserNotification(
-                    'You received a new message on Whisper', message.message)
-            } catch {
-                logOut()
-            }
-        };
+		return () => {
+			document.removeEventListener('keydown', keyDownHandler);
+		};
+	}, [editing]);
 
-        const deleteMessageHandler = ({ id, chatId }) => {
-            removeMessage(id, chatId);
-        };
+	useEffect(() => {
+		const newMessageHandler = (message) => {
+			try {
+				addMessage(message);
+				playNotification('newMessage');
+				createBrowserNotification('You received a new message on Whisper', message.message);
+			} catch {
+				logOut();
+			}
+		};
 
-        const editMessageHandler = ({ id, chatId, newMessage }) => {
-            editText(id, chatId, newMessage);
-        };
+		const deleteMessageHandler = ({ id, chatId }) => {
+			removeMessage(id, chatId);
+		};
 
-        // This is used to recive message form other user.
-        socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
-        socket.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-        socket.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+		const editMessageHandler = ({ id, chatId, newMessage, oldMessage }) => {
+			editText(id, chatId, newMessage, oldMessage);
+		};
 
-        return () => {
-            socket.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
-            socket.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-            socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
-        };
-    }, []);
+		// This is used to recive message form other user.
+		socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+		socket.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+		socket.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
 
-    const checkPartnerResponse = () => {
-        const currentTime = new Date().getTime();
-        const isInactive = lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold;
-        if (isInactive) {
-            createBrowserNotification("your partner isn't responding, want to leave?");
-        }
-    };
+		return () => {
+			socket.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+			socket.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+			socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+		};
+	}, []);
 
-    useEffect(()=>{
-        const newLastMessageTime = sortedMessages.filter((message) => message.senderId !== senderId).pop()?.time;
-        if(newLastMessageTime !== lastMessageTime){
-            setLastMessageTime(newLastMessageTime);
-            clearTimeout(inactiveTimeOut);
-            inactiveTimeOut = setTimeout(checkPartnerResponse,inactiveTimeThreshold);
-        }
-    },[sortedMessages])
+	const checkPartnerResponse = () => {
+		const currentTime = new Date().getTime();
+		const isInactive = lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold;
+		if (isInactive) {
+			createBrowserNotification("your partner isn't responding, want to leave?");
+		}
+	};
 
+	const openPreviousEdit = (messageId) => {
+		if (openPreviousMessages === messageId) {
+			setOpenPreviousMessages(null);
+		} else {
+			setOpenPreviousMessages(messageId);
+		}
+	};
 
-    return (
-        <div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6">
-            <div className="max-h-[67vh]">
-                <p className="text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center">
-                    Connected with a random User{sortedMessages.length === 0 && ', Be the first to send {"Hello"}'}
-                </p>
-                <ScrollToBottom
-                    initialScrollBehavior="auto"
-                    className="h-[100%] max-h-[70vh] md:max-h-full overflow-y-scroll w-full scroll-smooth"
-                >
-                    {sortedMessages.map(
-                        ({ senderId: sender, id, message, time, status }) => {
-                            const resultOfWarningMessage = warningMessage(
-                                sender,
-                                message
-                            );
-                            !(resultOfWarningMessage === undefined) &&
-                                (message = resultOfWarningMessage);
+	useEffect(() => {
+		const newLastMessageTime = sortedMessages
+			.filter((message) => message.senderId !== senderId)
+			.pop()?.time;
+		if (newLastMessageTime !== lastMessageTime) {
+			setLastMessageTime(newLastMessageTime);
+			clearTimeout(inactiveTimeOut);
+			inactiveTimeOut = setTimeout(checkPartnerResponse, inactiveTimeThreshold);
+		}
+	}, [sortedMessages]);
 
+	return (
+		<div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6">
+			<div className="max-h-[67vh]">
+				<p className="text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center">
+					Connected with a random User
+					{sortedMessages.length === 0 && ', Be the first to send {"Hello"}'}
+				</p>
+				<ScrollToBottom
+					initialScrollBehavior="auto"
+					className="h-[100%] md:max-h-full overflow-y-scroll w-full scroll-smooth"
+				>
+					{sortedMessages.map(
+						({ senderId: sender, id, message, time, status, isEdited, oldMessages }) => {
+							const resultOfWarningMessage = warningMessage(sender, message);
+							!(resultOfWarningMessage === undefined) && (message = resultOfWarningMessage);
 
+							return (
+								<div
+									key={id}
+									className={`w-full flex text-white relative ${
+										sender.toString() === senderId.toString() ? 'justify-end' : 'justify-start'
+									}`}
+								>
+									<div
+										className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${
+											sender.toString() === senderId.toString() ? 'items-end' : 'items-start'
+										}`}
+									>
+										<div
+											className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${
+												sender.toString() === senderId.toString()
+													? 'justify-between bg-secondary rounded-l-md'
+													: 'rounded-r-md'
+											}`}
+										>
+											{typeof message === 'string' ? (
+												<span dangerouslySetInnerHTML={{ __html: md.render(message) }} />
+											) : (
+												message
+											)}
 
-                            return (
-                                <div
-                                    key={id}
-                                    className={`w-full flex text-white ${sender.toString() ===
-                                        senderId.toString()
-                                        ? 'justify-end'
-                                        : 'justify-start'
-                                        }`}
-                                >
-                                    <div className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${sender.toString() ===
-                                        senderId.toString()
-                                        ? 'items-end'
-                                        : 'items-start'
-                                        }`}>
-                                        <div
-                                            className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${sender.toString() ===
-                                                senderId.toString() ?
-                                                'justify-between bg-secondary rounded-l-md' : 'rounded-r-md'
-                                                }`}
-                                        >
-                                            {typeof message === 'string' ? <span
-                                                dangerouslySetInnerHTML={{ __html: md.render(message) }}
-                                            /> : message}
+											{sender.toString() === senderId.toString() && status !== 'pending' && (
+												<Dropdown
+													placement="leftStart"
+													style={{
+														zIndex: 'auto',
+													}}
+													renderToggle={renderIconButton}
+													NoCaret
+												>
+													<Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>
 
-                                            {sender.toString() ===
-                                                senderId.toString() &&
-                                                status !== 'pending' && (
-                                                    <Dropdown
-                                                        placement="leftStart"
-                                                        style={{
-                                                            zIndex: 'auto',
-                                                        }}
-                                                        renderToggle={
-                                                            renderIconButton
-                                                        }
-                                                        NoCaret
-                                                    >
-                                                        <Dropdown.Item
-                                                            onClick={() =>
-                                                                handleEdit(id)
-                                                            }
-                                                        >
-                                                            Edit
-                                                        </Dropdown.Item>
-
-                                                        <Dropdown.Item
-                                                            onClick={() =>
-                                                                handleCopyToClipBoard(
-                                                                    id
-                                                                )
-                                                            }
-                                                        >
-                                                            Copy
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item
-                                                            onClick={() =>
-                                                                handleQuoteReply(
-                                                                    id
-                                                                )
-                                                            }
-                                                        >
-                                                            Quote Reply
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item
-                                                            onClick={() =>
-                                                                handleDelete(id)
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </Dropdown.Item>
-                                                    </Dropdown>
-                                                )}
-                                            {sender.toString() !==
-                                                senderId.toString() &&
-                                                status !== 'pending' && (
-                                                    <Dropdown
-                                                        placement="rightStart"
-                                                        style={{
-                                                            zIndex: 'auto',
-                                                        }}
-                                                        renderToggle={
-                                                            renderIconButtonReceiver
-                                                        }
-                                                        NoCaret
-                                                    >
-                                                        <Dropdown.Item
-                                                            onClick={() =>
-                                                                handleCopyToClipBoard(
-                                                                    id
-                                                                )
-                                                            }
-                                                        >
-                                                            Copy
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item
-                                                            onClick={() =>
-                                                                handleQuoteReply(
-                                                                    id
-                                                                )
-                                                            }
-                                                        >
-                                                            Quote Reply
-                                                        </Dropdown.Item>
-                                                    </Dropdown>
-                                                )}
-                                        </div>
-                                        <div
-                                            className={`px-[10px] text-[12px] flex gap-2 items-center ${status === 'failed'
-                                                ? 'text-red-600'
-                                                : 'text-white'
-                                                }`}
-                                        >
-                                            <MessageStatus
-                                                time={getTime(time)}
-                                                status={status ?? 'sent'}
-                                                iAmTheSender={
-                                                    sender.toString() ===
-                                                    senderId.toString()
-                                                }
-                                                onResend={() =>
-                                                    handleResend(id)
-                                                }
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        }
-                    )}
-
-                </ScrollToBottom>
-            </div>
-            <form
-                className="flex justify-center items-center mt-[40px]"
-                onSubmit={handleSubmit}
-            >
-                <div className="w-full flex items-center justify-between bg-secondary rounded-l-md max-h-[150px] relative">
-                    <textarea
-                        placeholder="Send a Message....."
-                        className="h-[45px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] py-[10px] text-[18px] placeholder-shown:align-middle min-h-[40px] max-h-[100px] overflow-y-scroll"
-                        ref={inputRef}
-                        value={message}
-                        onChange={handleTypingStatus}
-                    />
-                    <EmojiPicker
-                        onEmojiPick={setMessage}
-                        focusInput={() => inputRef.current.focus()}
-                    />
-                    {editing.isediting && (
-                        <ImCancelCircle
-                            onClick={cancelEdit}
-                            className="fill-white mr-5 scale-[1.3] cursor-pointer"
-                        />
-                    )}
-                </div>
-                <button
-                    type="submit"
-                    className="bg-[#FF9F1C] h-[47px] w-[70px] flex justify-center items-center rounded-r-md"
-                >
-                    <IoSend className="fill-primary scale-[2]" />
-                </button>
-            </form>
-        </div>
-    );
+													<Dropdown.Item onClick={() => handleCopyToClipBoard(id)}>
+														Copy
+													</Dropdown.Item>
+													<Dropdown.Item onClick={() => handleQuoteReply(id)}>
+														Quote Reply
+													</Dropdown.Item>
+													<Dropdown.Item onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
+												</Dropdown>
+											)}
+											{sender.toString() !== senderId.toString() && status !== 'pending' && (
+												<Dropdown
+													placement="rightStart"
+													style={{
+														zIndex: 'auto',
+													}}
+													renderToggle={renderIconButtonReceiver}
+													NoCaret
+												>
+													<Dropdown.Item onClick={() => handleCopyToClipBoard(id)}>
+														Copy
+													</Dropdown.Item>
+													<Dropdown.Item onClick={() => handleQuoteReply(id)}>
+														Quote Reply
+													</Dropdown.Item>
+												</Dropdown>
+											)}
+										</div>
+										<div
+											className={`flex gap-2 items-center ${
+												sender.toString() === senderId.toString() ? 'flex-row' : 'flex-row-reverse'
+											}`}
+										>
+											<div
+												className={`text-[12px] ${
+													status === 'failed' ? 'text-red-600' : 'text-white'
+												}`}
+											>
+												<MessageStatus
+													time={getTime(time)}
+													status={status ?? 'sent'}
+													iAmTheSender={sender.toString() === senderId.toString()}
+													onResend={() => handleResend(id)}
+												/>
+											</div>
+											<div>
+												{isEdited && (
+													<div
+														className={`cursor-pointer flex items-center gap ${
+															sender.toString() === senderId.toString()
+																? 'flex-row'
+																: 'flex-row-reverse'
+														}`}
+														onClick={() => openPreviousEdit(id)}
+													>
+														<BiSolidEditAlt className="fill-white scale-110" />
+														<AiFillCaretDown className="fill-white scale-75" />
+													</div>
+												)}
+												{isEdited && openPreviousMessages === id && (
+													<div
+														className={`absolute ${
+															sender.toString() === senderId.toString() ? 'right-10' : 'left-10'
+														} top-12 bg-highlight px-4 py-2 gap flex flex-col rounded-md w-[100px]`}
+													>
+														<p className="text-center font-bold underline text-lg">Old</p>
+														<div className="flex flex-col">
+															{oldMessages !== undefined &&
+																Array.isArray(oldMessages) &&
+																oldMessages.map((message, index) => (
+																	<span key={index} className="text-base">
+																		{message}
+																	</span>
+																))}
+														</div>
+													</div>
+												)}
+											</div>
+										</div>
+									</div>
+								</div>
+							);
+						}
+					)}
+				</ScrollToBottom>
+			</div>
+			<form className="flex justify-center items-center mt-[40px]" onSubmit={handleSubmit}>
+				<div className="w-full flex items-center justify-between bg-secondary rounded-l-md max-h-[150px] relative">
+					<textarea
+						placeholder="Send a Message....."
+						className="h-[45px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] py-[10px] text-[18px] placeholder-shown:align-middle min-h-[40px] max-h-[100px] overflow-y-scroll"
+						ref={inputRef}
+						value={message}
+						onChange={handleTypingStatus}
+					/>
+					<EmojiPicker onEmojiPick={setMessage} focusInput={() => inputRef.current.focus()} />
+					{editing.isediting && (
+						<ImCancelCircle
+							onClick={cancelEdit}
+							className="fill-white mr-5 scale-[1.3] cursor-pointer"
+						/>
+					)}
+				</div>
+				<button
+					type="submit"
+					className="bg-[#FF9F1C] h-[47px] w-[70px] flex justify-center items-center rounded-r-md"
+				>
+					<IoSend className="fill-primary scale-[2]" />
+				</button>
+			</form>
+		</div>
+	);
 };
 
 export default Chat;
