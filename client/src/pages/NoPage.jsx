@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 const NoPage = () => {
 	return (
-		<div className="bg-light text-primary dark:text-light dark:bg-primary md:min-w-[calc(100%-120px)] flex items-center justify-center text-center">
+		<div className="bg-light text-primary dark:text-light h-full dark:bg-primary md:min-w-[calc(100%-120px)] flex items-center justify-center text-center">
 			<div>
 				<h1 className="text-9xl font-bold">404</h1>
 				<p className="text-3xl">Sorry, Page Not found!</p>
