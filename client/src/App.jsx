@@ -17,6 +17,7 @@ import Searching from 'pages/Searching';
 import ComingSoon from 'pages/ComingSoon';
 import Login from 'pages/Login';
 import Settings from 'pages/Settings';
+import NoPage from './pages/NoPage';
 
 const clientID = import.meta.env.VITE_IMPORTANT;
 import Profile from './pages/Profile';
@@ -84,6 +85,7 @@ function App() {
 					</Route>
 
 					<Route exact path="/login" element={isLoggedIn ? <Navigate to="/" /> : <Login />} />
+					<Route path="*" element={<NoPage />} />
 				</Routes>
 			</div>
 		</KindeProvider>
