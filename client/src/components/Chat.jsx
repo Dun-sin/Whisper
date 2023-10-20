@@ -8,6 +8,8 @@ import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 import { v4 as uuid } from 'uuid';
 import { throttle } from 'lodash';
 import MarkdownIt from 'markdown-it';
+import BadWordsNext from 'bad-words-next';
+import en from 'bad-words-next/data/en.json'
 
 import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';
@@ -15,7 +17,6 @@ import { useApp } from 'src/context/AppContext';
 
 import useChatUtils from 'src/lib/chatSocket';
 import MessageStatus from './MessageStatus';
-import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
 import {
 	NEW_EVENT_DELETE_MESSAGE,
@@ -53,6 +54,7 @@ const Chat = () => {
 	const [quoteMessage, setQuoteMessage] = useState(null);
 	// use the id so we can track what message's previousMessage is open
 	const [openPreviousMessages, setOpenPreviousMessages] = useState(null);
+	const [badwordChoices, setBadwordChoices] = useState({});
 
 	const { messages: state, addMessage, updateMessage, removeMessage, editText } = useChat();
 	const { authState, dispatchAuth } = useAuth();
@@ -73,6 +75,8 @@ const Chat = () => {
 		linkify: true,
 		typographer: true,
 	});
+
+	const badwords = new BadWordsNext({ data: en })
 
 	function logOut() {
 		dispatchAuth({
@@ -97,7 +101,7 @@ const Chat = () => {
 		[state, app.currentChatId]
 	);
 
-	const doSend = async ({ senderId, room, tmpId = uuid(), message, time }) => {
+	const doSend = async ({ senderId, room, tmpId = uuid(), message, time, containsBadword }) => {
 		try {
 			addMessage({
 				senderId,
@@ -106,6 +110,7 @@ const Chat = () => {
 				message,
 				time,
 				status: 'pending',
+				containsBadword
 			});
 		} catch {
 			logOut();
@@ -118,6 +123,7 @@ const Chat = () => {
 				message,
 				time,
 				chatId: room,
+				containsBadword
 			});
 
 			try {
@@ -135,6 +141,7 @@ const Chat = () => {
 					message,
 					time,
 					status: 'failed',
+					containsBadword
 				});
 			} catch {
 				logOut();
@@ -170,13 +177,6 @@ const Chat = () => {
 		setIsQuoteReply(false);
 		setQuoteMessage(null);
 
-		const splitMessage = message.split(' ');
-		for (const word of splitMessage) {
-			// TODO: We need a better way to implement this
-			if (listOfBadWordsNotAllowed.includes(word)) {
-				message = 'Warning Message: send a warning to users';
-			}
-		}
 
 		if (editing.isediting === true) {
 			try {
@@ -202,6 +202,7 @@ const Chat = () => {
 				room: app.currentChatId,
 				message,
 				time: d.getTime(),
+				containsBadword: badwords.check(message)
 			});
 		}
 
@@ -228,19 +229,13 @@ const Chat = () => {
 		}
 	};
 
-	const warningMessage = (sender, message) => {
-		// TODO: Instrad of replacing the message we should add some kind of increment for the users to decide to see the message or not
-		if (message.includes('Warning Message')) {
-			if (senderId === sender) {
-				return <span className="text-red">ADMIN MESSAGE: You are trying to send a bad word!</span>;
-			} else {
-				return (
-					<span className="text-black">
-						ADMIN MESSAGE: The person you are chatting with is trying to send a bad word!
-					</span>
-				);
-			}
-		}
+
+	const hideBadword = (id) => {
+		setBadwordChoices({ ...badwordChoices, [id]: 'hide' });
+	};
+
+	const showBadword = (id) => {
+		setBadwordChoices({ ...badwordChoices, [id]: 'show' });
 	};
 
 	// Clear chat when escape is pressed
@@ -316,9 +311,7 @@ const Chat = () => {
 					className="h-[100%] md:max-h-full overflow-y-scroll w-full scroll-smooth"
 				>
 					{sortedMessages.map(
-						({ senderId: sender, id, message, time, status, isEdited, oldMessages }) => {
-							const resultOfWarningMessage = warningMessage(sender, message);
-							!(resultOfWarningMessage === undefined) && (message = resultOfWarningMessage);
+						({ senderId: sender, id, message, time, status, isEdited, oldMessages, containsBadword }) => {
 							return (
 								<div
 									key={id}
@@ -331,57 +324,69 @@ const Chat = () => {
 											sender.toString() === senderId.toString() ? 'items-end' : 'items-start'
 										}`}
 									>
-										<div
-											className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${
-												sender.toString() === senderId.toString()
-													? 'justify-between bg-secondary rounded-l-md'
-													: 'rounded-r-md'
-											}`}
-										>
-											{typeof message === 'string' ? (
-												<span dangerouslySetInnerHTML={{ __html: md.render(message) }} />
-											) : (
-												message
-											)}
-
-											<DropDownOptions
-												isSender={
-													sender.toString() === senderId.toString()
-													&& status !== 'pending'}
-												id={id}
-												inputRef={inputRef}
-												cancelEdit={cancelEdit}
-												setEditing={setEditing}
-												setIsQuoteReply={setIsQuoteReply}
-												setQuoteMessage={setQuoteMessage}
-											/>
-										</div>
-										<div
-											className={`flex gap-2 items-center ${
-												sender.toString() === senderId.toString() ? 'flex-row' : 'flex-row-reverse'
-											}`}
-										>
-											<div
-												className={`text-[12px] ${
-													status === 'failed' ? 'text-red-600' : 'text-white'
-												}`}
-											>
-												<MessageStatus
-													time={getTime(time)}
-													status={status ?? 'sent'}
-													iAmTheSender={sender.toString() === senderId.toString()}
-													onResend={() => handleResend(id, doSend, state, app)}
-												/>
+										{containsBadword && sender.toString() !== senderId.toString() && !badwordChoices[id] ? (
+											<div className='flex flex-col border-red border w-full rounded-r-md p-3'>
+												<p>Your buddy is trying to send you a bad word</p>
+												<div className='flex w-full gap-6'>
+													<span onClick={() => showBadword(id)} className='text-sm cursor-pointer'>See</span>
+													<span onClick={() => hideBadword(id)} className='text-red text-sm cursor-pointer'>Hide</span>
+												</div>
 											</div>
-											<PreviousMessages
-												id={id}
-												isSender={sender.toString() === senderId.toString()}
-												isEdited={isEdited}
-												openPreviousEdit={openPreviousEdit}
-												openPreviousMessages={openPreviousMessages}
-												oldMessages={oldMessages}
-											/>
-										</div>
+										)
+											:
+											<>
+												<div
+													className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${sender.toString() === senderId.toString()
+														? 'justify-between bg-secondary rounded-l-md'
+														: 'rounded-r-md'
+														}`}
+												>
+													{typeof message === 'string' ? (
+														<span dangerouslySetInnerHTML={{
+															__html: md.render(
+																badwordChoices[id] === 'hide' ? badwords.filter(message) : badwordChoices[id] === 'show' ? message : message)
+														}} />
+													) : (
+														badwordChoices[id] === 'hide' ? badwords.filter(message) : badwordChoices[id] === 'show' ? message : message
+													)}
+
+													<DropDownOptions
+														isSender={
+															sender.toString() === senderId.toString()
+															&& status !== 'pending'}
+														id={id}
+														inputRef={inputRef}
+														cancelEdit={cancelEdit}
+														setEditing={setEditing}
+														setIsQuoteReply={setIsQuoteReply}
+														setQuoteMessage={setQuoteMessage}
+													/>
+												</div>
+												<div
+													className={`flex gap-2 items-center ${sender.toString() === senderId.toString() ? 'flex-row' : 'flex-row-reverse'
+														}`}
+												>
+													<div
+														className={`text-[12px] ${status === 'failed' ? 'text-red-600' : 'text-white'
+															}`}
+													>
+														<MessageStatus
+															time={getTime(time)}
+															status={status ?? 'sent'}
+															iAmTheSender={sender.toString() === senderId.toString()}
+															onResend={() => handleResend(id, doSend, state, app)}
+														/>
+													</div>
+													<PreviousMessages
+														id={id}
+														isSender={sender.toString() === senderId.toString()}
+														isEdited={isEdited}
+														openPreviousEdit={openPreviousEdit}
+														openPreviousMessages={openPreviousMessages}
+														oldMessages={oldMessages}
+													/>
+												</div>
+											</>}
 									</div>
 								</div>
 							);
