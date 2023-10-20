@@ -1,16 +1,9 @@
 /* eslint-disable max-len */
 import { useEffect, useRef, useContext, useMemo, useState } from 'react';
 import { SocketContext } from 'context/Context';
-import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
 
 import ScrollToBottom from 'react-scroll-to-bottom';
-import Dropdown from 'rsuite/Dropdown';
 import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
-
-import { ImCancelCircle } from 'react-icons/im';
-import { IoSend } from 'react-icons/io5';
-import { AiFillCaretDown } from 'react-icons/ai';
-import { BiDotsVerticalRounded, BiSolidEditAlt } from 'react-icons/bi';
 
 import { v4 as uuid } from 'uuid';
 import { throttle } from 'lodash';
@@ -20,7 +13,7 @@ import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';
 import { useApp } from 'src/context/AppContext';
 
-import useChatUtils from 'src/lib/chat';
+import useChatUtils from 'src/lib/chatSocket';
 import MessageStatus from './MessageStatus';
 import listOfBadWordsNotAllowed from 'src/lib/badWords';
 import { useNotification } from 'src/lib/notification';
@@ -32,7 +25,17 @@ import {
 } from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 
-import EmojiPicker from './EmojiPicker';
+import chatHelper,
+{
+	adjustTextareaHeight,
+	checkPartnerResponse,
+	getTime
+} from '../lib/chatHelper';
+
+import MessageInput from './Chat/MessageInput';
+import DropDownOptions from './Chat/DropDownOption';
+import PreviousMessages from './Chat/PreviousMessages';
+
 
 const inactiveTimeThreshold = 180000; // 3 mins delay
 let senderId;
@@ -48,6 +51,7 @@ const Chat = () => {
 	const [isQuoteReply, setIsQuoteReply] = useState(false);
 	const [message, setMessage] = useState('');
 	const [quoteMessage, setQuoteMessage] = useState(null);
+	// use the id so we can track what message's previousMessage is open
 	const [openPreviousMessages, setOpenPreviousMessages] = useState(null);
 
 	const { messages: state, addMessage, updateMessage, removeMessage, editText } = useChat();
@@ -55,25 +59,14 @@ const Chat = () => {
 	const { logout } = useKindeAuth();
 	const socket = useContext(SocketContext);
 
-	const { sendMessage, deleteMessage, editMessage } = useChatUtils(socket);
+	const { sendMessage, editMessage } = useChatUtils(socket);
+	const { getMessage, handleResend } = chatHelper(state, app)
 
 	const inputRef = useRef('');
 
 	const [lastMessageTime, setLastMessageTime] = useState(null);
 
 	senderId = authState.email ?? authState.loginId;
-
-	const getMessage = (id) => {
-		if (!state[app.currentChatId]) {
-			return null;
-		}
-
-		return state[app.currentChatId].messages[id];
-	};
-
-	const messageExists = (id) => {
-		return Boolean(getMessage(id));
-	};
 
 	const md = new MarkdownIt({
 		html: false,
@@ -153,55 +146,6 @@ const Chat = () => {
 		return true;
 	};
 
-	const handleDelete = async (id) => {
-		if (!messageExists(id)) {
-			return;
-		}
-
-		const messageObject = getMessage(id);
-		const { message } = messageObject;
-
-		if (message.includes('Warning Message')) {
-			return;
-		}
-
-		updateMessage(id, {
-			...messageObject,
-			status: 'pending',
-		});
-
-		try {
-			const messageDeleted = await deleteMessage({
-				id,
-				chatId: messageObject.room,
-			});
-
-			if (!messageDeleted) {
-				updateMessage(id, messageObject);
-				return;
-			}
-
-			removeMessage(id, messageObject.room);
-		} catch {
-			updateMessage(id, messageObject);
-		}
-	};
-
-	const warningMessage = (sender, message) => {
-		// TODO: Instrad of replacing the message we should add some kind of increment for the users to decide to see the message or not
-		if (message.includes('Warning Message')) {
-			if (senderId === sender) {
-				return <span className="text-red">ADMIN MESSAGE: You are trying to send a bad word!</span>;
-			} else {
-				return (
-					<span className="text-black">
-						ADMIN MESSAGE: The person you are chatting with is trying to send a bad word!
-					</span>
-				);
-			}
-		}
-	};
-
 	// Here whenever user will submit message it will be send to the server
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -236,7 +180,7 @@ const Chat = () => {
 
 		if (editing.isediting === true) {
 			try {
-				const oldMessage = getMessage(editing.messageID).message;
+				const oldMessage = getMessage(editing.messageID, state, app).message;
 				await editMessage({
 					id: editing.messageID,
 					chatId: app.currentChatId,
@@ -244,7 +188,7 @@ const Chat = () => {
 					oldMessage,
 				});
 				editText(editing.messageID, app.currentChatId, message, oldMessage);
-				const messageObject = getMessage(editing.messageID);
+				const messageObject = getMessage(editing.messageID, state, app);
 
 				updateMessage(editing.messageID, messageObject, true);
 			} catch {
@@ -268,101 +212,35 @@ const Chat = () => {
 		}
 	};
 
-	// Define a new function to handle "Ctrl + Enter" key press
-	const handleCtrlEnter = (e) => {
-		if (e.ctrlKey && e.key === 'Enter') {
-			handleSubmit(e);
-		}
-	};
-
-	// Use the useKeyPress hook to listen for "Ctrl + Enter" key press
-	useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
-
-	const handleResend = (id) => {
-		if (!messageExists(id)) {
-			return;
-		}
-
-		const { senderId, room, message, time } = getMessage(id);
-
-		doSend({
-			senderId,
-			room,
-			message,
-			time,
-			tmpId: id,
-		});
-	};
-
-	const handleEdit = (id) => {
-		inputRef.current.focus();
-		const { message } = getMessage(id);
-
-		if (message.includes('Warning Message')) {
-			cancelEdit();
-			return;
-		}
-		inputRef.current.value = message;
-
-		setEditing({ isediting: true, messageID: id });
-	};
-
-	const handleQuoteReply = (id) => {
-		inputRef.current.focus();
-
-		const { message } = getMessage(id);
-		if (message.includes('Warning Message')) {
-			cancelEdit();
-			return;
-		}
-
-		const quotedMessage = `> ${message}
-        
-`;
-		inputRef.current.value = quotedMessage;
-		setIsQuoteReply(true);
-		setQuoteMessage(quotedMessage);
-	};
-
-	const adjustTextareaHeight = () => {
-		if (inputRef.current) {
-			const minTextareaHeight = '45px';
-			const currentScrollHeight = inputRef.current.scrollHeight + 'px';
-
-			inputRef.current.style.height =
-				Math.max(parseInt(minTextareaHeight), parseInt(currentScrollHeight)) + 'px';
-		}
-	};
-
 	const handleTypingStatus = throttle((e) => {
 		if (e.target.value.length > 0) {
 			socket.timeout(5000).emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
 		}
 		setMessage(e.target.value);
-		adjustTextareaHeight();
+		adjustTextareaHeight(inputRef);
 	}, 500);
 
-	const handleCopyToClipBoard = async (id) => {
-		const { message } = getMessage(id);
-		if (message.includes('Warning Message')) {
-			return;
-		}
-		if ('clipboard' in navigator) {
-			return await navigator.clipboard.writeText(message);
+	const openPreviousEdit = (messageId) => {
+		if (openPreviousMessages === messageId) {
+			setOpenPreviousMessages(null);
 		} else {
-			return document.execCommand('copy', true, message);
+			setOpenPreviousMessages(messageId);
 		}
 	};
-	const getTime = (time) => {
-		return new Date(time).toLocaleTimeString();
-	};
 
-	const renderIconButton = (props) => {
-		return <BiDotsVerticalRounded {...props} className="fill-white scale-[1.8]" />;
-	};
-
-	const renderIconButtonReceiver = (props) => {
-		return <BiDotsVerticalRounded {...props} className="fill-white scale-[1.8]" />;
+	const warningMessage = (sender, message) => {
+		// TODO: Instrad of replacing the message we should add some kind of increment for the users to decide to see the message or not
+		if (message.includes('Warning Message')) {
+			if (senderId === sender) {
+				return <span className="text-red">ADMIN MESSAGE: You are trying to send a bad word!</span>;
+			} else {
+				return (
+					<span className="text-black">
+						ADMIN MESSAGE: The person you are chatting with is trying to send a bad word!
+					</span>
+				);
+			}
+		}
 	};
 
 	// Clear chat when escape is pressed
@@ -412,22 +290,6 @@ const Chat = () => {
 		};
 	}, []);
 
-	const checkPartnerResponse = () => {
-		const currentTime = new Date().getTime();
-		const isInactive = lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold;
-		if (isInactive) {
-			createBrowserNotification("your partner isn't responding, want to leave?");
-		}
-	};
-
-	const openPreviousEdit = (messageId) => {
-		if (openPreviousMessages === messageId) {
-			setOpenPreviousMessages(null);
-		} else {
-			setOpenPreviousMessages(messageId);
-		}
-	};
-
 	useEffect(() => {
 		const newLastMessageTime = sortedMessages
 			.filter((message) => message.senderId !== senderId)
@@ -435,7 +297,10 @@ const Chat = () => {
 		if (newLastMessageTime !== lastMessageTime) {
 			setLastMessageTime(newLastMessageTime);
 			clearTimeout(inactiveTimeOut);
-			inactiveTimeOut = setTimeout(checkPartnerResponse, inactiveTimeThreshold);
+			inactiveTimeOut = setTimeout(() => {
+				checkPartnerResponse(lastMessageTime, inactiveTimeThreshold);
+			}, inactiveTimeThreshold);
+
 		}
 	}, [sortedMessages]);
 
@@ -454,7 +319,6 @@ const Chat = () => {
 						({ senderId: sender, id, message, time, status, isEdited, oldMessages }) => {
 							const resultOfWarningMessage = warningMessage(sender, message);
 							!(resultOfWarningMessage === undefined) && (message = resultOfWarningMessage);
-
 							return (
 								<div
 									key={id}
@@ -480,43 +344,17 @@ const Chat = () => {
 												message
 											)}
 
-											{sender.toString() === senderId.toString() && status !== 'pending' && (
-												<Dropdown
-													placement="leftStart"
-													style={{
-														zIndex: 'auto',
-													}}
-													renderToggle={renderIconButton}
-													NoCaret
-												>
-													<Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>
-
-													<Dropdown.Item onClick={() => handleCopyToClipBoard(id)}>
-														Copy
-													</Dropdown.Item>
-													<Dropdown.Item onClick={() => handleQuoteReply(id)}>
-														Quote Reply
-													</Dropdown.Item>
-													<Dropdown.Item onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
-												</Dropdown>
-											)}
-											{sender.toString() !== senderId.toString() && status !== 'pending' && (
-												<Dropdown
-													placement="rightStart"
-													style={{
-														zIndex: 'auto',
-													}}
-													renderToggle={renderIconButtonReceiver}
-													NoCaret
-												>
-													<Dropdown.Item onClick={() => handleCopyToClipBoard(id)}>
-														Copy
-													</Dropdown.Item>
-													<Dropdown.Item onClick={() => handleQuoteReply(id)}>
-														Quote Reply
-													</Dropdown.Item>
-												</Dropdown>
-											)}
+											<DropDownOptions
+												isSender={
+													sender.toString() === senderId.toString()
+													&& status !== 'pending'}
+												id={id}
+												inputRef={inputRef}
+												cancelEdit={cancelEdit}
+												setEditing={setEditing}
+												setIsQuoteReply={setIsQuoteReply}
+												setQuoteMessage={setQuoteMessage}
+											/>
 										</div>
 										<div
 											className={`flex gap-2 items-center ${
@@ -532,42 +370,17 @@ const Chat = () => {
 													time={getTime(time)}
 													status={status ?? 'sent'}
 													iAmTheSender={sender.toString() === senderId.toString()}
-													onResend={() => handleResend(id)}
+													onResend={() => handleResend(id, doSend, state, app)}
 												/>
 											</div>
-											<div>
-												{isEdited && (
-													<div
-														className={`cursor-pointer flex items-center gap ${
-															sender.toString() === senderId.toString()
-																? 'flex-row'
-																: 'flex-row-reverse'
-														}`}
-														onClick={() => openPreviousEdit(id)}
-													>
-														<BiSolidEditAlt className="fill-white scale-110" />
-														<AiFillCaretDown className="fill-white scale-75" />
-													</div>
-												)}
-												{isEdited && openPreviousMessages === id && (
-													<div
-														className={`absolute ${
-															sender.toString() === senderId.toString() ? 'right-10' : 'left-10'
-														} top-12 bg-highlight px-4 py-2 gap flex flex-col rounded-md w-[100px]`}
-													>
-														<p className="text-center font-bold underline text-lg">Old</p>
-														<div className="flex flex-col">
-															{oldMessages !== undefined &&
-																Array.isArray(oldMessages) &&
-																oldMessages.map((message, index) => (
-																	<span key={index} className="text-base">
-																		{message}
-																	</span>
-																))}
-														</div>
-													</div>
-												)}
-											</div>
+											<PreviousMessages
+												id={id}
+												isSender={sender.toString() === senderId.toString()}
+												isEdited={isEdited}
+												openPreviousEdit={openPreviousEdit}
+												openPreviousMessages={openPreviousMessages}
+												oldMessages={oldMessages}
+											/>
 										</div>
 									</div>
 								</div>
@@ -576,30 +389,16 @@ const Chat = () => {
 					)}
 				</ScrollToBottom>
 			</div>
-			<form className="flex justify-center items-center mt-[40px]" onSubmit={handleSubmit}>
-				<div className="w-full flex items-center justify-between bg-secondary rounded-l-md max-h-[150px] relative">
-					<textarea
-						placeholder="Send a Message....."
-						className="h-[45px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] py-[10px] text-[18px] placeholder-shown:align-middle min-h-[40px] max-h-[100px] overflow-y-scroll"
-						ref={inputRef}
-						value={message}
-						onChange={handleTypingStatus}
-					/>
-					<EmojiPicker onEmojiPick={setMessage} focusInput={() => inputRef.current.focus()} />
-					{editing.isediting && (
-						<ImCancelCircle
-							onClick={cancelEdit}
-							className="fill-white mr-5 scale-[1.3] cursor-pointer"
-						/>
-					)}
-				</div>
-				<button
-					type="submit"
-					className="bg-[#FF9F1C] h-[47px] w-[70px] flex justify-center items-center rounded-r-md"
-				>
-					<IoSend className="fill-primary scale-[2]" />
-				</button>
-			</form>
+
+			<MessageInput
+				message={message}
+				handleTypingStatus={handleTypingStatus}
+				setMessage={setMessage}
+				editing={editing}
+				cancelEdit={cancelEdit}
+				handleSubmit={handleSubmit}
+				inputRef={inputRef}
+			/>
 		</div>
 	);
 };
