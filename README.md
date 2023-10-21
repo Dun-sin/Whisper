@@ -21,7 +21,7 @@
 
 ## Whisper
 
-This app is developed to make chatting much private and easy without stealing your data!!
+This app is developed to make chatting much more private and easy without stealing your data!!
 
 ### ✨ Built With
 
@@ -93,7 +93,7 @@ Before installation, please make sure you have already installed the following t
 ### 🛠️ Installation
 
 1. [Fork](https://github.com/Dun-sin/Whisper/fork) the project. Click on the fork icon in the top right to get started
-2. Clone the project, you can use the following command:
+2. To clone the project, you can use the following command:
 
    ```bash
    git clone https://github.com/<your-github-username>/Whisper
@@ -121,7 +121,7 @@ Before installation, please make sure you have already installed the following t
    npm install
    ```
 
-6. Use `.env_sample` to configure the `.env` file for this project. For mongodb url use the localhost to test
+6. Use `.env_sample` to configure the `.env` file for this project. For the mongodb url use the localhost to test
 
    > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0  
    > Note: If using Docker, the MongoDB port is **27018**
@@ -150,7 +150,7 @@ Check out the website: [Whisper](https://WhisChat.vercel.app/)
 
 ## 👩🏽‍💻 Contributing
 
-- Contributions make the open source community such an amazing place to learn, inspire, and create.
+- Contributions make the open-source community such an amazing place to learn, inspire, and create.
 - Any contributions you make are greatly appreciated.
 - Check out our [contribution guidelines](/CONTRIBUTING.md) for more information.
 
@@ -158,7 +158,7 @@ Check out the website: [Whisper](https://WhisChat.vercel.app/)
 
 ## ✏️ Edit with Gitpod
 
-Click this button to run this project in Gitpod which comes with pre-configured environment.
+Click this button to run this project in Gitpod which comes with a pre-configured environment.
 
 <a href="https://gitpod.io/#type=client/https://github.com/Dun-sin/Whisper">
 <img
@@ -171,7 +171,7 @@ Click this button to run this project in Gitpod which comes with pre-configured 
 
 ## 👨‍👩‍👦 Community
 
-Don't forget to join the discord community - [Join us](https://discord.gg/ufcysW9q23)
+Don't forget to join the Discord community - [Join us](https://discord.gg/ufcysW9q23)
 
 ## 🛡️ License
 
