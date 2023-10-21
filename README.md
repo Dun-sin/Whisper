@@ -57,7 +57,7 @@ This app is developed to make chatting much private and easy without stealing yo
    <tbody>
       <tr>
      <td align="Center" width="30%">   
-<a href="https://socket.io/" target="_blank" rel="noreferrer"><img src="https://w7.pngwing.com/pngs/162/702/png-transparent-socket-io-node-js-express-js-npm-network-socket-github-angle-triangle-logo-thumbnail.png" width="36" height="36" alt="SocketIo">
+<a href="https://socket.io/" target="_blank" rel="noreferrer"><img src="https://w7.pngwing.com/pngs/162/702/png-transparent-socket-io-node-js-express-js-npm-network-socket-github-angle-triangle-logo-thumbnail.png" width="36" height="36" alt="SocketIo"></a>
      <br>SocketIo
     </td>  
   <td align="Center" width="30%">
