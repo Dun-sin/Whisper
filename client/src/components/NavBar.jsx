@@ -84,7 +84,7 @@ const NavBar = ({ className }) => {
 				'md:p-5',
 				'sticky bottom-0',
 				'md:flex',
-				'h-[70px]',
+				'min-h-[70px]',
 			])}
 		>
 			<div className="justify-between md:justify-center flex items-center md:flex-col flex-row h-full w-full gap-2 flex-nowrap overflow-auto md:h-full">
@@ -92,7 +92,7 @@ const NavBar = ({ className }) => {
 					placement="auto"
 					controlId="control-id-hover"
 					trigger="hover"
-					speaker={<Tooltip>Search for random buddies</Tooltip>}
+					speaker={<Tooltip className="md:mt-4">Search for random buddies</Tooltip>}
 				>
 					<NavLink to="/" className={getLinkStyle}>
 						<Icon icon="fluent:people-search-20-regular" color="white" height="24" width="24" />
@@ -103,7 +103,7 @@ const NavBar = ({ className }) => {
 					placement="auto"
 					controlId="control-id-hover"
 					trigger="hover"
-					speaker={<Tooltip>Friends</Tooltip>}
+					speaker={<Tooltip className="md:mt-4">Friends</Tooltip>}
 				>
 					<NavLink to="/friends" className={getLinkStyle}>
 						<Icon color="white" icon="la:user-friends" height="24" width="24" />
@@ -113,7 +113,7 @@ const NavBar = ({ className }) => {
 					placement="auto"
 					controlId="control-id-hover"
 					trigger="hover"
-					speaker={<Tooltip>My Profile</Tooltip>}
+					speaker={<Tooltip className="md:mt-4">My Profile</Tooltip>}
 				>
 					<NavLink to="/profile" className={getLinkStyle}>
 						<Icon icon="fluent:person-circle-20-regular" color="white" height="24" width="24" />
@@ -123,7 +123,7 @@ const NavBar = ({ className }) => {
 					placement="auto"
 					controlId="control-id-hover"
 					trigger="hover"
-					speaker={<Tooltip>Settings</Tooltip>}
+					speaker={<Tooltip className="md:-mt-4">Settings</Tooltip>}
 				>
 					<NavLink to="/settings" className={getLinkStyle}>
 						<Icon icon="ic:outline-settings" color="white" height="24" width="24" />
@@ -133,7 +133,7 @@ const NavBar = ({ className }) => {
 					placement="auto"
 					controlId="control-id-hover"
 					trigger="hover"
-					speaker={<Tooltip>Logout</Tooltip>}
+					speaker={<Tooltip className="md:-mt-4">Logout</Tooltip>}
 				>
 					<button className={linkStyle} onClick={() => handleLogout()}>
 						<Icon icon="majesticons:logout-half-circle" color="white" height={24} width={24} />
