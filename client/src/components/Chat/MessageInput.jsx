@@ -1,4 +1,4 @@
-import React from 'react'
+import {React,useState} from 'react'
 
 import PropTypes from 'prop-types';
 
@@ -17,6 +17,9 @@ const MessageInput = ({
 	cancelEdit,
 	handleSubmit
 }) => {
+
+	const [focusTextArea, setFocusTextArea] = useState(false);
+
 	// Define a new function to handle "Ctrl + Enter" key press
 	const handleCtrlEnter = (e) => {
 		if (e.ctrlKey && e.key === 'Enter') {
@@ -31,11 +34,13 @@ const MessageInput = ({
 			<form className="flex justify-center items-center mt-[40px]" onSubmit={handleSubmit}>
 				<div className="w-full flex items-center justify-between bg-secondary rounded-l-md max-h-[150px] relative">
 					<textarea
-						placeholder="Send a Message....."
+						placeholder={focusTextArea ? 'Press Ctrl + Enter to send message':'Type a message...'}
 						className="h-[45px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] py-[10px] text-[18px] placeholder-shown:align-middle min-h-[40px] max-h-[100px] overflow-y-scroll"
 						ref={inputRef}
 						value={message}
 						onChange={handleTypingStatus}
+						onFocus={() => setFocusTextArea(true)}
+                        onBlur={() => setFocusTextArea(false)}
 					/>
 					<EmojiPicker
 						onEmojiPick={setMessage}
