@@ -87,6 +87,9 @@ const NavBar = ({ className }) => {
 				'h-[70px]',
 			])}
 		>
+			<div className='hidden md:flex'>
+				<img src='favicon.ico'/>
+			</div>
 			<div className="justify-between md:justify-center flex items-center md:flex-col flex-row h-full w-full gap-2 flex-nowrap overflow-auto md:h-full">
 				<Whisper
 					placement="auto"
@@ -119,7 +122,39 @@ const NavBar = ({ className }) => {
 						<Icon icon="fluent:person-circle-20-regular" color="white" height="24" width="24" />
 					</NavLink>
 				</Whisper>
+
+				{/* show only on mobile screen */}
+				<div className='flex w-full md:hidden'>
 				<Whisper
+					placement="auto"
+					controlId="control-id-hover"
+					trigger="hover"
+					speaker={<Tooltip>Settings</Tooltip>}
+				>
+					<NavLink to="/settings" className={getLinkStyle}>
+						<Icon icon="ic:outline-settings" color="white" height="24" width="24" />
+					</NavLink>
+				</Whisper>
+				</div>
+			
+			<div className='flex w-full md:hidden'>
+			<Whisper
+					placement="auto"
+					controlId="control-id-hover"
+					trigger="hover"
+					speaker={<Tooltip>Logout</Tooltip>}
+				>
+					<button className={linkStyle} onClick={() => handleLogout()}>
+						<Icon icon="majesticons:logout-half-circle" color="white" height={24} width={24} />
+					</button>
+				</Whisper>
+			</div>
+				 
+			
+			
+			</div>
+			<div className='hidden md:block w-full'>
+			<Whisper
 					placement="auto"
 					controlId="control-id-hover"
 					trigger="hover"
