@@ -34,7 +34,7 @@ export default function EmojiPicker({ onEmojiPick, focusInput }) {
 							onEmojiClick={hndleEmojiClick}
 							lazyLoadEmojis
 							skinTonesDisabled
-							searchDisabled
+							searchDisabled={false}
 						/>
 					</div>
 				</>
