@@ -31,7 +31,7 @@ const MessageInput = ({
 			<form className="flex justify-center items-center mt-[40px]" onSubmit={handleSubmit}>
 				<div className="w-full flex items-center justify-between bg-secondary rounded-l-md max-h-[150px] relative">
 					<textarea
-						placeholder="Press Ctrl + Enter to send message"
+						placeholder="Press Ctrl + Enter to send a message"
 						className="h-[45px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] py-[10px] text-[18px] placeholder-shown:align-middle min-h-[40px] max-h-[100px] overflow-y-scroll"
 						ref={inputRef}
 						value={message}
