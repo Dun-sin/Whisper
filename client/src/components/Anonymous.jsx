@@ -206,16 +206,16 @@ const Anonymous = ({ onChatClosed }) => {
 
 				<Dropdown placement="leftStart" style={{ zIndex: 3 }} renderToggle={MenuToggle} noCaret>
 					<Dropdown.Item onClick={() => handleClose()}>
-                        <div className="flex items-center space-between">
+                        <div className="flex items-center justify-between">
                         <p>Close Chat</p>
-                        <p className="text-gray-500 text-xs pl-2">Ctrl + Shift + X</p>
+                        <p className="text-gray-500 text-xs">Ctrl + Shift + X</p>
                         </div>
                     </Dropdown.Item>
 
                     <Dropdown.Item onClick={() => handleClose(true)}>
-                        <div className="flex items-center space-between">
+                        <div className="flex items-center justify-between">
                         <p>Find a new buddy</p>
-                        <p className="text-gray-500 text-xs pl-2">Ctrl + Alt + N</p>
+                        <p className="text-gray-500 text-xs">Ctrl + Alt + N</p>
                         </div>
                     </Dropdown.Item>
 				</Dropdown>
