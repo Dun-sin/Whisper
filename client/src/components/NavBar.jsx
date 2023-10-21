@@ -16,7 +16,7 @@ import { createClassesFromArray } from 'src/lib/utils';
 import { useApp } from 'src/context/AppContext';
 import { NEW_EVENT_LOGOUT } from '../../../constants.json';
 
-const linkStyle = `md:h-[60px] w-full flex items-center justify-center hover:bg-primary rounded-[15px] `;
+const linkStyle = `md:h-[60px] h-full w-full flex items-center justify-center hover:bg-primary rounded-[15px] `;
 const activeStyle = linkStyle + 'bg-primary shadow-2xl';
 
 const NavBar = ({ className }) => {
@@ -74,6 +74,7 @@ const NavBar = ({ className }) => {
 				'navContainer',
 				'bg-secondary',
 				'md:w-[120px]',
+				'min-h-[55px]',
 				'md:min-h-screen',
 				'items-center',
 				'md:flex-col',
