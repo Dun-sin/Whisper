@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const ActiveUser = require('../models/ActiveUserModel');
 const Chat = require('../models/ChatModel');
 const Message = require('../models/MessageModel');
-const { isSharedArrayBuffer } = require('util/types');
 
 /**
  * @typedef {{
