@@ -121,7 +121,7 @@ Before installation, please make sure you have already installed the following t
    npm install
    ```
 
-6. Use `.env_sample` to configure the `.env` file for this project. For mongodb url use the localhost to test
+6. Use `.env_sample` to configure the `.env` file for both client and server. For the server .env mongodb url use the localhost to test
 
    > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0  
    > Note: If using Docker, the MongoDB port is **27018**
