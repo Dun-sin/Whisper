@@ -23,6 +23,7 @@ import {
 	NEW_EVENT_EDIT_MESSAGE,
 	NEW_EVENT_RECEIVE_MESSAGE,
 	NEW_EVENT_TYPING,
+	NEW_EVENT_SEND_FAILED
 } from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 
@@ -272,16 +273,23 @@ const Chat = () => {
 		const editMessageHandler = ({ id, chatId, newMessage, oldMessage }) => {
 			editText(id, chatId, newMessage, oldMessage);
 		};
+		
+		const limitMessageHandler = (data) => {
+			alert(data.message);
+		};
 
 		// This is used to recive message form other user.
 		socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
 		socket.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
 		socket.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+		socket.on(NEW_EVENT_SEND_FAILED, limitMessageHandler);
 
 		return () => {
+			
 			socket.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
 			socket.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
 			socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+			socket.off(NEW_EVENT_SEND_FAILED, limitMessageHandler);
 		};
 	}, []);
 
