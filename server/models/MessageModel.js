@@ -29,6 +29,10 @@ const MessageSchema = new Schema(
       type: String,
       default: 'message',
     },
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -44,6 +48,7 @@ const MessageSchema = new Schema(
             isEdited: this.isEdited,
             containsBadword: this.containsBadword,
             oldMessages: this.oldMessages,
+            isRead: this.isRead,
           };
         },
       },

@@ -23,6 +23,7 @@ import {
 	NEW_EVENT_EDIT_MESSAGE,
 	NEW_EVENT_RECEIVE_MESSAGE,
 	NEW_EVENT_TYPING,
+	NEW_EVENT_READ_MESSAGE
 } from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 
@@ -33,6 +34,7 @@ import chatHelper,
 	getTime
 } from '../lib/chatHelper';
 
+import MessageSeen from './Chat/MessageSeen';
 import MessageInput from './Chat/MessageInput';
 import DropDownOptions from './Chat/DropDownOption';
 import PreviousMessages from './Chat/PreviousMessages';
@@ -56,7 +58,7 @@ const Chat = () => {
 	const [openPreviousMessages, setOpenPreviousMessages] = useState(null);
 	const [badwordChoices, setBadwordChoices] = useState({});
 
-	const { messages: state, addMessage, updateMessage, removeMessage, editText } = useChat();
+	const { messages: state, addMessage, updateMessage, removeMessage, editText, receiveMessage } = useChat();
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 	const socket = useContext(SocketContext);
@@ -273,15 +275,21 @@ const Chat = () => {
 			editText(id, chatId, newMessage, oldMessage);
 		};
 
+		const readMessageHandler = ({ messageId, chatId }) => {
+			receiveMessage(messageId, chatId)
+		}
+
 		// This is used to recive message form other user.
 		socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
 		socket.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
 		socket.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+		socket.on(NEW_EVENT_READ_MESSAGE, readMessageHandler)
 
 		return () => {
 			socket.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
 			socket.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
 			socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+			socket.off(NEW_EVENT_READ_MESSAGE, readMessageHandler)
 		};
 	}, []);
 
@@ -311,20 +319,22 @@ const Chat = () => {
 					className="h-[100%] md:max-h-full overflow-y-scroll w-full scroll-smooth"
 				>
 					{sortedMessages.map(
-						({ senderId: sender, id, message, time, status, isEdited, oldMessages, containsBadword }) => {
+						({ senderId: sender, id, message, time, status, isEdited, oldMessages, containsBadword, isRead }) => {
+							const isSender = sender.toString() === senderId.toString()
 							return (
 								<div
 									key={id}
+									id={!isSender && `message-${id}`}
 									className={`w-full flex text-white relative ${
-										sender.toString() === senderId.toString() ? 'justify-end' : 'justify-start'
+										isSender ? 'justify-end' : 'justify-start'
 									}`}
 								>
 									<div
 										className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${
-											sender.toString() === senderId.toString() ? 'items-end' : 'items-start'
+											isSender ? 'items-end' : 'items-start'
 										}`}
 									>
-										{containsBadword && sender.toString() !== senderId.toString() && !badwordChoices[id] ? (
+										{containsBadword && !isSender && !badwordChoices[id] ? (
 											<div className='flex flex-col border-red border w-full rounded-r-md p-3'>
 												<p>Your buddy is trying to send you a bad word</p>
 												<div className='flex w-full gap-6'>
@@ -336,7 +346,7 @@ const Chat = () => {
 											:
 											<>
 												<div
-													className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${sender.toString() === senderId.toString()
+													className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${isSender
 														? 'justify-between bg-secondary rounded-l-md'
 														: 'rounded-r-md'
 														}`}
@@ -352,7 +362,7 @@ const Chat = () => {
 
 													<DropDownOptions
 														isSender={
-															sender.toString() === senderId.toString()
+															isSender
 															&& status !== 'pending'}
 														id={id}
 														inputRef={inputRef}
@@ -363,7 +373,7 @@ const Chat = () => {
 													/>
 												</div>
 												<div
-													className={`flex gap-2 items-center ${sender.toString() === senderId.toString() ? 'flex-row' : 'flex-row-reverse'
+													className={`flex gap-2 items-center ${isSender ? 'flex-row' : 'flex-row-reverse'
 														}`}
 												>
 													<div
@@ -373,18 +383,19 @@ const Chat = () => {
 														<MessageStatus
 															time={getTime(time)}
 															status={status ?? 'sent'}
-															iAmTheSender={sender.toString() === senderId.toString()}
+															iAmTheSender={isSender}
 															onResend={() => handleResend(id, doSend, state, app)}
 														/>
 													</div>
 													<PreviousMessages
 														id={id}
-														isSender={sender.toString() === senderId.toString()}
+														isSender={isSender}
 														isEdited={isEdited}
 														openPreviousEdit={openPreviousEdit}
 														openPreviousMessages={openPreviousMessages}
 														oldMessages={oldMessages}
 													/>
+													<MessageSeen isRead={isRead} isSender={isSender} />
 												</div>
 											</>}
 									</div>
