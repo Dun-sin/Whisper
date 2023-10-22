@@ -11,7 +11,13 @@ const messageCounts = {};
 module.exports = (socket) => {
   socket.on(
     NEW_EVENT_SEND_MESSAGE,
-    async ({ senderId, message, time, chatId }, returnMessageToSender) => {
+    async ({ senderId, message, time, chatId, containsBadword }, returnMessageToSender) => {
+      // Below line is just a failed message simulator for testing purposes.
+
+      // const rndInt = Math.floor(Math.random() * 6) + 1;
+      // if (rndInt % 2 !== 0) {
+      //   return;
+      // }
       const user = getActiveUser({
         socketId: socket.id,
       });
@@ -37,12 +43,15 @@ module.exports = (socket) => {
         return;
       }
 
-      // Cache the sent message in memory and persist to the database
+       /**
+       * Cache the sent message in memory a nd persist to db
+       */
       const sentMessage = await addMessage(chatId, {
         message,
         time,
         senderId,
         type: 'message',
+        containsBadword
       });
 
       const messageDetails = {
