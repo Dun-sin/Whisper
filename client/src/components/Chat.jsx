@@ -23,7 +23,7 @@ import {
 	NEW_EVENT_EDIT_MESSAGE,
 	NEW_EVENT_RECEIVE_MESSAGE,
 	NEW_EVENT_TYPING,
-	NEW_EVENT_READ_MESSAGE
+	NEW_EVENT_READ_MESSAGE,
 	NEW_EVENT_SEND_FAILED
 } from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
