@@ -1,11 +1,11 @@
 /**
  * @typedef {import('socket.io-client').Socket} Socket
  */
-
 import {
 	NEW_EVENT_DELETE_MESSAGE,
 	NEW_EVENT_EDIT_MESSAGE,
 	NEW_EVENT_SEND_MESSAGE,
+	NEW_EVENT_READ_MESSAGE,
 } from '../../../constants.json';
 
 /**
@@ -75,9 +75,29 @@ export default function useChatUtils(socket) {
 		});
 	}
 
+	function seenMessage({ messageId, chatId }) {
+		return new Promise((resolve, reject) => {
+			if (!socket.connected) {
+				reject(null);
+				return;
+			}
+
+			socket
+				.timeout(30000)
+				.emit(NEW_EVENT_READ_MESSAGE, { messageId, chatId }, (err, messagedRead) => {
+					if (err) {
+						reject(err);
+						return;
+					}
+
+					resolve(messagedRead);
+				});
+		});
+	}
 	return {
 		sendMessage,
 		deleteMessage,
 		editMessage,
+		seenMessage,
 	};
 }

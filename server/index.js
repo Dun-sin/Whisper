@@ -41,6 +41,7 @@ const UserRouter = require('./controllers/userController');
 const JoinHandler = require('./sockets/join');
 const SendMessageHandler = require('./sockets/sendMessage');
 const EditMessageHandler = require('./sockets/editMessage');
+const SeenMessageHandler = require('./sockets/seenMesage');
 const DeleteMessageHandler = require('./sockets/deleteMessage');
 const TypingHandler = require('./sockets/typing');
 const LogOutHandler = require('./sockets/logout');
@@ -61,6 +62,7 @@ io.on('connection', (socket) => {
   SendMessageHandler(socket);
   EditMessageHandler(socket);
   DeleteMessageHandler(socket);
+  SeenMessageHandler(socket);
   TypingHandler(socket);
   LogOutHandler(io, socket);
   CloseChatHandler(socket);
