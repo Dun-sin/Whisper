@@ -25,7 +25,7 @@
     "express-rate-limit": "^7.1.1",
     "mongodb": "^5.7.0",
     "mongoose": "^7.4.3",
-    "nodemon": "^2.0.20",
+    "nodemon": "^2.0.22",
     "socket.io": "^4.7.2",
     "validator": "^13.11.0"
   },
