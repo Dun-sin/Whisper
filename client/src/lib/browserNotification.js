@@ -1,3 +1,6 @@
+import BadWordsNext from 'bad-words-next';
+import en from 'bad-words-next/data/en.json'
+
 export const requestBrowserNotificationPermissions = () => {
 	if (!('Notification' in window)) {
 		console.log('Browser does not support desktop notification');
@@ -7,6 +10,8 @@ export const requestBrowserNotificationPermissions = () => {
 };
 
 export const createBrowserNotification = (title, body) => {
+	const badwords = new BadWordsNext({ data: en })
+
 	if (Notification.permission === 'denied') {
 		return;
 	}
@@ -15,8 +20,10 @@ export const createBrowserNotification = (title, body) => {
 		return;
 	}
 
+	const message = badwords.filter(body);
+
 	new Notification(title, {
-		body,
+		body: message,
 		icon: '/favicon.ico',
 	});
 };
