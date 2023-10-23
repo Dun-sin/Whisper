@@ -208,14 +208,14 @@ const Anonymous = ({ onChatClosed }) => {
 					<Dropdown.Item onClick={() => handleClose()}>
                         <div className="flex items-center justify-between gap-2 flex-wrap">
                         <p>Close Chat</p>
-                        <p className="text-gray-500 text-xs">Ctrl + Shift + X</p>
+                        <p className="text-gray-500 text-xs sm:hidden">Ctrl + Shift + X</p>
                         </div>
                     </Dropdown.Item>
 
                     <Dropdown.Item onClick={() => handleClose(true)}>
                         <div className="flex items-center justify-between gap-2 flex-wrap">
                         <p>Find a new buddy</p>
-                        <p className="text-gray-500 text-xs">Ctrl + Alt + N</p>
+                        <p className="text-gray-500 text-xs sm:hidden">Ctrl + Alt + N</p>
                         </div>
                     </Dropdown.Item>
 				</Dropdown>
