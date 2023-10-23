@@ -13,10 +13,11 @@
 - Don't create a pull request on an issue that doesn't exist, create an issue first and if the changes you are proposing are said to be okay, you can go ahead and create a pull request
 - Don't work on the main branch, create your own branch by following the instructions [here](#-how-to-make-a-pull-request)
 - If you are working on the backend, share a screenrecording of your working software
+- don't create a PR for things outside of your issue's scope, it will lead to more work for the maintainers
 
 ### General guidelines
 - Do read the `readme.md` file
-- If there's no activity on an issue/pull request in one week, it gets closed and the person can't have it resigned to them, make sure to give updates on things so maintainers don't think you aren't doing anything. 
+- If there's no PR for an issue in the allocated time, you will be unassigned, the following labels determine the time. `easy: 4days`, `medium: 7 days(1week)`, `hard: 2 weeks`
 - Fill out issue and pull request(PR) templates properly, if you don't know how, check out previous issues/PR to know how they are filled, this video👇🏾 or [this](#-how-to-fill-a-pull-request-templatetext)
 
 #### 👌🏾 How to fill a pull request template(video)
