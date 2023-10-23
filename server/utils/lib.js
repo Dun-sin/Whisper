@@ -1,8 +1,12 @@
 const { Socket } = require('socket.io');
 const mongoose = require('mongoose');
+const CryptoJS = require('crypto-js');
+
 const ActiveUser = require('../models/ActiveUserModel');
 const Chat = require('../models/ChatModel');
 const Message = require('../models/MessageModel');
+
+const secretKey = process.env.SECRET_KEY;
 
 /**
  * @typedef {{
@@ -296,6 +300,8 @@ async function addMessage(
 ) {
   const sender = getActiveUser(senderId);
 
+  message = CryptoJS.AES.encrypt(message, secretKey).toString();
+
   if (!sender) {
     return null;
   }
@@ -360,6 +366,8 @@ async function editMessage(chatId, { id, message, oldMessage }) {
     return false;
   }
 
+  message = CryptoJS.AES.encrypt(message, secretKey).toString();
+
   try {
     await Message.findOneAndUpdate(
       { _id: id },
@@ -376,11 +384,10 @@ async function editMessage(chatId, { id, message, oldMessage }) {
       chats[chatId].messages[id].oldMessages = [];
     }
     chats[chatId].messages[id].oldMessages.push(oldMessage);
+    return chats[chatId].messages[id];
   } catch {
     return false;
   }
-
-  return true;
 }
 
 async function seenMessage(chatId, messageId) {

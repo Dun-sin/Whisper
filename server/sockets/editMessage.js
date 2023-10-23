@@ -17,18 +17,13 @@ module.exports = (socket) => {
         return;
       }
 
-      const messageEditted = await editMessage(chatId, {
+      const messageEdited = await editMessage(chatId, {
         id: messageId,
         message: newMessage,
         oldMessage,
       });
-      socket.broadcast.to(chatId).emit(NEW_EVENT_EDIT_MESSAGE, {
-        id: messageId,
-        chatId,
-        newMessage,
-        oldMessage,
-      });
-      messageWasEditedSuccessfully(messageEditted);
+      socket.broadcast.to(chatId).emit(NEW_EVENT_EDIT_MESSAGE, messageEdited);
+      messageWasEditedSuccessfully(messageEdited);
     }
   );
 };
