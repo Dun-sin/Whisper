@@ -47,6 +47,7 @@ const TypingHandler = require('./sockets/typing');
 const LogOutHandler = require('./sockets/logout');
 const CloseChatHandler = require('./sockets/close');
 const stopSearch = require('./sockets/stopSearch');
+const onlineStatus = require('./sockets/onlineStatus');
 
 app.use(express.json());
 app.use(cors());
@@ -67,6 +68,7 @@ io.on('connection', (socket) => {
   LogOutHandler(io, socket);
   CloseChatHandler(socket);
   stopSearch(socket);
+  onlineStatus(socket);
 });
 
 server.listen(HTTP_PORT, async () => {
