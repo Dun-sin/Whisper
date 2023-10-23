@@ -275,7 +275,7 @@ const Chat = () => {
 		const editMessageHandler = ({ id, chatId, newMessage, oldMessage }) => {
 			editText(id, chatId, newMessage, oldMessage);
 		};
-
+		
 		const limitMessageHandler = (data) => {
 			alert(data.message);
 		};
@@ -287,7 +287,7 @@ const Chat = () => {
 		socket.on(NEW_EVENT_SEND_FAILED, limitMessageHandler);
 
 		return () => {
-
+			
 			socket.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
 			socket.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
 			socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
@@ -325,12 +325,14 @@ const Chat = () => {
 							return (
 								<div
 									key={id}
-									className={`w-full flex text-white relative ${sender.toString() === senderId.toString() ? 'justify-end' : 'justify-start'
-										}`}
+									className={`w-full flex text-white relative ${
+										sender.toString() === senderId.toString() ? 'justify-end' : 'justify-start'
+									}`}
 								>
 									<div
-										className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${sender.toString() === senderId.toString() ? 'items-end' : 'items-start'
-											}`}
+										className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${
+											sender.toString() === senderId.toString() ? 'items-end' : 'items-start'
+										}`}
 									>
 										{containsBadword && sender.toString() !== senderId.toString() && !badwordChoices[id] ? (
 											<div className='flex flex-col border-red border w-full rounded-r-md p-3'>
