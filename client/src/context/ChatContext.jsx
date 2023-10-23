@@ -97,6 +97,13 @@ export const ChatProvider = ({ children }) => {
 		});
 	}
 
+	function receiveMessage(id, chatId) {
+		dispatch({
+			type: 'RECEIVE_MESSAGE',
+			payload: { id, room: chatId }
+		})
+	}
+
 	function closeChat(chatId) {
 		dispatch({
 			type: 'CLOSE_CHAT',
@@ -122,6 +129,7 @@ export const ChatProvider = ({ children }) => {
 				editText,
 				closeChat,
 				closeAllChats,
+				receiveMessage
 			}}
 		>
 			{children}

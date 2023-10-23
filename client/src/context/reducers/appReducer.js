@@ -33,6 +33,13 @@ export default function chatReducer(state, action) {
 			break;
 		}
 
+		case 'ONLINE_STATUS': {
+			const { onlineStatus } = action.payload;
+
+			clonedState.onlineStatus = onlineStatus;
+			break;
+		}
+
 		default:
 			throw new Error('No action provided!');
 	}

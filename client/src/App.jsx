@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { KindeProvider } from '@kinde-oss/kinde-auth-react';
@@ -15,20 +16,24 @@ import { api } from 'src/lib/axios';
 import Start from 'pages/Start';
 import Searching from 'pages/Searching';
 import ComingSoon from 'pages/ComingSoon';
+import Profile from './pages/Profile';
 import Login from 'pages/Login';
 import Settings from 'pages/Settings';
 import NoPage from './pages/NoPage';
 
-const clientID = import.meta.env.VITE_IMPORTANT;
-import Profile from './pages/Profile';
-
 import { useDarkMode } from './context/DarkModeContext';
+import useIsTabActive from './hooks/useIsTabActive';
+
+const clientID = import.meta.env.VITE_IMPORTANT;
 
 function App() {
 	const { isLoggedIn, dispatchAuth } = useAuth();
-	const { loadUserSettings } = useApp();
-
+	const { loadUserSettings, updateOnlineStatus } = useApp(); 
 	const { darkMode } = useDarkMode();
+
+	const [onlineStatus, setOnlineStatus] = useState(null)
+
+	const isTabActive = useIsTabActive()
 
 	async function loginWithEmail(email) {
 		try {
@@ -61,6 +66,22 @@ function App() {
 			console.error('Error logging in:', err);
 		}
 	}
+
+	useEffect(() => {
+		if (!isLoggedIn) {
+			return
+		}
+
+		if (isTabActive) {
+			setOnlineStatus('online')
+		} else {
+			setOnlineStatus(new Date)
+		}
+	}, [isTabActive])
+
+	useEffect(() => {
+		updateOnlineStatus(onlineStatus)
+	}, [onlineStatus])
 
 	return (
 		<KindeProvider
