@@ -95,6 +95,15 @@ export const AppProvider = ({ children }) => {
 		});
 	}
 
+	function updateOnlineStatus(onlineStatus) {
+		dispatch(
+			{
+				type: 'ONLINE_STATUS',
+				payload: { onlineStatus }
+			}
+		)
+	}
+
 	return (
 		<AppContext.Provider
 			value={{
@@ -106,6 +115,7 @@ export const AppProvider = ({ children }) => {
 				startSearch,
 				endSearch,
 				loadUserSettings,
+				updateOnlineStatus
 			}}
 		>
 			{children}
