@@ -72,8 +72,9 @@ export default function chatReducer(state, action) {
 		}
 
 		case 'UPDATE_MESSAGE': {
-			const { id, message, isEdited } = action.payload;
+			const { message, isEdited } = action.payload;
 
+			const id = message.id;
 			if (!clonedState[message.room]) {
 				throw new Error('Room not found!');
 			}
@@ -85,6 +86,7 @@ export default function chatReducer(state, action) {
 			const room = message.room;
 			const messageId = message.id;
 			const updatedMessage = message;
+			const oldMessages = message.oldMessages;
 
 			// Assign the message to the cloned state
 			clonedState[room].messages[messageId] = updatedMessage;
@@ -94,6 +96,12 @@ export default function chatReducer(state, action) {
 				break;
 			}
 			clonedState[room].messages[messageId].isEdited = isEdited;
+
+			if (oldMessages.length === 0) {
+				break;
+			}
+
+			clonedState[room].messages[messageId].oldMessages = oldMessages 
 			break;
 		}
 
