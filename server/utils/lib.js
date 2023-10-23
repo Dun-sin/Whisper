@@ -144,8 +144,8 @@ async function init() {
 
     for (const message of chat.messages) {
       if (message.sender === null) {
-        return
-      };
+        return;
+      }
 
       messages[message._id.toString()] = {
         ...message.optimizedVersion,
@@ -383,6 +383,33 @@ async function editMessage(chatId, { id, message, oldMessage }) {
   return true;
 }
 
+async function seenMessage(chatId, messageId) {
+  if (!chats[chatId]) {
+    return false;
+  }
+
+  const isRead = true;
+
+  try {
+    const checkIfRead = await Message.findById(messageId)
+    if (checkIfRead.isRead) {
+      return
+    }
+    await Message.findOneAndUpdate(
+      {
+        _id: messageId,
+      },
+      { $set: { isRead: isRead } },
+      { new: true }
+    );
+
+    chats[chatId].messages[messageId].isRead = isRead;
+  } catch {
+    return false;
+  }
+  return true;
+}
+
 function getRandomPairFromWaitingList() {
   /**
    * Since we indexed waiting users by emailOrLoginId, we need to first
@@ -465,4 +492,5 @@ module.exports = {
   getActiveUser,
   addToWaitingList,
   delActiveUser,
+  seenMessage,
 };
