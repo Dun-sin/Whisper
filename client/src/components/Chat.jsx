@@ -39,6 +39,7 @@ import MessageSeen from './Chat/MessageSeen';
 import MessageInput from './Chat/MessageInput';
 import DropDownOptions from './Chat/DropDownOption';
 import PreviousMessages from './Chat/PreviousMessages';
+import decryptMessage from 'src/lib/decryptMessage';
 
 
 const inactiveTimeThreshold = 180000; // 3 mins delay
@@ -59,7 +60,7 @@ const Chat = () => {
 	const [openPreviousMessages, setOpenPreviousMessages] = useState(null);
 	const [badwordChoices, setBadwordChoices] = useState({});
 
-	const { messages: state, addMessage, updateMessage, removeMessage, editText, receiveMessage } = useChat();
+	const { messages: state, addMessage, updateMessage, removeMessage, receiveMessage } = useChat();
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 	const socket = useContext(SocketContext);
@@ -104,22 +105,7 @@ const Chat = () => {
 		[state, app.currentChatId]
 	);
 
-	const doSend = async ({ senderId, room, tmpId = uuid(), message, time, containsBadword }) => {
-		try {
-			addMessage({
-				senderId,
-				room,
-				id: tmpId,
-				message,
-				time,
-				status: 'pending',
-				containsBadword
-			});
-		} catch {
-			logOut();
-			return false;
-		}
-
+	const doSend = async ({ senderId, room, message, time, containsBadword }) => {
 		try {
 			const sentMessage = await sendMessage({
 				senderId,
@@ -129,18 +115,28 @@ const Chat = () => {
 				containsBadword
 			});
 
+			addMessage({
+				senderId,
+				room,
+				id: sentMessage.id,
+				message,
+				time,
+				status: 'pending',
+				containsBadword
+			});
+
 			try {
-				updateMessage(tmpId, sentMessage);
+				updateMessage(sentMessage);
 			} catch {
 				logOut();
 				return false;
 			}
 		} catch (e) {
 			try {
-				updateMessage(tmpId, {
+				updateMessage({
 					senderId,
 					room,
-					id: tmpId,
+					id: uuid(),
 					message,
 					time,
 					status: 'failed',
@@ -183,18 +179,17 @@ const Chat = () => {
 
 		if (editing.isediting === true) {
 			try {
-				const oldMessage = getMessage(editing.messageID, state, app).message;
-				await editMessage({
+				const messageObject = getMessage(editing.messageID, state, app)
+				const oldMessage = messageObject.message;
+				const editedMessage = await editMessage({
 					id: editing.messageID,
 					chatId: app.currentChatId,
 					newMessage: message,
 					oldMessage,
 				});
-				editText(editing.messageID, app.currentChatId, message, oldMessage);
-				const messageObject = getMessage(editing.messageID, state, app);
 
-				updateMessage(editing.messageID, messageObject, true);
-			} catch {
+				updateMessage({ ...editedMessage, room: app.currentChatId }, true);
+			} catch (e) {
 				setEditing({ isediting: false, messageID: null });
 				return;
 			}
@@ -274,8 +269,8 @@ const Chat = () => {
 			removeMessage(id, chatId);
 		};
 
-		const editMessageHandler = ({ id, chatId, newMessage, oldMessage }) => {
-			editText(id, chatId, newMessage, oldMessage);
+		const editMessageHandler = (messageEdited) => {
+			updateMessage({ ...messageEdited, room: app.currentChatId }, true);
 		};
 		
 		const limitMessageHandler = (data) => {
@@ -329,12 +324,14 @@ const Chat = () => {
 				>
 					{sortedMessages.map(
 						({ senderId: sender, id, message, time, status, isEdited, oldMessages, containsBadword, isRead }) => {
-							const isSender = sender.toString() === senderId.toString()
+							const isSender = sender.toString() === senderId.toString();
+							message = decryptMessage(message)
+
 							return (
 								<div
 									key={id}
 									id={!isSender && `message-${id}`}
-									className={`w-full flex text-white relative ${
+									className={`w-full flex text-white relative mb-2 ${
 										isSender ? 'justify-end' : 'justify-start'
 									}`}
 								>
@@ -404,8 +401,8 @@ const Chat = () => {
 														openPreviousMessages={openPreviousMessages}
 														oldMessages={oldMessages}
 													/>
-													<MessageSeen isRead={isRead} isSender={isSender} />
 												</div>
+												<MessageSeen isRead={isRead} isSender={isSender} />
 											</>}
 									</div>
 								</div>

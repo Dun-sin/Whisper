@@ -1,5 +1,6 @@
 import BadWordsNext from 'bad-words-next';
 import en from 'bad-words-next/data/en.json'
+import decryptMessage from './decryptMessage';
 
 export const requestBrowserNotificationPermissions = () => {
 	if (!('Notification' in window)) {
@@ -10,7 +11,7 @@ export const requestBrowserNotificationPermissions = () => {
 };
 
 export const createBrowserNotification = (title, body) => {
-	const badwords = new BadWordsNext({ data: en })
+	const badwords = new BadWordsNext({ data: en });
 
 	if (Notification.permission === 'denied') {
 		return;
@@ -20,7 +21,7 @@ export const createBrowserNotification = (title, body) => {
 		return;
 	}
 
-	const message = badwords.filter(body);
+	const message = badwords.filter(decryptMessage(body));
 
 	new Notification(title, {
 		body: message,
