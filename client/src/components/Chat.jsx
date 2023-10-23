@@ -217,6 +217,8 @@ const Chat = () => {
 		}
 		setMessage(e.target.value);
 		adjustTextareaHeight(inputRef);
+		e.target.style.height = '45px';
+		e.target.style.height = `${e.target.scrollHeight}px`;
 	}, 500);
 
 	const openPreviousEdit = (messageId) => {
