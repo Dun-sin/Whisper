@@ -217,7 +217,7 @@ const Chat = () => {
 		}
 		setMessage(e.target.value);
 		adjustTextareaHeight(inputRef);
-		e.target.style.height = '45px';
+		e.target.style.height = '48px';
 		e.target.style.height = `${e.target.scrollHeight}px`;
 	}, 500);
 
@@ -320,7 +320,7 @@ const Chat = () => {
 				</p>
 				<ScrollToBottom
 					initialScrollBehavior="auto"
-					className="h-[100%] md:max-h-full overflow-y-scroll w-full scroll-smooth"
+					className="h-[100%] md:max-h-full overflow-y-auto w-full scroll-smooth"
 				>
 					{sortedMessages.map(
 						({ senderId: sender, id, message, time, status, isEdited, oldMessages, containsBadword, isRead }) => {
