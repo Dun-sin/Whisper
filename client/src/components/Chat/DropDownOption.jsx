@@ -19,8 +19,7 @@ const DropDownOptions = ({
 	inputRef,
 	cancelEdit,
 	setEditing,
-	setIsQuoteReply,
-	setQuoteMessage
+	setReplyId
 }) => {
 	const { app } = useApp();
 	const socket = useContext(SocketContext);
@@ -48,23 +47,6 @@ const DropDownOptions = ({
 		inputRef.current.value = message;
 
 		setEditing({ isediting: true, messageID: id });
-	};
-
-	const handleQuoteReply = (id) => {
-		inputRef.current.focus();
-
-		const { message } = getMessage(id, state, app);
-		if (message.includes('Warning Message')) {
-			cancelEdit();
-			return;
-		}
-
-		const quotedMessage = `> ${message}
-        
-`;
-		inputRef.current.value = quotedMessage;
-		setIsQuoteReply(true);
-		setQuoteMessage(quotedMessage);
 	};
 
 	const handleDelete = async (id) => {
@@ -126,8 +108,8 @@ const DropDownOptions = ({
 				onClick={() => handleCopyToClipBoard(id, state, app)}>
 				Copy
 			</Dropdown.Item>
-			<Dropdown.Item onClick={() => handleQuoteReply(id)}>
-				Quote Reply
+			<Dropdown.Item onClick={() => setReplyId(id)}>
+				Reply
 			</Dropdown.Item>
 			<Dropdown.Item
 				onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
@@ -145,8 +127,8 @@ const DropDownOptions = ({
 				onClick={() => handleCopyToClipBoard(id, state, app)}>
 				Copy
 			</Dropdown.Item>
-			<Dropdown.Item onClick={() => handleQuoteReply(id)}>
-				Quote Reply
+			<Dropdown.Item onClick={() => setReplyId(id)}>
+				Reply
 			</Dropdown.Item>
 		</Dropdown>
 	} else {
@@ -162,6 +144,5 @@ DropDownOptions.propTypes = {
 	isSender: PropTypes.bool.isRequired,
 	cancelEdit: PropTypes.func.isRequired,
 	setEditing: PropTypes.func.isRequired,
-	setIsQuoteReply: PropTypes.func.isRequired,
-	setQuoteMessage: PropTypes.func.isRequired
+	setReplyId: PropTypes.func.isRequired
 };
