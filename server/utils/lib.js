@@ -1,8 +1,12 @@
 const { Socket } = require('socket.io');
 const mongoose = require('mongoose');
+const CryptoJS = require('crypto-js');
+
 const ActiveUser = require('../models/ActiveUserModel');
 const Chat = require('../models/ChatModel');
 const Message = require('../models/MessageModel');
+
+const secretKey = process.env.SECRET_KEY;
 
 /**
  * @typedef {{
@@ -144,8 +148,8 @@ async function init() {
 
     for (const message of chat.messages) {
       if (message.sender === null) {
-        return
-      };
+        return;
+      }
 
       messages[message._id.toString()] = {
         ...message.optimizedVersion,
@@ -292,9 +296,11 @@ function chatExists(chatId) {
  */
 async function addMessage(
   chatId,
-  { message, time, senderId, type = 'message' }
+  { message, time, senderId, type = 'message', containsBadword }
 ) {
   const sender = getActiveUser(senderId);
+
+  message = CryptoJS.AES.encrypt(message, secretKey).toString();
 
   if (!sender) {
     return null;
@@ -311,6 +317,7 @@ async function addMessage(
         sender: new mongoose.Types.ObjectId(sender.id),
         type,
         createdAt: new Date(time),
+        containsBadword,
       })
     ).optimizedVersion,
     senderId,
@@ -359,6 +366,8 @@ async function editMessage(chatId, { id, message, oldMessage }) {
     return false;
   }
 
+  message = CryptoJS.AES.encrypt(message, secretKey).toString();
+
   try {
     await Message.findOneAndUpdate(
       { _id: id },
@@ -375,10 +384,36 @@ async function editMessage(chatId, { id, message, oldMessage }) {
       chats[chatId].messages[id].oldMessages = [];
     }
     chats[chatId].messages[id].oldMessages.push(oldMessage);
+    return chats[chatId].messages[id];
   } catch {
     return false;
   }
+}
 
+async function seenMessage(chatId, messageId) {
+  if (!chats[chatId]) {
+    return false;
+  }
+
+  const isRead = true;
+
+  try {
+    const checkIfRead = await Message.findById(messageId)
+    if (checkIfRead.isRead) {
+      return
+    }
+    await Message.findOneAndUpdate(
+      {
+        _id: messageId,
+      },
+      { $set: { isRead: isRead } },
+      { new: true }
+    );
+
+    chats[chatId].messages[messageId].isRead = isRead;
+  } catch {
+    return false;
+  }
   return true;
 }
 
@@ -464,4 +499,5 @@ module.exports = {
   getActiveUser,
   addToWaitingList,
   delActiveUser,
+  seenMessage,
 };

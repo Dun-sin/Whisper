@@ -41,11 +41,13 @@ const UserRouter = require('./controllers/userController');
 const JoinHandler = require('./sockets/join');
 const SendMessageHandler = require('./sockets/sendMessage');
 const EditMessageHandler = require('./sockets/editMessage');
+const SeenMessageHandler = require('./sockets/seenMesage');
 const DeleteMessageHandler = require('./sockets/deleteMessage');
 const TypingHandler = require('./sockets/typing');
 const LogOutHandler = require('./sockets/logout');
 const CloseChatHandler = require('./sockets/close');
 const stopSearch = require('./sockets/stopSearch');
+const onlineStatus = require('./sockets/onlineStatus');
 
 app.use(express.json());
 app.use(cors());
@@ -61,10 +63,12 @@ io.on('connection', (socket) => {
   SendMessageHandler(socket);
   EditMessageHandler(socket);
   DeleteMessageHandler(socket);
+  SeenMessageHandler(socket);
   TypingHandler(socket);
   LogOutHandler(io, socket);
   CloseChatHandler(socket);
   stopSearch(socket);
+  onlineStatus(socket);
 });
 
 server.listen(HTTP_PORT, async () => {

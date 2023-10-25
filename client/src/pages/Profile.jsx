@@ -7,6 +7,7 @@ import { useAuth } from 'context/AuthContext';
 
 import { api } from 'src/lib/axios';
 import { createClassesFromArray } from 'src/lib/utils';
+import SignupAnonUser from './SignupAnonUser';
 
 const Profile = () => {
 	const [username, setUsername] = useState('Anonymous');
@@ -96,7 +97,7 @@ const Profile = () => {
 			)}
 		>
 			{JSON.parse(localStorage.getItem('auth')).loginType === 'anonymous' ? (
-				<h1 className="text-2xl font-bold">Please Create an Account</h1>
+				<SignupAnonUser/>
 			) : (
 				<>
 					<section className="min-w-[300px] max-w-[400px] w-[40%] px-10 py-8 rounded-2xl flex flex-col justify-center items-center bg-clip-padding backdrop-filter backdrop-blur-2xl bg-gray-100 dark:bg-opacity-5 dark:bg-gray-300">
@@ -152,7 +153,7 @@ const Profile = () => {
 						</div>
 					</section>
 					<button
-						className="border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-primary text-primary hover:bg-primary hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-primary"
+						className="border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-green-500 text-green-500 hover:bg-green-500 hover:text-white dark:border-green-500 dark:text-green-500 dark:hover:bg-green-500 dark:hover:text-white"
 						onClick={handleUpdateProfile}
 					>
 						Save changes

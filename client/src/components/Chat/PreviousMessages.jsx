@@ -5,6 +5,11 @@ import PropTypes from 'prop-types'
 import { AiFillCaretDown } from 'react-icons/ai';
 import { BiSolidEditAlt } from 'react-icons/bi';
 
+import BadWordsNext from 'bad-words-next';
+import en from 'bad-words-next/data/en.json'
+
+import decryptMessage from 'src/lib/decryptMessage';
+
 
 const PreviousMessages = ({
 	id,
@@ -13,6 +18,8 @@ const PreviousMessages = ({
 	openPreviousEdit,
 	openPreviousMessages,
 	oldMessages }) => {
+
+	const badwords = new BadWordsNext({ data: en });
 	return (
 		<div>
 			{isEdited && (
@@ -36,11 +43,15 @@ const PreviousMessages = ({
 					<div className="flex flex-col">
 						{oldMessages !== undefined &&
 							Array.isArray(oldMessages) &&
-							oldMessages.map((message, index) => (
+							oldMessages.map((message, index) => {
+								message = badwords
+									.filter(decryptMessage(message))
+								return (
 								<span key={index} className="text-base">
 									{message}
 								</span>
-							))}
+								)
+							})}
 					</div>
 				</div>
 			)}
@@ -53,8 +64,8 @@ export default PreviousMessages
 PreviousMessages.propTypes = {
 	id: PropTypes.string.isRequired,
 	isSender: PropTypes.bool.isRequired,
-	isEdited: PropTypes.bool.isRequired,
+	isEdited: PropTypes.bool,
 	openPreviousEdit: PropTypes.func.isRequired,
-	openPreviousMessages: PropTypes.string.isRequired,
+	openPreviousMessages: PropTypes.string,
 	oldMessages: PropTypes.array
 }

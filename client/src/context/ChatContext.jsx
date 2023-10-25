@@ -62,10 +62,10 @@ export const ChatProvider = ({ children }) => {
 	 * @param {string} id
 	 * @param {Message} message
 	 */
-	function updateMessage(id, message, isEdited) {
+	function updateMessage(message, isEdited) {
 		dispatch({
 			type: 'UPDATE_MESSAGE',
-			payload: { id, message, isEdited },
+			payload: { message, isEdited },
 		});
 	}
 
@@ -90,11 +90,11 @@ export const ChatProvider = ({ children }) => {
 		});
 	}
 
-	function editText(id, chatId, newText, oldMessage) {
+	function receiveMessage(id, chatId) {
 		dispatch({
-			type: 'EDIT_TEXT',
-			payload: { id, room: chatId, newText, oldMessage },
-		});
+			type: 'RECEIVE_MESSAGE',
+			payload: { id, room: chatId }
+		})
 	}
 
 	function closeChat(chatId) {
@@ -119,9 +119,9 @@ export const ChatProvider = ({ children }) => {
 				updateMessage,
 				createChat,
 				removeMessage,
-				editText,
 				closeChat,
 				closeAllChats,
+				receiveMessage
 			}}
 		>
 			{children}

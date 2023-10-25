@@ -21,6 +21,8 @@
 		"@mui/styled-engine-sc": "^5.6.1",
 		"@rsuite/icons": "^1.0.3",
 		"axios": "^1.4.0",
+		"bad-words-next": "^2.2.1",
+		"crypto-js": "^4.1.1",
 		"emoji-picker-react": "^4.5.2",
 		"lodash": "^4.17.21",
 		"markdown-it": "^13.0.1",
