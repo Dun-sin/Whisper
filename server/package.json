@@ -28,6 +28,7 @@
     "mongoose": "^7.4.3",
     "nodemon": "^2.0.20",
     "socket.io": "^4.7.2",
+    "uuid": "^9.0.1",
     "validator": "^13.11.0"
   },
   "devDependencies": {

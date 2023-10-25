@@ -58,7 +58,8 @@
 			"warn",
 			{
 				"ignoreStrings": true,
-				"ignoreTemplateLiterals": true
+				"ignoreTemplateLiterals": true,
+				"code": 100
 			}
 		],
 		"max-statements-per-line": "warn",
