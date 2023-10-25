@@ -72,7 +72,7 @@ const Chat = () => {
 
 	const [lastMessageTime, setLastMessageTime] = useState(null);
 
-	senderId = authState.email ?? authState.loginId;
+	senderId = authState.loginId;
 
 	const md = new MarkdownIt({
 		html: false,

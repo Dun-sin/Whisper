@@ -5,7 +5,9 @@ const { v4: uuidv4 } = require('uuid');
 
 const User = require('../models/UserSchema');
 
-const accessToken = process.env.ACCESS_TOKEN;
+let accessToken = process.env.ACCESS_TOKEN;
+const clientId = process.env.clientId;
+const clientSecret = process.env.clientSecret;
 const domain = process.env.DOMAIN;
 
 const headers = {
@@ -32,6 +34,31 @@ const emailValidator = (req, res, next) => {
     });
   } else {
     next();
+  }
+};
+
+const getAccessToken = async () => {
+  try {
+    const response = await fetch(`${domain}/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: clientId,
+        client_secret: clientSecret,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`couldn't get access token`);
+    }
+
+    const data = await response.json();
+    return data.access_token;
+  } catch (error) {
+    console.error('An error occurred:', error);
   }
 };
 
@@ -74,7 +101,19 @@ const createUserWithId = async (email, id) => {
   });
 
   if (!response.ok) {
-    throw new Error(`Couldn't add user to kinde`);
+    const errorText = await response.json(); // Capture the error response text
+    if (errorText.errors[1].code === 'TOKEN_INVALID') {
+      const newAccessToken = await getAccessToken();
+      accessToken = newAccessToken;
+
+      await fetch(`${domain}/api/v1/user`, {
+        method: 'POST',
+        body: JSON.stringify(inputBody),
+        headers: headers,
+      });
+    } else {
+      throw new Error(`Couldn't add user to kinde`);
+    }
   }
 
   return User.create({ _id: id, email });
