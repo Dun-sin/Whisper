@@ -29,6 +29,7 @@ import chatHelper,
 {
 	adjustTextareaHeight,
 	checkPartnerResponse,
+	checkUserResponse,
 	getTime
 } from '../lib/chatHelper';
 
@@ -40,6 +41,7 @@ import PreviousMessages from './Chat/PreviousMessages';
 const inactiveTimeThreshold = 180000; // 3 mins delay
 let senderId;
 let inactiveTimeOut;
+let userInactiveTimeOut;
 
 const Chat = () => {
 	const { app } = useApp();
@@ -65,6 +67,7 @@ const Chat = () => {
 	const inputRef = useRef('');
 
 	const [lastMessageTime, setLastMessageTime] = useState(null);
+	const [userLastMessageTime, setUserLastMessageTime] = useState(null);
 
 	senderId = authState.email ?? authState.loginId;
 
@@ -294,6 +297,9 @@ const Chat = () => {
 		const newLastMessageTime = sortedMessages
 			.filter((message) => message.senderId !== senderId)
 			.pop()?.time;
+
+		const userNewLastMessageTime = sortedMessages.filter((message) => message.senderId === senderId).pop()?.time;
+
 		if (newLastMessageTime !== lastMessageTime) {
 			setLastMessageTime(newLastMessageTime);
 			clearTimeout(inactiveTimeOut);
@@ -302,6 +308,15 @@ const Chat = () => {
 			}, inactiveTimeThreshold);
 
 		}
+		
+		if (userNewLastMessageTime !== userLastMessageTime) {
+			setUserLastMessageTime(newLastMessageTime);
+			clearTimeout(userInactiveTimeOut);
+			userInactiveTimeOut = setTimeout(() => {
+				checkUserResponse(userLastMessageTime, inactiveTimeThreshold);
+			}, inactiveTimeThreshold);
+		}
+
 	}, [sortedMessages]);
 
 	return (

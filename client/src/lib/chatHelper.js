@@ -65,3 +65,11 @@ export const checkPartnerResponse = (lastMessageTime, inactiveTimeThreshold) => 
 		createBrowserNotification("your partner isn't responding, want to leave?");
 	}
 };
+
+export const checkUserResponse = (userLastMessageTime, inactiveTimeThreshold) => {
+	const currentTime = new Date().getTime();
+	const isInactive = userLastMessageTime && currentTime - userLastMessageTime > inactiveTimeThreshold;
+	if (isInactive) {
+		createBrowserNotification("don't leave your partner hanging, drop a response");
+	}
+};
