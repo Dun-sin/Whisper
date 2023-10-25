@@ -15,28 +15,25 @@ import PairedSound from '/notifications/paired.mp3';
  * @return {Sound}
  */
 export function useSound(soundSrc, settings) {
-    const _settings = {
-        volume: 10,
-        ...settings,
-    };
+	const _settings = {
+		volume: 10,
+		...settings,
+	};
 
-    const audio = new Audio(soundSrc);
-    audio.preload = 'auto';
-    audio.volume = _settings.volume / 100;
+	const audio = new Audio(soundSrc);
+	audio.preload = 'auto';
+	audio.volume = _settings.volume / 100;
 
-    return {
-        async play() {
-            if (
-                !audio.paused &&
-                (audio.currentTime / audio.duration) * 100 >= 1
-            ) {
-                audio.pause();
-                audio.currentTime = 0;
-            }
-            
-            await audio.play();
-        },
-    };
+	return {
+		async play() {
+			if (!audio.paused && (audio.currentTime / audio.duration) * 100 >= 1) {
+				audio.pause();
+				audio.currentTime = 0;
+			}
+
+			await audio.play();
+		},
+	};
 }
 
 /**
@@ -44,34 +41,32 @@ export function useSound(soundSrc, settings) {
  * @param {NotificationSettings} settings
  */
 export function useNotification(settings = {}) {
-    const { app } = useApp();
-    const { settings: appSettings } = app;
+	const { app } = useApp();
+	const { settings: appSettings } = app;
 
-    const _settings = {
-        volume: appSettings.notificationsEnabled
-            ? appSettings.notificationVolume
-            : 0,
-        ...settings,
-    };
+	const _settings = {
+		volume: appSettings.notificationsEnabled ? appSettings.notificationVolume : 0,
+		...settings,
+	};
 
-    /** @type {{[event in NotificationEvent]: Sound}} */
-    const notifications = {
-        chatClosed: useSound(ChatClosedSound, _settings),
-        newMessage: useSound(NewMessageSound, _settings),
-        buddyPaired: useSound(PairedSound, _settings),
-    };
+	/** @type {{[event in NotificationEvent]: Sound}} */
+	const notifications = {
+		chatClosed: useSound(ChatClosedSound, _settings),
+		newMessage: useSound(NewMessageSound, _settings),
+		buddyPaired: useSound(PairedSound, _settings),
+	};
 
-    return {
-        /**
-         *
-         * @param {NotificationEvent} event
-         */
-        async playNotification(event) {
-            if (!notifications[event]) {
-                return;
-            }
+	return {
+		/**
+		 *
+		 * @param {NotificationEvent} event
+		 */
+		async playNotification(event) {
+			if (!notifications[event]) {
+				return;
+			}
 
-            await notifications[event].play();
-        },
-    };
+			await notifications[event].play();
+		},
+	};
 }

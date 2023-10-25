@@ -5,124 +5,125 @@ import { isEqual } from 'lodash';
 import appReducer from './reducers/appReducer';
 
 const initialState = {
-    settings: {
-        notificationsEnabled: true,
-        notificationVolume: 10,
-    },
-    tmpSettings: null,
-    currentChatId: null,
-    isSearching: false,
+	settings: {
+		notificationsEnabled: true,
+		notificationVolume: 10,
+	},
+	tmpSettings: null,
+	currentChatId: null,
+	isSearching: false,
 };
 
 const AppContext = createContext({
-    ...initialState,
-    updateSettings: () => undefined,
-    startSearch: () => undefined,
-    endSearch: () => undefined
+	...initialState,
+	updateSettings: () => undefined,
+	startSearch: () => undefined,
+	endSearch: () => undefined,
 });
 
 export const useApp = () => {
-    return useContext(AppContext);
+	return useContext(AppContext);
 };
 
 export const AppProvider = ({ children }) => {
-    const [state, dispatch] = useReducer(
-        appReducer,
-        initialState,
-        (defaultState) => {
-            try {
-                const persistedState = JSON.parse(localStorage.getItem('app'));
+	const [state, dispatch] = useReducer(appReducer, initialState, (defaultState) => {
+		try {
+			const persistedState = JSON.parse(localStorage.getItem('app'));
 
-                if (!persistedState) {
-                    return defaultState;
-                }
+			if (!persistedState) {
+				return defaultState;
+			}
 
-                return persistedState;
-            } catch {
-                return defaultState;
-            }
-        }
-    );
+			return persistedState;
+		} catch {
+			return defaultState;
+		}
+	});
 
-    const hasUnsavedSettings = useMemo(() => {
-        return (
-            Boolean(state.tmpSettings) &&
-            !isEqual(state.settings, state.tmpSettings)
-        );
-    });
+	const hasUnsavedSettings = useMemo(() => {
+		return Boolean(state.tmpSettings) && !isEqual(state.settings, state.tmpSettings);
+	});
 
-    function updateSettings() {
-        if (!state.tmpSettings) {
-            return;
-        }
+	function updateSettings() {
+		if (!state.tmpSettings) {
+			return;
+		}
 
-        dispatch({
-            type: 'UPDATE_SETTINGS',
-            payload: state.tmpSettings,
-        });
+		dispatch({
+			type: 'UPDATE_SETTINGS',
+			payload: state.tmpSettings,
+		});
 
-        dispatch({
-            type: 'CANCEL_SETTINGS_UPDATE',
-        });
-    }
+		dispatch({
+			type: 'CANCEL_SETTINGS_UPDATE',
+		});
+	}
 
-    function loadUserSettings(settings) {
-        if (!settings) {
-            return;
-        }
-        dispatch({
-            type: 'UPDATE_SETTINGS',
-            payload: settings,
-        });
-    }
+	function loadUserSettings(settings) {
+		if (!settings) {
+			return;
+		}
+		dispatch({
+			type: 'UPDATE_SETTINGS',
+			payload: settings,
+		});
+	}
 
-    function updateTmpSettings(newSettings) {
-        dispatch({
-            type: 'UPDATE_TMP_SETTINGS',
-            payload: state.tmpSettings
-                ? { ...state.tmpSettings, ...newSettings }
-                : newSettings,
-        });
-    }
+	function updateTmpSettings(newSettings) {
+		dispatch({
+			type: 'UPDATE_TMP_SETTINGS',
+			payload: state.tmpSettings ? { ...state.tmpSettings, ...newSettings } : newSettings,
+		});
+	}
 
-    function cancelSettingsUpdate() {
-        dispatch({
-            type: 'CANCEL_SETTINGS_UPDATE',
-        });
-    }
+	function cancelSettingsUpdate() {
+		dispatch({
+			type: 'CANCEL_SETTINGS_UPDATE',
+		});
+	}
 
-    function startSearch() {
-        dispatch({
-            type: 'START_SEARCHING',
-        });
-    }
+	function startSearch() {
+		dispatch({
+			type: 'START_SEARCHING',
+		});
+	}
 
-    function endSearch(currentChatId = null) {
-        dispatch({
-            type: 'STOP_SEARCHING',
-            payload: { currentChatId },
-        });
-    }
+	function endSearch(currentChatId = null) {
+		dispatch({
+			type: 'STOP_SEARCHING',
+			payload: { currentChatId },
+		});
+	}
 
-    return (
-        <AppContext.Provider
-            value={{
-                app: state,
-                hasUnsavedSettings,
-                updateSettings,
-                updateTmpSettings,
-                cancelSettingsUpdate,
-                startSearch,
-                endSearch,
-                loadUserSettings
-            }}
-        >
-            {children}
-        </AppContext.Provider>
-    );
+	function updateOnlineStatus(onlineStatus) {
+		dispatch(
+			{
+				type: 'ONLINE_STATUS',
+				payload: { onlineStatus }
+			}
+		)
+	}
+
+	return (
+		<AppContext.Provider
+			value={{
+				app: state,
+				hasUnsavedSettings,
+				updateSettings,
+				updateTmpSettings,
+				cancelSettingsUpdate,
+				startSearch,
+				endSearch,
+				loadUserSettings,
+				updateOnlineStatus
+			}}
+		>
+			{children}
+		</AppContext.Provider>
+	);
 };
 
 // Eslint forced me to do this :(
 AppProvider.propTypes = {
-    children: PropTypes.node.isRequired,
+	children: PropTypes.node.isRequired,
 };

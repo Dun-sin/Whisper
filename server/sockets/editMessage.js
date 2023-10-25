@@ -1,11 +1,11 @@
-const { NEW_EVENT_EDIT_MESSAGE } = require("../../constants.json");
-const { getActiveUser, editMessage } = require("../utils/lib");
+const { NEW_EVENT_EDIT_MESSAGE } = require('../../constants.json');
+const { getActiveUser, editMessage } = require('../utils/lib');
 
 module.exports = (socket) => {
   socket.on(
     NEW_EVENT_EDIT_MESSAGE,
     async (
-      { id: messageId, chatId, newMessage },
+      { id: messageId, chatId, newMessage, oldMessage },
       messageWasEditedSuccessfully
     ) => {
       const user = getActiveUser({
@@ -17,15 +17,13 @@ module.exports = (socket) => {
         return;
       }
 
-      const messageEditted = await editMessage(chatId, {
+      const messageEdited = await editMessage(chatId, {
         id: messageId,
         message: newMessage,
+        oldMessage,
       });
-
-      socket.broadcast
-        .to(chatId)
-        .emit(NEW_EVENT_EDIT_MESSAGE, { id: messageId, chatId, newMessage });
-      messageWasEditedSuccessfully(messageEditted);
+      socket.broadcast.to(chatId).emit(NEW_EVENT_EDIT_MESSAGE, messageEdited);
+      messageWasEditedSuccessfully(messageEdited);
     }
   );
 };
