@@ -32,9 +32,12 @@ const SignupAnonUser = () => {
 
 			const data = await response.data;
 			if (response.status === 200) {
+				const id = data.id
+				console.log(id, loginId)
 				dispatchAuth({
 					type: 'LOGIN',
 					payload: {
+						loginId: id,
 						loginType: 'email',
 						email
 					}

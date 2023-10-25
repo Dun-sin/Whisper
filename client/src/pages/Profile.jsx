@@ -77,6 +77,9 @@ const Profile = () => {
 	};
 
 	useEffect(() => {
+		if (email === null || email === '') {
+			return
+		}
 		getProfileData(email);
 	}, []);
 
