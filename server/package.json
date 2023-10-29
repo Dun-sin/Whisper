@@ -19,6 +19,7 @@
   "author": "Dun-sin",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/vision": "^4.0.2",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "dotenv": "^16.3.1",
@@ -26,6 +27,7 @@
     "express-rate-limit": "^7.1.1",
     "mongodb": "^5.7.0",
     "mongoose": "^7.4.3",
+    "multer": "^1.4.5-lts.1",
     "nodemon": "^2.0.20",
     "socket.io": "^4.7.2",
     "uuid": "^9.0.1",

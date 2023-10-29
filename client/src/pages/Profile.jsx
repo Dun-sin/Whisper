@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { HiUserCircle } from 'react-icons/hi';
+import UserAvatar from './UserAvatar';
 import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 
 import { useAuth } from 'context/AuthContext';
@@ -12,6 +12,8 @@ import SignupAnonUser from './SignupAnonUser';
 const Profile = () => {
 	const [username, setUsername] = useState('Anonymous');
 	const [profileResponse, setProfileResponse] = useState();
+	const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+	const [imageFile, setImageFile] = useState(null);
 
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
@@ -25,9 +27,12 @@ const Profile = () => {
 	const getProfileData = async (email) => {
 		try {
 			const response = await api.get(`/profile/${email}`);
-			const { aboutMe, age, gender, username } = response.data;
+			const { aboutMe, age, gender, username, profileImage } = response.data;
 
 			setUsername(username);
+			if (profileImage) {
+				setUploadedImageUrl(profileImage);
+			}
 			aboutRef.current.value = aboutMe || '';
 			ageRef.current.value = age;
 			genderRef.current.value = gender;
@@ -38,22 +43,52 @@ const Profile = () => {
 
 	const handleUserName = (e) => setUsername(e.target.value);
 
-	const handleUpdateProfile = async () => {
-		const data = {
-			email,
-			username,
-			aboutMe: aboutRef.current.value,
-			gender: genderRef.current.value,
-			age: Number(ageRef.current.value),
+	const handleImageUpload = () => {
+		const fileInput = document.createElement('input');
+		fileInput.type = 'file';
+		fileInput.accept = 'image/*';
+		fileInput.onchange = (e) => {
+			const file = e.target.files[0];
+			if (file) {
+				setImageFile(file);
+				const reader = new FileReader();
+				reader.onload = (event) => {
+					setUploadedImageUrl(event.target.result);
+				};
+				reader.readAsDataURL(file);
+			}
 		};
+		fileInput.click();
+	};
+	const handleEditProfile = () => {
+		handleImageUpload();
+	};
+	const handleUpdateProfile = async () => {
+		const formData = new FormData();
+		formData.append('email', email);
+		formData.append('username', username);
+		formData.append('aboutMe', aboutRef.current.value);
+		formData.append('gender', genderRef.current.value);
+		formData.append('age', Number(ageRef.current.value));
 
-		try {
-			const response = await api.post('/profile', data);
-			console.log(response.data.message);
-			setProfileResponse(response.data);
-		} catch (error) {
-			console.error(error);
+		if (imageFile) {
+			formData.append('profileImage', imageFile);
 		}
+		try {
+			const response = await api.post('/profile', formData);
+			console.log(response.data.message);
+			setProfileResponse(response.data.message);
+
+		} catch (error) {
+			// Handle network errors or other unexpected issues
+			console.error('Error uploading file:', error);
+			if (error.response) {
+				// Handle HTTP errors with custom messages
+				console.log(error.response.data.error);
+				setProfileResponse(error.response.data.error);
+			}
+		}
+
 	};
 
 	function logOut() {
@@ -100,11 +135,15 @@ const Profile = () => {
 			)}
 		>
 			{JSON.parse(localStorage.getItem('auth')).loginType === 'anonymous' ? (
-				<SignupAnonUser/>
+				<SignupAnonUser />
 			) : (
 				<>
 					<section className="min-w-[300px] max-w-[400px] w-[40%] px-10 py-8 rounded-2xl flex flex-col justify-center items-center bg-clip-padding backdrop-filter backdrop-blur-2xl bg-gray-100 dark:bg-opacity-5 dark:bg-gray-300">
-						<HiUserCircle className="text-highlight h-20 w-20" />
+						<UserAvatar
+							imageUrl={uploadedImageUrl}
+							onUploadClick={handleImageUpload}
+							onEditClick={handleEditProfile}
+						/>
 
 						<input
 							className="outline-none bg-transparent w-fit text-center text-2xl placeholder:text-2xl placeholder:text-white"
@@ -169,7 +208,7 @@ const Profile = () => {
 					</button>
 					{profileResponse ? (
 						<div>
-							<p className="text-green-300">Profile Updated!</p>
+							<p className="text-green-300">{profileResponse}</p>
 						</div>
 					) : null}
 				</>

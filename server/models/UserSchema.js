@@ -31,6 +31,10 @@ const UserSchema = new mongoose.Schema({
     type: Object,
     required: false,
   },
+  profileImage: {
+    type: String, 
+    required: false
+  },
 });
 
 UserSchema.index({ email: 1 }, { unique: true });
