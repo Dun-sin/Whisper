@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const User = require('../models/UserSchema');
 
-let accessToken = process.env.ACCESS_TOKEN;
+let accessToken = `eyJhbGciOiJSUzI1NiIsImtpZCI6ImY0OmFjOmVkOjdjOjgwOjlmOjQyOmZkOjQyOjNjOjFkOjQ1OmY2OjI1OmEyOjI5IiwidHlwIjoiSldUIn0.eyJhdWQiOltdLCJhenAiOiIwOGQ2ZjNmY2QxNGE0ZDNjODEyN2FjNDljYmUzYjU3ZCIsImV4cCI6MTY5ODY4MzA0NCwiZ3R5IjpbImNsaWVudF9jcmVkZW50aWFscyJdLCJpYXQiOjE2OTg1OTY2NDQsImlzcyI6Imh0dHBzOi8vd2hpc3Blci5raW5kZS5jb20iLCJqdGkiOiI1MmNmZTE3Zi1iMmVmLTQxMzYtOTNiYy03ZmUxMzBmMDU4YzkiLCJzY3AiOltdfQ.ca5HiO9W3cWIHaMjTfOA1SyaAkWCSU9JIVIe-xyxvjhc_txGAPr65XWmg5ai4a38_xsTCr3alr2PwlQE7iSUMtXrdqN5Nn8VCXMqk4Xjj949DzvZaW0Zi2a-qnEfrVH49dZNLOBmTDX2rWqRCh3IvPg0YUNgElrg8oPhsKyDwaQpmMdaPQDRTZDE6ypQ0F0FGSyMDqOF2c0fIK-ELGuUz4MnjtpGxiO1v-aDZwI2e8mDPxkcrLseb0NqBAbETrz9DsK1qxnR5KzkljQMR9A1gp1uDm8pFEiCS-39Q_75QRa8betxcYI0ICvNf91dX1acMR792FAgRc0rr5zkgwYTGQ`;
 const clientId = process.env.clientId;
 const clientSecret = process.env.clientSecret;
 const domain = process.env.DOMAIN;
@@ -62,23 +62,47 @@ const getAccessToken = async () => {
   }
 };
 
-const checkIfUserExistsInKinde = async (email) => {
-  const headers = {
-    Accept: 'application/json',
-    Authorization: `Bearer ${accessToken}`,
-  };
-
+const getKindeUser = async (email) => {
   const response = await fetch(`${domain}/api/v1/users?email=${email}`, {
     method: 'GET',
-    headers: headers,
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
   });
-  const data = await response.json();
-  return data.users ? true : false;
+  let data;
+  if (!response.ok) {
+    const errorText = await response.json(); // Capture the error response text
+    if (errorText.errors[1].code === 'TOKEN_INVALID') {
+      const newAccessToken = await getAccessToken();
+      accessToken = newAccessToken;
+
+      console.log({ accessToken, newAccessToken });
+      const response = await fetch(`${domain}/api/v1/users?email=${email}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Bearer ${newAccessToken}`,
+        },
+      });
+
+      data = await response.json();
+    } else {
+      console.log(errorText);
+      throw new Error(`Couldn't get user from kinde`);
+    }
+  } else {
+    data = await response.json();
+  }
+  return data;
 };
 
 const createUserWithId = async (email, id) => {
   // Logic to create a new user with a provided ID
-  const doesUserExist = await checkIfUserExistsInKinde(email);
+  const getUser = await getKindeUser(email);
+  const doesUserExist = getUser.users ? true : false;
 
   if (doesUserExist) {
     return User.create({ _id: id, email });
@@ -220,6 +244,25 @@ const deleteUser = async (req, res) => {
 
     if (!user) {
       return res.status(NOT_FOUND).json({ error: 'User not found' });
+    }
+
+    const kindeUser = await getKindeUser(email);
+    console.log(kindeUser);
+    const kindeUserId = kindeUser.users[0].id;
+
+    const response = fetch(`${domain}/api/v1/user?id=${kindeUserId}`, {
+      method: 'DELETE',
+
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error((await response).text());
+    } else {
+      return;
     }
 
     // Delete the user
