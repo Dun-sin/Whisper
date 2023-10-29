@@ -21,16 +21,15 @@ import Login from 'pages/Login';
 import Settings from 'pages/Settings';
 import NoPage from './pages/NoPage';
 
-import { useDarkMode } from './context/DarkModeContext';
 import useIsTabActive from './hooks/useIsTabActive';
 
 const clientID = import.meta.env.VITE_IMPORTANT;
 
 function App() {
 	const { isLoggedIn, dispatchAuth } = useAuth();
-	const { loadUserSettings, updateOnlineStatus } = useApp(); 
-	const { darkMode } = useDarkMode();
+	const { loadUserSettings, updateOnlineStatus, app } = useApp(); 
 
+	const { settings } = app
 	const [onlineStatus, setOnlineStatus] = useState(null)
 
 	const isTabActive = useIsTabActive()
@@ -93,7 +92,7 @@ function App() {
 				loginWithEmail(user.email);
 			}}
 		>
-			<div className={`flex flex-col-reverse md:flex-row h-screen ${darkMode && 'dark'}`}>
+			<div className={`flex flex-col-reverse md:flex-row h-screen ${settings.theme && 'dark'}`}>
 				{isLoggedIn && <NavBar />}
 				<Routes>
 					<Route exact path="/" element={<ProtectedRoutes isLoggedIn={isLoggedIn} />}>
