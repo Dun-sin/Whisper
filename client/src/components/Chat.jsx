@@ -29,7 +29,6 @@ import {
 	NEW_EVENT_SEND_FAILED
 } from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
-import { createClassesFromArray } from 'src/lib/utils';
 
 import chatHelper,
 {
@@ -340,18 +339,17 @@ const Chat = () => {
 							const hasActiveReply = currentReplyMessageId === id
 
 							return (
-								<div key={id} id={`message-${id}`} className={createClassesFromArray(
-									'flex flex-col gap-2 py-2 duration-500 transition-all',
-									hasActiveReply && 'bg-[#FF9F1C]/25 border-[#FF9F1C]',
-									hasActiveReply && (isSender ? 'border-r-[3.5px]' : 'border-l-[3.5px]')
-								)}>
+								<div key={id} id={`message-${id}`} className={`
+								flex flex-col gap-2 py-2 duration-500 transition-all
+									${hasActiveReply ? 'bg-[#FF9F1C]/25 border-[#FF9F1C]' : ''},
+									${hasActiveReply ? (isSender ? 'border-r-[3.5px]' : 'border-l-[3.5px]') : ''}`}>
 								{replyTo && (
 									<div
-										className={createClassesFromArray(
-											'max-w-[80%] md:max-w-[50%] min-w-[10px] flex gap-2 items-center',
-											sender.toString() === senderId.toString() && 'self-end',
-											repliedMessage && 'cursor-pointer'
-										)}
+										className={`
+										max-w-[80%] md:max-w-[50%] min-w-[10px] flex gap-2 items-center
+											${sender.toString() === senderId.toString() ? 'self-end' : ''}
+											${repliedMessage ? 'cursor-pointer' : ''}
+										`}
 										onClick={() => scrollToMessage(replyTo)}
 									>
 										<div className="truncate border-b-4 border-[#FF9F1C] p-1">
@@ -371,9 +369,8 @@ const Chat = () => {
 											)}
 										</div>
 										<div
-											className={createClassesFromArray(
-												sender.toString() !== senderId.toString() && 'order-first'
-											)}
+											className={
+												sender.toString() !== senderId.toString() ? 'order-first' : ''}
 										>
 											{sender.toString() === senderId.toString() ? (
 												<BsArrow90DegLeft className="fill-white text-2xl" />
