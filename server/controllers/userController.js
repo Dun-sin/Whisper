@@ -304,11 +304,7 @@ const deleteUser = async (req, res) => {
 };
 
 UserRouter.route('/login').post(emailValidator, loginUser);
-UserRouter.route('/profile').post(
-  upload.single('profileImage'),
-  emailValidator,
-  updateProfile
-);
+UserRouter.route('/profile').post(upload.single('profileImage'), emailValidator, updateProfile);
 UserRouter.route('/profile/:email').get(getProfile);
 UserRouter.route('/deleteUser').delete(emailValidator, deleteUser); //Email validation applied to the required request handlers
 
