@@ -1,19 +1,21 @@
 import { HiUserCircle, HiPencil } from 'react-icons/hi';
+import PropTypes from 'prop-types';
 
-const UserAvatar = (prop) => {
+
+export default function UserAvatar({imageUrl, onUploadClick, onEditClick }) {
   return (
     <div className="relative group">
-      {prop.imageUrl ? (
+      {imageUrl ? (
         <>
           <img
-            src={prop.imageUrl}
+            src={imageUrl}
             alt="Profile Image"
             className="h-20 w-20 rounded-full"
           />
           <div className="absolute top-0 -right-5 opacity-0 group-hover:opacity-100 flex items-center space-x-2">
             <HiPencil
               className="text-blue-500 h-6 w-6 cursor-pointer"
-              onClick={prop.onEditClick}
+              onClick={onEditClick}
             />
             {/* <HiTrash
               className="text-red-500 h-6 w-6 cursor-pointer"
@@ -24,11 +26,16 @@ const UserAvatar = (prop) => {
       ) : (
         <HiUserCircle
           className="text-highlight h-20 w-20 cursor-pointer"
-          onClick={prop.onUploadClick}
+          onClick={onUploadClick}
           title='upload profile image'
         />
       )}
     </div>
-  );
+  )
 };
-export default UserAvatar;
+
+UserAvatar.propTypes = {
+  imageUrl: PropTypes.string.isRequired,
+  onUploadClick: PropTypes.func.isRequired,
+  onEditClick: PropTypes.func.isRequired,
+};

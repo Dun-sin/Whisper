@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import UserAvatar from './UserAvatar';
+import UserAvatar from '../components/UserAvatar';
 import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 
 import { useAuth } from 'context/AuthContext';

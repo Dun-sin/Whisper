@@ -8,7 +8,7 @@ const multer = require('multer');
 const vision = require('@google-cloud/vision');
 // multer for profile image
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const imageUpload = multer({ storage: storage });
 
 const User = require('../models/UserSchema');
 
@@ -304,7 +304,7 @@ const deleteUser = async (req, res) => {
 };
 
 UserRouter.route('/login').post(emailValidator, loginUser);
-UserRouter.route('/profile').post(upload.single('profileImage'), emailValidator, updateProfile);
+UserRouter.route('/profile').post(imageUpload.single('profileImage'), emailValidator, updateProfile);
 UserRouter.route('/profile/:email').get(getProfile);
 UserRouter.route('/deleteUser').delete(emailValidator, deleteUser); //Email validation applied to the required request handlers
 
