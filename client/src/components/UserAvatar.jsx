@@ -17,10 +17,6 @@ export default function UserAvatar({imageUrl, onUploadClick, onEditClick }) {
               className="text-blue-500 h-6 w-6 cursor-pointer"
               onClick={onEditClick}
             />
-            {/* <HiTrash
-              className="text-red-500 h-6 w-6 cursor-pointer"
-              onClick={imageUrl.onDeleteClick}
-            /> */}
           </div>
         </>
       ) : (
