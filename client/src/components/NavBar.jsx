@@ -12,14 +12,13 @@ import { useAuth } from 'context/AuthContext';
 import { SocketContext } from 'context/Context';
 
 // Lib
-import { createClassesFromArray } from 'src/lib/utils';
 import { useApp } from 'src/context/AppContext';
 import { NEW_EVENT_LOGOUT } from '../../../constants.json';
 
-const linkStyle = `md:h-[60px] h-full w-full flex items-center justify-center hover:bg-primary rounded-[15px] `;
-const activeStyle = linkStyle + 'bg-primary shadow-2xl';
+const linkStyle = `h-full w-full flex items-center justify-center hover:bg-primary rounded-[15px] md:max-h-[60px] md:h-[60px] md:min-h-[60px] `;
+const activeStyle = linkStyle + 'bg-primary';
 
-const NavBar = ({ className }) => {
+const NavBar = () => {
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 	const socket = useContext(SocketContext);
@@ -68,30 +67,14 @@ const NavBar = ({ className }) => {
 
 	return (
 		<div
-			className={createClassesFromArray([
-				className,
-				hideNavbar && 'hidden',
-				'navContainer',
-				'bg-secondary',
-				'md:w-[120px]',
-				'min-h-[55px]',
-				'md:min-h-screen',
-				'items-center',
-				'md:flex-col',
-				'flex-row',
-				'justify-center',
-				'shadow-[0_0_100px_0_rgba(0,0,0,1)]',
-				'p-2',
-				'md:p-5',
-				'sticky bottom-0',
-				'md:flex',
-				'h-[70px]',
-			])}
+			className={
+				`${hideNavbar && 'hidden'} bg-secondary md:w-[120px] md:min-h-screen md:max-h-screen items-center md:flex-col flex-row justify-between shadow-[rgb(0,_0,_0)_12px_0px_18px_-18px] p-2 md:p-5 sticky bottom-0 md:flex max-h-[70px] h-[70px] min-h-[70px]`
+			}
 		>
 			<div className='hidden md:flex'>
 				<img src='favicon.ico'/>
 			</div>
-			<div className="justify-between md:justify-center flex items-center md:flex-col flex-row h-full w-full gap-2 flex-nowrap overflow-auto md:h-full">
+			<div className="justify-between md:justify-center flex items-center md:flex-col flex-row w-full gap-2 flex-nowrap overflow-auto">
 				<Whisper
 					placement="auto"
 					controlId="control-id-hover"
@@ -100,7 +83,6 @@ const NavBar = ({ className }) => {
 				>
 					<NavLink to="/" className={getLinkStyle}>
 						<Icon icon="fluent:people-search-20-regular" color="white" height="24" width="24" />
-						{className}
 					</NavLink>
 				</Whisper>
 				<Whisper
@@ -125,7 +107,7 @@ const NavBar = ({ className }) => {
 				</Whisper>
 
 				{/* show only on mobile screen */}
-				<div className='flex w-full md:hidden'>
+				<div className='flex w-full md:hidden h-full'>
 				<Whisper
 					placement="auto"
 					controlId="control-id-hover"
@@ -138,7 +120,7 @@ const NavBar = ({ className }) => {
 				</Whisper>
 				</div>
 			
-			<div className='flex w-full md:hidden'>
+				<div className='flex w-full md:hidden h-full'>
 			<Whisper
 					placement="auto"
 					controlId="control-id-hover"
@@ -149,12 +131,9 @@ const NavBar = ({ className }) => {
 						<Icon icon="majesticons:logout-half-circle" color="white" height={24} width={24} />
 					</button>
 				</Whisper>
+				</div>
 			</div>
-				 
-			
-			
-			</div>
-			<div className='hidden md:block w-full'>
+			<div className='hidden md:flex w-full flex-col gap-2'>
 			<Whisper
 					placement="auto"
 					controlId="control-id-hover"
