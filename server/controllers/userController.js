@@ -62,12 +62,13 @@ const profileImageValidator = async (imageBuffer) => {
     VERY_LIKELY: 100,
   };
   const isUnsafe = (detections) => {
-    const likelihood =
-      detections.adult ||
-      detections.medical ||
-      detections.spoof ||
-      detections.violence ||
-      detections.racy;
+    const likelihood =Math.max(
+      detections.adult,
+      detections.medical,
+      detections.spoof,
+      detections.violence,
+      detections.racy
+    );
     return likelihoodToPercentage[likelihood] >= 50; // Adjust as needed
   };
 
