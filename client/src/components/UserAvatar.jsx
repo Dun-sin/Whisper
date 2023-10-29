@@ -31,7 +31,7 @@ export default function UserAvatar({imageUrl, onUploadClick, onEditClick }) {
 };
 
 UserAvatar.propTypes = {
-  imageUrl: PropTypes.string.isRequired,
-  onUploadClick: PropTypes.func.isRequired,
-  onEditClick: PropTypes.func.isRequired,
+  imageUrl: PropTypes.string,
+  onUploadClick: PropTypes.func,
+  onEditClick: PropTypes.func,
 };
