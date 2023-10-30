@@ -1,13 +1,17 @@
 import { default as ReactEmojiPicker } from 'emoji-picker-react';
 import { useState } from 'react';
 import { MdOutlineEmojiEmotions } from 'react-icons/md';
-import { useDarkMode } from 'src/context/DarkModeContext';
+
 import PropTypes from 'prop-types';
 
-export default function EmojiPicker({ onEmojiPick, focusInput }) {
-	const { darkMode } = useDarkMode();
-	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+import { useApp } from 'src/context/AppContext';
 
+export default function EmojiPicker({ onEmojiPick, focusInput }) {
+
+	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+	const { app } = useApp();
+
+	const { settings } = app
 	const onClosePicker = () => {
 		setShowEmojiPicker(false);
 		focusInput();
@@ -30,7 +34,7 @@ export default function EmojiPicker({ onEmojiPick, focusInput }) {
 					<div className="absolute bottom-[calc(100%+16px)] right-0 z-20 w-[min(100%,350px)]">
 						<ReactEmojiPicker
 							width="100%"
-							theme={darkMode ? 'dark' : 'light'}
+							theme={settings.theme ? 'dark' : 'light'}
 							onEmojiClick={hndleEmojiClick}
 							lazyLoadEmojis
 							skinTonesDisabled
