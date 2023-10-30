@@ -86,7 +86,8 @@ function App() {
 	return (
 		<KindeProvider
 			clientId={clientID}
-			domain="https://whisper.kinde.com"
+			// domain="https://whisper.kinde.com"
+			domain="https://shivewishper-salamander.au.kinde.com"
 			logoutUri={window.location.origin}
 			redirectUri={window.location.origin + '/login'}
 			onRedirectCallback={(user) => {

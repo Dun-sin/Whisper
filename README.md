@@ -126,6 +126,10 @@ Before installation, please make sure you have already installed the following t
    > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0  
    > Note: If using Docker, the MongoDB port is **27018**
 
+    In the client ```.env```  to use the image processing functionality obtain a service account key with Cloud Vision API access
+      > Follow the steps in the [Google Cloud documentation](https://cloud.google.com/iam/docs/keys-create-deletet) to create a service account and download the JSON key file.  
+      Place the file key ``` GOOGLE_APPLICATION_CREDENTIALS = '' ```
+
 7. Run npm start in the client directory and npm run dev:docker in the server directory, this uses docker for the server part
 
     ```bash
