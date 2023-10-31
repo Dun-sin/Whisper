@@ -263,7 +263,7 @@ const Anonymous = ({ onChatClosed }) => {
 
 				<Dropdown placement="leftStart" style={{ zIndex: 3 }} renderToggle={MenuToggle} noCaret>
   <Dropdown.Item onClick={() => handleClose()} className='sm:w-[200px]'>
-    <div className="flex justify-between gap-2 flex-wrap">
+    <div className="flex items-center justify-between gap-2 flex-wrap">
       <span>Close Chat</span>
       <span className="text-gray-500 text-xs">Ctrl + Shift + X</span>
     </div>
