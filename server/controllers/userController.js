@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const User = require('../models/UserSchema');
 
-let accessToken = `eyJhbGciOiJSUzI1NiIsImtpZCI6ImY0OmFjOmVkOjdjOjgwOjlmOjQyOmZkOjQyOjNjOjFkOjQ1OmY2OjI1OmEyOjI5IiwidHlwIjoiSldUIn0.eyJhdWQiOltdLCJhenAiOiIwOGQ2ZjNmY2QxNGE0ZDNjODEyN2FjNDljYmUzYjU3ZCIsImV4cCI6MTY5ODY4MzA0NCwiZ3R5IjpbImNsaWVudF9jcmVkZW50aWFscyJdLCJpYXQiOjE2OTg1OTY2NDQsImlzcyI6Imh0dHBzOi8vd2hpc3Blci5raW5kZS5jb20iLCJqdGkiOiI1MmNmZTE3Zi1iMmVmLTQxMzYtOTNiYy03ZmUxMzBmMDU4YzkiLCJzY3AiOltdfQ.ca5HiO9W3cWIHaMjTfOA1SyaAkWCSU9JIVIe-xyxvjhc_txGAPr65XWmg5ai4a38_xsTCr3alr2PwlQE7iSUMtXrdqN5Nn8VCXMqk4Xjj949DzvZaW0Zi2a-qnEfrVH49dZNLOBmTDX2rWqRCh3IvPg0YUNgElrg8oPhsKyDwaQpmMdaPQDRTZDE6ypQ0F0FGSyMDqOF2c0fIK-ELGuUz4MnjtpGxiO1v-aDZwI2e8mDPxkcrLseb0NqBAbETrz9DsK1qxnR5KzkljQMR9A1gp1uDm8pFEiCS-39Q_75QRa8betxcYI0ICvNf91dX1acMR792FAgRc0rr5zkgwYTGQ`;
+let accessToken = process.env.ACCESS_TOKEN;
 const clientId = process.env.clientId;
 const clientSecret = process.env.clientSecret;
 const domain = process.env.DOMAIN;
@@ -48,6 +48,7 @@ const getAccessToken = async () => {
         grant_type: 'client_credentials',
         client_id: clientId,
         client_secret: clientSecret,
+        audience: `${domain}/api`,
       }),
     });
 
@@ -78,7 +79,6 @@ const getKindeUser = async (email) => {
       const newAccessToken = await getAccessToken();
       accessToken = newAccessToken;
 
-      console.log({ accessToken, newAccessToken });
       const response = await fetch(`${domain}/api/v1/users?email=${email}`, {
         method: 'GET',
         headers: {
@@ -247,10 +247,10 @@ const deleteUser = async (req, res) => {
     }
 
     const kindeUser = await getKindeUser(email);
-    console.log(kindeUser);
     const kindeUserId = kindeUser.users[0].id;
 
-    const response = fetch(`${domain}/api/v1/user?id=${kindeUserId}`, {
+    // delte user from kinde
+    const response = await fetch(`${domain}/api/v1/user?id=${kindeUserId}`, {
       method: 'DELETE',
 
       headers: {
@@ -260,11 +260,8 @@ const deleteUser = async (req, res) => {
     });
 
     if (!response.ok) {
-      throw new Error((await response).text());
-    } else {
-      return;
+      throw new Error(response.text());
     }
-
     // Delete the user
     await user.deleteOne();
 
