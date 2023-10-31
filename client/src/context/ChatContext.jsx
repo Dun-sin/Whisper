@@ -1,7 +1,9 @@
-import { createContext, useContext, useReducer } from 'react';
+import { createContext, useContext, useMemo, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import chatReducer from './reducers/chatReducer';
+import { useApp } from './AppContext';
+import useChatHelper from 'src/lib/chatHelper';
 
 /**
  * @typedef {'pending' | 'sent' | 'failed'} MessageStatus
@@ -18,7 +20,7 @@ import chatReducer from './reducers/chatReducer';
 
 const initialState = {};
 
-const ChatContext = createContext({
+export const ChatContext = createContext({
 	...initialState,
 	deleteMessage: () => undefined,
 	addMessage: () => undefined,
@@ -33,6 +35,7 @@ export const useChat = () => {
 };
 
 export const ChatProvider = ({ children }) => {
+	const {app} = useApp()
 	const [state, dispatch] = useReducer(chatReducer, initialState, (defaultState) => {
 		try {
 			const persistedState = JSON.parse(localStorage.getItem('chats'));
@@ -46,6 +49,11 @@ export const ChatProvider = ({ children }) => {
 			return defaultState;
 		}
 	});
+	const { getMessage } = useChatHelper(state, app)
+
+	const [currentReplyMessageId, setCurrentReplyMessageId] = useState(null)
+	// eslint-disable-next-line no-use-before-define
+	const currentReplyMessage = useMemo(() => getMessage(currentReplyMessageId), [currentReplyMessageId]);
 
 	/**
 	 *
@@ -111,17 +119,29 @@ export const ChatProvider = ({ children }) => {
 		});
 	}
 
+	function startReply(messageId) {
+		setCurrentReplyMessageId(messageId)
+	}
+
+	function cancelReply() {
+		setCurrentReplyMessageId(null)
+	}
+
 	return (
 		<ChatContext.Provider
 			value={{
 				messages: state,
+				currentReplyMessage,
+				currentReplyMessageId,
 				addMessage,
 				updateMessage,
 				createChat,
 				removeMessage,
 				closeChat,
 				closeAllChats,
-				receiveMessage
+				receiveMessage,
+				startReply,
+				cancelReply
 			}}
 		>
 			{children}
