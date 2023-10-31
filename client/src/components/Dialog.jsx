@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
-import { useDialog } from 'src/context/DialogContext';
 
-import { useDarkMode } from 'src/context/DarkModeContext';
+import PropTypes from 'prop-types';
+
+import { useDialog } from 'src/context/DialogContext';
+import { useApp } from 'src/context/AppContext';
 
 const Dialog = ({ ...rest }) => {
 	const { dialog, setDialog } = useDialog();
 	const { isOpen, text, handler, noBtnText, yesBtnText } = dialog;
 
-	const { darkMode } = useDarkMode();
+	const { app } = useApp();
+
+	const { settings } = app
 
 	const resetDialog = () => {
 		setDialog({ isOpen: false, text: '', handler: null });
@@ -39,7 +42,7 @@ const Dialog = ({ ...rest }) => {
 	}
 
 	return ReactDOM.createPortal(
-		<div className={`${darkMode && 'dark'}`}>
+		<div className={`${settings.theme && 'dark'}`}>
 			<div id="overlay" className="z-50 fixed inset-0 bg-black opacity-60" onClick={resetDialog} />
 			<dialog
 				open={isOpen}
@@ -50,7 +53,7 @@ const Dialog = ({ ...rest }) => {
 
 				<div className="flex justify-end gap-2 mt-6">
 					<button
-						className="hover:opacity-80 text-white px-4 py-2 rounded-lg bg-gray-500 dark:bg-primary text-primary dark:text-white"
+						className="hover:opacity-80 px-4 py-2 rounded-lg bg-gray-500 dark:bg-primary text-primary dark:text-white"
 						onClick={handleNoClick}
 					>
 						{noBtnText || 'Cancel'}

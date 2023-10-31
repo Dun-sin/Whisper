@@ -11,6 +11,8 @@ import MarkdownIt from 'markdown-it';
 import BadWordsNext from 'bad-words-next';
 import en from 'bad-words-next/data/en.json'
 
+import { BsArrow90DegLeft, BsArrow90DegRight } from 'react-icons/bs'
+
 import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';
 import { useApp } from 'src/context/AppContext';
@@ -53,20 +55,18 @@ const Chat = () => {
 		isediting: false,
 		messageID: null,
 	});
-	const [isQuoteReply, setIsQuoteReply] = useState(false);
 	const [message, setMessage] = useState('');
-	const [quoteMessage, setQuoteMessage] = useState(null);
 	// use the id so we can track what message's previousMessage is open
 	const [openPreviousMessages, setOpenPreviousMessages] = useState(null);
 	const [badwordChoices, setBadwordChoices] = useState({});
 
-	const { messages: state, addMessage, updateMessage, removeMessage, receiveMessage } = useChat();
+	const { messages: state, addMessage, updateMessage, removeMessage, receiveMessage, startReply, currentReplyMessageId, cancelReply } = useChat();
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 	const socket = useContext(SocketContext);
 
 	const { sendMessage, editMessage } = useChatUtils(socket);
-	const { getMessage, handleResend } = chatHelper(state, app)
+	const { getMessage, handleResend, scrollToMessage } = chatHelper(state, app)
 
 	const inputRef = useRef('');
 
@@ -105,14 +105,15 @@ const Chat = () => {
 		[state, app.currentChatId]
 	);
 
-	const doSend = async ({ senderId, room, message, time, containsBadword }) => {
+	const doSend = async ({ senderId, room, message, time, containsBadword, replyTo = null }) => {
 		try {
 			const sentMessage = await sendMessage({
 				senderId,
 				message,
 				time,
 				chatId: room,
-				containsBadword
+				containsBadword,
+				replyTo
 			});
 
 			addMessage({
@@ -122,7 +123,8 @@ const Chat = () => {
 				message,
 				time,
 				status: 'pending',
-				containsBadword
+				containsBadword,
+				replyTo
 			});
 
 			try {
@@ -140,7 +142,8 @@ const Chat = () => {
 					message,
 					time,
 					status: 'failed',
-					containsBadword
+					containsBadword,
+					replyTo
 				});
 			} catch {
 				logOut();
@@ -158,24 +161,11 @@ const Chat = () => {
 
 		socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
 		const d = new Date();
-		let message = inputRef.current.value.trim(); // Trim the message to remove the extra spaces
-
-		if (!isQuoteReply) {
-			const cleanedText = message.replace(/>+/g, '');
-			message = cleanedText;
-		}
+		const message = inputRef.current.value.trim(); // Trim the message to remove the extra spaces
 
 		if (message === '' || senderId === undefined || senderId === '123456') {
 			return;
 		}
-
-		if (isQuoteReply && message.trim() === quoteMessage.trim()) {
-			return;
-		}
-
-		setIsQuoteReply(false);
-		setQuoteMessage(null);
-
 
 		if (editing.isediting === true) {
 			try {
@@ -200,7 +190,8 @@ const Chat = () => {
 				room: app.currentChatId,
 				message,
 				time: d.getTime(),
-				containsBadword: badwords.check(message)
+				containsBadword: badwords.check(message),
+				replyTo: currentReplyMessageId
 			});
 		}
 
@@ -209,6 +200,7 @@ const Chat = () => {
 			setMessage('');
 			inputRef.current.focus();
 		}
+		cancelReply()
 	};
 
 	const handleTypingStatus = throttle((e) => {
@@ -311,6 +303,10 @@ const Chat = () => {
 		}
 	}, [sortedMessages]);
 
+	useEffect(() => {
+		inputRef.current.focus()
+	}, [currentReplyMessageId])
+
 	return (
 		<div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6">
 			<div className="max-h-[67vh]">
@@ -323,89 +319,143 @@ const Chat = () => {
 					className="h-[100%] md:max-h-full overflow-y-auto w-full scroll-smooth"
 				>
 					{sortedMessages.map(
-						({ senderId: sender, id, message, time, status, isEdited, oldMessages, containsBadword, isRead }) => {
+						({ senderId: sender, id, message, time, status, isEdited, oldMessages, containsBadword, isRead, replyTo }) => {
 							const isSender = sender.toString() === senderId.toString();
 							message = decryptMessage(message)
+							// original message this message is a reply to
+							const repliedMessage = replyTo ? (() => {
+								const messageObj = getMessage(replyTo)
+								if (!messageObj) {
+									return null
+								}
+
+								return {
+									...messageObj,
+									message: decryptMessage(messageObj.message)
+								}
+							})() : null
+
+							// is this message currently being replied? 
+							const hasActiveReply = currentReplyMessageId === id
 
 							return (
-								<div
-									key={id}
-									id={!isSender && `message-${id}`}
-									className={`w-full flex text-white relative mb-2 ${
-										isSender ? 'justify-end' : 'justify-start'
-									}`}
-								>
+								<div key={id} id={`message-${id}`} className={`
+								flex flex-col gap-2 py-2 duration-500 transition-all
+									${hasActiveReply ? 'bg-[#FF9F1C]/25 border-[#FF9F1C]' : ''},
+									${hasActiveReply ? (isSender ? 'border-r-[3.5px]' : 'border-l-[3.5px]') : ''}`}>
+								{replyTo && (
 									<div
-										className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${
-											isSender ? 'items-end' : 'items-start'
+										className={`
+										max-w-[80%] md:max-w-[50%] min-w-[10px] flex gap-2 items-center
+											${sender.toString() === senderId.toString() ? 'self-end' : ''}
+											${repliedMessage ? 'cursor-pointer' : ''}
+										`}
+										onClick={() => scrollToMessage(replyTo)}
+									>
+										<div className="truncate border-b-4 border-[#FF9F1C] p-1">
+											{repliedMessage ? (
+												typeof repliedMessage.message === 'string' ? (
+													<div
+														className="message-reply-container flex flex-nowrap items-center gap-2"
+														dangerouslySetInnerHTML={{ __html: md.render(repliedMessage.message) }}
+													/>
+												) : (
+													repliedMessage.message
+												)
+											) : (
+												<p className="text-gray-400 uppercase text-sm italic">
+													Original Message Deleted
+												</p>
+											)}
+										</div>
+										<div
+											className={
+												sender.toString() !== senderId.toString() ? 'order-first' : ''}
+										>
+											{sender.toString() === senderId.toString() ? (
+												<BsArrow90DegLeft className="fill-white text-2xl" />
+											) : (
+												<BsArrow90DegRight className="fill-white text-2xl" />
+											)}
+										</div>
+									</div>
+								)}
+									<div
+										className={`w-full flex text-white relative mb-2 ${
+											isSender ? 'justify-end' : 'justify-start'
 										}`}
 									>
-										{containsBadword && !isSender && !badwordChoices[id] ? (
-											<div className='flex flex-col border-red border w-full rounded-r-md p-3'>
-												<p>Your buddy is trying to send you a bad word</p>
-												<div className='flex w-full gap-6'>
-													<span onClick={() => showBadword(id)} className='text-sm cursor-pointer'>See</span>
-													<span onClick={() => hideBadword(id)} className='text-red text-sm cursor-pointer'>Hide</span>
+										<div
+											className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${
+												isSender ? 'items-end' : 'items-start'
+											}`}
+										>
+											{containsBadword && !isSender && !badwordChoices[id] ? (
+												<div className='flex flex-col border-red border w-full rounded-r-md p-3'>
+													<p>Your buddy is trying to send you a bad word</p>
+													<div className='flex w-full gap-6'>
+														<span onClick={() => showBadword(id)} className='text-sm cursor-pointer'>See</span>
+														<span onClick={() => hideBadword(id)} className='text-red text-sm cursor-pointer'>Hide</span>
+													</div>
 												</div>
-											</div>
-										)
-											:
-											<>
-												<div
-													className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${isSender
-														? 'justify-between bg-secondary rounded-l-md'
-														: 'rounded-r-md'
-														}`}
-												>
-													{typeof message === 'string' ? (
-														<span dangerouslySetInnerHTML={{
-															__html: md.render(
-																badwordChoices[id] === 'hide' ? badwords.filter(message) : badwordChoices[id] === 'show' ? message : message)
-														}} />
-													) : (
-														badwordChoices[id] === 'hide' ? badwords.filter(message) : badwordChoices[id] === 'show' ? message : message
-													)}
-
-													<DropDownOptions
-														isSender={
-															isSender
-															&& status !== 'pending'}
-														id={id}
-														inputRef={inputRef}
-														cancelEdit={cancelEdit}
-														setEditing={setEditing}
-														setIsQuoteReply={setIsQuoteReply}
-														setQuoteMessage={setQuoteMessage}
-													/>
-												</div>
-												<div
-													className={`flex gap-2 items-center ${isSender ? 'flex-row' : 'flex-row-reverse'
-														}`}
-												>
+											)
+												:
+												<>
 													<div
-														className={`text-[12px] ${status === 'failed' ? 'text-red-600' : 'text-white'
+														className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${isSender
+															? 'justify-between bg-secondary rounded-l-md'
+															: 'rounded-r-md'
 															}`}
 													>
-														<MessageStatus
-															time={getTime(time)}
-															status={status ?? 'sent'}
-															iAmTheSender={isSender}
-															onResend={() => handleResend(id, doSend, state, app)}
+														{typeof message === 'string' ? (
+															<span dangerouslySetInnerHTML={{
+																__html: md.render(
+																	badwordChoices[id] === 'hide' ? badwords.filter(message) : badwordChoices[id] === 'show' ? message : message)
+															}} />
+														) : (
+															badwordChoices[id] === 'hide' ? badwords.filter(message) : badwordChoices[id] === 'show' ? message : message
+														)}
+
+														<DropDownOptions
+															isSender={
+																isSender
+																&& status !== 'pending'}
+															id={id}
+															inputRef={inputRef}
+															cancelEdit={cancelEdit}
+															setEditing={setEditing}
+															setReplyId={startReply}
 														/>
 													</div>
-													<PreviousMessages
-														id={id}
-														isSender={isSender}
-														isEdited={isEdited}
-														openPreviousEdit={openPreviousEdit}
-														openPreviousMessages={openPreviousMessages}
-														oldMessages={oldMessages}
-													/>
-												</div>
-												<MessageSeen isRead={isRead} isSender={isSender} />
-											</>}
+													<div
+														className={`flex gap-2 items-center ${isSender ? 'flex-row' : 'flex-row-reverse'
+															}`}
+													>
+														<div
+															className={`text-[12px] ${status === 'failed' ? 'text-red-600' : 'text-white'
+																}`}
+														>
+															<MessageStatus
+																time={getTime(time)}
+																status={status ?? 'sent'}
+																iAmTheSender={isSender}
+																onResend={() => handleResend(id, doSend, state, app)}
+															/>
+														</div>
+														<PreviousMessages
+															id={id}
+															isSender={isSender}
+															isEdited={isEdited}
+															openPreviousEdit={openPreviousEdit}
+															openPreviousMessages={openPreviousMessages}
+															oldMessages={oldMessages}
+														/>
+													</div>
+													<MessageSeen isRead={isRead} isSender={isSender} />
+												</>}
+										</div>
 									</div>
-								</div>
+									</div>
 							);
 						}
 					)}
