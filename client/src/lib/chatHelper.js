@@ -41,7 +41,45 @@ export default (state, app) => {
 		}
 	};
 
-	return { getMessage, messageExists, handleCopyToClipBoard, handleResend };
+	function scrollToMessage(messageId, animate = true) {
+		const element = document.getElementById(`message-${messageId}`);
+
+		if (!element) {
+			return;
+		}
+
+		const alreadyHighlighted = element.classList.contains('bg-[#FF9F1C]/25');
+
+		element.scrollIntoView({
+			behavior: 'auto',
+		});
+
+		if (!animate) {
+			return
+		}
+
+		if (alreadyHighlighted) {
+			element.classList.replace('bg-[#FF9F1C]/25', 'bg-[#FF9F1C]/50');
+		} else {
+			element.classList.add('bg-[#FF9F1C]/50');
+		}
+
+		element.addEventListener(
+			'transitionend',
+			() => {
+				if (alreadyHighlighted) {
+					element.classList.replace('bg-[#FF9F1C]/50', 'bg-[#FF9F1C]/25');
+				} else {
+					element.classList.remove('bg-[#FF9F1C]/50');
+				}
+			},
+			{
+				once: true,
+			}
+		);
+	}
+
+	return { getMessage, messageExists, handleCopyToClipBoard, handleResend, scrollToMessage };
 };
 
 export const adjustTextareaHeight = (inputRef) => {
