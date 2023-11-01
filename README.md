@@ -126,11 +126,26 @@ Before installation, please make sure you have already installed the following t
    > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0  
    > Note: If using Docker, the MongoDB port is **27018**
 
-    In the client ```.env ```  to use the image processing functionality obtain a service account key with Cloud Vision API access
-      > Follow the steps in the [Google Cloud documentation](https://cloud.google.com/iam/docs/keys-create-deletet) to create a service account and download the JSON key file.  
-      Place the file key ``` GOOGLE_APPLICATION_CREDENTIALS = '' ```
+7.  To use the image processing functionality obtain a service account key with Cloud Vision API access Follow the steps: (You should have an account on google cloud also enable billing ``` its free for 90 days ``` ).
+    > Step 1: [Create or Select the project](https://console.cloud.google.com/projectselector/iam-admin/serviceaccounts/create?walkthrough_id=iam--create-service-account&_ga=2.95254812.1412247885.1698768878-1984436149.1698327773&_gac=1.225382632.1698486356.Cj0KCQjw4vKpBhCZARIsAOKHoWSK9SOo6MDekcPb_OUp7RnW2Gx3v1scmZTxg7QumNv6oHerxitOeM0aAoL5EALw_wcB#step_index=1)  
+    > Step 2: [Enable The Cloud Vision API](https://console.cloud.google.com/apis/library/vision.googleapis.com)  
+    > Step 2: Go back open the same project and click on Action ``` ⁝ > manage key > Add Key ```. You have got a JSON KEY file, copy the key and paste it into client ``` .env > GOOGLE_APPLICATION_CREDENTIALS = '' ```  
+    ```
+    Format:
+        GOOGLE_APPLICATION_CREDENTIALS = '{
+        "type": "service_account",  
+        "project_id": "PROJECT_ID",  
+        "private_key_id": "KEY_ID",  
+        "private_key": "-----BEGIN PRIVATE KEY-----\nPRIVATE_KEY\n-----END PRIVATE KEY-----\n",  
+        "client_email": "SERVICE_ACCOUNT_EMAIL",  
+        "client_id": "CLIENT_ID",  
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",  
+        "token_uri": "https://accounts.google.com/o/oauth2/token",  
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",  
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/SERVICE_ACCOUNT_EMAIL" }' 
+    ```
 
-7. Run npm start in the client directory and npm run dev:docker in the server directory, this uses docker for the server part
+8. Run npm start in the client directory and npm run dev:docker in the server directory, this uses docker for the server part
 
     ```bash
     npm start
@@ -142,7 +157,7 @@ Before installation, please make sure you have already installed the following t
 
 > For those who do not wish to use Docker, here is another option -> [to start the project](https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md#starting-the-project-without-docker)
 
-8. To test things out, you can open the same URL in two different browsers or open a private browsing window in the same browser. This allows you to connect to yourself, use `login anonymously` if you aren't dealing with anything that uses user data else use `login` and open an account on kinde `https://kinde.com/` following the instructions for react implementation and replace it with the data from your kinde.
+9. To test things out, you can open the same URL in two different browsers or open a private browsing window in the same browser. This allows you to connect to yourself, use `login anonymously` if you aren't dealing with anything that uses user data else use `login` and open an account on kinde `https://kinde.com/` following the instructions for react implementation and replace it with the data from your kinde.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
