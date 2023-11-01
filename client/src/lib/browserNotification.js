@@ -21,10 +21,21 @@ export const createBrowserNotification = (title, body) => {
 		return;
 	}
 
-	const message = badwords.filter(decryptMessage(body));
+	if (title !== 'Inactive Chat') {
+		if (badwords.check(decryptMessage(body))) {
+			const message = badwords.filter(decryptMessage(body));
+			new Notification(title, {
+				body: message,
+				icon: '/favicon.ico',
+			});
+
+			return;
+		}
+		body = decryptMessage(body);
+	}
 
 	new Notification(title, {
-		body: message,
+		body,
 		icon: '/favicon.ico',
 	});
 };
