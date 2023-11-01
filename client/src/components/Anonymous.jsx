@@ -27,12 +27,15 @@ import Chat from 'components/Chat';
 import { createClassesFromArray, isExplicitDisconnection } from 'src/lib/utils';
 
 import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
+import useCheckTimePassed from 'src/hooks/useCheckTimePassed';
 
 const centerItems = `flex items-center justify-center`;
 
 const Anonymous = ({ onChatClosed }) => {
 	const { app, endSearch } = useApp();
 	const { currentChatId, onlineStatus } = app;
+	const { clearTimer } = useCheckTimePassed()
+
 	const currentChatIdRef = useRef(currentChatId);
 
 	const [isTyping, setIsTyping] = useState(false);
@@ -103,6 +106,8 @@ const Anonymous = ({ onChatClosed }) => {
 			} else {
 				navigate('/');
 			}
+
+			clearTimer()
 		});
 	};
 

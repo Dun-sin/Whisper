@@ -33,8 +33,7 @@ import { createBrowserNotification } from 'src/lib/browserNotification';
 import chatHelper,
 {
 	adjustTextareaHeight,
-	checkPartnerResponse,
-	getTime
+	getTime,
 } from '../lib/chatHelper';
 
 import MessageSeen from './Chat/MessageSeen';
@@ -42,11 +41,10 @@ import MessageInput from './Chat/MessageInput';
 import DropDownOptions from './Chat/DropDownOption';
 import PreviousMessages from './Chat/PreviousMessages';
 import decryptMessage from 'src/lib/decryptMessage';
+import useInactiveChat from 'src/hooks/useInactiveChat';
 
 
-const inactiveTimeThreshold = 180000; // 3 mins delay
 let senderId;
-let inactiveTimeOut;
 
 const Chat = () => {
 	const { app } = useApp();
@@ -69,8 +67,6 @@ const Chat = () => {
 	const { getMessage, handleResend, scrollToMessage } = chatHelper(state, app)
 
 	const inputRef = useRef('');
-
-	const [lastMessageTime, setLastMessageTime] = useState(null);
 
 	senderId = authState.loginId;
 
@@ -289,19 +285,15 @@ const Chat = () => {
 		};
 	}, []);
 
-	useEffect(() => {
-		const newLastMessageTime = sortedMessages
-			.filter((message) => message.senderId !== senderId)
-			.pop()?.time;
-		if (newLastMessageTime !== lastMessageTime) {
-			setLastMessageTime(newLastMessageTime);
-			clearTimeout(inactiveTimeOut);
-			inactiveTimeOut = setTimeout(() => {
-				checkPartnerResponse(lastMessageTime, inactiveTimeThreshold);
-			}, inactiveTimeThreshold);
+	// this is used to send the notification for inactive chat to the respective user
+	// get the last message sent
+	const getLastMessage = sortedMessages.at(-1);
 
-		}
-	}, [sortedMessages]);
+	const amITheSender = getLastMessage && getLastMessage.senderId === senderId
+
+	// pass it to the hook
+	useInactiveChat(getLastMessage, amITheSender)
+
 
 	useEffect(() => {
 		inputRef.current.focus()
