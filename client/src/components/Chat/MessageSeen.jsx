@@ -36,7 +36,7 @@ const MessageSeen = ({ isRead, isSender }) => {
 		const observer = new IntersectionObserver(
 			(entries) => {
 				entries.forEach((entry) => {
-					if (entry.isIntersecting) {
+					if (entry.isIntersecting && !isSender) {
 						// Mark the message as read
 						const messageId = entry.target.getAttribute('id').split('-')[1]
 						try {
@@ -74,7 +74,7 @@ const MessageSeen = ({ isRead, isSender }) => {
 		};
 	}, [sortedMessages, isTabVisible]);
 
-	return isSender && <p className='text-sm'>{isRead ? 'Seen' : 'Not Seen'}</p>
+	return isSender && <p className='text-sm text-black dark:text-white'>{isRead ? 'Seen' : 'Not Seen'}</p>
 }
 
 export default MessageSeen
