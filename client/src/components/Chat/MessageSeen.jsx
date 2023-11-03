@@ -36,7 +36,7 @@ const MessageSeen = ({ isRead, isSender }) => {
 		const observer = new IntersectionObserver(
 			(entries) => {
 				entries.forEach((entry) => {
-					if (entry.isIntersecting) {
+					if (entry.isIntersecting && !isSender) {
 						// Mark the message as read
 						const messageId = entry.target.getAttribute('id').split('-')[1]
 						try {
