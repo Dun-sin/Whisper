@@ -1,61 +1,68 @@
 {
-	"name": "whischat",
-	"version": "0.1.0",
-	"private": true,
-	"scripts": {
-		"dev": "next dev",
-		"build": "next build",
-		"start": "next start",
-		"lint": "next lint",
-		"semantic-release": "semantic-release"
-	},
-	"dependencies": {
-		"@kinde-oss/kinde-auth-react": "^3.0.23",
-		"@types/crypto-js": "^4.1.3",
-		"@types/lodash": "^4.14.200",
-		"@types/markdown-it": "^13.0.5",
-		"@types/react-scroll-to-bottom": "^4.2.3",
-		"@types/socket.io": "^3.0.2",
-		"@types/uuid": "^9.0.6",
-		"axios": "^1.6.0",
-		"bad-words-next": "^2.2.1",
-		"crypto-js": "^4.2.0",
-		"emoji-picker-react": "^4.5.7",
-		"lodash": "^4.17.21",
-		"markdown-it": "^13.0.2",
-		"next": "14.0.1",
-		"next-connect": "^1.0.0",
-		"react": "^18",
-		"react-dom": "^18",
-		"react-loading-icons": "^1.1.0",
-		"react-scroll-to-bottom": "^4.2.0",
-		"rsuite": "^5.43.0",
-		"socket.io": "^4.7.2",
-		"socket.io-client": "^4.7.2",
-		"uuid": "^9.0.1"
-	},
-	"devDependencies": {
-		"@iconify/react": "^4.1.1",
-		"@types/node": "^20",
-		"@types/react": "^18",
-		"@types/react-dom": "^18",
-		"autoprefixer": "^10.0.1",
-		"cz-conventional-changelog": "^3.3.0",
-		"eslint": "^8",
-		"eslint-config-next": "14.0.1",
-		"postcss": "^8",
-		"semantic-release": "^22.0.7",
-		"tailwindcss": "^3.3.0",
-		"typescript": "^5"
-	},
-	"config": {
-		"commitizen": {
-			"path": "./node_modules/cz-conventional-changelog"
-		}
-	},
-	"release": {
-		"branches": [
-			"main"
-		]
-	}
+  "name": "whischat",
+  "version": "0.0.0-development",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "semantic-release": "semantic-release"
+  },
+  "dependencies": {
+    "@kinde-oss/kinde-auth-react": "^3.0.23",
+    "@types/crypto-js": "^4.1.3",
+    "@types/lodash": "^4.14.200",
+    "@types/markdown-it": "^13.0.5",
+    "@types/react-scroll-to-bottom": "^4.2.3",
+    "@types/socket.io": "^3.0.2",
+    "@types/uuid": "^9.0.6",
+    "axios": "^1.6.0",
+    "bad-words-next": "^2.2.1",
+    "crypto-js": "^4.2.0",
+    "emoji-picker-react": "^4.5.7",
+    "lodash": "^4.17.21",
+    "markdown-it": "^13.0.2",
+    "next": "14.0.1",
+    "next-connect": "^1.0.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-loading-icons": "^1.1.0",
+    "react-scroll-to-bottom": "^4.2.0",
+    "rsuite": "^5.43.0",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@iconify/react": "^4.1.1",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.1",
+    "postcss": "^8",
+    "semantic-release": "^22.0.7",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "release": {
+    "branches": [
+      "main"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dun-sin/Whisper.git"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
 }
