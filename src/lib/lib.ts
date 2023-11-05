@@ -119,12 +119,6 @@ async function init() {
   }
 }
 
-/**
- *
- * @param {ActiveUser[]} users
- *
- * @return {Promise<Chat>}
- */
 async function createChat(users: ActiveUserType[]) {
   const _chat: {
     _id: mongoose.Types.ObjectId;
@@ -223,19 +217,10 @@ async function closeChat(chatId: string) {
   return inactiveList;
 }
 
-/**
- *
- * @param {string} chatId
- */
 function chatExists(chatId: string) {
   return Boolean(getChat(chatId));
 }
 
-/**
- *
- * @param {string} chatId
- * @param {Message} message
- */
 async function addMessage(
   chatId: string,
   {
@@ -395,28 +380,17 @@ function getRandomPairFromWaitingList() {
   return pairedUsers;
 }
 
-/**
- * @param {string} emailOrLoginId
- */
 function isUserActive(id: string) {
   return Boolean(activeUsers[id]);
 }
 
-/**
- *
- * @param {{
- *     loginId: string,
- *     email?: null | string,
- *     socket: Socket
- * }} param0
- */
 function addToWaitingList({
   loginId,
   email,
   socket,
 }: {
   loginId: string;
-  email: string;
+  email?: string;
   socket: Socket;
 }) {
   waitingUsers[loginId] = new Proxy(
@@ -453,14 +427,11 @@ export {
   addMessage,
   removeMessage,
   editMessage,
-  getChatsCount,
-  addActiveUser,
   getWaitingUserLen,
   delWaitingUser,
   getRandomPairFromWaitingList,
   isUserActive,
   getActiveUser,
   addToWaitingList,
-  delActiveUser,
   seenMessage,
 };

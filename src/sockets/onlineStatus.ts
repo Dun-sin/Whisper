@@ -1,7 +1,7 @@
 import { OnlineStatus } from '@/types/types';
 import { Socket } from 'socket.io';
 
-const { NEW_EVENT_ONLINE_STATUS } = require('@/constants.json');
+import { NEW_EVENT_ONLINE_STATUS } from '@/constants.json';
 
 const OnlineStatusHandler = (socket: Socket) => {
   socket.on(

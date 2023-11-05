@@ -18,6 +18,7 @@ import LogOutHandler from '@/sockets/logout';
 import CloseChatHandler from '@/sockets/close';
 import StopSearchHandler from '@/sockets/stopSearch';
 import OnlineStatusHandler from '@/sockets/onlineStatus';
+import connectMongo from '@/mongo';
 
 interface SocketServer extends HTTPServer {
   io?: IOServer | undefined;
@@ -36,14 +37,18 @@ const handler = createRouter<NextApiRequest, NextApiResponseWithSocket>();
 // Enable CORS
 handler.use(cors());
 
-handler.all((_: NextApiRequest, res: NextApiResponseWithSocket) => {
+handler.all(async (_: NextApiRequest, res: NextApiResponseWithSocket) => {
   if (res.socket.server.io) {
     console.log('Already set up');
     res.end();
     return;
   }
 
-  const io = new Server(res.socket.server);
+  const io = new Server(res.socket.server, {
+    cors: { origin: '*' },
+  });
+
+  await connectMongo();
 
   // Event handler for client connections
   io.on('connection', (socket: Socket) => {

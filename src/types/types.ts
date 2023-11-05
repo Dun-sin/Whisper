@@ -64,7 +64,7 @@ export type ChatIdType = {
 
 export type ActiveUserType = {
   id?: string;
-  email: null | string;
+  email?: null | string;
   loginId: string;
   socketConnections: Socket[];
   socketIds: string[];
