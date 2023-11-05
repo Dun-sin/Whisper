@@ -1,13 +1,14 @@
 import {
-	createContext,
-	useContext,
-	useMemo,
-	useReducer,
-	Dispatch,
+  createContext,
+  useContext,
+  useMemo,
+  useReducer,
+  Dispatch,
 } from 'react';
 
 import authReducer, { initialState } from '@/reducer/authReducer';
-import { AuthType, ProviderType } from '@/types';
+import { AuthType } from '@/types/types';
+import { ProviderType } from '@/types/propstypes';
 
 /**
  * Changed the state from a boolean type to an object. This helps improve
@@ -34,59 +35,59 @@ import { AuthType, ProviderType } from '@/types';
  */
 
 const AuthContext = createContext<{
-	authState: AuthType;
-	dispatchAuth: Dispatch<any>;
-	isLoggedIn: boolean;
+  authState: AuthType;
+  dispatchAuth: Dispatch<any>;
+  isLoggedIn: boolean;
 }>({
-	authState: initialState,
-	dispatchAuth: () => {},
-	isLoggedIn: false,
+  authState: initialState,
+  dispatchAuth: () => {},
+  isLoggedIn: false,
 });
 
 export const useAuth = () => {
-	const context = useContext(AuthContext);
-	if (!context) {
-		throw new Error('useAuth must be used within a ContentProvider');
-	}
-	return context;
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within a ContentProvider');
+  }
+  return context;
 };
 
 const initializeAuthState: unknown = (defaultState: AuthType): AuthType => {
-	try {
-		const persistedState = JSON.parse(localStorage.getItem('auth') as string);
+  try {
+    const persistedState = JSON.parse(localStorage.getItem('auth') as string);
 
-		if (!persistedState) {
-			return defaultState;
-		}
+    if (!persistedState) {
+      return defaultState;
+    }
 
-		if (!persistedState.loginId && persistedState.isLoggedIn === true) {
-			throw new Error('Gotcha! :D');
-		}
+    if (!persistedState.loginId && persistedState.isLoggedIn === true) {
+      throw new Error('Gotcha! :D');
+    }
 
-		return persistedState;
-	} catch {
-		return defaultState;
-	}
+    return persistedState;
+  } catch {
+    return defaultState;
+  }
 };
 
 export const AuthProvider = ({ children }: ProviderType) => {
-	const [authState, dispatchAuth] = useReducer(
-		authReducer as React.Reducer<AuthType, any>,
-		initialState,
-		initializeAuthState as undefined,
-	);
+  const [authState, dispatchAuth] = useReducer(
+    authReducer as React.Reducer<AuthType, any>,
+    initialState,
+    initializeAuthState as undefined
+  );
 
-	const isLoggedIn = useMemo(() => {
-		return authState.isLoggedIn && authState.loginId !== null;
-	}, [authState.isLoggedIn, authState.loginId]);
+  const isLoggedIn = useMemo(() => {
+    return authState.isLoggedIn && authState.loginId !== null;
+  }, [authState.isLoggedIn, authState.loginId]);
 
-	const contextValue = {
-		authState,
-		dispatchAuth,
-		isLoggedIn,
-	};
+  const contextValue = {
+    authState,
+    dispatchAuth,
+    isLoggedIn,
+  };
 
-	return (
-		<AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
-	);
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
 };

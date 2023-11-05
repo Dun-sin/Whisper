@@ -1,137 +1,137 @@
-import { AppType, ChatType, MessageType } from '@/types';
+import { AppType, ChatIdType, MessageType } from '@/types/types';
 import { RefObject } from 'react';
 
-export default (state: ChatType, app: AppType) => {
-	const getMessage = (id: string): MessageType | null => {
-		if (app.currentChatId === null) {
-			return null;
-		}
+export default (state: ChatIdType, app: AppType) => {
+  const getMessage = (id: string): MessageType | null => {
+    if (app.currentChatId === null) {
+      return null;
+    }
 
-		const chatContent = state[app.currentChatId];
+    const chatContent = state[app.currentChatId];
 
-		if (!chatContent) {
-			return null;
-		}
+    if (!chatContent) {
+      return null;
+    }
 
-		return chatContent.messages[id];
-	};
+    return chatContent.messages[id];
+  };
 
-	const messageExists = (id: string) => {
-		return Boolean(getMessage(id));
-	};
+  const messageExists = (id: string) => {
+    return Boolean(getMessage(id));
+  };
 
-	const handleResend = (id: string, doSend: any) => {
-		if (!messageExists(id)) {
-			return;
-		}
+  const handleResend = (id: string, doSend: any) => {
+    if (!messageExists(id)) {
+      return;
+    }
 
-		const gottenMessage = getMessage(id);
+    const gottenMessage = getMessage(id);
 
-		if (!gottenMessage) {
-			return;
-		}
+    if (!gottenMessage) {
+      return;
+    }
 
-		const { senderId, room, message, time } = gottenMessage;
+    const { senderId, room, message, time } = gottenMessage;
 
-		doSend({
-			senderId,
-			room,
-			message,
-			time,
-			tmpId: id,
-		});
-	};
+    doSend({
+      senderId,
+      room,
+      message,
+      time,
+      tmpId: id,
+    });
+  };
 
-	const handleCopyToClipBoard = async (id: string) => {
-		const gottenMessage = getMessage(id);
+  const handleCopyToClipBoard = async (id: string) => {
+    const gottenMessage = getMessage(id);
 
-		if (!gottenMessage) {
-			return;
-		}
+    if (!gottenMessage) {
+      return;
+    }
 
-		const { message, containsBadword } = gottenMessage;
+    const { message, containsBadword } = gottenMessage;
 
-		if (containsBadword) {
-			return;
-		}
+    if (containsBadword) {
+      return;
+    }
 
-		if ('clipboard' in navigator) {
-			return await navigator.clipboard.writeText(message);
-		} else {
-			return document.execCommand('copy', true, message);
-		}
-	};
+    if ('clipboard' in navigator) {
+      return await navigator.clipboard.writeText(message);
+    } else {
+      return document.execCommand('copy', true, message);
+    }
+  };
 
-	function scrollToMessage(messageId: string, animate = true) {
-		const element = document.getElementById(`message-${messageId}`);
+  function scrollToMessage(messageId: string, animate = true) {
+    const element = document.getElementById(`message-${messageId}`);
 
-		if (!element) {
-			return;
-		}
+    if (!element) {
+      return;
+    }
 
-		const alreadyHighlighted = element.classList.contains('bg-[#FF9F1C]/25');
+    const alreadyHighlighted = element.classList.contains('bg-[#FF9F1C]/25');
 
-		element.scrollIntoView({
-			behavior: 'auto',
-		});
+    element.scrollIntoView({
+      behavior: 'auto',
+    });
 
-		if (!animate) {
-			return;
-		}
+    if (!animate) {
+      return;
+    }
 
-		if (alreadyHighlighted) {
-			element.classList.replace('bg-[#FF9F1C]/25', 'bg-[#FF9F1C]/50');
-		} else {
-			element.classList.add('bg-[#FF9F1C]/50');
-		}
+    if (alreadyHighlighted) {
+      element.classList.replace('bg-[#FF9F1C]/25', 'bg-[#FF9F1C]/50');
+    } else {
+      element.classList.add('bg-[#FF9F1C]/50');
+    }
 
-		element.addEventListener(
-			'transitionend',
-			() => {
-				if (alreadyHighlighted) {
-					element.classList.replace('bg-[#FF9F1C]/50', 'bg-[#FF9F1C]/25');
-				} else {
-					element.classList.remove('bg-[#FF9F1C]/50');
-				}
-			},
-			{
-				once: true,
-			},
-		);
-	}
+    element.addEventListener(
+      'transitionend',
+      () => {
+        if (alreadyHighlighted) {
+          element.classList.replace('bg-[#FF9F1C]/50', 'bg-[#FF9F1C]/25');
+        } else {
+          element.classList.remove('bg-[#FF9F1C]/50');
+        }
+      },
+      {
+        once: true,
+      }
+    );
+  }
 
-	return {
-		getMessage,
-		messageExists,
-		handleCopyToClipBoard,
-		handleResend,
-		scrollToMessage,
-	};
+  return {
+    getMessage,
+    messageExists,
+    handleCopyToClipBoard,
+    handleResend,
+    scrollToMessage,
+  };
 };
 
 export const adjustTextareaHeight = (
-	inputRef: RefObject<HTMLTextAreaElement>,
+  inputRef: RefObject<HTMLTextAreaElement>
 ) => {
-	if (inputRef.current) {
-		const minTextareaHeight = '45px';
-		const currentScrollHeight = inputRef.current.scrollHeight + 'px';
+  if (inputRef.current) {
+    const minTextareaHeight = '45px';
+    const currentScrollHeight = inputRef.current.scrollHeight + 'px';
 
-		inputRef.current.style.height =
-			Math.max(parseInt(minTextareaHeight), parseInt(currentScrollHeight)) +
-			'px';
-	}
+    inputRef.current.style.height =
+      Math.max(parseInt(minTextareaHeight), parseInt(currentScrollHeight)) +
+      'px';
+  }
 };
 
 export const getTime = (time: number) => {
-	return new Date(time).toLocaleTimeString();
+  return new Date(time).toLocaleTimeString();
 };
 
 export const isGreaterThan3Minutes = (interval: number, time: number) => {
-	const currentTime = Date.now();
-	const timeDifference = currentTime - time;
+  const currentTime = Date.now();
+  const timeDifference = currentTime - time;
 
-	if (timeDifference > interval) {
-		return true;
-	}
-	return false;
+  if (timeDifference > interval) {
+    return true;
+  }
+  return false;
 };

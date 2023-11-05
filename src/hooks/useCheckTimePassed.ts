@@ -5,45 +5,52 @@ import { useEffect, useState } from 'react';
  * {timeToCheck} is the time to track against also in ms e.g 3 minutes
  */
 export default (timeInMilliseconds: number, timeToCheck: number) => {
-	const [timePassed, setTimePassed] = useState(false);
-	const [timer, setTimer] = useState<
-		undefined | ReturnType<typeof setInterval>
-	>();
+  const [timePassed, setTimePassed] = useState(false);
+  const [timer, setTimer] = useState<
+    undefined | ReturnType<typeof setInterval>
+  >();
 
-	// Function to clear the timer externally
-	const clearTimer = () => {
-		if (!timer) return;
-		clearInterval(timer);
-		return { timePassed: false, clearTimer };
-	};
+  // Function to clear the timer externally
+  const clearTimer = () => {
+    if (!timer) {
+      return;
+    }
+    clearInterval(timer);
+    return { timePassed: false, clearTimer };
+  };
 
-	useEffect(() => {
-		if (!timeInMilliseconds) {
-			return;
-		}
+  useEffect(() => {
+    if (!timeInMilliseconds || timeInMilliseconds === 0) {
+      return;
+    }
 
-		// check if the time if it's greater or equal to the `timeToCheck`
-		const checkTime = () => {
-			const currentTime = Date.now();
-			const timeDifference = currentTime - timeInMilliseconds;
-			setTimePassed(timeDifference >= timeToCheck);
-		};
+    // check if the time if it's greater or equal to the `timeToCheck`
+    const checkTime = () => {
+      const currentTime = Date.now();
+      const timeDifference = currentTime - timeInMilliseconds;
 
-		let timerId: undefined | ReturnType<typeof setInterval> = undefined;
-		timerId = setInterval(checkTime, 1000);
+      if (timeDifference === timeInMilliseconds) return;
 
-		// set the interval to state
-		if (!timerId) return;
-		setTimer(timerId);
+      setTimePassed(timeDifference >= timeToCheck);
+    };
 
-		return () => {
-			clearInterval(timerId);
-		};
-	}, [timeInMilliseconds]);
+    let timerId: undefined | ReturnType<typeof setInterval> = undefined;
+    timerId = setInterval(checkTime, 1000);
 
-	if (!timeInMilliseconds) {
-		return { timePassed: false, clearTimer };
-	}
+    // set the interval to state
+    if (!timerId) {
+      return;
+    }
+    setTimer(timerId);
 
-	return { timePassed, clearTimer };
+    return () => {
+      clearInterval(timerId);
+    };
+  }, [timeInMilliseconds, timeToCheck]);
+
+  if (!timeInMilliseconds) {
+    return { timePassed: false, clearTimer };
+  }
+
+  return { timePassed, clearTimer };
 };

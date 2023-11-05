@@ -1,9 +1,4 @@
-import React, {
-	useContext,
-	Dispatch,
-	SetStateAction,
-	MutableRefObject,
-} from 'react';
+import React, { useContext } from 'react';
 
 import Dropdown from 'rsuite/Dropdown';
 import { Icon } from '@iconify/react';
@@ -15,150 +10,147 @@ import { useApp } from '@/context/AppContext';
 import { SocketContext } from '@/context/Context';
 
 import useChatUtils from '@/lib/chatSocket';
+import { DropDownProps } from '@/types/propstypes';
 
 const DropDownOptions = ({
-	id,
-	isSender,
-	inputRef,
-	cancelEdit,
-	setEditing,
-	setReplyId,
-}: {
-	id: string;
-	inputRef: MutableRefObject<any>;
-	isSender: boolean;
-	cancelEdit: () => void;
-	setEditing: Dispatch<
-		SetStateAction<{
-			isediting: boolean;
-			messageID: string;
-		}>
-	>;
-	setReplyId: (messageID: string) => void;
-}) => {
-	const { app } = useApp();
-	const socket = useContext(SocketContext);
+  id,
+  isSender,
+  inputRef,
+  cancelEdit,
+  setEditing,
+  setReplyId,
+}: DropDownProps) => {
+  const { app } = useApp();
+  const socket = useContext(SocketContext);
 
-	const { messages: state, updateMessage, removeMessage } = useChat();
-	const { getMessage, messageExists, handleCopyToClipBoard } = chatHelper(
-		state,
-		app,
-	);
-	const { deleteMessage } = useChatUtils(socket);
+  const { messages: state, updateMessage, removeMessage } = useChat();
+  const { getMessage, messageExists, handleCopyToClipBoard } = chatHelper(
+    state,
+    app
+  );
+  const { deleteMessage } = useChatUtils(socket);
 
-	const handleEdit = (id: string) => {
-		inputRef?.current.focus();
-		const gottenMessage = getMessage(id);
+  const handleEdit = (id: string) => {
+    inputRef?.current?.focus();
+    const gottenMessage = getMessage(id);
 
-		if (!gottenMessage) return;
+    if (!gottenMessage) {
+      return;
+    }
 
-		const { message } = gottenMessage;
+    const { message } = gottenMessage;
 
-		if (gottenMessage.containsBadword) {
-			cancelEdit();
-			return;
-		}
-		inputRef.current.value = message;
+    if (gottenMessage.containsBadword) {
+      cancelEdit();
+      return;
+    }
 
-		setEditing({ isediting: true, messageID: id });
-	};
+    if (!inputRef.current) {
+      return;
+    }
+    inputRef.current.value = message;
 
-	const handleDelete = async (id: string) => {
-		if (!messageExists(id)) {
-			return;
-		}
+    setEditing({ isediting: true, messageID: id });
+  };
 
-		const gottenMessage = getMessage(id);
+  const handleDelete = async (id: string) => {
+    if (!messageExists(id)) {
+      return;
+    }
 
-		if (!gottenMessage) {
-			return;
-		}
+    const gottenMessage = getMessage(id);
 
-		if (gottenMessage.containsBadword) {
-			return;
-		}
+    if (!gottenMessage) {
+      return;
+    }
 
-		const messageToUpdate = { ...gottenMessage };
+    if (gottenMessage.containsBadword) {
+      return;
+    }
 
-		messageToUpdate.status = 'pending';
+    const messageToUpdate = { ...gottenMessage };
 
-		updateMessage(messageToUpdate);
+    messageToUpdate.status = 'pending';
 
-		try {
-			const messageDeleted = await deleteMessage({
-				id,
-				chatId: gottenMessage.room as string,
-			});
+    updateMessage(messageToUpdate);
 
-			console.log(messageDeleted);
-			if (!messageDeleted) {
-				updateMessage(id);
-				return;
-			}
+    try {
+      const messageDeleted = await deleteMessage({
+        id,
+        chatId: gottenMessage.room as string,
+      });
 
-			removeMessage(id, gottenMessage.room as string);
-		} catch (e) {
-			console.log(e);
-			updateMessage(gottenMessage);
-		}
-	};
+      console.log(messageDeleted);
+      if (!messageDeleted) {
+        updateMessage(id);
+        return;
+      }
 
-	const renderIconButton = (props: any) => {
-		return (
-			<Icon
-				icon='mdi:dots-vertical'
-				{...props}
-				className='fill-white h-7 w-7'
-			/>
-		);
-	};
+      removeMessage(id, gottenMessage.room as string);
+    } catch (e) {
+      console.log(e);
+      updateMessage(gottenMessage);
+    }
+  };
 
-	const renderIconButtonReceiver = (props: any) => {
-		return (
-			<Icon
-				icon='mdi:dots-vertical'
-				{...props}
-				className='fill-white h-7 w-7'
-			/>
-		);
-	};
+  const renderIconButton = (props: any) => {
+    return (
+      <Icon
+        icon='mdi:dots-vertical'
+        {...props}
+        className='fill-white h-7 w-7'
+      />
+    );
+  };
 
-	if (isSender) {
-		return (
-			<Dropdown
-				placement='leftStart'
-				style={{
-					zIndex: 'auto',
-				}}
-				renderToggle={renderIconButton}
-				NoCaret>
-				<Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>
+  const renderIconButtonReceiver = (props: any) => {
+    return (
+      <Icon
+        icon='mdi:dots-vertical'
+        {...props}
+        className='fill-white h-7 w-7'
+      />
+    );
+  };
 
-				<Dropdown.Item onClick={() => handleCopyToClipBoard(id)}>
-					Copy
-				</Dropdown.Item>
-				<Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
-				<Dropdown.Item onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
-			</Dropdown>
-		);
-	} else if (!isSender) {
-		return (
-			<Dropdown
-				placement='rightStart'
-				style={{
-					zIndex: 'auto',
-				}}
-				renderToggle={renderIconButtonReceiver}
-				NoCaret>
-				<Dropdown.Item onClick={() => handleCopyToClipBoard(id)}>
-					Copy
-				</Dropdown.Item>
-				<Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
-			</Dropdown>
-		);
-	} else {
-		return null;
-	}
+  if (isSender) {
+    return (
+      <Dropdown
+        placement='leftStart'
+        style={{
+          zIndex: 'auto',
+        }}
+        renderToggle={renderIconButton}
+        NoCaret
+      >
+        <Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>
+
+        <Dropdown.Item onClick={() => handleCopyToClipBoard(id)}>
+          Copy
+        </Dropdown.Item>
+        <Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
+        <Dropdown.Item onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
+      </Dropdown>
+    );
+  } else if (!isSender) {
+    return (
+      <Dropdown
+        placement='rightStart'
+        style={{
+          zIndex: 'auto',
+        }}
+        renderToggle={renderIconButtonReceiver}
+        NoCaret
+      >
+        <Dropdown.Item onClick={() => handleCopyToClipBoard(id)}>
+          Copy
+        </Dropdown.Item>
+        <Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
+      </Dropdown>
+    );
+  } else {
+    return null;
+  }
 };
 
 export default DropDownOptions;

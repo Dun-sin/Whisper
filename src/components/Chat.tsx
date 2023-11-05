@@ -1,11 +1,11 @@
 /* eslint-disable max-len */
 import {
-	useEffect,
-	useRef,
-	useContext,
-	useMemo,
-	useState,
-	FormEvent,
+  useEffect,
+  useRef,
+  useContext,
+  useMemo,
+  useState,
+  FormEvent,
 } from 'react';
 import { SocketContext } from '@/context/Context';
 
@@ -26,12 +26,12 @@ import useChatUtils from '@/lib/chatSocket';
 import MessageStatus from '@/components/Chat/MessageStatus';
 import { useNotification } from '@/lib/notification';
 import {
-	NEW_EVENT_DELETE_MESSAGE,
-	NEW_EVENT_EDIT_MESSAGE,
-	NEW_EVENT_RECEIVE_MESSAGE,
-	NEW_EVENT_TYPING,
-	NEW_EVENT_READ_MESSAGE,
-	NEW_EVENT_SEND_FAILED,
+  NEW_EVENT_DELETE_MESSAGE,
+  NEW_EVENT_EDIT_MESSAGE,
+  NEW_EVENT_RECEIVE_MESSAGE,
+  NEW_EVENT_TYPING,
+  NEW_EVENT_READ_MESSAGE,
+  NEW_EVENT_SEND_FAILED,
 } from '@/constants.json';
 import { createBrowserNotification } from '@/lib/browserNotification';
 
@@ -43,534 +43,559 @@ import DropDownOptions from './Chat/DropDownOption';
 import PreviousMessages from './Chat/PreviousMessages';
 import decryptMessage from '@/lib/decryptMessage';
 import useInactiveChat from '@/hooks/useInactiveChat';
-import { MessageType } from '@/types';
+import { MessageType, InputRefType } from '@/types/types';
 
 let senderId: string | undefined;
 
 const Chat = () => {
-	const { app } = useApp();
-	const { playNotification } = useNotification(app.settings);
-	const [editing, setEditing] = useState<{
-		isediting: boolean;
-		messageID: string;
-	}>({
-		isediting: false,
-		messageID: '',
-	});
-	const [message, setMessage] = useState<string>('');
-	// use the id so we can track what message's previousMessage is open
-	const [openPreviousMessages, setOpenPreviousMessages] = useState<string>('');
-	const [badwordChoices, setBadwordChoices] = useState<{
-		[id: string]: string;
-	}>({});
+  const { app } = useApp();
+  const { playNotification } = useNotification(app.settings);
+  const [editing, setEditing] = useState<{
+    isediting: boolean;
+    messageID: string;
+  }>({
+    isediting: false,
+    messageID: '',
+  });
+  const [message, setMessage] = useState<string>('');
+  // use the id so we can track what message's previousMessage is open
+  const [openPreviousMessages, setOpenPreviousMessages] = useState<string>('');
+  const [badwordChoices, setBadwordChoices] = useState<{
+    [id: string]: string;
+  }>({});
 
-	const {
-		messages: state,
-		addMessage,
-		updateMessage,
-		removeMessage,
-		receiveMessage,
-		startReply,
-		currentReplyMessageId,
-		cancelReply,
-	} = useChat();
-	const { authState, dispatchAuth } = useAuth();
-	const { logout } = useKindeAuth();
-	const socket = useContext(SocketContext);
+  const {
+    messages: state,
+    addMessage,
+    updateMessage,
+    removeMessage,
+    receiveMessage,
+    startReply,
+    currentReplyMessageId,
+    cancelReply,
+  } = useChat();
+  const { authState, dispatchAuth } = useAuth();
+  const { logout } = useKindeAuth();
+  const socket = useContext(SocketContext);
 
-	const { sendMessage, editMessage } = useChatUtils(socket);
-	const { getMessage, handleResend, scrollToMessage } = chatHelper(state, app);
+  const { sendMessage, editMessage } = useChatUtils(socket);
+  const { getMessage, handleResend, scrollToMessage } = chatHelper(state, app);
 
-	const inputRef = useRef<HTMLTextAreaElement | null>(null);
+  const inputRef: InputRefType = useRef<HTMLTextAreaElement | null>(null);
 
-	senderId = authState.loginId;
+  senderId = authState.loginId;
 
-	const md = new MarkdownIt({
-		html: false,
-		linkify: true,
-		typographer: true,
-	});
+  const md = new MarkdownIt({
+    html: false,
+    linkify: true,
+    typographer: true,
+  });
 
-	const badwords = new BadWordsNext({ data: en });
+  const badwords = new BadWordsNext({ data: en });
 
-	function logOut() {
-		dispatchAuth({
-			type: 'LOGOUT',
-		});
-		logout();
-	}
+  function logOut() {
+    dispatchAuth({
+      type: 'LOGOUT',
+    });
+    logout();
+  }
 
-	const cancelEdit = () => {
-		if (!inputRef.current) return;
-		inputRef.current.value = '';
-		setEditing({ isediting: false, messageID: '' });
-		socket
-			?.timeout(10000)
-			.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
-	};
+  const cancelEdit = () => {
+    if (!inputRef.current) {
+      return;
+    }
+    inputRef.current.value = '';
+    setEditing({ isediting: false, messageID: '' });
+    socket
+      ?.timeout(10000)
+      .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
+  };
 
-	const sortedMessages = useMemo(() => {
-		if (!app.currentChatId) return;
-		return Object.values(state[app.currentChatId]?.messages ?? {})?.sort(
-			(a, b) => {
-				const da = new Date(a.time),
-					db = new Date(b.time);
-				return da.getTime() - db.getTime();
-			},
-		);
-	}, [state, app.currentChatId]);
+  const sortedMessages = useMemo(() => {
+    if (!app.currentChatId) {
+      return;
+    }
+    return Object.values(state[app.currentChatId]?.messages ?? {})?.sort(
+      (a, b) => {
+        const da = new Date(a.time),
+          db = new Date(b.time);
+        return da.getTime() - db.getTime();
+      }
+    );
+  }, [state, app.currentChatId]);
 
-	const doSend = async ({
-		senderId,
-		room,
-		message,
-		time,
-		containsBadword,
-		replyTo = null,
-	}: {
-		senderId: string;
-		room: string | null;
-		message: string;
-		time: number;
-		containsBadword: boolean;
-		replyTo: string | null;
-	}) => {
-		try {
-			const sentMessage = await sendMessage({
-				senderId,
-				message,
-				time,
-				room,
-				containsBadword,
-				replyTo,
-			});
+  const doSend = async ({
+    senderId,
+    room,
+    message,
+    time,
+    containsBadword,
+    replyTo = null,
+  }: {
+    senderId: string;
+    room: string | null;
+    message: string;
+    time: number;
+    containsBadword: boolean;
+    replyTo: string | null;
+  }) => {
+    try {
+      const sentMessage = await sendMessage({
+        senderId,
+        message,
+        time,
+        room,
+        containsBadword,
+        replyTo,
+      });
 
-			addMessage({
-				senderId,
-				room,
-				id: sentMessage.id,
-				message,
-				time,
-				status: 'pending',
-				containsBadword,
-				replyTo,
-			});
+      addMessage({
+        senderId,
+        room,
+        id: sentMessage.id,
+        message,
+        time,
+        status: 'pending',
+        containsBadword,
+        replyTo,
+      });
 
-			try {
-				updateMessage(sentMessage);
-			} catch {
-				logOut();
-				return false;
-			}
-		} catch (e) {
-			try {
-				updateMessage({
-					senderId,
-					room,
-					id: uuid(),
-					message,
-					time,
-					status: 'failed',
-					containsBadword,
-					replyTo,
-				});
-			} catch {
-				logOut();
-			}
+      try {
+        updateMessage(sentMessage);
+      } catch {
+        logOut();
+        return false;
+      }
+    } catch (e) {
+      try {
+        updateMessage({
+          senderId,
+          room,
+          id: uuid(),
+          message,
+          time,
+          status: 'failed',
+          containsBadword,
+          replyTo,
+        });
+      } catch {
+        logOut();
+      }
 
-			return false;
-		}
+      return false;
+    }
 
-		return true;
-	};
+    return true;
+  };
 
-	// Here whenever user will submit message it will be send to the server
-	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
+  // Here whenever user will submit message it will be send to the server
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-		socket?.emit(NEW_EVENT_TYPING, {
-			chatId: app.currentChatId,
-			isTyping: false,
-		});
-		const d = new Date();
-		const message = inputRef.current?.value.trim(); // Trim the message to remove the extra spaces
+    socket?.emit(NEW_EVENT_TYPING, {
+      chatId: app.currentChatId,
+      isTyping: false,
+    });
+    const d = new Date();
+    const message = inputRef.current?.value.trim(); // Trim the message to remove the extra spaces
 
-		if (message === '' || senderId === undefined || senderId === '123456') {
-			return;
-		}
+    if (message === '' || senderId === undefined || senderId === '123456') {
+      return;
+    }
 
-		if (editing.isediting === true) {
-			try {
-				const messageObject = getMessage(editing.messageID);
-				const oldMessage = messageObject?.message;
-				const editedMessage = await editMessage({
-					id: editing.messageID,
-					chatId: app.currentChatId,
-					newMessage: message as string,
-					oldMessage,
-				});
+    if (editing.isediting === true) {
+      try {
+        const messageObject = getMessage(editing.messageID);
+        const oldMessage = messageObject?.message;
+        const editedMessage = await editMessage({
+          id: editing.messageID,
+          chatId: app.currentChatId,
+          newMessage: message as string,
+          oldMessage,
+        });
 
-				updateMessage({
-					...editedMessage,
-					room: app.currentChatId,
-					isEdited: true,
-				});
-			} catch (e) {
-				setEditing({ isediting: false, messageID: '' });
-				return;
-			}
-			setEditing({ isediting: false, messageID: '' });
-		} else {
-			doSend({
-				senderId,
-				room: app.currentChatId,
-				message: message as string,
-				time: d.getTime(),
-				containsBadword: badwords.check(message as string),
-				replyTo: currentReplyMessageId,
-			});
-		}
+        updateMessage({
+          ...editedMessage,
+          room: app.currentChatId,
+          isEdited: true,
+        });
+      } catch (e) {
+        setEditing({ isediting: false, messageID: '' });
+        return;
+      }
+      setEditing({ isediting: false, messageID: '' });
+    } else {
+      doSend({
+        senderId,
+        room: app.currentChatId,
+        message: message as string,
+        time: d.getTime(),
+        containsBadword: badwords.check(message as string),
+        replyTo: currentReplyMessageId,
+      });
+    }
 
-		if (inputRef.current) {
-			inputRef.current.value = '';
-			setMessage('');
-			inputRef.current.focus();
-		}
-		cancelReply();
-	};
+    if (inputRef.current) {
+      inputRef.current.value = '';
+      setMessage('');
+      inputRef.current.focus();
+    }
+    cancelReply();
+  };
 
-	const handleTypingStatus = throttle((e) => {
-		if (e.target.value.length > 0) {
-			socket
-				?.timeout(5000)
-				.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
-		}
-		setMessage(e.target.value);
-		adjustTextareaHeight(inputRef);
-		e.target.style.height = '48px';
-		e.target.style.height = `${e.target.scrollHeight}px`;
-	}, 500);
+  const handleTypingStatus = throttle(e => {
+    if (e.target.value.length > 0) {
+      socket
+        ?.timeout(5000)
+        .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
+    }
+    setMessage(e.target.value);
+    adjustTextareaHeight(inputRef);
+    e.target.style.height = '48px';
+    e.target.style.height = `${e.target.scrollHeight}px`;
+  }, 500);
 
-	const openPreviousEdit = (messageId: string) => {
-		if (openPreviousMessages === messageId) {
-			setOpenPreviousMessages('');
-		} else {
-			setOpenPreviousMessages(messageId);
-		}
-	};
+  const openPreviousEdit = (messageId: string) => {
+    if (openPreviousMessages === messageId) {
+      setOpenPreviousMessages('');
+    } else {
+      setOpenPreviousMessages(messageId);
+    }
+  };
 
-	const hideBadword = (id: string) => {
-		setBadwordChoices({ ...badwordChoices, [id]: 'hide' });
-	};
+  const hideBadword = (id: string) => {
+    setBadwordChoices({ ...badwordChoices, [id]: 'hide' });
+  };
 
-	const showBadword = (id: string) => {
-		setBadwordChoices({ ...badwordChoices, [id]: 'show' });
-	};
+  const showBadword = (id: string) => {
+    setBadwordChoices({ ...badwordChoices, [id]: 'show' });
+  };
 
-	// Clear chat when escape is pressed
-	useEffect(() => {
-		const keyDownHandler = (event: KeyboardEvent) => {
-			if (event.key === 'Escape' && editing.isediting) {
-				event.preventDefault();
-				cancelEdit();
-			}
-		};
+  // Clear chat when escape is pressed
+  useEffect(() => {
+    const keyDownHandler = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && editing.isediting) {
+        event.preventDefault();
+        cancelEdit();
+      }
+    };
 
-		document.addEventListener('keydown', keyDownHandler);
+    document.addEventListener('keydown', keyDownHandler);
 
-		return () => {
-			document.removeEventListener('keydown', keyDownHandler);
-		};
-	}, [editing]);
+    return () => {
+      document.removeEventListener('keydown', keyDownHandler);
+    };
+  }, [editing]);
 
-	useEffect(() => {
-		const newMessageHandler = (message: MessageType) => {
-			try {
-				addMessage(message);
-				playNotification('newMessage');
-				createBrowserNotification(
-					'You received a new message on Whisper',
-					message.message,
-				);
-			} catch {
-				logOut();
-			}
-		};
+  useEffect(() => {
+    const newMessageHandler = (message: MessageType) => {
+      try {
+        addMessage(message);
+        playNotification('newMessage');
+        createBrowserNotification(
+          'You received a new message on Whisper',
+          message.message
+        );
+      } catch {
+        logOut();
+      }
+    };
 
-		const deleteMessageHandler = ({
-			id,
-			chatId,
-		}: {
-			id: string;
-			chatId: string;
-		}) => {
-			removeMessage(id, chatId);
-		};
+    const deleteMessageHandler = ({
+      id,
+      chatId,
+    }: {
+      id: string;
+      chatId: string;
+    }) => {
+      removeMessage(id, chatId);
+    };
 
-		const editMessageHandler = (messageEdited: MessageType) => {
-			updateMessage({
-				...messageEdited,
-				room: app.currentChatId,
-				isEdited: true,
-			});
-		};
+    const editMessageHandler = (messageEdited: MessageType) => {
+      updateMessage({
+        ...messageEdited,
+        room: app.currentChatId,
+        isEdited: true,
+      });
+    };
 
-		const limitMessageHandler = (data: { message: string }) => {
-			alert(data.message);
-		};
+    const limitMessageHandler = (data: { message: string }) => {
+      alert(data.message);
+    };
 
-		const readMessageHandler = ({
-			messageId,
-			chatId,
-		}: {
-			messageId: string;
-			chatId: string;
-		}) => {
-			receiveMessage(messageId, chatId);
-		};
+    const readMessageHandler = ({
+      messageId,
+      chatId,
+    }: {
+      messageId: string;
+      chatId: string;
+    }) => {
+      receiveMessage(messageId, chatId);
+    };
 
-		// This is used to recive message form other user.
-		socket?.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
-		socket?.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-		socket?.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
-		socket?.on(NEW_EVENT_READ_MESSAGE, readMessageHandler);
-		socket?.on(NEW_EVENT_SEND_FAILED, limitMessageHandler);
+    // This is used to recive message form other user.
+    socket?.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+    socket?.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+    socket?.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+    socket?.on(NEW_EVENT_READ_MESSAGE, readMessageHandler);
+    socket?.on(NEW_EVENT_SEND_FAILED, limitMessageHandler);
 
-		return () => {
-			socket?.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
-			socket?.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-			socket?.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
-			socket?.off(NEW_EVENT_READ_MESSAGE, readMessageHandler);
-			socket?.off(NEW_EVENT_SEND_FAILED, limitMessageHandler);
-		};
-	}, []);
+    return () => {
+      socket?.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+      socket?.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+      socket?.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+      socket?.off(NEW_EVENT_READ_MESSAGE, readMessageHandler);
+      socket?.off(NEW_EVENT_SEND_FAILED, limitMessageHandler);
+    };
+  }, [
+    addMessage,
+    app.currentChatId,
+    playNotification,
+    receiveMessage,
+    removeMessage,
+    socket,
+    updateMessage,
+  ]);
 
-	// this is used to send the notification for inactive chat to the respective user
-	// get the last message sent
-	const getLastMessage = sortedMessages?.at(-1);
+  // this is used to send the notification for inactive chat to the respective user
+  // get the last message sent
+  const getLastMessage = sortedMessages?.at(-1);
 
-	const amITheSender = getLastMessage && getLastMessage.senderId === senderId;
+  const amITheSender = getLastMessage && getLastMessage.senderId === senderId;
 
-	// pass it to the hook
-	useInactiveChat(getLastMessage, amITheSender);
+  // pass it to the hook
+  useInactiveChat(getLastMessage, amITheSender);
 
-	useEffect(() => {
-		if (!inputRef.current) return;
-		inputRef.current.focus();
-	}, [currentReplyMessageId]);
+  useEffect(() => {
+    if (!inputRef.current) {
+      return;
+    }
+    inputRef.current.focus();
+  }, [currentReplyMessageId]);
 
-	return (
-		<div className='w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6'>
-			<div className='max-h-[67vh]'>
-				<p className='text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center'>
-					Connected with a random User
-					{sortedMessages?.length === 0 && ', Be the first to send {"Hello"}'}
-				</p>
-				<ScrollToBottom
-					initialScrollBehavior='auto'
-					className='h-[100%] md:max-h-full overflow-y-auto w-full scroll-smooth'>
-					{sortedMessages?.map(
-						({
-							senderId: sender,
-							id,
-							message,
-							time,
-							status,
-							isEdited,
-							oldMessages,
-							containsBadword,
-							isRead,
-							replyTo,
-						}: MessageType) => {
-							const isSender = sender.toString() === senderId?.toString();
-							message = decryptMessage(message) as string;
-							// original message this message is a reply to
-							const repliedMessage = replyTo
-								? (() => {
-										const messageObj = getMessage(replyTo);
-										if (!messageObj) {
-											return null;
-										}
+  return (
+    <div className='w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6'>
+      <div className='max-h-[67vh]'>
+        <p className='text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center'>
+          Connected with a random User
+          {sortedMessages?.length === 0 && ', Be the first to send {"Hello"}'}
+        </p>
+        <ScrollToBottom
+          initialScrollBehavior='auto'
+          className='h-[100%] md:max-h-full overflow-y-auto w-full scroll-smooth'
+        >
+          {sortedMessages?.map(
+            ({
+              senderId: sender,
+              id,
+              message,
+              time,
+              status,
+              isEdited,
+              oldMessages,
+              containsBadword,
+              isRead,
+              replyTo,
+            }: MessageType) => {
+              const isSender = sender.toString() === senderId?.toString();
+              message = decryptMessage(message) as string;
+              // original message this message is a reply to
+              const repliedMessage = replyTo
+                ? (() => {
+                    const messageObj = getMessage(replyTo);
+                    if (!messageObj) {
+                      return null;
+                    }
 
-										return {
-											...messageObj,
-											message: decryptMessage(messageObj.message),
-										};
-								  })()
-								: null;
+                    return {
+                      ...messageObj,
+                      message: decryptMessage(messageObj.message),
+                    };
+                  })()
+                : null;
 
-							// is this message currently being replied?
-							const hasActiveReply = currentReplyMessageId === id;
-							id = id as string;
-							return (
-								<div
-									key={id}
-									id={`message-${id}`}
-									className={`
+              // is this message currently being replied?
+              const hasActiveReply = currentReplyMessageId === id;
+              id = id as string;
+              return (
+                <div
+                  key={id}
+                  id={`message-${id}`}
+                  className={`
 								flex flex-col gap-2 py-2 duration-500 transition-all
 									${hasActiveReply ? 'bg-[#FF9F1C]/25 border-[#FF9F1C]' : ''},
-									${hasActiveReply ? (isSender ? 'border-r-[3.5px]' : 'border-l-[3.5px]') : ''}`}>
-									{replyTo && (
-										<div
-											className={`
+									${hasActiveReply ? (isSender ? 'border-r-[3.5px]' : 'border-l-[3.5px]') : ''}`}
+                >
+                  {replyTo && (
+                    <div
+                      className={`
 										max-w-[80%] md:max-w-[50%] min-w-[10px] flex gap-2 items-center
 											${sender.toString() === senderId?.toString() ? 'self-end' : ''}
 											${repliedMessage ? 'cursor-pointer' : ''}
 										`}
-											onClick={() => scrollToMessage(replyTo)}>
-											<div className='truncate border-b-4 border-[#FF9F1C] p-1'>
-												{repliedMessage ? (
-													typeof repliedMessage.message === 'string' ? (
-														<div
-															className='message-reply-container flex flex-nowrap items-center gap-2'
-															dangerouslySetInnerHTML={{
-																__html: md.render(repliedMessage.message),
-															}}
-														/>
-													) : (
-														repliedMessage.message
-													)
-												) : (
-													<p className='text-gray-400 uppercase text-sm italic'>
-														Original Message Deleted
-													</p>
-												)}
-											</div>
-											<div
-												className={
-													sender.toString() !== senderId?.toString()
-														? 'order-first'
-														: ''
-												}>
-												{sender.toString() === senderId?.toString() ? (
-													<Icon
-														icon='bi:arrow-90deg-left'
-														className='fill-white h-6 w-6'
-													/>
-												) : (
-													<Icon
-														icon='bi:arrow-90deg-left'
-														className='text-white h-6 w-6'
-													/>
-												)}
-											</div>
-										</div>
-									)}
-									<div
-										className={`w-full flex text-white relative mb-2 ${
-											isSender ? 'justify-end' : 'justify-start'
-										}`}>
-										<div
-											className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${
-												isSender ? 'items-end' : 'items-start'
-											}`}>
-											{containsBadword && !isSender && !badwordChoices[id] ? (
-												<div className='flex flex-col border-red border w-full rounded-r-md p-3'>
-													<p>Your buddy is trying to send you a bad word</p>
-													<div className='flex w-full gap-6'>
-														<span
-															onClick={() => showBadword(id as string)}
-															className='text-sm cursor-pointer'>
-															See
-														</span>
-														<span
-															onClick={() => hideBadword(id as string)}
-															className='text-red text-sm cursor-pointer'>
-															Hide
-														</span>
-													</div>
-												</div>
-											) : (
-												<>
-													<div
-														className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${
-															isSender
-																? 'justify-between bg-secondary rounded-l-md'
-																: 'rounded-r-md'
-														}`}>
-														{typeof message === 'string' ? (
-															<span
-																dangerouslySetInnerHTML={{
-																	__html: md.render(
-																		badwordChoices[id] === 'hide'
-																			? badwords.filter(message)
-																			: badwordChoices[id] === 'show'
-																			? message
-																			: message,
-																	),
-																}}
-															/>
-														) : badwordChoices[id] === 'hide' ? (
-															badwords.filter(message)
-														) : badwordChoices[id] === 'show' ? (
-															message
-														) : (
-															message
-														)}
+                      onClick={() => scrollToMessage(replyTo)}
+                    >
+                      <div className='truncate border-b-4 border-[#FF9F1C] p-1'>
+                        {repliedMessage ? (
+                          typeof repliedMessage.message === 'string' ? (
+                            <div
+                              className='message-reply-container flex flex-nowrap items-center gap-2'
+                              dangerouslySetInnerHTML={{
+                                __html: md.render(repliedMessage.message),
+                              }}
+                            />
+                          ) : (
+                            repliedMessage.message
+                          )
+                        ) : (
+                          <p className='text-gray-400 uppercase text-sm italic'>
+                            Original Message Deleted
+                          </p>
+                        )}
+                      </div>
+                      <div
+                        className={
+                          sender.toString() !== senderId?.toString()
+                            ? 'order-first'
+                            : ''
+                        }
+                      >
+                        {sender.toString() === senderId?.toString() ? (
+                          <Icon
+                            icon='bi:arrow-90deg-left'
+                            className='fill-white h-6 w-6'
+                          />
+                        ) : (
+                          <Icon
+                            icon='bi:arrow-90deg-left'
+                            className='text-white h-6 w-6'
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <div
+                    className={`w-full flex text-white relative mb-2 ${
+                      isSender ? 'justify-end' : 'justify-start'
+                    }`}
+                  >
+                    <div
+                      className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${
+                        isSender ? 'items-end' : 'items-start'
+                      }`}
+                    >
+                      {containsBadword && !isSender && !badwordChoices[id] ? (
+                        <div className='flex flex-col border-red border w-full rounded-r-md p-3'>
+                          <p>Your buddy is trying to send you a bad word</p>
+                          <div className='flex w-full gap-6'>
+                            <span
+                              onClick={() => showBadword(id as string)}
+                              className='text-sm cursor-pointer'
+                            >
+                              See
+                            </span>
+                            <span
+                              onClick={() => hideBadword(id as string)}
+                              className='text-red text-sm cursor-pointer'
+                            >
+                              Hide
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div
+                            className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${
+                              isSender
+                                ? 'justify-between bg-secondary rounded-l-md'
+                                : 'rounded-r-md'
+                            }`}
+                          >
+                            {typeof message === 'string' ? (
+                              <span
+                                dangerouslySetInnerHTML={{
+                                  __html: md.render(
+                                    badwordChoices[id] === 'hide'
+                                      ? badwords.filter(message)
+                                      : badwordChoices[id] === 'show'
+                                      ? message
+                                      : message
+                                  ),
+                                }}
+                              />
+                            ) : badwordChoices[id] === 'hide' ? (
+                              badwords.filter(message)
+                            ) : badwordChoices[id] === 'show' ? (
+                              message
+                            ) : (
+                              message
+                            )}
 
-														<DropDownOptions
-															isSender={isSender && status !== 'pending'}
-															id={id}
-															inputRef={inputRef}
-															cancelEdit={cancelEdit}
-															setEditing={setEditing}
-															setReplyId={startReply}
-														/>
-													</div>
-													<div
-														className={`flex gap-2 items-center ${
-															isSender ? 'flex-row' : 'flex-row-reverse'
-														}`}>
-														<div
-															className={`text-[12px] ${
-																status === 'failed'
-																	? 'text-red-600'
-																	: 'text-white'
-															}`}>
-															<MessageStatus
-																time={getTime(time)}
-																status={status ?? 'sent'}
-																iAmTheSender={isSender}
-																onResend={() =>
-																	handleResend(id as string, doSend)
-																}
-															/>
-														</div>
-														<PreviousMessages
-															id={id}
-															isSender={isSender}
-															isEdited={isEdited}
-															openPreviousEdit={openPreviousEdit}
-															openPreviousMessages={openPreviousMessages}
-															oldMessages={oldMessages as string[]}
-														/>
-													</div>
-													<MessageSeen
-														isRead={isRead as boolean}
-														isSender={isSender}
-													/>
-												</>
-											)}
-										</div>
-									</div>
-								</div>
-							);
-						},
-					)}
-				</ScrollToBottom>
-			</div>
+                            <DropDownOptions
+                              isSender={isSender && status !== 'pending'}
+                              id={id}
+                              inputRef={inputRef}
+                              cancelEdit={cancelEdit}
+                              setEditing={setEditing}
+                              setReplyId={startReply}
+                            />
+                          </div>
+                          <div
+                            className={`flex gap-2 items-center ${
+                              isSender ? 'flex-row' : 'flex-row-reverse'
+                            }`}
+                          >
+                            <div
+                              className={`text-[12px] ${
+                                status === 'failed'
+                                  ? 'text-red-600'
+                                  : 'text-white'
+                              }`}
+                            >
+                              <MessageStatus
+                                time={getTime(time)}
+                                status={status ?? 'sent'}
+                                iAmTheSender={isSender}
+                                onResend={() =>
+                                  handleResend(id as string, doSend)
+                                }
+                              />
+                            </div>
+                            <PreviousMessages
+                              id={id}
+                              isSender={isSender}
+                              isEdited={isEdited}
+                              openPreviousEdit={openPreviousEdit}
+                              openPreviousMessages={openPreviousMessages}
+                              oldMessages={oldMessages as string[]}
+                            />
+                          </div>
+                          <MessageSeen
+                            isRead={isRead as boolean}
+                            isSender={isSender}
+                          />
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+          )}
+        </ScrollToBottom>
+      </div>
 
-			<MessageInput
-				message={message}
-				handleTypingStatus={handleTypingStatus}
-				setMessage={setMessage}
-				editing={editing}
-				cancelEdit={cancelEdit}
-				handleSubmit={handleSubmit}
-				inputRef={inputRef}
-			/>
-		</div>
-	);
+      <MessageInput
+        message={message}
+        handleTypingStatus={handleTypingStatus}
+        setMessage={setMessage}
+        editing={editing}
+        cancelEdit={cancelEdit}
+        handleSubmit={handleSubmit}
+        inputRef={inputRef}
+      />
+    </div>
+  );
 };
 
 export default Chat;

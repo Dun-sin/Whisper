@@ -1,4 +1,4 @@
-import { CloneStateType } from '@/types';
+import { CloneStateType } from '@/types/types';
 import { flattenDeep, uniq } from 'lodash';
 
 /**
@@ -7,7 +7,7 @@ import { flattenDeep, uniq } from 'lodash';
  * @returns
  */
 export function createClassesFromArray(...classes: string[]) {
-	return uniq(flattenDeep(classes)).filter(Boolean).join(' ');
+  return uniq(flattenDeep(classes)).filter(Boolean).join(' ');
 }
 
 /**
@@ -15,13 +15,13 @@ export function createClassesFromArray(...classes: string[]) {
  * @param {string} reason Reason for socket disconnection
  */
 export function isExplicitDisconnection(reason: string) {
-	const explicitReasons = ['io server disconnect', 'io client disconnect'];
+  const explicitReasons = ['io server disconnect', 'io client disconnect'];
 
-	return explicitReasons.includes(reason);
+  return explicitReasons.includes(reason);
 }
 
 export function cloneState<T>(state: T): CloneStateType<T> {
-	// This creates a clone of the original state, hence preventing us from
-	// accidentally modifying the original state
-	return Object.assign({}, state);
+  // This creates a clone of the original state, hence preventing us from
+  // accidentally modifying the original state
+  return Object.assign({}, state);
 }

@@ -1,7 +1,7 @@
 name: 📄 Documentation issue
 description: Found an issue in the documentation? You can use this one!
-title: "[DOCS] <what do you have to add>"
-labels: ["documentation", "hacktoberfest"]
+title: '[DOCS] <what do you have to add>'
+labels: ['documentation', 'hacktoberfest']
 body:
   - type: textarea
     id: description
@@ -28,7 +28,7 @@ body:
   - type: checkboxes
     id: no-duplicate-issues
     attributes:
-      label: "👀 Have you checked if this issue has been raised before?"
+      label: '👀 Have you checked if this issue has been raised before?'
       options:
         - label: "I checked and didn't find similar issue"
           required: true
@@ -36,9 +36,9 @@ body:
   - type: checkboxes
     id: read-code-of-conduct
     attributes:
-      label: "🏢 Have you read the Contributing Guidelines?"
+      label: '🏢 Have you read the Contributing Guidelines?'
       options:
-        - label: "I have read and understood the rules in the [Contributing Guidelines](https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md)"
+        - label: 'I have read and understood the rules in the [Contributing Guidelines](https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md)'
           required: true
 
   - type: dropdown
@@ -46,11 +46,10 @@ body:
       label: Are you willing to work on this issue ?
       description: This is absolutely not required, but we are happy to guide you in the contribution process.
       options:
-        - "Yes I am willing to submit a PR!"
+        - 'Yes I am willing to submit a PR!'
 
   - type: markdown
     attributes:
       value: |
         Follow me on Twitter [here](https://twitter.com/DunsinWebDev)
         Feel free to Join the discord server [here](https://discord.gg/kcFraw3nhz) and check out other cool repositories [here](https://github.com/Dunsin)
-        

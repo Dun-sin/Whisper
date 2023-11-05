@@ -11,16 +11,16 @@ import { DialogProvider } from '@/context/DialogContext';
 import Dialog from '@/components/Dialog';
 
 export default function App({ Component, pageProps }: AppProps) {
-	return (
-		<AuthProvider>
-			<SocketProvider>
-				<AppProvider>
-					<DialogProvider>
-						<Component {...pageProps} />
-						<Dialog />
-					</DialogProvider>
-				</AppProvider>
-			</SocketProvider>
-		</AuthProvider>
-	);
+  return (
+    <AuthProvider>
+      <SocketProvider>
+        <AppProvider>
+          <DialogProvider>
+            <Component {...pageProps} />
+            <Dialog />
+          </DialogProvider>
+        </AppProvider>
+      </SocketProvider>
+    </AuthProvider>
+  );
 }

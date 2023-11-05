@@ -6,8 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "semantic-release": "semantic-release"
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --fix src",
+    "format": "prettier --write .",
+    "semantic-release": "semantic-release",
+    "prepare": "husky install .husky"
   },
   "dependencies": {
     "@kinde-oss/kinde-auth-react": "^3.0.23",
@@ -23,6 +25,7 @@
     "emoji-picker-react": "^4.5.7",
     "lodash": "^4.17.21",
     "markdown-it": "^13.0.2",
+    "mongoose": "^8.0.0",
     "next": "14.0.1",
     "next-connect": "^1.0.0",
     "react": "^18",
@@ -41,9 +44,13 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^8",
+    "eslint": "^8.53.0",
     "eslint-config-next": "14.0.1",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-next": "^0.0.0",
+    "husky": "^8.0.3",
     "postcss": "^8",
+    "prettier": "^3.0.3",
     "semantic-release": "^22.0.7",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
@@ -62,7 +69,8 @@
     "type": "git",
     "url": "https://github.com/Dun-sin/Whisper.git"
   },
-  "publishConfig": {
-    "access": "restricted"
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint --fix",
+    "*.--write": "prettier --write ."
   }
 }
