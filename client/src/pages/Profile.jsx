@@ -13,10 +13,10 @@ import SignupAnonUser from './SignupAnonUser';
 const Profile = () => {
 	const [username, setUsername] = useState('Anonymous');
 	const [profileResponse, setProfileResponse] = useState();
-	const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
 	const [imageFile, setImageFile] = useState(null);
 	const [isImageSafe,setImageSafe] = useState(false);
 	const { authState, dispatchAuth } = useAuth();
+	const [loading, setLoading] = useState(false);
 	const { logout } = useKindeAuth();
 	
 	const aboutRef = useRef(null);
@@ -33,7 +33,7 @@ const Profile = () => {
 
 			setUsername(username);
 			if (profileImage) {
-				setUploadedImageUrl(profileImage);
+				imageRef.current.src = profileImage
 			}
 			aboutRef.current.value = aboutMe || '';
 			ageRef.current.value = age;
@@ -44,10 +44,9 @@ const Profile = () => {
 	};
 
 	const handleUserName = (e) => setUsername(e.target.value);
-	const handlerisImageSafe =async(imageSrc)=>{
+	const handlerisImageSafe =async()=>{
+		setLoading(true);
 			try {
-				
-				imageRef.current.src = imageSrc;
 				const model = await nsfwjs.load();
 				const predictions = await model.classify(imageRef.current);
 				const neutralProb = predictions.find((p) => p.className === 'Neutral');
@@ -67,13 +66,15 @@ const Profile = () => {
 			if (file) {
 				const reader = new FileReader();
 				reader.onload = async (event) => {
-					const imageSafe = await handlerisImageSafe(event.target.result)
+					imageRef.current.src = event.target.result;
+					setLoading(true);
+					const imageSafe = await handlerisImageSafe();
 					imageSafe?setProfileResponse()
 						:setProfileResponse('Profile image is not safe. Please upload a different image.');
 
 					setImageSafe(imageSafe)
-					setUploadedImageUrl(event.target.result);
 					setImageFile(file);
+					setLoading(false);
 				};
 				reader.readAsDataURL(file);
 			}
@@ -84,6 +85,9 @@ const Profile = () => {
 		handleImageUpload();
 	};
 	const handleUpdateProfile = async () => {
+		if(loading){
+			return;
+		}
 		const formData = new FormData();
 		formData.append('email', email);
 		formData.append('username', username);
@@ -94,6 +98,7 @@ const Profile = () => {
 		if(imageFile && isImageSafe){
 			formData.append('profileImage',imageFile)
 		}
+		setLoading(true);
 		try {
 			const response = await api.post('/profile', formData);
 			console.log(response.data.message);
@@ -108,6 +113,7 @@ const Profile = () => {
 				setProfileResponse(error.response.data.error);
 			}
 		}
+		setLoading(false);
 
 	};
 
@@ -160,7 +166,7 @@ const Profile = () => {
 				<>
 					<section className="min-w-[300px] max-w-[400px] w-[40%] px-10 py-8 rounded-2xl flex flex-col justify-center items-center bg-clip-padding backdrop-filter backdrop-blur-2xl bg-gray-100 dark:bg-opacity-5 dark:bg-gray-300">
 						<UserAvatar
-							imageUrl={uploadedImageUrl}
+							imageRef={imageRef}
 							onUploadClick={handleImageUpload}
 							onEditClick={handleEditProfile}
 						/>
@@ -218,7 +224,7 @@ const Profile = () => {
 						className="border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-green-500 text-green-500 hover:bg-green-500 hover:text-white dark:border-green-500 dark:text-green-500 dark:hover:bg-green-500 dark:hover:text-white"
 						onClick={handleUpdateProfile}
 					>
-						Save changes
+						{loading? `Processing...` : `Save changes`}
 					</button>
 					<button
 						className="border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-red text-red hover:bg-red hover:text-white"

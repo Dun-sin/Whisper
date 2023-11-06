@@ -2,13 +2,14 @@ import { HiUserCircle, HiPencil } from 'react-icons/hi';
 import PropTypes from 'prop-types';
 
 
-export default function UserAvatar({imageUrl, onUploadClick, onEditClick }) {
+export default function UserAvatar({imageRef, onUploadClick, onEditClick }) {
   return (
     <div className="relative group">
-      {imageUrl ? (
+      {imageRef?.current.src ? (
         <>
           <img
-            src={imageUrl}
+            src={imageRef.current.src}
+            ref={imageRef}
             alt="Profile Image"
             className="h-20 w-20 rounded-full"
           />
@@ -31,7 +32,7 @@ export default function UserAvatar({imageUrl, onUploadClick, onEditClick }) {
 };
 
 UserAvatar.propTypes = {
-  imageUrl: PropTypes.string,
+  imageRef: PropTypes.object,
   onUploadClick: PropTypes.func,
   onEditClick: PropTypes.func,
 };
