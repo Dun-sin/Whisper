@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import UserAvatar from '../components/UserAvatar';
 import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
+import * as nsfwjs from 'nsfwjs';
 
 import { useAuth } from 'context/AuthContext';
 
@@ -14,13 +15,14 @@ const Profile = () => {
 	const [profileResponse, setProfileResponse] = useState();
 	const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
 	const [imageFile, setImageFile] = useState(null);
-
+	const [isImageSafe,setImageSafe] = useState(false);
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
-
+	
 	const aboutRef = useRef(null);
 	const genderRef = useRef(null);
 	const ageRef = useRef(null);
+	const imageRef = useRef(new Image());
 
 	const { email } = authState;
 
@@ -42,7 +44,20 @@ const Profile = () => {
 	};
 
 	const handleUserName = (e) => setUsername(e.target.value);
-
+	const handlerisImageSafe =async(imageSrc)=>{
+			try {
+				
+				imageRef.current.src = imageSrc;
+				const model = await nsfwjs.load();
+				const predictions = await model.classify(imageRef.current);
+				const neutralProb = predictions.find((p) => p.className === 'Neutral');
+				return neutralProb.probability>=0.6;
+			} catch (error) {
+				setProfileResponse("Profile image update is temporarily unavailable. Please try again later.")
+				console.error('Error classifying image:', error);
+				return false;
+			}
+	};
 	const handleImageUpload = () => {
 		const fileInput = document.createElement('input');
 		fileInput.type = 'file';
@@ -50,10 +65,15 @@ const Profile = () => {
 		fileInput.onchange = (e) => {
 			const file = e.target.files[0];
 			if (file) {
-				setImageFile(file);
 				const reader = new FileReader();
-				reader.onload = (event) => {
+				reader.onload = async (event) => {
+					const imageSafe = await handlerisImageSafe(event.target.result)
+					imageSafe?setProfileResponse()
+						:setProfileResponse('Profile image is not safe. Please upload a different image.');
+
+					setImageSafe(imageSafe)
 					setUploadedImageUrl(event.target.result);
+					setImageFile(file);
 				};
 				reader.readAsDataURL(file);
 			}
@@ -71,8 +91,8 @@ const Profile = () => {
 		formData.append('gender', genderRef.current.value);
 		formData.append('age', Number(ageRef.current.value));
 
-		if (imageFile) {
-			formData.append('profileImage', imageFile);
+		if(imageFile && isImageSafe){
+			formData.append('profileImage',imageFile)
 		}
 		try {
 			const response = await api.post('/profile', formData);
@@ -208,7 +228,7 @@ const Profile = () => {
 					</button>
 					{profileResponse ? (
 						<div>
-							<p className="text-green-300">{profileResponse}</p>
+							<p className="text-blue-500">{profileResponse}</p>
 						</div>
 					) : null}
 				</>

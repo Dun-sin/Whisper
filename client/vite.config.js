@@ -13,6 +13,7 @@ export default defineConfig({
 			context: resolve(__dirname, './src/context'),
 			styles: resolve(__dirname, './src/styles'),
 			assets: resolve(__dirname, './src/assets'),
+			nsfwjs: 'nsfwjs/dist/nsfwjs.min.js',
 		},
 	},
 });
