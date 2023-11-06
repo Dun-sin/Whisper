@@ -4,8 +4,6 @@ const validator = require('validator').default;
 const { v4: uuidv4 } = require('uuid');
 
 const multer = require('multer');
-// google cloud vision api to check profile image validation
-const vision = require('@google-cloud/vision');
 // multer for profile image
 const storage = multer.memoryStorage();
 const imageUpload = multer({ storage: storage });
@@ -42,49 +40,6 @@ const emailValidator = (req, res, next) => {
   } else {
     next();
   }
-};
-// check picture is safe or not
-const profileImageValidator = async (imageBuffer) => {
-  const CREDENTIALS = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-  const CONFIG = {
-    credentials: {
-      private_key: CREDENTIALS.private_key,
-      client_email: CREDENTIALS.client_email,
-    },
-  };
-  const client = new vision.ImageAnnotatorClient(CONFIG);
-
-  const likelihoodToPercentage = {
-    VERY_UNLIKELY: 0,
-    UNLIKELY: 25,
-    POSSIBLE: 50,
-    LIKELY: 75,
-    VERY_LIKELY: 100,
-  };
-  const isUnsafe = (detections) => {
-    const likelihood =
-      detections.adult ||
-      detections.medical ||
-      detections.spoof ||
-      detections.violence ||
-      detections.racy;
-    return likelihoodToPercentage[likelihood] >= 50; // Adjust as needed
-  };
-
-  let result;
-  try {
-    [result] = await client.safeSearchDetection(imageBuffer);
-  } catch (err) {
-    console.error('cloud vision api error', err.code, ' : ', err.details);
-    return {
-      unsafe: false,
-      error:
-        'Currently, there is some error while uploading the profile image. Please try again later.',
-    };
-  }
-  const detections = result.safeSearchAnnotation;
-  const unsafe = isUnsafe(detections);
-  return { unsafe, error: null };
 };
 
 const getAccessToken = async () => {
@@ -266,22 +221,6 @@ const updateProfile = async (req, res) => {
       return res.status(NOT_FOUND).json({ error: 'User not found' });
     }
 
-    if (req.file) {
-      const imageBuffer = req.file.buffer;
-      // Check for unsafe content using the utility function
-      const validationResult = await profileImageValidator(imageBuffer);
-      if (validationResult.unsafe) {
-        // Return the error if the image is not safe or there's a permission issue
-        return res
-          .status(NOT_ACCEPTABLE)
-          .json({ error: 'Unsafe content detected in the profile image' });
-      } else if (validationResult.error) {
-        console.error(error);
-        return res
-          .status(INTERNAL_SERVER_ERROR)
-          .json({ error: validationResult.error });
-      }
-    }
     // Update user's profile with provided fields or the User fields or defaults
     user.username = username || user.username || 'Anonymous';
     user.aboutMe = aboutMe || user.aboutMe || null;
