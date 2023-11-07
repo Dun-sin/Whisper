@@ -3,6 +3,11 @@ const UserRouter = require('express').Router();
 const validator = require('validator').default;
 const { v4: uuidv4 } = require('uuid');
 
+const multer = require('multer');
+// multer for profile image
+const storage = multer.memoryStorage();
+const imageUpload = multer({ storage: storage });
+
 const User = require('../models/UserSchema');
 
 let accessToken = process.env.ACCESS_TOKEN;
@@ -222,6 +227,9 @@ const updateProfile = async (req, res) => {
     user.gender = gender || user.gender || 'Unknown';
     user.age = age || user.age || null;
     user.settings = settings || user.settings;
+    user.profileImage = req.file
+      ? `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`
+      : user.profileImage;
 
     // Save the updated user profile
     await user.save();
@@ -275,7 +283,7 @@ const deleteUser = async (req, res) => {
 };
 
 UserRouter.route('/login').post(emailValidator, loginUser);
-UserRouter.route('/profile').post(emailValidator, updateProfile);
+UserRouter.route('/profile').post(imageUpload.single('profileImage'), emailValidator, updateProfile);
 UserRouter.route('/profile/:email').get(getProfile);
 UserRouter.route('/deleteUser').delete(emailValidator, deleteUser); //Email validation applied to the required request handlers
 
