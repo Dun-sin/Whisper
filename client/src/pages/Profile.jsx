@@ -223,18 +223,20 @@ const Profile = () => {
 					<button
 						className="border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-green-500 text-green-500 hover:bg-green-500 hover:text-white dark:border-green-500 dark:text-green-500 dark:hover:bg-green-500 dark:hover:text-white"
 						onClick={handleUpdateProfile}
+						disabled={loading}
 					>
 						{loading? `Processing...` : `Save changes`}
 					</button>
 					<button
 						className="border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-red text-red hover:bg-red hover:text-white"
 						onClick={handleDeleteAccount}
+						disabled={loading}
 					>
 						Delete My Account
 					</button>
 					{profileResponse ? (
 						<div>
-							<p className="text-blue-500">{profileResponse}</p>
+							<p className="text-green-300">{profileResponse}</p>
 						</div>
 					) : null}
 				</>

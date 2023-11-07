@@ -19,7 +19,6 @@
   "author": "Dun-sin",
   "license": "ISC",
   "dependencies": {
-    "@google-cloud/vision": "^4.0.2",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "dotenv": "^16.3.1",
