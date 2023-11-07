@@ -1,5 +1,3 @@
-import { createBrowserNotification } from 'src/lib/browserNotification';
-
 export default (state, app) => {
 	const getMessage = (id) => {
 		if (!state[app.currentChatId]) {
@@ -55,7 +53,7 @@ export default (state, app) => {
 		});
 
 		if (!animate) {
-			return
+			return;
 		}
 
 		if (alreadyHighlighted) {
@@ -96,10 +94,12 @@ export const getTime = (time) => {
 	return new Date(time).toLocaleTimeString();
 };
 
-export const checkPartnerResponse = (lastMessageTime, inactiveTimeThreshold) => {
-	const currentTime = new Date().getTime();
-	const isInactive = lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold;
-	if (isInactive) {
-		createBrowserNotification("your partner isn't responding, want to leave?");
+export const isGreaterThan3Minutes = (interval, time) => {
+	const currentTime = Date.now();
+	const timeDifference = currentTime - time;
+
+	if (timeDifference > interval) {
+		return true;
 	}
+	return false;
 };

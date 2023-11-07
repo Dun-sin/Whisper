@@ -17,7 +17,7 @@
 
 ### General guidelines
 - Do read the `readme.md` file
-- If there's no PR for an issue in the allocated time, you will be unassigned, the following labels determine the time. `easy: 4days`, `medium: 7 days(1week)`, `hard: 2 weeks`
+- If there's no PR for an issue in the allocated time, you will be unassigned, the following labels determine the time. `2days`, `4days`, `7 days(1week)`, `2 weeks`
 - Fill out issue and pull request(PR) templates properly, if you don't know how, check out previous issues/PR to know how they are filled, this video👇🏾 or [this](#-how-to-fill-a-pull-request-templatetext)
 
 #### 👌🏾 How to fill a pull request template(video)
