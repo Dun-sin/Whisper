@@ -6,7 +6,6 @@ const ActiveUser = require('../models/ActiveUserModel');
 const Chat = require('../models/ChatModel');
 const Message = require('../models/MessageModel');
 
-const secretKey = process.env.SECRET_KEY;
 
 /**
  * @typedef {{
@@ -296,11 +295,9 @@ function chatExists(chatId) {
  */
 async function addMessage(
   chatId,
-  { message, time, senderId, type = 'message', containsBadword }
+  { encryptedMessage, time, senderId, type = 'message', containsBadword }
 ) {
   const sender = getActiveUser(senderId);
-
-  message = CryptoJS.AES.encrypt(message, secretKey).toString();
 
   if (!sender) {
     return null;
@@ -313,7 +310,7 @@ async function addMessage(
   const optimizedMessage = {
     ...(
       await Message.create({
-        message: message,
+        message: encryptedMessage,
         sender: new mongoose.Types.ObjectId(sender.id),
         type,
         createdAt: new Date(time),

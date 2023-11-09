@@ -24,7 +24,8 @@ import {
 	NEW_EVENT_RECEIVE_MESSAGE,
 	NEW_EVENT_TYPING,
 	NEW_EVENT_READ_MESSAGE,
-	NEW_EVENT_SEND_FAILED
+	NEW_EVENT_SEND_FAILED, 
+	NEW_EVENT_REQUEST_PUBLIC_KEY
 } from '../../../constants.json';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 
@@ -40,7 +41,7 @@ import MessageInput from './Chat/MessageInput';
 import DropDownOptions from './Chat/DropDownOption';
 import PreviousMessages from './Chat/PreviousMessages';
 import decryptMessage from 'src/lib/decryptMessage';
-
+// import decryptMessage from 'src/lib/decryptMessage';
 
 const inactiveTimeThreshold = 180000; // 3 mins delay
 let senderId;
@@ -56,17 +57,20 @@ const Chat = () => {
 	const [isQuoteReply, setIsQuoteReply] = useState(false);
 	const [message, setMessage] = useState('');
 	const [quoteMessage, setQuoteMessage] = useState(null);
+	const [decryptedMessages, setDecryptedMessages] = useState();
 	// use the id so we can track what message's previousMessage is open
 	const [openPreviousMessages, setOpenPreviousMessages] = useState(null);
 	const [badwordChoices, setBadwordChoices] = useState({});
-
+	const [cryptoKey, setCryptoKey] = useState({});
+	const [importedPublicKey, setImportedPublicKey] = useState(null);
 	const { messages: state, addMessage, updateMessage, removeMessage, receiveMessage } = useChat();
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 	const socket = useContext(SocketContext);
 
 	const { sendMessage, editMessage } = useChatUtils(socket);
-	const { getMessage, handleResend } = chatHelper(state, app)
+	const { getMessage, handleResend } = chatHelper(state, app);
+
 
 	const inputRef = useRef('');
 
@@ -96,25 +100,53 @@ const Chat = () => {
 	};
 
 	const sortedMessages = useMemo(
-		() =>
-			Object.values(state[app.currentChatId]?.messages ?? {})?.sort((a, b) => {
+		 () =>
+			  Object.values(state[app.currentChatId]?.messages ?? {})?.sort((a, b) => {
 				const da = new Date(a.time),
 					db = new Date(b.time);
 				return da - db;
-			}),
+			}) 
+		,
 		[state, app.currentChatId]
-	);
+	);	
+	  
+	const arrayBufferToBase64 = (arrayBuffer) => {
+		let binary = '';
+		const bytes = new Uint8Array(arrayBuffer);
+		const len = bytes.byteLength;
+		for (let i = 0; i < len; i++) {
+		  binary += String.fromCharCode(bytes[i]);
+		}
+		return btoa(binary);
+	};
 
 	const doSend = async ({ senderId, room, message, time, containsBadword }) => {
+		let encryptedMessage;
+		if (!cryptoKey) {
+			console.error('Encryption key not generated yet.');
+			return;
+		  }
+	  
+		  const encoder = new TextEncoder();
+		  const encryptedMessagersa = await crypto.subtle.encrypt(
+			{
+			  name: 'RSA-OAEP'
+			},
+			importedPublicKey,
+			encoder.encode(message)
+		  );
+	  
+		  // Convert the Uint8Array to Base64 string
+		  encryptedMessage = arrayBufferToBase64(new Uint8Array(encryptedMessagersa));
+		
 		try {
 			const sentMessage = await sendMessage({
 				senderId,
-				message,
+				encryptedMessage,
 				time,
 				chatId: room,
 				containsBadword
 			});
-
 			addMessage({
 				senderId,
 				room,
@@ -126,7 +158,10 @@ const Chat = () => {
 			});
 
 			try {
-				updateMessage(sentMessage);
+				updateMessage({
+					...sentMessage,
+					message: message
+				});
 			} catch {
 				logOut();
 				return false;
@@ -264,7 +299,6 @@ const Chat = () => {
 				logOut();
 			}
 		};
-
 		const deleteMessageHandler = ({ id, chatId }) => {
 			removeMessage(id, chatId);
 		};
@@ -282,7 +316,7 @@ const Chat = () => {
 		}
 
 		// This is used to recive message form other user.
-		socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+		socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);	
 		socket.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
 		socket.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
 		socket.on(NEW_EVENT_READ_MESSAGE, readMessageHandler)
@@ -311,6 +345,155 @@ const Chat = () => {
 		}
 	}, [sortedMessages]);
 
+	const importKey = async (arrayBuffer) => {
+		const storedPublicKey = localStorage.getItem('importPublicKey' + app.currentChatId);
+		const publicKeyArray = new Uint8Array(JSON.parse(storedPublicKey));
+
+		const importedPublicKey = await crypto.subtle.importKey(
+			'spki',
+			storedPublicKey ? publicKeyArray : arrayBuffer,
+			{
+				name: 'RSA-OAEP',
+				hash: { name: 'SHA-256' }
+			},
+			true,
+			['encrypt']
+			)
+				console.log(importedPublicKey);
+				setImportedPublicKey(importedPublicKey);
+				if(!storedPublicKey){
+				const exportedPublicKey = await crypto.subtle.exportKey(
+					'spki',
+					importedPublicKey
+				  );
+				  const publicKeyArray = new Uint8Array(exportedPublicKey);
+				  localStorage.setItem("importPublicKey" + app.currentChatId , JSON.stringify(Array.from(publicKeyArray)));
+				}
+			
+	}
+	const convertArrayBufferToPem = (arrayBuffer, type) => {
+		const buffer = new Uint8Array(arrayBuffer);
+		const base64String = btoa(String.fromCharCode.apply(null, buffer));
+		return `-----BEGIN ${type}-----\n${base64String}\n-----END ${type}-----`;
+	  };
+
+	  function pemToArrayBuffer(pemString) {
+		const base64String = pemString && pemString
+		  .replace(/-----BEGIN (.+)-----/, '')
+		  .replace(/-----END (.+)-----/, '')
+		  .replace(/\s/g, '');
+	  
+		const binaryString = atob(base64String);
+		const byteArray = new Uint8Array(binaryString.length);
+		for (let i = 0; i < binaryString.length; i++) {
+		  byteArray[i] = binaryString.charCodeAt(i);
+		}
+	  
+		return byteArray.buffer;
+	  }
+	  
+	const generateKeyPair = async () => {
+		const storedCryptoKey = localStorage.getItem('cryptoKey' + app.currentChatId);
+		let pemPublicKey;
+		const keyPair = await crypto.subtle.generateKey(
+			{
+			  name: 'RSA-OAEP',
+			  modulusLength: 2048,
+			  publicExponent: new Uint8Array([1, 0, 1]),
+			  hash: 'SHA-256'
+			},
+			true,
+			['encrypt', 'decrypt']
+		  );
+  if (storedCryptoKey) {
+	const privateKeyArray = new Uint8Array(JSON.parse(storedCryptoKey));
+	
+	crypto.subtle.importKey(
+		'pkcs8',
+		privateKeyArray,
+		{
+			name: 'RSA-OAEP',
+			hash: { name: 'SHA-256' }
+		},
+		true,
+		['decrypt']
+		).then((importedPrivateKey) => {
+			setCryptoKey(importedPrivateKey);
+			console.log(importedPrivateKey);
+		});
+  } else {
+		
+		setCryptoKey(keyPair.privateKey);
+		const exportedPrivateKey = await crypto.subtle.exportKey(
+			'pkcs8',
+			keyPair.privateKey
+		);
+		const privateKeyArray = new Uint8Array(exportedPrivateKey);
+		localStorage.setItem("cryptoKey" + app.currentChatId , JSON.stringify(Array.from(privateKeyArray)));
+		}
+		const exportedPublicKey = await crypto.subtle.exportKey(
+			'spki',
+			keyPair.publicKey
+		  );
+		  pemPublicKey = convertArrayBufferToPem(exportedPublicKey, 'PUBLIC KEY');
+		socket.emit(NEW_EVENT_REQUEST_PUBLIC_KEY, {
+			chatId: app.currentChatId,
+			publicKey: pemPublicKey
+		  });
+	  };
+
+	useEffect(() => {
+		generateKeyPair();
+		const publicStringHandler = (pemPublicKeyString) => {
+			console.log(pemPublicKeyString);
+			const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
+
+			// Import PEM-formatted public key as CryptoKey
+			importKey(pemPublicKeyArrayBuffer);
+		}
+		socket.on('publicKey', publicStringHandler); 
+		return () => {
+			socket.off('publicKey', publicStringHandler);
+		}
+	}, []);
+
+	useEffect(() => {
+		const fetchData = async () => {
+		  const decryptedPromises = sortedMessages.map(async ({ message, senderId: sender, ...rest }) => {
+			if (sender.toString() === senderId.toString()) {
+				return {
+				  ...rest,
+				  senderId: senderId,
+				  message
+				};
+			  }
+	  
+			  try {
+				const finalMessage = await decryptMessage(message, cryptoKey);
+				return {
+				  ...rest,
+				  senderId: sender,
+				  message: finalMessage || message // Use the decrypted message, or fallback to the original message
+				};
+			  } catch (error) {
+				// Handle decryption errors if necessary
+				console.error('Decryption error:', error);
+				return {
+				  ...rest,
+				  senderId: sender,
+				  message: message // Use the original message in case of decryption error
+				};
+			  }
+		  });
+	
+		  const decryptedMessages = await Promise.all(decryptedPromises);
+		  console.log(decryptedMessages);
+		  setDecryptedMessages(decryptedMessages);
+		};
+	
+		fetchData();
+	  }, [sortedMessages, cryptoKey]);
+
 	return (
 		<div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6">
 			<div className="max-h-[67vh]">
@@ -322,11 +505,9 @@ const Chat = () => {
 					initialScrollBehavior="auto"
 					className="h-[100%] md:max-h-full overflow-y-auto w-full scroll-smooth"
 				>
-					{sortedMessages.map(
+					{decryptedMessages && decryptedMessages.map(
 						({ senderId: sender, id, message, time, status, isEdited, oldMessages, containsBadword, isRead }) => {
-							const isSender = sender.toString() === senderId.toString();
-							message = decryptMessage(message)
-
+							const isSender = sender.toString() === senderId.toString();	
 							return (
 								<div
 									key={id}

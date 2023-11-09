@@ -48,6 +48,7 @@ const LogOutHandler = require('./sockets/logout');
 const CloseChatHandler = require('./sockets/close');
 const stopSearch = require('./sockets/stopSearch');
 const onlineStatus = require('./sockets/onlineStatus');
+const requestPublicKeyHandler = require('./sockets/requestPublicKey');
 
 app.use(express.json());
 app.use(cors());
@@ -69,6 +70,7 @@ io.on('connection', (socket) => {
   CloseChatHandler(socket);
   stopSearch(socket);
   onlineStatus(socket);
+  requestPublicKeyHandler(socket);
 });
 
 server.listen(HTTP_PORT, async () => {

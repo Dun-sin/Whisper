@@ -14,6 +14,7 @@ import {
  */
 export default function useChatUtils(socket) {
 	function sendMessage(message) {
+		console.log(message);
 		return new Promise((resolve, reject) => {
 			if (!socket.connected) {
 				reject(null);

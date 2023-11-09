@@ -40,7 +40,8 @@ export default function chatReducer(state, action) {
 
 		case 'CLOSE_CHAT': {
 			const { chatId } = action.payload;
-
+			localStorage.removeItem('cryptoKey' + chatId);
+			localStorage.removeItem('importPublicKey'+ chatId);
 			delete clonedState[chatId];
 			break;
 		}
