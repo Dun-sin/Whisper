@@ -14,11 +14,11 @@ const Profile = () => {
 	const [username, setUsername] = useState('Anonymous');
 	const [profileResponse, setProfileResponse] = useState();
 	const [imageFile, setImageFile] = useState(null);
-	const [isImageSafe,setImageSafe] = useState(false);
+	const [isImageSafe, setImageSafe] = useState(false);
 	const { authState, dispatchAuth } = useAuth();
 	const [loading, setLoading] = useState(false);
 	const { logout } = useKindeAuth();
-	
+
 	const aboutRef = useRef(null);
 	const genderRef = useRef(null);
 	const ageRef = useRef(null);
@@ -33,7 +33,7 @@ const Profile = () => {
 
 			setUsername(username);
 			if (profileImage) {
-				imageRef.current.src = profileImage
+				imageRef.current.src = profileImage;
 			}
 			aboutRef.current.value = aboutMe || '';
 			ageRef.current.value = age;
@@ -44,18 +44,20 @@ const Profile = () => {
 	};
 
 	const handleUserName = (e) => setUsername(e.target.value);
-	const handlerisImageSafe =async()=>{
+	const handlerisImageSafe = async () => {
 		setLoading(true);
-			try {
-				const model = await nsfwjs.load();
-				const predictions = await model.classify(imageRef.current);
-				const neutralProb = predictions.find((p) => p.className === 'Neutral');
-				return neutralProb.probability>=0.6;
-			} catch (error) {
-				setProfileResponse("Profile image update is temporarily unavailable. Please try again later.")
-				console.error('Error classifying image:', error);
-				return false;
-			}
+		try {
+			const model = await nsfwjs.load();
+			const predictions = await model.classify(imageRef.current);
+			const neutralProb = predictions.find((p) => p.className === 'Neutral');
+			return neutralProb.probability >= 0.6;
+		} catch (error) {
+			setProfileResponse(
+				'Profile image update is temporarily unavailable. Please try again later.'
+			);
+			console.error('Error classifying image:', error);
+			return false;
+		}
 	};
 	const handleImageUpload = () => {
 		const fileInput = document.createElement('input');
@@ -69,10 +71,11 @@ const Profile = () => {
 					imageRef.current.src = event.target.result;
 					setLoading(true);
 					const imageSafe = await handlerisImageSafe();
-					imageSafe?setProfileResponse()
-						:setProfileResponse('Profile image is not safe. Please upload a different image.');
+					imageSafe
+						? setProfileResponse()
+						: setProfileResponse('Profile image is not safe. Please upload a different image.');
 
-					setImageSafe(imageSafe)
+					setImageSafe(imageSafe);
 					setImageFile(file);
 					setLoading(false);
 				};
@@ -85,7 +88,7 @@ const Profile = () => {
 		handleImageUpload();
 	};
 	const handleUpdateProfile = async () => {
-		if(loading){
+		if (loading) {
 			return;
 		}
 		const formData = new FormData();
@@ -95,15 +98,14 @@ const Profile = () => {
 		formData.append('gender', genderRef.current.value);
 		formData.append('age', Number(ageRef.current.value));
 
-		if(imageFile && isImageSafe){
-			formData.append('profileImage',imageFile)
+		if (imageFile && isImageSafe) {
+			formData.append('profileImage', imageFile);
 		}
 		setLoading(true);
 		try {
 			const response = await api.post('/profile', formData);
 			console.log(response.data.message);
 			setProfileResponse(response.data.message);
-
 		} catch (error) {
 			// Handle network errors or other unexpected issues
 			console.error('Error uploading file:', error);
@@ -114,7 +116,6 @@ const Profile = () => {
 			}
 		}
 		setLoading(false);
-
 	};
 
 	function logOut() {
@@ -139,7 +140,7 @@ const Profile = () => {
 
 	useEffect(() => {
 		if (email === null || email === '') {
-			return
+			return;
 		}
 		getProfileData(email);
 	}, []);
@@ -161,7 +162,7 @@ const Profile = () => {
 			)}
 		>
 			{JSON.parse(localStorage.getItem('auth')).loginType === 'anonymous' ? (
-				<SignupAnonUser/>
+				<SignupAnonUser />
 			) : (
 				<>
 					<section className="min-w-[300px] max-w-[400px] w-[40%] px-10 py-8 rounded-2xl flex flex-col justify-center items-center bg-clip-padding backdrop-filter backdrop-blur-2xl bg-gray-100 dark:bg-opacity-5 dark:bg-gray-300">
@@ -207,7 +208,7 @@ const Profile = () => {
 									<input
 										type="number"
 										placeholder="19"
-										className="outline-none bg-transparent text-right"
+										className="outline-none bg-transparent text-right [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
 										ref={ageRef}
 										min="1"
 										onChange={(e) => {
@@ -225,7 +226,7 @@ const Profile = () => {
 						onClick={handleUpdateProfile}
 						disabled={loading}
 					>
-						{loading? `Processing...` : `Save changes`}
+						{loading ? `Processing...` : `Save changes`}
 					</button>
 					<button
 						className="border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-red text-red hover:bg-red hover:text-white"
