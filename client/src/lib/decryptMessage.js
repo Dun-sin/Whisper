@@ -1,10 +1,32 @@
-import CryptoJS from 'crypto-js';
+export default async (message, cryptoKey) => {
+  const encryptedMessageUint8Array = new Uint8Array(atob(message).split('').map(char => char.charCodeAt(0)));
+  try{
+    const decryptedMessageBuffer = await crypto.subtle.decrypt(
+      {
+        name: 'RSA-OAEP'
+      },
+      cryptoKey,
+      encryptedMessageUint8Array
+    );
+    const decoder = new TextDecoder();
+    const decryptedMessage = decoder.decode(decryptedMessageBuffer)
+    return decryptedMessage;
+    } catch (error) {
+      console.log(error);
+    }
+}
 
-const secretKey = import.meta.env.VITE_SECRET_KEY;
 
-export default (message) => {
-	const bytes = CryptoJS.AES.decrypt(message, secretKey);
-	const originalMessage = bytes.toString(CryptoJS.enc.Utf8);
 
-	return originalMessage;
-};
+
+
+  
+  
+
+
+
+
+
+
+
+

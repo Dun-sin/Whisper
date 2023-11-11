@@ -6,7 +6,6 @@ const ActiveUser = require('../models/ActiveUserModel');
 const Chat = require('../models/ChatModel');
 const Message = require('../models/MessageModel');
 
-const secretKey = process.env.SECRET_KEY;
 
 /**
  * @typedef {{
@@ -299,8 +298,6 @@ async function addMessage(
   { message, time, senderId, type = 'message', containsBadword, replyTo }
 ) {
   const sender = getActiveUser(senderId);
-
-  message = CryptoJS.AES.encrypt(message, secretKey).toString();
 
   if (!sender) {
     return null;
