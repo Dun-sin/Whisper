@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { HiUserCircle } from 'react-icons/hi';
+import UserAvatar from '../components/UserAvatar';
 import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
+import * as nsfwjs from 'nsfwjs';
 
 import { useAuth } from 'context/AuthContext';
 
@@ -12,22 +13,28 @@ import SignupAnonUser from './SignupAnonUser';
 const Profile = () => {
 	const [username, setUsername] = useState('Anonymous');
 	const [profileResponse, setProfileResponse] = useState();
-
+	const [imageFile, setImageFile] = useState(null);
+	const [isImageSafe,setImageSafe] = useState(false);
 	const { authState, dispatchAuth } = useAuth();
+	const [loading, setLoading] = useState(false);
 	const { logout } = useKindeAuth();
-
+	
 	const aboutRef = useRef(null);
 	const genderRef = useRef(null);
 	const ageRef = useRef(null);
+	const imageRef = useRef(new Image());
 
 	const { email } = authState;
 
 	const getProfileData = async (email) => {
 		try {
 			const response = await api.get(`/profile/${email}`);
-			const { aboutMe, age, gender, username } = response.data;
+			const { aboutMe, age, gender, username, profileImage } = response.data;
 
 			setUsername(username);
+			if (profileImage) {
+				imageRef.current.src = profileImage
+			}
 			aboutRef.current.value = aboutMe || '';
 			ageRef.current.value = age;
 			genderRef.current.value = gender;
@@ -37,23 +44,77 @@ const Profile = () => {
 	};
 
 	const handleUserName = (e) => setUsername(e.target.value);
+	const handlerisImageSafe =async()=>{
+		setLoading(true);
+			try {
+				const model = await nsfwjs.load();
+				const predictions = await model.classify(imageRef.current);
+				const neutralProb = predictions.find((p) => p.className === 'Neutral');
+				return neutralProb.probability>=0.6;
+			} catch (error) {
+				setProfileResponse("Profile image update is temporarily unavailable. Please try again later.")
+				console.error('Error classifying image:', error);
+				return false;
+			}
+	};
+	const handleImageUpload = () => {
+		const fileInput = document.createElement('input');
+		fileInput.type = 'file';
+		fileInput.accept = 'image/*';
+		fileInput.onchange = (e) => {
+			const file = e.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = async (event) => {
+					imageRef.current.src = event.target.result;
+					setLoading(true);
+					const imageSafe = await handlerisImageSafe();
+					imageSafe?setProfileResponse()
+						:setProfileResponse('Profile image is not safe. Please upload a different image.');
 
-	const handleUpdateProfile = async () => {
-		const data = {
-			email,
-			username,
-			aboutMe: aboutRef.current.value,
-			gender: genderRef.current.value,
-			age: Number(ageRef.current.value),
+					setImageSafe(imageSafe)
+					setImageFile(file);
+					setLoading(false);
+				};
+				reader.readAsDataURL(file);
+			}
 		};
-
-		try {
-			const response = await api.post('/profile', data);
-			console.log(response.data.message);
-			setProfileResponse(response.data);
-		} catch (error) {
-			console.error(error);
+		fileInput.click();
+	};
+	const handleEditProfile = () => {
+		handleImageUpload();
+	};
+	const handleUpdateProfile = async () => {
+		if(loading){
+			return;
 		}
+		const formData = new FormData();
+		formData.append('email', email);
+		formData.append('username', username);
+		formData.append('aboutMe', aboutRef.current.value);
+		formData.append('gender', genderRef.current.value);
+		formData.append('age', Number(ageRef.current.value));
+
+		if(imageFile && isImageSafe){
+			formData.append('profileImage',imageFile)
+		}
+		setLoading(true);
+		try {
+			const response = await api.post('/profile', formData);
+			console.log(response.data.message);
+			setProfileResponse(response.data.message);
+
+		} catch (error) {
+			// Handle network errors or other unexpected issues
+			console.error('Error uploading file:', error);
+			if (error.response) {
+				// Handle HTTP errors with custom messages
+				console.log(error.response.data.error);
+				setProfileResponse(error.response.data.error);
+			}
+		}
+		setLoading(false);
+
 	};
 
 	function logOut() {
@@ -104,7 +165,11 @@ const Profile = () => {
 			) : (
 				<>
 					<section className="min-w-[300px] max-w-[400px] w-[40%] px-10 py-8 rounded-2xl flex flex-col justify-center items-center bg-clip-padding backdrop-filter backdrop-blur-2xl bg-gray-100 dark:bg-opacity-5 dark:bg-gray-300">
-						<HiUserCircle className="text-highlight h-20 w-20" />
+						<UserAvatar
+							imageRef={imageRef}
+							onUploadClick={handleImageUpload}
+							onEditClick={handleEditProfile}
+						/>
 
 						<input
 							className="outline-none bg-transparent w-fit text-center text-2xl placeholder:text-2xl placeholder:text-white"
@@ -158,18 +223,20 @@ const Profile = () => {
 					<button
 						className="border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-green-500 text-green-500 hover:bg-green-500 hover:text-white dark:border-green-500 dark:text-green-500 dark:hover:bg-green-500 dark:hover:text-white"
 						onClick={handleUpdateProfile}
+						disabled={loading}
 					>
-						Save changes
+						{loading? `Processing...` : `Save changes`}
 					</button>
 					<button
 						className="border min-w-[300px] max-w-[400px] w-[40%] p-2 text-md rounded-xl border-red text-red hover:bg-red hover:text-white"
 						onClick={handleDeleteAccount}
+						disabled={loading}
 					>
 						Delete My Account
 					</button>
 					{profileResponse ? (
 						<div>
-							<p className="text-green-300">Profile Updated!</p>
+							<p className="text-green-300">{profileResponse}</p>
 						</div>
 					) : null}
 				</>

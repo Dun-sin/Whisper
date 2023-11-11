@@ -295,7 +295,7 @@ function chatExists(chatId) {
  */
 async function addMessage(
   chatId,
-  { message, time, senderId, type = 'message', containsBadword }
+  { message, time, senderId, type = 'message', containsBadword, replyTo }
 ) {
   const sender = getActiveUser(senderId);
 
@@ -315,6 +315,7 @@ async function addMessage(
         type,
         createdAt: new Date(time),
         containsBadword,
+        replyTo
       })
     ).optimizedVersion,
     senderId,

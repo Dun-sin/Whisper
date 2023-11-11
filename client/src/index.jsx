@@ -12,12 +12,10 @@ import { DialogProvider } from './context/DialogContext';
 
 import 'rsuite/dist/rsuite.min.css';
 import './index.css';
-import { DarkModeProvider } from './context/DarkModeContext';
 
 const root = createRoot(document.getElementById('root'));
 
 root.render(
-	<DarkModeProvider>
 		<AuthProvider>
 			<AppProvider>
 				<Router>
@@ -29,6 +27,5 @@ root.render(
 					</SocketContext.Provider>
 				</Router>
 			</AppProvider>
-		</AuthProvider>
-	</DarkModeProvider>
+	</AuthProvider>
 );

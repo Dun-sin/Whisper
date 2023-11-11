@@ -1,5 +1,3 @@
-import { createBrowserNotification } from 'src/lib/browserNotification';
-
 export default (state, app) => {
 	const getMessage = (id) => {
 		if (!state[app.currentChatId]) {
@@ -41,7 +39,45 @@ export default (state, app) => {
 		}
 	};
 
-	return { getMessage, messageExists, handleCopyToClipBoard, handleResend };
+	function scrollToMessage(messageId, animate = true) {
+		const element = document.getElementById(`message-${messageId}`);
+
+		if (!element) {
+			return;
+		}
+
+		const alreadyHighlighted = element.classList.contains('bg-[#FF9F1C]/25');
+
+		element.scrollIntoView({
+			behavior: 'auto',
+		});
+
+		if (!animate) {
+			return;
+		}
+
+		if (alreadyHighlighted) {
+			element.classList.replace('bg-[#FF9F1C]/25', 'bg-[#FF9F1C]/50');
+		} else {
+			element.classList.add('bg-[#FF9F1C]/50');
+		}
+
+		element.addEventListener(
+			'transitionend',
+			() => {
+				if (alreadyHighlighted) {
+					element.classList.replace('bg-[#FF9F1C]/50', 'bg-[#FF9F1C]/25');
+				} else {
+					element.classList.remove('bg-[#FF9F1C]/50');
+				}
+			},
+			{
+				once: true,
+			}
+		);
+	}
+
+	return { getMessage, messageExists, handleCopyToClipBoard, handleResend, scrollToMessage };
 };
 
 export const adjustTextareaHeight = (inputRef) => {
@@ -58,12 +94,14 @@ export const getTime = (time) => {
 	return new Date(time).toLocaleTimeString();
 };
 
-export const checkPartnerResponse = (lastMessageTime, inactiveTimeThreshold) => {
-	const currentTime = new Date().getTime();
-	const isInactive = lastMessageTime && currentTime - lastMessageTime > inactiveTimeThreshold;
-	if (isInactive) {
-		createBrowserNotification("your partner isn't responding, want to leave?");
+export const isGreaterThan3Minutes = (interval, time) => {
+	const currentTime = Date.now();
+	const timeDifference = currentTime - time;
+
+	if (timeDifference > interval) {
+		return true;
 	}
+	return false;
 };
 
 // As we cant store data in array form directly in database we need to convert it into string which is Base64 of Unit8Array

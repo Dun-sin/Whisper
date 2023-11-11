@@ -33,6 +33,10 @@ const MessageSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    replyTo: {
+      type: Schema.Types.ObjectId,
+      ref: 'Message'
+    }
   },
   {
     timestamps: true,
@@ -49,6 +53,7 @@ const MessageSchema = new Schema(
             containsBadword: this.containsBadword,
             oldMessages: this.oldMessages,
             isRead: this.isRead,
+            replyTo: this.replyTo?.toString() || null
           };
         },
       },

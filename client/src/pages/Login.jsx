@@ -38,7 +38,7 @@ const Login = () => {
 							<button
 								disabled={isLoading}
 								onClick={loginAnonymously}
-								className={`dark:text-white bg-secondary h-10 px-10 font-light cursor-pointer rounded-md`}
+								className={`text-white bg-secondary h-10 px-10 font-light cursor-pointer rounded-md`}
 							>
 								Login Anonymously
 							</button>

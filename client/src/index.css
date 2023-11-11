@@ -55,3 +55,7 @@ h6 {
 .chat blockquote {
 	@apply px-2 my-4 border-l-4 border-gray-600;
 }
+
+.message-reply-container * {
+	@apply m-0 p-0;
+}

@@ -3,6 +3,11 @@ const UserRouter = require('express').Router();
 const validator = require('validator').default;
 const { v4: uuidv4 } = require('uuid');
 
+const multer = require('multer');
+// multer for profile image
+const storage = multer.memoryStorage();
+const imageUpload = multer({ storage: storage });
+
 const User = require('../models/UserSchema');
 
 let accessToken = process.env.ACCESS_TOKEN;
@@ -48,6 +53,7 @@ const getAccessToken = async () => {
         grant_type: 'client_credentials',
         client_id: clientId,
         client_secret: clientSecret,
+        audience: `${domain}/api`,
       }),
     });
 
@@ -62,23 +68,46 @@ const getAccessToken = async () => {
   }
 };
 
-const checkIfUserExistsInKinde = async (email) => {
-  const headers = {
-    Accept: 'application/json',
-    Authorization: `Bearer ${accessToken}`,
-  };
-
+const getKindeUser = async (email) => {
   const response = await fetch(`${domain}/api/v1/users?email=${email}`, {
     method: 'GET',
-    headers: headers,
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
   });
-  const data = await response.json();
-  return data.users ? true : false;
+  let data;
+  if (!response.ok) {
+    const errorText = await response.json(); // Capture the error response text
+    if (errorText.errors[1].code === 'TOKEN_INVALID') {
+      const newAccessToken = await getAccessToken();
+      accessToken = newAccessToken;
+
+      const response = await fetch(`${domain}/api/v1/users?email=${email}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Bearer ${newAccessToken}`,
+        },
+      });
+
+      data = await response.json();
+    } else {
+      console.log(errorText);
+      throw new Error(`Couldn't get user from kinde`);
+    }
+  } else {
+    data = await response.json();
+  }
+  return data;
 };
 
 const createUserWithId = async (email, id) => {
   // Logic to create a new user with a provided ID
-  const doesUserExist = await checkIfUserExistsInKinde(email);
+  const getUser = await getKindeUser(email);
+  const doesUserExist = getUser.users ? true : false;
 
   if (doesUserExist) {
     return User.create({ _id: id, email });
@@ -198,6 +227,9 @@ const updateProfile = async (req, res) => {
     user.gender = gender || user.gender || 'Unknown';
     user.age = age || user.age || null;
     user.settings = settings || user.settings;
+    user.profileImage = req.file
+      ? `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`
+      : user.profileImage;
 
     // Save the updated user profile
     await user.save();
@@ -222,6 +254,22 @@ const deleteUser = async (req, res) => {
       return res.status(NOT_FOUND).json({ error: 'User not found' });
     }
 
+    const kindeUser = await getKindeUser(email);
+    const kindeUserId = kindeUser.users[0].id;
+
+    // delte user from kinde
+    const response = await fetch(`${domain}/api/v1/user?id=${kindeUserId}`, {
+      method: 'DELETE',
+
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(response.text());
+    }
     // Delete the user
     await user.deleteOne();
 
@@ -235,7 +283,7 @@ const deleteUser = async (req, res) => {
 };
 
 UserRouter.route('/login').post(emailValidator, loginUser);
-UserRouter.route('/profile').post(emailValidator, updateProfile);
+UserRouter.route('/profile').post(imageUpload.single('profileImage'), emailValidator, updateProfile);
 UserRouter.route('/profile/:email').get(getProfile);
 UserRouter.route('/deleteUser').delete(emailValidator, deleteUser); //Email validation applied to the required request handlers
 

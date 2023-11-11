@@ -55,7 +55,7 @@ export default function chatReducer(state, action) {
 		}
 
 		case 'ADD_MESSAGE': {
-			const { senderId, room, id, message, time, status, containsBadword } = action.payload;
+			const { senderId, room, id, message, time, status, containsBadword, replyTo } = action.payload;
 
 			if (!clonedState[room]) {
 				throw new Error('Room not found!');
@@ -69,6 +69,7 @@ export default function chatReducer(state, action) {
 				time,
 				status,
 				containsBadword,
+				replyTo
 			};
 			break;
 		}

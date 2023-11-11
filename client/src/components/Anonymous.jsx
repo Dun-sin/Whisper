@@ -27,12 +27,15 @@ import Chat from 'components/Chat';
 import { createClassesFromArray, isExplicitDisconnection } from 'src/lib/utils';
 
 import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
+import useCheckTimePassed from 'src/hooks/useCheckTimePassed';
 
 const centerItems = `flex items-center justify-center`;
 
 const Anonymous = ({ onChatClosed }) => {
 	const { app, endSearch } = useApp();
 	const { currentChatId, onlineStatus } = app;
+	const { clearTimer } = useCheckTimePassed()
+
 	const currentChatIdRef = useRef(currentChatId);
 
 	const [isTyping, setIsTyping] = useState(false);
@@ -103,6 +106,8 @@ const Anonymous = ({ onChatClosed }) => {
 			} else {
 				navigate('/');
 			}
+
+			clearTimer()
 		});
 	};
 
@@ -262,20 +267,19 @@ const Anonymous = ({ onChatClosed }) => {
 				</div>
 
 				<Dropdown placement="leftStart" style={{ zIndex: 3 }} renderToggle={MenuToggle} noCaret>
-					<Dropdown.Item onClick={() => handleClose()} className='sm:w-[200px]'>
-						<div className="flex justify-between gap-2 flex-wrap">
-							<span>Close Chat</span>
-							<span className="text-gray-500 text-xs hidden sm:block">Ctrl + Shift + X</span>
-                        </div>
-                    </Dropdown.Item>
-
-					<Dropdown.Item onClick={() => handleClose(true)} className='sm:w-[200px]'>
-						<div className="flex items-center justify-between gap-2 flex-wrap">
-							<span>Find a new buddy</span>
-							<span className="text-gray-500 text-xs hidden sm:block">Ctrl + Alt + N</span>
-                        </div>
-                    </Dropdown.Item>
-				</Dropdown>
+  <Dropdown.Item onClick={() => handleClose()} className='sm:w-[200px]'>
+    <div className="flex items-center justify-between gap-2 flex-wrap">
+      <span>Close Chat</span>
+      <span className="text-gray-500 text-xs">Ctrl + Shift + X</span>
+    </div>
+  </Dropdown.Item>
+  <Dropdown.Item onClick={() => handleClose(true)} className='sm:w-[200px]'>
+    <div className="flex items-center justify-between gap-2 flex-wrap">
+      <span>Find a new buddy</span>
+      <span className="text-gray-500 text-xs">Ctrl + Alt + N</span>
+    </div>
+  </Dropdown.Item>
+</Dropdown>
 			</div>
 			<div
 				className={createClassesFromArray([

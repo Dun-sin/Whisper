@@ -20,10 +20,21 @@ export const createBrowserNotification = (title, body) => {
 		return;
 	}
 
-	const message = badwords.filter(body);
+	
+	if (title !== 'Inactive Chat') {
+		if (badwords.check(message)) {
+			const message = badwords.filter(body);
+			new Notification(title, {
+				body: message,
+				icon: '/favicon.ico',
+			});
+
+			return;
+		}
+	}
 
 	new Notification(title, {
-		body: message,
+		body,
 		icon: '/favicon.ico',
 	});
 };
