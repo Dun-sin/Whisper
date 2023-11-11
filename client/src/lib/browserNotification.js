@@ -1,6 +1,5 @@
 import BadWordsNext from 'bad-words-next';
 import en from 'bad-words-next/data/en.json'
-import decryptMessage from './decryptMessage';
 
 export const requestBrowserNotificationPermissions = () => {
 	if (!('Notification' in window)) {
@@ -21,7 +20,7 @@ export const createBrowserNotification = (title, body) => {
 		return;
 	}
 
-	const message = badwords.filter(decryptMessage(body));
+	const message = badwords.filter(body);
 
 	new Notification(title, {
 		body: message,

@@ -388,7 +388,6 @@ const Chat = () => {
 		const storedCryptoKey = localStorage.getItem('cryptoKey' + app.currentChatId);
 		const storedPublicKey = localStorage.getItem('importPublicKey' + app.currentChatId);
 		const storedPrivateKey = localStorage.getItem('importedPrivateKey' + app.currentChatId);
-
 		let pemPublicKey;	
 		let pemPrivateKey;
 	
