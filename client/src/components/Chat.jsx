@@ -282,11 +282,12 @@ const Chat = () => {
 	}, [editing]);
 
 	useEffect(() => {
-		const newMessageHandler = (message) => {
+		const newMessageHandler = async (message) => {
 			try {
+				const decryptedMessage = await decryptMessage(message.message, cryptoKey);
 				addMessage(message);
 				playNotification('newMessage');
-				createBrowserNotification('You received a new message on Whisper', message.message);
+				createBrowserNotification('You received a new message on Whisper', decryptedMessage);
 			} catch {
 				logOut();
 			}
