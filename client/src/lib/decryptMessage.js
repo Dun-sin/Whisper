@@ -10,7 +10,6 @@ export default async (message, cryptoKey) => {
     );
     const decoder = new TextDecoder();
     const decryptedMessage = decoder.decode(decryptedMessageBuffer)
-    console.log(decryptedMessage);
     return decryptedMessage;
     } catch (error) {
       console.log(error);

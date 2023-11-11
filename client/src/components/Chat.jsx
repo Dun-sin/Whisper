@@ -32,8 +32,11 @@ import { createBrowserNotification } from 'src/lib/browserNotification';
 import chatHelper,
 {
 	adjustTextareaHeight,
+	arrayBufferToBase64,
 	checkPartnerResponse,
-	getTime
+	convertArrayBufferToPem,
+	getTime,
+	pemToArrayBuffer
 } from '../lib/chatHelper';
 
 import MessageSeen from './Chat/MessageSeen';
@@ -63,6 +66,7 @@ const Chat = () => {
 	const [badwordChoices, setBadwordChoices] = useState({});
 	const [cryptoKey, setCryptoKey] = useState({});
 	const [importedPublicKey, setImportedPublicKey] = useState(null);
+	const [importedPrivateKey, setImportedPrivateKey] = useState(null);
 	const { messages: state, addMessage, updateMessage, removeMessage, receiveMessage } = useChat();
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
@@ -110,16 +114,6 @@ const Chat = () => {
 		[state, app.currentChatId]
 	);	
 	  
-	const arrayBufferToBase64 = (arrayBuffer) => {
-		let binary = '';
-		const bytes = new Uint8Array(arrayBuffer);
-		const len = bytes.byteLength;
-		for (let i = 0; i < len; i++) {
-		  binary += String.fromCharCode(bytes[i]);
-		}
-		return btoa(binary);
-	};
-
 	const doSend = async ({ senderId, room, message, time, containsBadword }) => {
 		let encryptedMessage;
 		if (!cryptoKey) {
@@ -127,6 +121,7 @@ const Chat = () => {
 			return;
 		  }
 	  
+		  // Encoding and encryting the message to be sent.
 		  const encoder = new TextEncoder();
 		  const encryptedMessagersa = await crypto.subtle.encrypt(
 			{
@@ -135,14 +130,14 @@ const Chat = () => {
 			importedPublicKey,
 			encoder.encode(message)
 		  );
-	  
+	    
 		  // Convert the Uint8Array to Base64 string
 		  encryptedMessage = arrayBufferToBase64(new Uint8Array(encryptedMessagersa));
 		
 		try {
 			const sentMessage = await sendMessage({
 				senderId,
-				encryptedMessage,
+				message: encryptedMessage,
 				time,
 				chatId: room,
 				containsBadword
@@ -151,17 +146,14 @@ const Chat = () => {
 				senderId,
 				room,
 				id: sentMessage.id,
-				message,
+				message: encryptedMessage,
 				time,
 				status: 'pending',
 				containsBadword
 			});
 
 			try {
-				updateMessage({
-					...sentMessage,
-					message: message
-				});
+				updateMessage(sentMessage);
 			} catch {
 				logOut();
 				return false;
@@ -172,7 +164,7 @@ const Chat = () => {
 					senderId,
 					room,
 					id: uuid(),
-					message,
+					message: encryptedMessage,
 					time,
 					status: 'failed',
 					containsBadword
@@ -345,13 +337,12 @@ const Chat = () => {
 		}
 	}, [sortedMessages]);
 
-	const importKey = async (arrayBuffer) => {
+	const importKey = async (publicArrayBuffer, privateArrayBuffer) => {
 		const storedPublicKey = localStorage.getItem('importPublicKey' + app.currentChatId);
-		const publicKeyArray = new Uint8Array(JSON.parse(storedPublicKey));
-
+		const storedPrivateKey = localStorage.getItem('importedPrivateKey'+ app.currentChatId);
 		const importedPublicKey = await crypto.subtle.importKey(
 			'spki',
-			storedPublicKey ? publicKeyArray : arrayBuffer,
+			publicArrayBuffer,
 			{
 				name: 'RSA-OAEP',
 				hash: { name: 'SHA-256' }
@@ -359,7 +350,6 @@ const Chat = () => {
 			true,
 			['encrypt']
 			)
-				console.log(importedPublicKey);
 				setImportedPublicKey(importedPublicKey);
 				if(!storedPublicKey){
 				const exportedPublicKey = await crypto.subtle.exportKey(
@@ -369,32 +359,39 @@ const Chat = () => {
 				  const publicKeyArray = new Uint8Array(exportedPublicKey);
 				  localStorage.setItem("importPublicKey" + app.currentChatId , JSON.stringify(Array.from(publicKeyArray)));
 				}
+			    const importedPrivateKey = await crypto.subtle.importKey(
+					'pkcs8',
+					privateArrayBuffer,
+					{
+						name: 'RSA-OAEP',
+						hash: { name: 'SHA-256' }
+					},
+					true,
+					['decrypt']
+					)
+						setImportedPrivateKey(importedPrivateKey);
+						if(!storedPrivateKey){
+							const exportedPrivateKey = await crypto.subtle.exportKey(
+								'pkcs8',
+								importedPrivateKey
+							);
+							const privateKeyArray = new Uint8Array(exportedPrivateKey);
+							  localStorage.setItem("importedPrivateKey" + app.currentChatId , JSON.stringify(Array.from(privateKeyArray)));
+						}
+			
 			
 	}
-	const convertArrayBufferToPem = (arrayBuffer, type) => {
-		const buffer = new Uint8Array(arrayBuffer);
-		const base64String = btoa(String.fromCharCode.apply(null, buffer));
-		return `-----BEGIN ${type}-----\n${base64String}\n-----END ${type}-----`;
-	  };
-
-	  function pemToArrayBuffer(pemString) {
-		const base64String = pemString && pemString
-		  .replace(/-----BEGIN (.+)-----/, '')
-		  .replace(/-----END (.+)-----/, '')
-		  .replace(/\s/g, '');
-	  
-		const binaryString = atob(base64String);
-		const byteArray = new Uint8Array(binaryString.length);
-		for (let i = 0; i < binaryString.length; i++) {
-		  byteArray[i] = binaryString.charCodeAt(i);
-		}
-	  
-		return byteArray.buffer;
-	  }
 	  
 	const generateKeyPair = async () => {
+		// Check to see if keys are already stored in local storage
 		const storedCryptoKey = localStorage.getItem('cryptoKey' + app.currentChatId);
-		let pemPublicKey;
+		const storedPublicKey = localStorage.getItem('importPublicKey' + app.currentChatId);
+		const storedPrivateKey = localStorage.getItem('importedPrivateKey' + app.currentChatId);
+
+		let pemPublicKey;	
+		let pemPrivateKey;
+	
+		// generate public and private key pair
 		const keyPair = await crypto.subtle.generateKey(
 			{
 			  name: 'RSA-OAEP',
@@ -407,7 +404,8 @@ const Chat = () => {
 		  );
   if (storedCryptoKey) {
 	const privateKeyArray = new Uint8Array(JSON.parse(storedCryptoKey));
-	
+
+	// import key or convert it from unit8array to cryptoKey
 	crypto.subtle.importKey(
 		'pkcs8',
 		privateKeyArray,
@@ -419,16 +417,20 @@ const Chat = () => {
 		['decrypt']
 		).then((importedPrivateKey) => {
 			setCryptoKey(importedPrivateKey);
-			console.log(importedPrivateKey);
 		});
-  } else {
-		
+  } else {	
 		setCryptoKey(keyPair.privateKey);
+		// Below code is used to export the private key to send it to other user and store it locally
+		//  We cant store or send key directly that's why we need to export it
 		const exportedPrivateKey = await crypto.subtle.exportKey(
 			'pkcs8',
 			keyPair.privateKey
 		);
-		const privateKeyArray = new Uint8Array(exportedPrivateKey);
+		const privateKeyArray = new Uint8Array(exportedPrivateKey); 
+		pemPrivateKey = convertArrayBufferToPem(exportedPrivateKey, 'PRIVATE KEY');
+		// Store key in local storage because it should remain same until the chat exist so that we can decrypt
+		// messages even if we open chats later as the keys will not change. If we store in context, the keys will
+		// change and we will not able to decrypt the older messages. Same applies for all keys.
 		localStorage.setItem("cryptoKey" + app.currentChatId , JSON.stringify(Array.from(privateKeyArray)));
 		}
 		const exportedPublicKey = await crypto.subtle.exportKey(
@@ -436,20 +438,29 @@ const Chat = () => {
 			keyPair.publicKey
 		  );
 		  pemPublicKey = convertArrayBufferToPem(exportedPublicKey, 'PUBLIC KEY');
+		  if(storedPublicKey){
+			const publicKeyArray = new Uint8Array(JSON.parse(storedPublicKey));
+			const privateKeyArray = new Uint8Array(JSON.parse(storedPrivateKey));
+			importKey(publicKeyArray, privateKeyArray);
+		  }else{
+			// emitting the public and private key to all receiver's. We need to emit private key too
+			// because we need to able to decrypt messages that we sent because we encrypt messages with receiver's
+			// public key
 		socket.emit(NEW_EVENT_REQUEST_PUBLIC_KEY, {
 			chatId: app.currentChatId,
-			publicKey: pemPublicKey
-		  });
+			publicKey: pemPublicKey,
+			privateKey: pemPrivateKey
+		  });}
 	  };
 
 	useEffect(() => {
 		generateKeyPair();
-		const publicStringHandler = (pemPublicKeyString) => {
-			console.log(pemPublicKeyString);
+		const publicStringHandler = (pemPublicKeyString, pemPrivateKeyString) => {
 			const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
+			const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
 
 			// Import PEM-formatted public key as CryptoKey
-			importKey(pemPublicKeyArrayBuffer);
+			importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
 		}
 		socket.on('publicKey', publicStringHandler); 
 		return () => {
@@ -458,13 +469,16 @@ const Chat = () => {
 	}, []);
 
 	useEffect(() => {
+		// This function is used to decrypt all messages from sorted messages array depending upon if
+		// its sender's message or receiver's message it uses current importedPrivateKey or current private key respectively
 		const fetchData = async () => {
 		  const decryptedPromises = sortedMessages.map(async ({ message, senderId: sender, ...rest }) => {
 			if (sender.toString() === senderId.toString()) {
+				const decryptedMessage = await decryptMessage(message, importedPrivateKey);
 				return {
 				  ...rest,
 				  senderId: senderId,
-				  message
+				  message: decryptedMessage
 				};
 			  }
 	  
@@ -487,7 +501,6 @@ const Chat = () => {
 		  });
 	
 		  const decryptedMessages = await Promise.all(decryptedPromises);
-		  console.log(decryptedMessages);
 		  setDecryptedMessages(decryptedMessages);
 		};
 	
