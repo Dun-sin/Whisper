@@ -5,21 +5,15 @@ import { KindeProvider } from '@kinde-oss/kinde-auth-react';
 
 // Store
 import { useAuth } from 'context/AuthContext';
-import { useApp } from 'src/context/AppContext';
+import { useApp } from './context/AppContext';
 
 // Components
-import NavBar from 'components/NavBar';
-import ProtectedRoutes from 'components/ProtectedRoutes';
+import {NavBar,ProtectedRoutes} from "./components/index"
 import { api } from 'src/lib/axios';
 
 // Pages
-import Start from 'pages/Start';
-import Searching from 'pages/Searching';
-import ComingSoon from 'pages/ComingSoon';
-import Profile from './pages/Profile';
-import Login from 'pages/Login';
-import Settings from 'pages/Settings';
-import NoPage from './pages/NoPage';
+import {ComingSoon,Searching,Start,Profile,Login,Settings,NoPage} from "./pages/index"
+
 
 import useIsTabActive from './hooks/useIsTabActive';
 
