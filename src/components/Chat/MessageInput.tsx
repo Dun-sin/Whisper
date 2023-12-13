@@ -4,9 +4,9 @@ import { Icon } from '@iconify/react';
 
 import EmojiPicker from './EmojiPicker';
 import useKeyPress, { ShortcutFlags } from '@/hooks/useKeyPress';
-import { NEW_EVENT_SEND_FAILED } from '@/constants.json';
+import events from '@/constants';
 
-import { SocketContext } from '@/context/Context';
+import { useSocket } from '@/context/SocketContext';
 import { useChat } from '@/context/ChatContext';
 import { useAuth } from '@/context/AuthContext';
 import chatHelper from '@/lib/chatHelper';
@@ -37,7 +37,7 @@ const MessageInput = ({
 
   const senderId = authState.loginId;
 
-  const socket = useContext(SocketContext);
+  const { socket } = useSocket();
 
   // Define the limitMessageHandler function
   function limitMessageHandler() {
@@ -53,14 +53,6 @@ const MessageInput = ({
     }, 1000);
   }
 
-  useEffect(() => {
-    socket?.on(NEW_EVENT_SEND_FAILED, limitMessageHandler);
-
-    return () => {
-      socket?.off(NEW_EVENT_SEND_FAILED, limitMessageHandler);
-    };
-  }, [socket]);
-
   // Create a function to handle "Ctrl + Enter" key press
   const handleCtrlEnter = (e: KeyboardEvent) => {
     if (e.ctrlKey && e.key === 'Enter') {
@@ -70,6 +62,14 @@ const MessageInput = ({
 
   // Use the useKeyPress hook to listen for "Ctrl + Enter" key press
   useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
+
+  useEffect(() => {
+    socket?.on(events.NEW_EVENT_SEND_FAILED, limitMessageHandler);
+
+    return () => {
+      socket?.off(events.NEW_EVENT_SEND_FAILED, limitMessageHandler);
+    };
+  }, [socket]);
 
   return (
     <>

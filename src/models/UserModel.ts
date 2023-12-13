@@ -1,4 +1,4 @@
-import { Schema, Document, Model, model } from 'mongoose';
+import { Schema, Document, Model, model, models } from 'mongoose';
 
 interface UserSchemaDocument extends Document {
   _id: string;
@@ -44,4 +44,5 @@ const userSchema = new Schema<UserSchemaDocument>({
 
 userSchema.index({ email: 1 }, { unique: true });
 
-export const UserModel: Model<UserSchemaDocument> = model('User', userSchema);
+export const UserModel: Model<UserSchemaDocument> =
+  models.User || model('User', userSchema);

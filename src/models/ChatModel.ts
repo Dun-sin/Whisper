@@ -1,4 +1,4 @@
-import { Schema, Document, Model, model, PopulatedDoc } from 'mongoose';
+import { Schema, Document, Model, model, PopulatedDoc,models } from 'mongoose';
 import { ActiveUserSchemaDocument } from './ActiveUserModel';
 import { MessageSchemaDocument } from './MessageModel';
 
@@ -51,6 +51,6 @@ chatSchema.virtual('optimizedVersion').get(function (this: ChatSchemaDocument) {
   };
 });
 
-const Chat: Model<ChatSchemaDocument> = model('Chat', chatSchema);
+const Chat: Model<ChatSchemaDocument> = models.Chat || model('Chat', chatSchema);
 
 export default Chat;

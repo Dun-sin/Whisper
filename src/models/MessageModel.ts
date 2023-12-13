@@ -1,4 +1,4 @@
-import { Schema, Document, Model, model, PopulatedDoc } from 'mongoose';
+import { Schema, Document, Model, model, PopulatedDoc, models } from 'mongoose';
 import { ActiveUserSchemaDocument } from './ActiveUserModel';
 
 export interface MessageSchemaDocument extends Document {
@@ -92,6 +92,7 @@ messageSchema.virtual('optimizedVersion').get(function (
   };
 });
 
-const Message: Model<MessageSchemaDocument> = model('Message', messageSchema);
+const Message: Model<MessageSchemaDocument> =
+  models.Message || model('Message', messageSchema);
 
 export default Message;

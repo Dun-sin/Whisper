@@ -5,7 +5,7 @@ import useIsTabActive from '@/hooks/useIsTabActive';
 import useChatUtils from '@/lib/chatSocket';
 import { useApp } from '@/context/AppContext';
 import { useChat } from '@/context/ChatContext';
-import { SocketContext } from '@/context/Context';
+import { useSocket } from '@/context/SocketContext';
 import { MessageSeenProps } from '@/types/propstypes';
 
 const MessageSeen = ({ isRead, isSender }: MessageSeenProps) => {
@@ -14,7 +14,7 @@ const MessageSeen = ({ isRead, isSender }: MessageSeenProps) => {
   const isTabVisible = useIsTabActive();
 
   const { messages: state, receiveMessage } = useChat();
-  const socket = useContext(SocketContext);
+  const { socket } = useSocket();
   const { seenMessage } = useChatUtils(socket);
 
   const sortedMessages = useMemo(() => {
@@ -81,14 +81,7 @@ const MessageSeen = ({ isRead, isSender }: MessageSeenProps) => {
       // Clean up the observer
       observer.disconnect();
     };
-  }, [
-    sortedMessages,
-    isTabVisible,
-    app.currentChatId,
-    isSender,
-    receiveMessage,
-    seenMessage,
-  ]);
+  }, [sortedMessages, isTabVisible, app.currentChatId, isSender]);
 
   return isSender && <p className='text-sm'>{isRead ? 'Seen' : 'Not Seen'}</p>;
 };

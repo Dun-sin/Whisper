@@ -1,16 +1,11 @@
 /**
  * @typedef {import('socket.io-client').Socket} Socket
  */
-import {
-  NEW_EVENT_DELETE_MESSAGE,
-  NEW_EVENT_EDIT_MESSAGE,
-  NEW_EVENT_SEND_MESSAGE,
-  NEW_EVENT_READ_MESSAGE,
-} from '@/constants.json';
+import events from '@/constants';
 import { MessageType } from '@/types/types';
 import { Socket } from 'socket.io-client';
 
-export default function useChatUtils(socket: Socket | null) {
+export default function useChatUtils(socket: Socket | undefined) {
   function sendMessage(message: MessageType): Promise<MessageType> {
     return new Promise((resolve, reject) => {
       if (!socket?.connected) {
@@ -21,7 +16,7 @@ export default function useChatUtils(socket: Socket | null) {
       socket
         .timeout(30000)
         .emit(
-          NEW_EVENT_SEND_MESSAGE,
+          events.NEW_EVENT_SEND_MESSAGE,
           message,
           (err: any, sentMessage: MessageType) => {
             if (err) {
@@ -45,7 +40,7 @@ export default function useChatUtils(socket: Socket | null) {
       socket
         .timeout(30000)
         .emit(
-          NEW_EVENT_DELETE_MESSAGE,
+          events.NEW_EVENT_DELETE_MESSAGE,
           { id, chatId },
           (err: any, messageDeleted: any) => {
             if (err) {
@@ -81,7 +76,7 @@ export default function useChatUtils(socket: Socket | null) {
       socket
         .timeout(30000)
         .emit(
-          NEW_EVENT_EDIT_MESSAGE,
+          events.NEW_EVENT_EDIT_MESSAGE,
           { id, chatId, newMessage, oldMessage, isEdited },
           (err: any, messageEdited: MessageType) => {
             if (err) {
@@ -111,7 +106,7 @@ export default function useChatUtils(socket: Socket | null) {
       socket
         .timeout(30000)
         .emit(
-          NEW_EVENT_READ_MESSAGE,
+          events.NEW_EVENT_READ_MESSAGE,
           { messageId, chatId },
           (err: any, messagedRead: any) => {
             if (err) {

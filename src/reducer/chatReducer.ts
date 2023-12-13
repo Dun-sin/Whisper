@@ -18,7 +18,6 @@ export const initialState: ChatIdType = {};
 
 export default function chatReducer(state: ChatIdType, action: any) {
   const clonedState = cloneState(state);
-
   switch (action.type) {
     case 'CREATE_CHAT': {
       const {
@@ -28,6 +27,7 @@ export default function chatReducer(state: ChatIdType, action: any) {
         createdAt = new Date(),
       } = action.payload;
 
+      console.log('context', { chatId, userIds });
       clonedState[chatId] = {
         userIds,
         messages,
@@ -61,7 +61,7 @@ export default function chatReducer(state: ChatIdType, action: any) {
         status,
         containsBadword,
         replyTo,
-      } = action.payload;
+      } = action.payload || {};
 
       if (!clonedState[room]) {
         throw new Error('Room not found!');
@@ -157,7 +157,8 @@ export default function chatReducer(state: ChatIdType, action: any) {
       break;
     }
     default:
-      throw new Error('No action provided!');
+      console.warn('Unhandled action type:', action.type);
+      return clonedState;
   }
 
   // Save auth state to localStorage on each change

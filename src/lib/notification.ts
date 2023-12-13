@@ -1,8 +1,8 @@
+import { useState, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
-
-import ChatClosedSound from '/notifications/closed.mp3';
-import NewMessageSound from '/notifications/new_message.mp3';
-import PairedSound from '/notifications/paired.mp3';
+import ChatClosedSound from '../../public/notifications/closed.mp3';
+import NewMessageSound from '../../public/notifications/new_message.mp3';
+import PairedSound from '../../public/notifications/paired.mp3';
 import { SettingsType } from '@/types/types';
 
 /**
@@ -11,30 +11,30 @@ import { SettingsType } from '@/types/types';
  * @typedef {{ volume: number}} NotificationSettings
  */
 
-export function useSound(soundSrc: string, settings: SettingsType) {
-  const _settings = {
-    ...settings,
-  };
+type AudioSettings = {
+  notificationVolume: number;
+};
 
-  _settings.notificationVolume = 10;
+type UseSoundReturnType = {
+  play: () => Promise<void>;
+};
 
-  const audio = new Audio(soundSrc);
-  audio.preload = 'auto';
-  audio.volume = _settings.notificationVolume / 100;
+type UseSoundProps = {
+  audio: HTMLAudioElement | null;
+  settings: SettingsType;
+};
 
-  return {
-    async play() {
-      if (!audio.paused && (audio.currentTime / audio.duration) * 100 >= 1) {
-        audio.pause();
-        audio.currentTime = 0;
-      }
+type UseNotificationReturnType = {
+  playNotification: (event: string) => Promise<void>;
+};
 
-      await audio.play();
-    },
-  };
-}
+type UseNotificationProps = {
+  settings: any;
+};
 
-export function useNotification(settings: any) {
+export function useNotification({
+  settings,
+}: UseNotificationProps): UseNotificationReturnType | null {
   const { app } = useApp();
   const { settings: appSettings } = app;
 
@@ -46,25 +46,65 @@ export function useNotification(settings: any) {
     ? appSettings.notificationVolume
     : 0;
 
-  const notifications = {
-    chatClosed: useSound(ChatClosedSound, _settings),
-    newMessage: useSound(NewMessageSound, _settings),
-    buddyPaired: useSound(PairedSound, _settings),
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+
+  const setAudioState = (event: string) => {
+    let audio;
+    switch (event) {
+      case 'chatClosed':
+        audio = ChatClosedSound;
+        break;
+      case 'newMessage':
+        audio = NewMessageSound;
+        break;
+      case 'buddyPaired':
+        audio = PairedSound;
+      default:
+        audio = ChatClosedSound;
+        break;
+    }
+    return audio;
   };
+
+  useEffect(() => {
+    SoundFuc({ audio, settings: _settings });
+  }, [audio]);
 
   return {
     async playNotification(event: string) {
-      const keys = Object.keys(notifications);
-      const value =
-        notifications[
-          keys.find(k => k === event) as keyof typeof notifications
-        ];
+      setAudio(new Audio(setAudioState(event)));
+    },
+  };
+}
 
-      if (!value) {
-        return;
+// Modify useSound to accept an existing audio object
+export function SoundFuc({
+  audio,
+  settings,
+}: UseSoundProps): UseSoundReturnType {
+  const _settings: AudioSettings = {
+    ...settings,
+  };
+
+  _settings.notificationVolume = 10;
+
+  if (!audio) {
+    return {
+      play: async () => {},
+    };
+  }
+
+  audio.preload = 'auto';
+  audio.volume = _settings.notificationVolume / 100;
+
+  return {
+    async play() {
+      if (!audio.paused && (audio.currentTime / audio.duration) * 100 >= 1) {
+        audio.pause();
+        audio.currentTime = 0;
       }
 
-      await value.play();
+      await audio.play();
     },
   };
 }

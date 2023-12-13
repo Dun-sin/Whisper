@@ -7,10 +7,10 @@ import {
   useState,
   FormEvent,
 } from 'react';
-import { SocketContext } from '@/context/Context';
+import { useSocket } from '@/context/SocketContext';
 
 import ScrollToBottom from 'react-scroll-to-bottom';
-import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
+
 import { Icon } from '@iconify/react';
 import { v4 as uuid } from 'uuid';
 import { throttle } from 'lodash';
@@ -25,14 +25,7 @@ import { useApp } from '@/context/AppContext';
 import useChatUtils from '@/lib/chatSocket';
 import MessageStatus from '@/components/Chat/MessageStatus';
 import { useNotification } from '@/lib/notification';
-import {
-  NEW_EVENT_DELETE_MESSAGE,
-  NEW_EVENT_EDIT_MESSAGE,
-  NEW_EVENT_RECEIVE_MESSAGE,
-  NEW_EVENT_TYPING,
-  NEW_EVENT_READ_MESSAGE,
-  NEW_EVENT_SEND_FAILED,
-} from '@/constants.json';
+import events from '@/constants';
 import { createBrowserNotification } from '@/lib/browserNotification';
 
 import chatHelper, { adjustTextareaHeight, getTime } from '../lib/chatHelper';
@@ -49,7 +42,7 @@ let senderId: string | undefined;
 
 const Chat = () => {
   const { app } = useApp();
-  const { playNotification } = useNotification(app.settings);
+  const notification = useNotification({ settings: app.settings });
   const [editing, setEditing] = useState<{
     isediting: boolean;
     messageID: string;
@@ -75,8 +68,7 @@ const Chat = () => {
     cancelReply,
   } = useChat();
   const { authState, dispatchAuth } = useAuth();
-  const { logout } = useKindeAuth();
-  const socket = useContext(SocketContext);
+  const { socket } = useSocket();
 
   const { sendMessage, editMessage } = useChatUtils(socket);
   const { getMessage, handleResend, scrollToMessage } = chatHelper(state, app);
@@ -97,7 +89,6 @@ const Chat = () => {
     dispatchAuth({
       type: 'LOGOUT',
     });
-    logout();
   }
 
   const cancelEdit = () => {
@@ -106,9 +97,10 @@ const Chat = () => {
     }
     inputRef.current.value = '';
     setEditing({ isediting: false, messageID: '' });
-    socket
-      ?.timeout(10000)
-      .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
+    socket?.timeout(10000).emit(events.NEW_EVENT_TYPING, {
+      chatId: app.currentChatId,
+      isTyping: false,
+    });
   };
 
   const sortedMessages = useMemo(() => {
@@ -149,23 +141,15 @@ const Chat = () => {
         replyTo,
       });
 
-      addMessage({
-        senderId,
-        room,
-        id: sentMessage.id,
-        message,
-        time,
-        status: 'pending',
-        containsBadword,
-        replyTo,
-      });
+      const toAddMessage: MessageType = { ...sentMessage, status: 'pending' };
+      addMessage(toAddMessage);
 
-      try {
-        updateMessage(sentMessage);
-      } catch {
-        logOut();
-        return false;
-      }
+      // try {
+      //   updateMessage(sentMessage);
+      // } catch {
+      //   logOut();
+      //   return false;
+      // }
     } catch (e) {
       try {
         updateMessage({
@@ -181,7 +165,7 @@ const Chat = () => {
       } catch {
         logOut();
       }
-
+      console.log(e);
       return false;
     }
 
@@ -192,7 +176,7 @@ const Chat = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    socket?.emit(NEW_EVENT_TYPING, {
+    socket?.emit(events.NEW_EVENT_TYPING, {
       chatId: app.currentChatId,
       isTyping: false,
     });
@@ -245,9 +229,10 @@ const Chat = () => {
 
   const handleTypingStatus = throttle(e => {
     if (e.target.value.length > 0) {
-      socket
-        ?.timeout(5000)
-        .emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
+      socket?.timeout(5000).emit(events.NEW_EVENT_TYPING, {
+        chatId: app.currentChatId,
+        isTyping: true,
+      });
     }
     setMessage(e.target.value);
     adjustTextareaHeight(inputRef);
@@ -288,10 +273,10 @@ const Chat = () => {
   }, [editing]);
 
   useEffect(() => {
-    const newMessageHandler = (message: MessageType) => {
+    const newMessageHandler = async (message: MessageType) => {
       try {
         addMessage(message);
-        playNotification('newMessage');
+        await notification?.playNotification('newMessage');
         createBrowserNotification(
           'You received a new message on Whisper',
           message.message
@@ -334,28 +319,20 @@ const Chat = () => {
     };
 
     // This is used to recive message form other user.
-    socket?.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
-    socket?.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-    socket?.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
-    socket?.on(NEW_EVENT_READ_MESSAGE, readMessageHandler);
-    socket?.on(NEW_EVENT_SEND_FAILED, limitMessageHandler);
+    socket?.on(events.NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+    socket?.on(events.NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+    socket?.on(events.NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+    socket?.on(events.NEW_EVENT_READ_MESSAGE, readMessageHandler);
+    socket?.on(events.NEW_EVENT_SEND_FAILED, limitMessageHandler);
 
     return () => {
-      socket?.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
-      socket?.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-      socket?.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
-      socket?.off(NEW_EVENT_READ_MESSAGE, readMessageHandler);
-      socket?.off(NEW_EVENT_SEND_FAILED, limitMessageHandler);
+      socket?.off(events.NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+      socket?.off(events.NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+      socket?.off(events.NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+      socket?.off(events.NEW_EVENT_READ_MESSAGE, readMessageHandler);
+      socket?.off(events.NEW_EVENT_SEND_FAILED, limitMessageHandler);
     };
-  }, [
-    addMessage,
-    app.currentChatId,
-    playNotification,
-    receiveMessage,
-    removeMessage,
-    socket,
-    updateMessage,
-  ]);
+  }, [app.currentChatId, socket]);
 
   // this is used to send the notification for inactive chat to the respective user
   // get the last message sent

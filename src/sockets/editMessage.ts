@@ -1,10 +1,10 @@
-import { NEW_EVENT_EDIT_MESSAGE } from '@/constants.json';
+import events from '@/constants';
 import { getActiveUser, editMessage } from '@/lib/lib';
 import { Socket } from 'socket.io';
 
 const EditMessageHandler = (socket: Socket) => {
   socket.on(
-    NEW_EVENT_EDIT_MESSAGE,
+    events.NEW_EVENT_EDIT_MESSAGE,
     async (
       { id: messageId, chatId, newMessage, oldMessage },
       messageWasEditedSuccessfully
@@ -23,7 +23,9 @@ const EditMessageHandler = (socket: Socket) => {
         message: newMessage,
         oldMessage,
       });
-      socket.broadcast.to(chatId).emit(NEW_EVENT_EDIT_MESSAGE, messageEdited);
+      socket.broadcast
+        .to(chatId)
+        .emit(events.NEW_EVENT_EDIT_MESSAGE, messageEdited);
       messageWasEditedSuccessfully(messageEdited);
     }
   );

@@ -4,20 +4,11 @@ import { isEqual } from 'lodash';
 
 import appReducer, { initialState } from '@/reducer/appReducer';
 
-import { SettingsType, AppType } from '@/types/types';
+import { SettingsType } from '@/types/types';
 import { ProviderType } from '@/types/propstypes';
+import { AppContextType } from '@/types/contextTypes';
 
-const AppContext = createContext<{
-  app: AppType;
-  hasUnsavedSettings: boolean;
-  updateSettings: () => undefined;
-  updateTmpSettings: (newSettings: SettingsType) => void;
-  cancelSettingsUpdate: () => void;
-  startSearch: () => undefined;
-  endSearch: (currentChatId: null | string) => undefined;
-  loadUserSettings: (settings: SettingsType) => void;
-  updateOnlineStatus: (onlineStatus: Date | string | null) => void;
-}>({
+const AppContext = createContext<AppContextType>({
   app: initialState,
   hasUnsavedSettings: false,
   updateSettings: () => undefined,
@@ -27,6 +18,7 @@ const AppContext = createContext<{
   endSearch: () => undefined,
   loadUserSettings: () => {},
   updateOnlineStatus: () => {},
+  updateConnection: () => {},
 });
 
 export const useApp = () => {
@@ -119,6 +111,12 @@ export const AppProvider = ({ children }: ProviderType) => {
       payload: { onlineStatus },
     });
   }
+  function updateConnection(isDisconnected: boolean) {
+    dispatch({
+      type: 'DISCONNECTED',
+      payload: { disconnected: isDisconnected },
+    });
+  }
 
   return (
     <AppContext.Provider
@@ -132,6 +130,7 @@ export const AppProvider = ({ children }: ProviderType) => {
         endSearch,
         loadUserSettings,
         updateOnlineStatus,
+        updateConnection,
       }}
     >
       {children}

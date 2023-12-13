@@ -1,5 +1,5 @@
 import mongoose, { Connection, Error, Mongoose } from 'mongoose';
-import { init } from './lib/lib';
+import { init } from '../lib/lib';
 
 // Initialize variables to store the MongoDB connection and Mongoose instance.
 let connection: Connection | null = null;

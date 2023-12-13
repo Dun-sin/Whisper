@@ -163,7 +163,7 @@ async function createChat(users: ActiveUserType[]) {
 
   chats[chatId] = optimizedChat;
 
-  return optimizedChat;
+  return { id: chatId, ...optimizedChat };
 }
 
 async function closeChat(chatId: string) {

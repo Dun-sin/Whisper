@@ -7,7 +7,7 @@ import chatHelper from '@/lib/chatHelper';
 
 import { useChat } from '@/context/ChatContext';
 import { useApp } from '@/context/AppContext';
-import { SocketContext } from '@/context/Context';
+import { useSocket } from '@/context/SocketContext';
 
 import useChatUtils from '@/lib/chatSocket';
 import { DropDownProps } from '@/types/propstypes';
@@ -21,7 +21,7 @@ const DropDownOptions = ({
   setReplyId,
 }: DropDownProps) => {
   const { app } = useApp();
-  const socket = useContext(SocketContext);
+  const { socket } = useSocket();
 
   const { messages: state, updateMessage, removeMessage } = useChat();
   const { getMessage, messageExists, handleCopyToClipBoard } = chatHelper(

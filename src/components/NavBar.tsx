@@ -5,16 +5,15 @@ import { usePathname } from 'next/navigation';
 
 import { Tooltip, Whisper } from 'rsuite';
 import { Icon } from '@iconify/react';
-import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 
 // Store
 import { useDialog } from '@/context/DialogContext';
 import { useAuth } from '@/context/AuthContext';
-import { SocketContext } from '@/context/Context';
+import { useSocket } from '@/context/SocketContext';
 import { useApp } from '@/context/AppContext';
 
 // Lib
-import constants from '@/constants.json';
+import constants from '@/constants';
 import { IsActiveType } from '@/types/types';
 import Image from 'next/image';
 
@@ -23,11 +22,10 @@ const activeStyle = linkStyle + 'bg-primary';
 
 const NavBar = () => {
   const { authState, dispatchAuth } = useAuth();
-  const socket = useContext(SocketContext);
+  const { socket } = useSocket();
 
   const [isActive, setIsActive] = useState<IsActiveType>('search');
 
-  const { logout } = useKindeAuth();
   const { app } = useApp();
   const location = usePathname();
   const { setDialog } = useDialog();
@@ -36,7 +34,6 @@ const NavBar = () => {
     dispatchAuth({
       type: 'LOGOUT',
     });
-    logout();
   }
 
   const handleLogout = () => {
@@ -83,7 +80,7 @@ const NavBar = () => {
       } bg-secondary md:w-[120px] md:min-h-screen md:max-h-screen items-center md:flex-col flex-row justify-between shadow-[rgb(0,_0,_0)_12px_0px_18px_-18px] p-2 md:p-5 sticky bottom-0 md:flex max-h-[70px] h-[70px] min-h-[70px]`}
     >
       <div className='hidden md:flex'>
-        <Image src='favicon.ico' alt='Whisper logo' />
+        <Image src='/favicon.ico' alt='Whisper logo' width={50} height={50} />
       </div>
       <div className='justify-between md:justify-center flex items-center md:flex-col flex-row w-full gap-2 flex-nowrap overflow-auto'>
         <Whisper

@@ -23,6 +23,7 @@ export type AppType = {
   currentChatId: string | null;
   isSearching: boolean;
   onlineStatus: OnlineStatus;
+  disconnected: boolean;
 };
 
 export type AuthType = {
@@ -52,7 +53,6 @@ export type MessageIdType = {
 };
 
 export type ChatType = {
-  id: string;
   messages: MessageIdType;
   createdAt: Date | number;
   userIds: [string, string];

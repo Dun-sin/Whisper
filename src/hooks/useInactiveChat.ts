@@ -41,7 +41,7 @@ export default (
     }
 
     setLastMessageTime(newMessageTime);
-  }, [getLastMessage, amITheSender, lastMessageTime]);
+  }, [getLastMessage, amITheSender]);
 
   useEffect(() => {
     if (timePassed) {
@@ -62,5 +62,5 @@ export default (
       clearTimer();
       setLastMessageTime(0);
     }
-  }, [timePassed, amITheSender, clearTimer]);
+  }, [timePassed, amITheSender]);
 };

@@ -21,8 +21,9 @@ export const createBrowserNotification = (title: string, body: string) => {
     return;
   }
 
-  if (title !== 'Inactive Chat') {
+  if (title === 'You received a new message on Whisper') {
     const decryptedMessage = decryptMessage(body) as string;
+    console.log({ decryptedMessage, body });
     if (badwords.check(decryptedMessage)) {
       const message = badwords.filter(decryptedMessage);
       new Notification(title, {

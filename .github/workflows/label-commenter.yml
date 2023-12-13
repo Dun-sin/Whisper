@@ -1,0 +1,37 @@
+name: Label Commenter
+
+on:
+  issues:
+    types:
+      - labeled
+      - unlabeled
+  pull_request_target:
+    types:
+      - labeled
+      - unlabeled
+  discussion:
+    types:
+      - labeled
+      - unlabeled
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  comment:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@v2.3.4
+        with:
+          ref: main
+
+      - name: Label Commenter
+        uses: peaceiris/actions-label-commenter@b9f3f5d91e1f6ea0fd28c45cee43e0b0a687a272
+        env:
+          RUNNER_DEBUG: 1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          config_file: .github/workflows/label-commenter-config.yml

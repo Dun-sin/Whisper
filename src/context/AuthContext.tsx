@@ -1,14 +1,10 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-  useReducer,
-  Dispatch,
-} from 'react';
+import { createContext, useContext, useMemo, useReducer } from 'react';
 
 import authReducer, { initialState } from '@/reducer/authReducer';
+
 import { AuthType } from '@/types/types';
 import { ProviderType } from '@/types/propstypes';
+import { AuthContextType } from '@/types/contextTypes';
 
 /**
  * Changed the state from a boolean type to an object. This helps improve
@@ -34,11 +30,7 @@ import { ProviderType } from '@/types/propstypes';
  *
  */
 
-const AuthContext = createContext<{
-  authState: AuthType;
-  dispatchAuth: Dispatch<any>;
-  isLoggedIn: boolean;
-}>({
+const AuthContext = createContext<AuthContextType>({
   authState: initialState,
   dispatchAuth: () => {},
   isLoggedIn: false,

@@ -1,0 +1,40 @@
+labels:
+  - name: invalid
+    labeled:
+      issue:
+        body: Please follow the issue templates.
+        action: close
+      pr:
+        body: |
+           Thank you @{{ pull_request.user.login }} for raising a PR. Please follow the pull request templates. 
+           PR compliance is complaining because of the PR description, some things needs to be fixed properly, if you don't know how, try this:
+            - Read the error carefully or read the <a href="https://github.com/Dun-sin/whisper/blob/main/CONTRIBUTING.md">Contributing.md file</a>
+            - Checkout past merged Pull requests to see how they were done for it to be merged
+           > Note: you can edit your PR message, this PR won't be merged if the error isn't gone and you have a week max to fix it before the PR gets closed without being merged
+  - name: wontfix
+    labeled:
+      issue:
+        body: This will not be worked on but we appreciate your contribution.
+        action: close
+    unlabeled:
+      issue:
+        body: This has become active again.
+        action: open
+  - name: duplicate
+    labeled:
+      issue:
+        body: This issue already exists.
+        action: close
+  - name: '🚦 status: awaiting approval'
+    labeled:
+      issue:
+        body: |
+         This issue is waiting to be approved so it's locked until approved      
+         Thank you @{{ issue.user.login }} for creating an issue, while you wait for a response, consider reading the <a href="https://github.com/Dun-sin/whisper/blob/main/CONTRIBUTING.md">Contributing.md file</a>, Thank you! Welcome to the community
+        locking: lock
+  - name: '🏁 status: ready for dev'
+    labeled:
+      issue:
+        body: |
+         This issue is ready for dev and assigned to anyone who properly asks
+        locking: unlock

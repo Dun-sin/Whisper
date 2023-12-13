@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 
-import constants from '@/constants.json';
+import constants from '@/constants';
 import { getActiveUser, chatExists, closeChat } from '@/lib/lib';
 
 const CloseChatHandler = (socket: Socket) => {

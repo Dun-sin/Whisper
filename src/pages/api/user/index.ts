@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import statusCodes from '@/httpStatusCodes';
 import { UserModel } from '@/models/UserModel';
-import { emailValidator, getKindeUser } from '@/lib/userAPI';
+import { emailValidator } from '@/lib/userAPI';
 
 let accessToken = process.env.ACCESS_TOKEN;
 const domain = process.env.DOMAIN;
@@ -22,23 +22,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             .json({ error: 'User not found' });
         }
 
-        const kindeUser = await getKindeUser(email);
-        const kindeUserId = kindeUser.users[0].id;
-
-        // Delete user from kinde
-        const response = await axios.delete(
-          `${domain}/api/v1/user?id=${kindeUserId}`,
-          {
-            headers: {
-              Accept: 'application/json',
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        if (response.status !== 200) {
-          throw new Error(response.data);
-        }
         // Delete the user
         await UserModel.deleteOne();
 

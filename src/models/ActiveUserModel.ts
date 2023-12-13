@@ -1,4 +1,4 @@
-import { Schema, Document, Model, model, Types } from 'mongoose';
+import { Schema, Document, Model, model, Types, models } from 'mongoose';
 
 export interface ActiveUserSchemaDocument extends Document {
   email: string | null;
@@ -52,9 +52,7 @@ activeUserSchema.virtual('optimizedVersion').get(function (
   };
 });
 
-export const ActiveUserModel: Model<ActiveUserSchemaDocument> = model(
-  'ActiveUser',
-  activeUserSchema
-);
+export const ActiveUserModel: Model<ActiveUserSchemaDocument> =
+  models.ActiveUser || model('ActiveUser', activeUserSchema);
 
 export default ActiveUserModel;

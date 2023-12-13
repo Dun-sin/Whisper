@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import { createPortal } from 'react-dom';
 
 import { useDialog } from '@/context/DialogContext';
 import { useApp } from '@/context/AppContext';
@@ -39,7 +39,7 @@ const Dialog = ({ ...rest }) => {
     return null;
   }
 
-  return ReactDOM.createPortal(
+  return createPortal(
     <div className={`${settings.theme && 'dark'}`}>
       <div
         id='overlay'

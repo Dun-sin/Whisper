@@ -8,22 +8,13 @@ import {
 } from 'react';
 import { useRouter } from 'next/navigation';
 
-import {
-  NEW_EVENT_CLOSE,
-  NEW_EVENT_DELETE_MESSAGE,
-  NEW_EVENT_DISPLAY,
-  NEW_EVENT_EDIT_MESSAGE,
-  NEW_EVENT_RECEIVE_MESSAGE,
-  NEW_EVENT_ONLINE_STATUS,
-  NEW_EVENT_CHAT_RESTORE,
-  NEW_EVENT_INACTIVE,
-} from '@/constants.json';
+import events from '@/constants';
 
 import { Dropdown, IconButton, Tooltip, Whisper } from 'rsuite';
 import { Icon } from '@iconify/react';
 
 // Store
-import { SocketContext } from '@/context/Context';
+import { useSocket } from '@/context/SocketContext';
 import { useChat } from '@/context/ChatContext';
 import { useApp } from '@/context/AppContext';
 import { useDialog } from '@/context/DialogContext';
@@ -44,10 +35,10 @@ import PageWrapper from '@/components/PageWrapper';
 const centerItems = `flex items-center justify-center`;
 
 const Anonymous = () => {
-  const { app, endSearch } = useApp();
-  const { currentChatId, onlineStatus } = app;
+  const { app, endSearch, updateConnection } = useApp();
+  const { currentChatId, onlineStatus, disconnected } = app;
   const { clearTimer } = useCheckTimePassed(0, 0);
-  const { playNotification } = useNotification(app.settings);
+  const notification = useNotification({ settings: app.settings });
   const { createChat, closeAllChats } = useChat();
 
   const currentChatIdRef = useRef(currentChatId);
@@ -55,7 +46,7 @@ const Anonymous = () => {
 
   const [isTyping, setIsTyping] = useState(false);
   const [autoSearchAfterClose, setAutoSearchAfterClose] = useState(false);
-  const [disconnected, setDisconnected] = useState(false);
+
   const [buddyOnlineStatus, setBuddyOnlineStatus] = useState<any>(null);
 
   const autoSearchRef = useRef(false);
@@ -66,12 +57,12 @@ const Anonymous = () => {
   >> = useRef(null);
 
   const navigate = useRouter();
-  const socket = useContext(SocketContext);
+  const { socket } = useSocket();
   const { closeChat } = useChat();
   const { setDialog } = useDialog();
 
   socket?.on(
-    NEW_EVENT_DISPLAY,
+    events.NEW_EVENT_DISPLAY,
     ({ isTyping, chatId }: { isTyping: boolean; chatId: string }) => {
       // eslint-disable-next-line curly
       if (chatId !== currentChatId) return;
@@ -104,28 +95,32 @@ const Anonymous = () => {
 
     socket
       ?.timeout(30000)
-      .emit(NEW_EVENT_CLOSE, currentChatId, (err: any, chatClosed: boolean) => {
-        if (err) {
-          alert('An error occured whiles closing chat.');
-          setAutoSearchAfterClose(false);
-          return err;
+      .emit(
+        events.NEW_EVENT_CLOSE,
+        currentChatId,
+        (err: any, chatClosed: boolean) => {
+          if (err) {
+            alert('An error occured whiles closing chat.');
+            setAutoSearchAfterClose(false);
+            return err;
+          }
+
+          if (chatClosed) {
+            closeChat(currentChatId);
+          }
+
+          endSearch(null);
+
+          if (chatClosed && autoSearchRef.current) {
+            navigate.push('/searching');
+            setAutoSearchAfterClose(false);
+          } else {
+            navigate.push('/');
+          }
+
+          clearTimer();
         }
-
-        if (chatClosed) {
-          closeChat(currentChatId);
-        }
-
-        endSearch(null);
-
-        if (chatClosed && autoSearchRef.current) {
-          navigate.push('/searching');
-          setAutoSearchAfterClose(false);
-        } else {
-          navigate.push('/');
-        }
-
-        clearTimer();
-      });
+      );
   };
 
   const MenuToggle = (props: any, ref: Ref<any>) => {
@@ -161,15 +156,15 @@ const Anonymous = () => {
 
   useEffect(() => {
     const newMessageEvents = [
-      NEW_EVENT_RECEIVE_MESSAGE,
-      NEW_EVENT_DELETE_MESSAGE,
-      NEW_EVENT_EDIT_MESSAGE,
+      events.NEW_EVENT_RECEIVE_MESSAGE,
+      events.NEW_EVENT_DELETE_MESSAGE,
+      events.NEW_EVENT_EDIT_MESSAGE,
     ];
 
-    socket?.on(NEW_EVENT_CLOSE, chatId => {
+    socket?.on(events.NEW_EVENT_CLOSE, async chatId => {
       endSearch(null);
       closeChat(chatId);
-      playNotification('chatClosed');
+      await notification?.playNotification('chatClosed');
 
       if (
         !confirm(
@@ -184,7 +179,7 @@ const Anonymous = () => {
       navigate.push('/searching');
     });
 
-    socket?.on(NEW_EVENT_CHAT_RESTORE, ({ chats, currentChatId }) => {
+    socket?.on(events.NEW_EVENT_CHAT_RESTORE, ({ chats, currentChatId }) => {
       Object.values(chats).forEach((chat: any) => {
         chat = chat as ChatIdType;
         createChat(chat.id, chat.userIds, chat.messages, chat.createdAt);
@@ -194,11 +189,11 @@ const Anonymous = () => {
 
     const connectionEvents = {
       connect: () => {
-        setDisconnected(false);
+        updateConnection(false);
       },
 
       disconnect: (reason: string) => {
-        setDisconnected(!isExplicitDisconnection(reason));
+        updateConnection(!isExplicitDisconnection(reason));
       },
     };
 
@@ -260,11 +255,11 @@ const Anonymous = () => {
       socket?.on(event, onNewMessage);
     });
 
-    socket?.on(NEW_EVENT_INACTIVE, () => {
+    socket?.on(events.NEW_EVENT_INACTIVE, () => {
       closeAllChats();
     });
 
-    socket?.on(NEW_EVENT_ONLINE_STATUS, onlineStatushandler);
+    socket?.on(events.NEW_EVENT_ONLINE_STATUS, onlineStatushandler);
 
     function disconnect() {
       reconnectAttempts.current = 0;
@@ -273,7 +268,7 @@ const Anonymous = () => {
       }
 
       socket?.disconnect();
-      setDisconnected(true);
+      updateConnection(true);
       endSearch(null);
     }
 
@@ -300,17 +295,15 @@ const Anonymous = () => {
     socket?.io.on('reconnect_error', onReconnectError);
 
     return () => {
-      socket?.off(NEW_EVENT_ONLINE_STATUS, onlineStatushandler);
-      socket
-        ?.off('connect')
-        .off(NEW_EVENT_CHAT_RESTORE)
-        .off(NEW_EVENT_CLOSE)
-        .off(NEW_EVENT_INACTIVE)
-        .off('disconnect', onDisconnect);
+      socket?.off(events.NEW_EVENT_ONLINE_STATUS, onlineStatushandler);
+      socket?.off('connect');
+      socket?.off(events.NEW_EVENT_CHAT_RESTORE);
+      socket?.off(events.NEW_EVENT_CLOSE);
+      socket?.off(events.NEW_EVENT_INACTIVE);
+      socket?.off('disconnect', onDisconnect);
 
-      socket?.io
-        .off('reconnect_attempt', onReconnectAttempt)
-        .off('reconnect_error', onReconnectError);
+      socket?.io.off('reconnect_attempt', onReconnectAttempt);
+      socket?.io.off('reconnect_error', onReconnectError);
 
       socket?.disconnect();
 
@@ -326,25 +319,17 @@ const Anonymous = () => {
         socket?.off(event, value);
       }
     };
-  }, [
-    app.currentChatId,
-    closeAllChats,
-    closeChat,
-    createChat,
-    endSearch,
-    navigate,
-    playNotification,
-    socket,
-  ]);
+  }, [app.currentChatId, navigate, socket]);
 
   useEffect(() => {
     if (!onlineStatus) {
       return;
     }
 
-    socket
-      ?.timeout(5000)
-      .emit(NEW_EVENT_ONLINE_STATUS, { onlineStatus, chatId: currentChatId });
+    socket?.timeout(5000).emit(events.NEW_EVENT_ONLINE_STATUS, {
+      onlineStatus,
+      chatId: currentChatId,
+    });
   }, [onlineStatus, currentChatId, socket]);
 
   return (

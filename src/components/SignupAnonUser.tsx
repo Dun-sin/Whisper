@@ -1,9 +1,9 @@
 import React, { RefObject, useRef, useState } from 'react';
+import { AxiosError } from 'axios';
 
 import { api } from '@/lib/axios';
-
+import statusCodes from '@/httpStatusCodes';
 import { useAuth } from '@/context/AuthContext';
-import { AxiosError } from 'axios';
 
 const SignupAnonUser = () => {
   const { authState, dispatchAuth } = useAuth();
@@ -29,11 +29,10 @@ const SignupAnonUser = () => {
     try {
       const response = await api.post('/login', {
         email,
-        id: loginId,
       });
 
       const data = await response.data;
-      if (response.status === 200) {
+      if (response.status === statusCodes.OK) {
         const id = data.id;
         console.log(id, loginId);
         dispatchAuth({
@@ -48,18 +47,18 @@ const SignupAnonUser = () => {
           return;
         }
         emailRef.current.value = '';
-      } else if (response.status === 500) {
+      } else if (response.status === statusCodes.INTERNAL_SERVER_ERROR) {
         throw new Error(data.message);
       }
       setLoading(false);
     } catch (err) {
       const axiosError = err as AxiosError;
       const errCode = axiosError?.response?.status;
-      if (errCode === 409) {
+      if (errCode === statusCodes.CONFLICT) {
         setError(
           'Email already exists, try loggin out and loggin in with the right email or using another email'
         );
-      } else if (errCode === 500) {
+      } else if (errCode === statusCodes.INTERNAL_SERVER_ERROR) {
         setError(`Oops, couldn't create your account, our fault.`);
       }
       setLoading(false);
