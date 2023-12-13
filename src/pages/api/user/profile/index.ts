@@ -3,11 +3,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { UserModel } from '@/models/UserModel';
 import { emailValidator } from '@/lib/userAPI';
 import statusCodes from '@/httpStatusCodes';
-import connectMongo from '@/mongo';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    await connectMongo();
     emailValidator(req, res, async () => {
       const { username, aboutMe, gender, age, email, settings } = req.body;
 

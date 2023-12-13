@@ -9,29 +9,12 @@ import {
 import chatReducer, { initialState } from '@/reducer/chatReducer';
 import { useApp } from './AppContext';
 import useChatHelper from '@/lib/chatHelper';
-import { ChatIdType, MessageIdType, MessageType } from '@/types/types';
 
+import { MessageIdType, MessageType } from '@/types/types';
 import { ProviderType } from '@/types/propstypes';
+import { ChatContextType } from '@/types/contextTypes';
 
-export const ChatContext = createContext<{
-  createChat: (
-    chatId: string,
-    userIds: [string, string],
-    messages?: MessageIdType,
-    createdAt?: Date
-  ) => void;
-  messages: ChatIdType;
-  removeMessage: (id: string, chatid: string) => void;
-  addMessage: (message: MessageType) => void;
-  updateMessage: (message: any) => void;
-  closeChat: (chatId: string) => void;
-  currentReplyMessage: MessageType | null;
-  currentReplyMessageId: string;
-  closeAllChats: () => void;
-  receiveMessage: (id: string, chatId: string) => void;
-  startReply: (messageId: string) => void;
-  cancelReply: () => void;
-}>({
+export const ChatContext = createContext<ChatContextType>({
   messages: initialState,
   addMessage: () => {},
   updateMessage: () => {},
@@ -66,7 +49,8 @@ export const ChatProvider = ({ children }: ProviderType) => {
         }
 
         return persistedState;
-      } catch {
+      } catch (error) {
+        console.error('Error parsing localStorage:', error);
         return defaultState;
       }
     }
@@ -77,14 +61,10 @@ export const ChatProvider = ({ children }: ProviderType) => {
     useState<string>('');
   // eslint-disable-next-line no-use-before-define
   const currentReplyMessage = useMemo(
-    () => getMessage(currentReplyMessageId ?? ''),
+    () => getMessage(currentReplyMessageId),
     [currentReplyMessageId, getMessage]
   );
 
-  /**
-   *
-   * @param {Message} message
-   */
   function addMessage(message: MessageType) {
     dispatch({
       type: 'ADD_MESSAGE',
@@ -92,9 +72,6 @@ export const ChatProvider = ({ children }: ProviderType) => {
     });
   }
 
-  /**
-   * @param {Message} message
-   */
   function updateMessage(message: MessageType) {
     dispatch({
       type: 'UPDATE_MESSAGE',
@@ -102,23 +79,21 @@ export const ChatProvider = ({ children }: ProviderType) => {
     });
   }
 
-  /**
-   *
-   * @param {string} chatId
-   * @param {string[]} userIds
-   * @param {{[key: string]: Message}} messages
-   * @param { string | number | Date } createdAt
-   */
   function createChat(
     chatId: string,
     userIds: [string, string],
-    messages?: MessageIdType,
+    messages: MessageIdType = {},
     createdAt?: Date
-  ) {
-    dispatch({
-      type: 'CREATE_CHAT',
-      payload: { chatId, userIds, messages, createdAt },
-    });
+  ): void {
+    try {
+      dispatch({
+        type: 'CREATE_CHAT',
+        payload: { chatId, userIds, messages, createdAt },
+      });
+      console.log('context', { chatId, userIds, messages, createdAt });
+    } catch (error) {
+      console.error('Error creating chat:', error);
+    }
   }
 
   function removeMessage(id: string, chatId: string) {

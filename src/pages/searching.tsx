@@ -1,23 +1,20 @@
-import { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
 import { ThreeDots } from 'react-loading-icons';
 import { Icon } from '@iconify/react';
 
-import { SocketContext } from '@/context/Context';
+import { useSocket } from '@/context/SocketContext';
 import { useAuth } from '@/context/AuthContext';
 import { useApp } from '@/context/AppContext';
 import { useChat } from '@/context/ChatContext';
 
-import {
-  NEW_EVENT_STOP_SEARCH,
-  NEW_EVENT_STOP_SEARCH_SUCCESS,
-  NEW_EVENT_JOIN,
-  NEW_EVENT_JOINED,
-} from '@/constants.json';
+import events from '@/constants';
+
 import { useNotification } from '@/lib/notification';
 import { createBrowserNotification } from '@/lib/browserNotification';
+
 import PageWrapper from '@/components/PageWrapper';
 
 const defaultLoadingText = <p>Looking for a random buddy</p>;
@@ -25,22 +22,20 @@ const stoppingSearchLoadingText = <p>Stopping the search</p>;
 let timeout: any = null;
 
 const Searching = () => {
-  const socket = useContext(SocketContext);
+  const { socket } = useSocket();
   const { endSearch, startSearch, app } = useApp();
   const { authState } = useAuth();
   const { createChat } = useChat();
 
-  const { playNotification } = useNotification(app.settings);
+  const notification = useNotification({ settings: app.settings });
   const router = useRouter();
 
   const [isStoppingSearch, setIsStoppingSearch] = useState(false);
   const [loadingText, setLoadingText] = useState(defaultLoadingText);
-  const [disconnected, setDisconnected] = useState(false);
 
   const handleStopSearch = () => {
-    socket?.emit(NEW_EVENT_STOP_SEARCH, {
+    socket?.emit(events.NEW_EVENT_STOP_SEARCH, {
       loginId: authState.loginId,
-      email: authState.email,
     });
     setIsStoppingSearch(true);
   };
@@ -70,47 +65,36 @@ const Searching = () => {
       socket?.connect();
     }
 
-    socket?.on('connect', () => {
-      // Here server will be informed that user is searching for
-      // another user
-      socket.emit(NEW_EVENT_JOIN, {
-        loginId: authState.loginId,
-        email: authState.email,
-      });
-      setDisconnected(false);
+    socket?.emit(events.NEW_EVENT_JOIN, {
+      loginId: authState.loginId,
+      email: authState.email,
     });
 
-    socket?.on(NEW_EVENT_STOP_SEARCH_SUCCESS, () => {
+    socket?.on(events.NEW_EVENT_STOP_SEARCH_SUCCESS, () => {
       setIsStoppingSearch(false);
       endSearch(null);
       router.push('/');
     });
 
-    socket?.on(NEW_EVENT_JOINED, ({ roomId, userIds }) => {
-      playNotification('buddyPaired');
-      createBrowserNotification(
-        "Let's Chat :)",
-        "You've found a match, don't keep your Partner waiting ⌛"
-      );
-      createChat(roomId, userIds);
-      endSearch(roomId);
-      router.push('/anonymous');
+    socket?.on(events.NEW_EVENT_JOINED, async ({ roomId, userIds }) => {
+      try {
+        await notification?.playNotification('buddyPaired');
+        createBrowserNotification(
+          "Let's Chat :)",
+          "You've found a match, don't keep your Partner waiting ⌛"
+        );
+        createChat(roomId, userIds);
+        endSearch(roomId);
+        router.push('/anonymous');
+      } catch (error) {
+        console.log({ error });
+      }
     });
 
     return () => {
-      socket?.off(NEW_EVENT_STOP_SEARCH_SUCCESS);
+      socket?.off(events.NEW_EVENT_STOP_SEARCH_SUCCESS);
     };
-  }, [
-    app.currentChatId,
-    authState.email,
-    authState.loginId,
-    createChat,
-    endSearch,
-    playNotification,
-    router,
-    socket,
-    startSearch,
-  ]);
+  }, [app.currentChatId, authState.email, authState.loginId, router, socket]);
 
   useEffect(() => {
     if (loadingText === defaultLoadingText) {
@@ -141,11 +125,11 @@ const Searching = () => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [loadingText]);
+  }, []);
 
   return (
     <PageWrapper>
-      {disconnected ? (
+      {app.disconnected ? (
         <div className='flex flex-col w-full justify-center items-center h-full bg-primary'>
           <Icon icon='ph:plugs-light' className='text-secondary h-24 w-24' />
           <p className='text-lg text-center text-white'>

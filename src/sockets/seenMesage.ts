@@ -1,10 +1,10 @@
-import { NEW_EVENT_READ_MESSAGE } from '@/constants.json';
+import events from '@/constants';
 import { getActiveUser, seenMessage } from '@/lib/lib';
 import { Socket } from 'socket.io';
 
 const SeenMessageHandler = (socket: Socket) => {
   socket.on(
-    NEW_EVENT_READ_MESSAGE,
+    events.NEW_EVENT_READ_MESSAGE,
     async ({ messageId, chatId }, messageSuccessfullySeen) => {
       const user = getActiveUser({ socketId: socket.id });
 
@@ -15,7 +15,7 @@ const SeenMessageHandler = (socket: Socket) => {
 
       const messageSeen = await seenMessage(chatId, messageId);
 
-      socket.broadcast.to(chatId).emit(NEW_EVENT_READ_MESSAGE, {
+      socket.broadcast.to(chatId).emit(events.NEW_EVENT_READ_MESSAGE, {
         messageId,
         chatId,
       });

@@ -11,6 +11,7 @@ export const initialState: AppType = {
   currentChatId: null,
   isSearching: false,
   onlineStatus: null,
+  disconnected: false,
 };
 
 export default function appReducer(state: AppType, action: any) {
@@ -53,6 +54,12 @@ export default function appReducer(state: AppType, action: any) {
       break;
     }
 
+    case 'DISCONNECTED': {
+      const { disconnected } = action.payload;
+
+      clonedState.disconnected = disconnected;
+      break;
+    }
     default:
       throw new Error('No action provided!');
   }

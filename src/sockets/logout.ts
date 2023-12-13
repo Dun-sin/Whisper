@@ -1,13 +1,9 @@
-import {
-  NEW_EVENT_LOGOUT,
-  NEW_EVENT_CLOSE,
-  NEW_EVENT_INACTIVE,
-} from '@/constants.json';
+import events from '@/constants';
 import { getActiveUser, delWaitingUser, closeChat } from '@/lib/lib';
 import { Server, Socket } from 'socket.io';
 
 const LogOutHandler = (io: Server, socket: Socket) => {
-  socket.on(NEW_EVENT_LOGOUT, async ({ loginId, email }) => {
+  socket.on(events.NEW_EVENT_LOGOUT, async ({ loginId, email }) => {
     const user = getActiveUser({
       socketId: socket.id,
     });
@@ -22,9 +18,9 @@ const LogOutHandler = (io: Server, socket: Socket) => {
     if (!user.email) {
       for (const chatId of user.chatIds) {
         const inactiveList = await closeChat(chatId);
-        io.to(chatId).emit(NEW_EVENT_CLOSE, chatId);
+        io.to(chatId).emit(events.NEW_EVENT_CLOSE, chatId);
         inactiveList?.forEach(emailOrLoginId => {
-          socket.broadcast.to(emailOrLoginId).emit(NEW_EVENT_INACTIVE);
+          socket.broadcast.to(emailOrLoginId).emit(events.NEW_EVENT_INACTIVE);
         });
       }
     }

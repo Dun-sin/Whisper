@@ -1,8 +1,4 @@
-import {
-  NEW_EVENT_SEND_MESSAGE,
-  NEW_EVENT_SEND_FAILED,
-  NEW_EVENT_RECEIVE_MESSAGE,
-} from '@/constants.json';
+import events from '@/constants';
 import { addMessage, getActiveUser } from '@/lib/lib';
 import { Socket } from 'socket.io';
 
@@ -13,7 +9,7 @@ const messageCounts: {
 
 const SendMessageHandler = (socket: Socket) => {
   socket.on(
-    NEW_EVENT_SEND_MESSAGE,
+    events.NEW_EVENT_SEND_MESSAGE,
     async (
       { senderId, message, time, chatId, containsBadword, replyTo },
       returnMessageToSender
@@ -29,7 +25,7 @@ const SendMessageHandler = (socket: Socket) => {
       });
 
       if (!user) {
-        socket.emit(NEW_EVENT_SEND_FAILED, {
+        socket.emit(events.NEW_EVENT_SEND_FAILED, {
           message:
             'Hmmm. It seems your login session has expired. ' +
             'Re-login and try again',
@@ -42,7 +38,7 @@ const SendMessageHandler = (socket: Socket) => {
 
       if (userMessageCount >= 25) {
         // User has exceeded the message limit
-        socket.emit(NEW_EVENT_SEND_FAILED, {
+        socket.emit(events.NEW_EVENT_SEND_FAILED, {
           message:
             'You have exceeded the message limit. Please try again later.',
         });
@@ -71,7 +67,7 @@ const SendMessageHandler = (socket: Socket) => {
 
       socket.broadcast
         .to(chatId)
-        .emit(NEW_EVENT_RECEIVE_MESSAGE, messageDetails);
+        .emit(events.NEW_EVENT_RECEIVE_MESSAGE, messageDetails);
 
       // Update the message count for the user
       messageCounts[senderId] = userMessageCount + 1;

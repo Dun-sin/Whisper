@@ -5,7 +5,7 @@ import type { AppProps } from 'next/app';
 
 import { AppProvider } from '@/context/AppContext';
 import { AuthProvider } from '@/context/AuthContext';
-import { SocketProvider } from '@/context/Context';
+import { SocketProvider } from '@/context/SocketContext';
 import { DialogProvider } from '@/context/DialogContext';
 
 import Dialog from '@/components/Dialog';
@@ -13,14 +13,14 @@ import Dialog from '@/components/Dialog';
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <AuthProvider>
-      <SocketProvider>
-        <AppProvider>
+      <AppProvider>
+        <SocketProvider>
           <DialogProvider>
             <Component {...pageProps} />
             <Dialog />
           </DialogProvider>
-        </AppProvider>
-      </SocketProvider>
+        </SocketProvider>
+      </AppProvider>
     </AuthProvider>
   );
 }

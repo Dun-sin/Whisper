@@ -1,8 +1,4 @@
-import {
-  NEW_EVENT_JOIN,
-  NEW_EVENT_JOINED,
-  NEW_EVENT_CHAT_RESTORE,
-} from '@/constants.json';
+import events from '@/constants';
 import {
   isUserActive,
   addToWaitingList,
@@ -22,30 +18,26 @@ import { Server, Socket } from 'socket.io';
 const matchMaker = async (io: Server) => {
   while (getWaitingUserLen() > 1) {
     const chat = await createChat(getRandomPairFromWaitingList());
-
-    io.to(chat.id).emit(NEW_EVENT_JOINED, {
+    const roomId: string = chat.id as unknown as string;
+    io.to(roomId).emit(events.NEW_EVENT_JOINED, {
       roomId: chat.id,
       userIds: chat.userIds,
     });
   }
 };
 const JoinHandler = (io: Server, socket: Socket) => {
-  socket.on(NEW_EVENT_JOIN, ({ loginId, email }) => {
+  socket.on(events.NEW_EVENT_JOIN, ({ loginId, email }) => {
     /**
      * This is necessary to enable us send notifications to users
      * using multiple devices to chat
      */
     socket.join(loginId);
-    // Email is possibly null for anonymous users
-    if (email) {
-      socket.join(email);
-    }
 
     /**
      * First we check if the user is already chatting.
      * If the user is already chatting, continue the chat from where the user left
      */
-    if (isUserActive(email ?? loginId)) {
+    if (isUserActive(loginId)) {
       const user = getActiveUser({
         socketId: socket.id,
         loginId,
@@ -66,7 +58,7 @@ const JoinHandler = (io: Server, socket: Socket) => {
       });
 
       // Then return all chat messages
-      socket.emit(NEW_EVENT_CHAT_RESTORE, {
+      socket.emit(events.NEW_EVENT_CHAT_RESTORE, {
         chats,
         currentChatId: user?.currentChatId,
       });
@@ -77,7 +69,7 @@ const JoinHandler = (io: Server, socket: Socket) => {
     addToWaitingList({ loginId, email, socket });
 
     // Finally, run matchMaker to pair all users on the waiting list
-    void matchMaker(io);
+    matchMaker(io);
   });
 };
 

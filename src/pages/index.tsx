@@ -21,7 +21,7 @@ export default function Home() {
     }
 
     requestBrowserNotificationPermissions();
-  }, [app.settings, navigate, app.isSearching]);
+  }, [navigate, app.isSearching]);
 
   return (
     <PageWrapper>
@@ -30,7 +30,7 @@ export default function Home() {
       >
         <Icon
           icon='mingcute:user-search-line'
-          className='text-secondary mb-6'
+          className='text-light h w-28 h-28'
         />
         <h1 className='text-[calc(1.2vh+1.2vh+1.2vmin)]'>Search For Someone</h1>
 
