@@ -1,4 +1,4 @@
-# Attention: Whisper is currently under some heavy changes as we are converting the project to nextjs + typescript, somethings aren't in other yet
+# Attention: Whisper is currently under some heavy changes as we are converting the project to nextjs + typescript, somethings aren't in order yet
 <div id="top"></div>
 
 <div align="center">
