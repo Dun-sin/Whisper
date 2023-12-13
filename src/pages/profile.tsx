@@ -10,6 +10,9 @@ import PageWrapper from '@/components/PageWrapper';
 const Profile = () => {
   const [username, setUsername] = useState('Anonymous');
   const [profileResponse, setProfileResponse] = useState();
+  const [loginType, setLoginType] = useState<'email' | 'anonymous' | null>(
+    null
+  );
 
   const { authState, dispatchAuth } = useAuth();
 
@@ -87,13 +90,16 @@ const Profile = () => {
     getProfileData(email);
   }, [email]);
 
+  useEffect(() => {
+    setLoginType(JSON.parse(localStorage.getItem('auth') as string).loginType);
+  }, []);
+
   return (
     <PageWrapper>
       <div
         className={`bg-light dark:bg-primary md:min-w-[calc(100%-120px)] flex items-center justify-center flex-col md:min-h-screen min-h-[calc(100vh-70px)] text-primary dark:text-white gap-3`}
       >
-        {JSON.parse(localStorage.getItem('auth') as string).loginType ===
-        'anonymous' ? (
+        {loginType === 'anonymous' ? (
           <SignupAnonUser />
         ) : (
           <>
