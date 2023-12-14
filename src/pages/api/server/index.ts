@@ -32,8 +32,8 @@ export default async (req: NextApiRequest, res: NextApiResponseWithSocket) => {
   try {
     if (res.socket.server.io) {
       console.log('Already set up');
-      res.end();
       await connectMongo();
+      res.end();
       return;
     }
 
