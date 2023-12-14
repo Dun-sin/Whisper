@@ -46,17 +46,21 @@ export const useAuth = () => {
 
 const initializeAuthState: unknown = (defaultState: AuthType): AuthType => {
   try {
-    const persistedState = JSON.parse(localStorage.getItem('auth') as string);
+    if (typeof window !== 'undefined') {
+      const persistedState = JSON.parse(localStorage.getItem('auth') as string);
 
-    if (!persistedState) {
+      if (!persistedState) {
+        return defaultState;
+      }
+
+      if (!persistedState.loginId && persistedState.isLoggedIn === true) {
+        throw new Error('Gotcha! :D');
+      }
+
+      return persistedState;
+    } else {
       return defaultState;
     }
-
-    if (!persistedState.loginId && persistedState.isLoggedIn === true) {
-      throw new Error('Gotcha! :D');
-    }
-
-    return persistedState;
   } catch {
     return defaultState;
   }

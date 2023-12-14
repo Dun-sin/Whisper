@@ -22,7 +22,7 @@ export type ChatContextType = {
     userIds: [string, string],
     messages?: MessageIdType,
     createdAt?: Date
-  ) => void;
+  ) => any;
   messages: ChatIdType;
   removeMessage: (id: string, chatid: string) => void;
   addMessage: (message: MessageType) => void;

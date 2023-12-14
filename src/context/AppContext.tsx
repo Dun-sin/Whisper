@@ -31,15 +31,19 @@ export const AppProvider = ({ children }: ProviderType) => {
     initialState,
     defaultState => {
       try {
-        const persistedState = JSON.parse(
-          localStorage.getItem('app') as string
-        );
+         if (typeof window !== 'undefined') {
+           const persistedState = JSON.parse(
+             localStorage.getItem('app') as string
+           );
 
-        if (!persistedState) {
-          return defaultState;
-        }
+           if (!persistedState) {
+             return defaultState;
+           }
 
-        return persistedState;
+           return persistedState;
+         } else {
+           return defaultState;
+         }
       } catch {
         return defaultState;
       }
