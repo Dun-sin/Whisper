@@ -30,7 +30,9 @@ labels:
       issue:
         body: |
          This issue is waiting to be approved so it's locked until approved      
-         Thank you @{{ issue.user.login }} for creating an issue, while you wait for a response, consider reading the <a href="https://github.com/Dun-sin/whisper/blob/main/CONTRIBUTING.md">Contributing.md file</a>, Thank you! Welcome to the community
+         Thank you @{{ issue.user.login }} for creating an issue, while you wait for a response, consider reading the <a href="https://github.com/Dun-sin/whisper/blob/main/CONTRIBUTING.md">Contributing.md file</a>
+         If you have any questions, please reach out to us on <a href="https://discord.gg/ufcysW9q23">Discord</a> or follow up on the issue itself.
+         Welcome to the community!!
         locking: lock
   - name: '🏁 status: ready for dev'
     labeled:
