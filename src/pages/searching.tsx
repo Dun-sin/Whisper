@@ -83,9 +83,10 @@ const Searching = () => {
           "Let's Chat :)",
           "You've found a match, don't keep your Partner waiting ⌛"
         );
-        
+
         createChat(roomId, userIds);
         endSearch(roomId);
+        // need to check if the roomid exists before pushing to anonymous
         router.push('/anonymous');
       } catch (error) {
         console.log({ error });
