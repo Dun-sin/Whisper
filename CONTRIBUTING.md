@@ -17,6 +17,7 @@
 - Don't work on the main branch, create your own branch by following the instructions [here](#-how-to-make-a-pull-request)
 - If you are working on the backend, share a screenrecording of your working software
 - don't create a PR for things outside of your issue's scope, it will lead to more work for the maintainers
+- don't commit package.json unless you are installing a package
 
 ### General guidelines
 
@@ -37,14 +38,10 @@
 ## 👩🏽‍💻 Prerequisite Skills to Contribute
 
 ### Contribute in Components/CSS
-
 - [React](https://reactjs.org/)
 - [TailwindCSS](https://tailwindcss.com/)
-- [React Redux](https://react-redux.js.org/)
 
 ### Contribute in backend
-
-- [Node.js](https://nodejs.org/)
 - [MongoDB](https://www.mongodb.com/)
 - [Socket.io](https://socket.io/)
 
@@ -58,23 +55,3 @@
 - Add screenshots or screen captures to your Pull Request to help us understand the effects of the changes proposed in your PR.
 
 ---
-
-## Starting the Project without Docker
-
-- Navigate to the Client Folder
-  ```bash
-  cd client
-  ```
-- Start the client Side
-  ```bash
-  npm start
-  ```
-- Navigate to the Server Folder
-  ```bash
-  cd server
-  ```
-- Start the Server Side
-  ```bash
-  nodemon index.js
-  ```
-  > Note: you must have gotten past step 5 in ["Installation"](https://github.com/Dun-sin/Whisper#%EF%B8%8F-installation) part of the readme file
