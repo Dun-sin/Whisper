@@ -3,17 +3,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { Server, Socket } from 'socket.io';
 import type { Server as HTTPServer } from 'http';
 import type { Socket as NetSocket } from 'net';
-import cors from 'cors';
-import JoinHandler from '@/sockets/join';
-import SendMessageHandler from '@/sockets/sendMessage';
-import EditMessageHandler from '@/sockets/editMessage';
-import DeleteManagerHandler from '@/sockets/deleteMessage';
-import SeenMessageHandler from '@/sockets/seenMesage';
-import TypingHandler from '@/sockets/typing';
-import LogOutHandler from '@/sockets/logout';
-import CloseChatHandler from '@/sockets/close';
-import StopSearchHandler from '@/sockets/stopSearch';
-import OnlineStatusHandler from '@/sockets/onlineStatus';
+
+import * as handlers from '@/handlers';
+import executeHandlers from '@/handlerDecorator';
+
 import connectMongo from '@/service/mongo';
 
 interface SocketServer extends HTTPServer {
@@ -46,19 +39,9 @@ export default async (req: NextApiRequest, res: NextApiResponseWithSocket) => {
     // Event handler for client connections
     io.on('connection', (socket: Socket) => {
       const clientId = socket.id;
-      console.log('A client connected');
       console.log(`A client connected. ID: ${clientId}`);
 
-      JoinHandler(io, socket);
-      SendMessageHandler(socket);
-      EditMessageHandler(socket);
-      DeleteManagerHandler(socket);
-      SeenMessageHandler(socket);
-      TypingHandler(socket);
-      LogOutHandler(io, socket);
-      CloseChatHandler(socket);
-      StopSearchHandler(socket);
-      OnlineStatusHandler(socket);
+      executeHandlers(io, socket, Object.values(handlers));
 
       // Event handler for client disconnections
       socket.on('disconnect', () => {
