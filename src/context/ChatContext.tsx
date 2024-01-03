@@ -83,7 +83,7 @@ export const ChatProvider = ({ children }: ProviderType) => {
       });
     },
     createChat: (
-      chatId: string,
+      id: string,
       userIds: [string, string],
       messages: MessageIdType = {},
       createdAt?: Date
@@ -91,10 +91,10 @@ export const ChatProvider = ({ children }: ProviderType) => {
       try {
         dispatch({
           type: 'CREATE_CHAT',
-          payload: { chatId, userIds, messages, createdAt },
+          payload: { id, userIds, messages, createdAt },
         });
-        console.log('context', { chatId, userIds, messages, createdAt });
-        return { chatId, userIds };
+        console.log('context', { id, userIds, messages, createdAt });
+        return { id, userIds };
       } catch (error) {
         console.error('Error creating chat:', error);
         return { error };

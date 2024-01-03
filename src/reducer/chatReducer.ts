@@ -21,14 +21,14 @@ export default function chatReducer(state: ChatIdType, action: any) {
   switch (action.type) {
     case 'CREATE_CHAT': {
       const {
-        id: chatId,
+        id,
         userIds,
         messages = messageInitial,
         createdAt = new Date(),
       } = action.payload;
-
-      console.log('context', { chatId, userIds });
-      clonedState[chatId] = {
+      
+      console.log('context', { id, userIds });
+      clonedState[id] = {
         userIds,
         messages,
         createdAt,
@@ -109,12 +109,14 @@ export default function chatReducer(state: ChatIdType, action: any) {
       }
       clonedState[room].messages[messageId].isEdited = message.isEdited;
 
-      if (oldMessages.length === 0) {
+      if (oldMessages) {
+        if (oldMessages.length === 0) {
+          break;
+        }
+
+        clonedState[room].messages[messageId].oldMessages = oldMessages;
         break;
       }
-
-      clonedState[room].messages[messageId].oldMessages = oldMessages;
-      break;
     }
 
     case 'REMOVE_MESSAGE': {
