@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { useRouter } from 'next/navigation';
 
-import events from '@/constants';
+import events from '@/shared/constants/constants';
 
 import { Dropdown, IconButton, Tooltip, Whisper } from 'rsuite';
 import { Icon } from '@iconify/react';

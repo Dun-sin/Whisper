@@ -2,9 +2,9 @@ import { Socket } from 'socket.io';
 import mongoose from 'mongoose';
 import CryptoJS from 'crypto-js';
 
-import ActiveUser from '../models/ActiveUserModel';
-import Chat from '../models/ChatModel';
-import Message from '../models/MessageModel';
+import ActiveUser from '@/server/models/ActiveUserModel';
+import Chat from '@/server/models/ChatModel';
+import Message from '@/server/models/MessageModel';
 import {
   ChatIdType,
   activeUserIdType,

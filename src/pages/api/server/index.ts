@@ -4,10 +4,10 @@ import { Server, Socket } from 'socket.io';
 import type { Server as HTTPServer } from 'http';
 import type { Socket as NetSocket } from 'net';
 
-import * as handlers from '@/handlers';
-import executeHandlers from '@/handlerDecorator';
+import * as handlers from '@/server/handlers';
+import executeHandlers from '@/server/handlerDecorator';
 
-import connectMongo from '@/service/mongo';
+import connectMongo from '@/server/service/mongo';
 
 interface SocketServer extends HTTPServer {
   io?: Server | undefined;
