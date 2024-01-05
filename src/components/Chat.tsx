@@ -25,7 +25,7 @@ import { useApp } from '@/context/AppContext';
 import useChatUtils from '@/lib/chatSocket';
 import MessageStatus from '@/components/Chat/MessageStatus';
 import { useNotification } from '@/lib/notification';
-import events from '@/constants';
+import events from '@/shared/constants/constants';
 import { createBrowserNotification } from '@/lib/browserNotification';
 
 import chatHelper, { adjustTextareaHeight, getTime } from '../lib/chatHelper';

@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { UserModel } from '@/models/UserModel';
-import { createUserWithAutoId, emailValidator } from '@/lib/userAPI';
-import statusCodes from '@/httpStatusCodes';
+import { UserModel } from '@/server/models/UserModel';
+import { createUserWithAutoId, emailValidator } from '@/server/lib/userAPI';
+import statusCodes from '@/shared/constants/httpStatusCodes';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   emailValidator(req, res, async () => {

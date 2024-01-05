@@ -13,7 +13,7 @@ import { useSocket } from '@/context/SocketContext';
 import { useApp } from '@/context/AppContext';
 
 // Lib
-import constants from '@/constants';
+import constants from '@/shared/constants/constants';
 import { IsActiveType } from '@/types/types';
 import Image from 'next/image';
 
