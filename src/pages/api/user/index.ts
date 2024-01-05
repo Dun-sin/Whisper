@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 
-import statusCodes from '@/httpStatusCodes';
-import { UserModel } from '@/models/UserModel';
-import { emailValidator } from '@/lib/userAPI';
+import statusCodes from '@/shared/constants/httpStatusCodes';
+import { UserModel } from '@/server/models/UserModel';
+import { emailValidator } from '@/server/lib/userAPI';
 
 let accessToken = process.env.ACCESS_TOKEN;
 const domain = process.env.DOMAIN;

@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useApp } from '@/context/AppContext';
 import { useChat } from '@/context/ChatContext';
 
-import events from '@/constants';
+import events from '@/shared/constants/constants';
 
 import { useNotification } from '@/lib/notification';
 import { createBrowserNotification } from '@/lib/browserNotification';

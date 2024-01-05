@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
 
-import constants from '@/constants';
+import constants from '@/shared/constants/constants';
 import { ChatIdType, OnlineStatus } from '@/types/types';
 import {
   chatExists,
@@ -17,7 +17,7 @@ import {
   delWaitingUser,
   seenMessage,
   addMessage,
-} from '@/lib/lib';
+} from '@/server/lib/lib';
 
 export const CloseChatHandler = (socket: Socket) => {
   socket.on(
