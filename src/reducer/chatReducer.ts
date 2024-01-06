@@ -21,7 +21,7 @@ export default function chatReducer(state: ChatIdType, action: any) {
   switch (action.type) {
     case 'CREATE_CHAT': {
       const {
-        id: chatId,
+        chatId,
         userIds,
         messages = messageInitial,
         createdAt = new Date(),

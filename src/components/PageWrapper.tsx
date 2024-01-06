@@ -49,7 +49,7 @@ const PageWrapper = ({ children }: ProviderType) => {
       }`}
     >
       <NavBar />
-      <ChatProvider>{children}</ChatProvider>
+      {children}
     </section>
   );
 };

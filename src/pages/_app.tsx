@@ -7,6 +7,7 @@ import { AppProvider } from '@/context/AppContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { SocketProvider } from '@/context/SocketContext';
 import { DialogProvider } from '@/context/DialogContext';
+import { ChatProvider } from '@/context/ChatContext';
 
 import Dialog from '@/components/Dialog';
 
@@ -16,8 +17,10 @@ export default function App({ Component, pageProps }: AppProps) {
       <AppProvider>
         <SocketProvider>
           <DialogProvider>
-            <Component {...pageProps} />
-            <Dialog />
+            <ChatProvider>
+              <Component {...pageProps} />
+              <Dialog />
+            </ChatProvider>
           </DialogProvider>
         </SocketProvider>
       </AppProvider>
