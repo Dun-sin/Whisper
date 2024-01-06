@@ -98,7 +98,7 @@ export default function chatReducer(state: ChatIdType, action: any) {
       const messageId = message.id;
       const updatedMessage = message;
       const oldMessages = message.oldMessages;
-      console.log(oldMessages);
+
       // Assign the message to the cloned state
       clonedState[room].messages[messageId] = updatedMessage;
 
