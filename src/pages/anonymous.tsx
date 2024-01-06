@@ -297,7 +297,7 @@ const Anonymous = () => {
     return () => {
       socket?.off(events.NEW_EVENT_ONLINE_STATUS, onlineStatushandler);
       socket?.off('connect');
-      // socket?.off(events.NEW_EVENT_CHAT_RESTORE);
+      socket?.off(events.NEW_EVENT_CHAT_RESTORE);
       socket?.off(events.NEW_EVENT_CLOSE);
       socket?.off(events.NEW_EVENT_INACTIVE);
       socket?.off('disconnect', onDisconnect);
@@ -305,7 +305,7 @@ const Anonymous = () => {
       socket?.io.off('reconnect_attempt', onReconnectAttempt);
       socket?.io.off('reconnect_error', onReconnectError);
 
-      // socket?.disconnect();
+      socket?.disconnect();
 
       newMessageEvents.forEach(event => {
         socket?.off(event, onNewMessage);

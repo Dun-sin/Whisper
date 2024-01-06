@@ -44,7 +44,7 @@ export default async (req: NextApiRequest, res: NextApiResponseWithSocket) => {
     await connectMongo();
 
     // Event handler for client connections
-    io.on('connect', (socket: Socket) => {
+    io.on('connection', (socket: Socket) => {
       const clientId = socket.id;
       console.log('A client connected');
       console.log(`A client connected. ID: ${clientId}`);

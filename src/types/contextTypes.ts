@@ -18,7 +18,7 @@ export type DialogType = {
 
 export type ChatContextType = {
   createChat: (
-    id: string,
+    chatId: string,
     userIds: [string, string],
     messages?: MessageIdType,
     createdAt?: Date

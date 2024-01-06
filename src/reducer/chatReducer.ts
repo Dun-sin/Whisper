@@ -21,14 +21,14 @@ export default function chatReducer(state: ChatIdType, action: any) {
   switch (action.type) {
     case 'CREATE_CHAT': {
       const {
-        id,
+        chatId,
         userIds,
         messages = messageInitial,
         createdAt = new Date(),
       } = action.payload;
       
-      console.log('context', { id, userIds });
-      clonedState[id] = {
+      console.log('context', { chatId, userIds });
+      clonedState[chatId] = {
         userIds,
         messages,
         createdAt,
@@ -85,7 +85,6 @@ export default function chatReducer(state: ChatIdType, action: any) {
 
     case 'UPDATE_MESSAGE': {
       const message = action.payload;
-
       const id = message.id;
       if (!clonedState[message.room]) {
         throw new Error('Room not found!');
@@ -99,7 +98,7 @@ export default function chatReducer(state: ChatIdType, action: any) {
       const messageId = message.id;
       const updatedMessage = message;
       const oldMessages = message.oldMessages;
-
+      console.log(oldMessages);
       // Assign the message to the cloned state
       clonedState[room].messages[messageId] = updatedMessage;
 
@@ -109,14 +108,13 @@ export default function chatReducer(state: ChatIdType, action: any) {
       }
       clonedState[room].messages[messageId].isEdited = message.isEdited;
 
-      if (oldMessages) {
-        if (oldMessages.length === 0) {
-          break;
-        }
-
-        clonedState[room].messages[messageId].oldMessages = oldMessages;
+      if (oldMessages.length === 0) {
         break;
       }
+
+      clonedState[room].messages[messageId].oldMessages = oldMessages;
+      break;
+
     }
 
     case 'REMOVE_MESSAGE': {
