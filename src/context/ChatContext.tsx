@@ -89,7 +89,6 @@ export const ChatProvider = ({ children }: ProviderType) => {
       createdAt?: Date
     ): any => {
       try {
-        console.log(chatId, userIds, messages, createdAt);
         dispatch({
           type: 'CREATE_CHAT',
           payload: { chatId, userIds, messages, createdAt },
