@@ -1,7 +1,7 @@
 /**
  * @typedef {import('socket.io-client').Socket} Socket
  */
-import events from '@/constants';
+import events from '@/shared/constants/constants';
 import { MessageType } from '@/types/types';
 import { Socket } from 'socket.io-client';
 

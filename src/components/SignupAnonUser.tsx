@@ -2,7 +2,7 @@ import React, { RefObject, useRef, useState } from 'react';
 import { AxiosError } from 'axios';
 
 import { api } from '@/lib/axios';
-import statusCodes from '@/httpStatusCodes';
+import statusCodes from '@/shared/constants/httpStatusCodes';
 import { useAuth } from '@/context/AuthContext';
 
 const SignupAnonUser = () => {

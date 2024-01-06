@@ -4,7 +4,7 @@ import { Icon } from '@iconify/react';
 
 import EmojiPicker from './EmojiPicker';
 import useKeyPress, { ShortcutFlags } from '@/hooks/useKeyPress';
-import events from '@/constants';
+import events from '@/shared/constants/constants';
 
 import { useSocket } from '@/context/SocketContext';
 import { useChat } from '@/context/ChatContext';

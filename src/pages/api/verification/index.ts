@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ApiError } from 'next/dist/server/api-utils';
 
-import httpStatusCodes from '@/httpStatusCodes';
+import httpStatusCodes from '@/shared/constants/httpStatusCodes';
 import sendMail from '@/service/mailService';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {

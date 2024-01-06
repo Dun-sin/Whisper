@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useApp } from '@/context/AppContext';
 import { useChat } from '@/context/ChatContext';
 
-import events from '@/constants';
+import events from '@/shared/constants/constants';
 
 import { useNotification } from '@/lib/notification';
 import { createBrowserNotification } from '@/lib/browserNotification';
@@ -83,9 +83,10 @@ const Searching = () => {
           "Let's Chat :)",
           "You've found a match, don't keep your Partner waiting ⌛"
         );
-        
+
         createChat(roomId, userIds);
         endSearch(roomId);
+        // need to check if the roomid exists before pushing to anonymous
         router.push('/anonymous');
       } catch (error) {
         console.log({ error });
