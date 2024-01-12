@@ -59,7 +59,7 @@ const messageSchema = new Schema<MessageSchemaDocument>(
       default: false,
     },
     replyTo: {
-      type: Schema.Types.ObjectId,
+      type: String,
       ref: 'Message',
     },
   },

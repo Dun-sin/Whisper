@@ -230,11 +230,11 @@ const messageCounts: {
   [id: string]: number;
 } = {};
 
-export const SendMessageHandler = (socket: Socket) => {
+export const SendMessageHandler = (io: Server, socket: Socket) => {
   socket.on(
     constants.NEW_EVENT_SEND_MESSAGE,
     async (
-      { senderId, message, time, chatId, containsBadword, replyTo },
+      { senderId, message, time, room, containsBadword, replyTo },
       returnMessageToSender
     ) => {
       // Below line is just a failed message simulator for testing purposes.
@@ -271,7 +271,7 @@ export const SendMessageHandler = (socket: Socket) => {
       /**
        * Cache the sent message in memory a nd persist to db
        */
-      const sentMessage = await addMessage(chatId, {
+      const sentMessage = await addMessage(room, {
         message,
         time,
         senderId,
@@ -282,14 +282,14 @@ export const SendMessageHandler = (socket: Socket) => {
 
       const messageDetails = {
         ...sentMessage,
-        room: chatId,
+        room,
         status: 'sent',
       };
 
       returnMessageToSender(messageDetails);
 
       socket.broadcast
-        .to(chatId)
+        .to(room)
         .emit(constants.NEW_EVENT_RECEIVE_MESSAGE, messageDetails);
 
       // Update the message count for the user
