@@ -234,7 +234,7 @@ export const SendMessageHandler = (io: Server, socket: Socket) => {
   socket.on(
     constants.NEW_EVENT_SEND_MESSAGE,
     async (
-      { senderId, message, time, chatId: room, containsBadword, replyTo },
+      { senderId, message, time, room: chatId, containsBadword, replyTo },
       returnMessageToSender
     ) => {
       // Below line is just a failed message simulator for testing purposes.
