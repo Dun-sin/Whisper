@@ -24,7 +24,7 @@ export default function useChatUtils(socket: Socket | undefined) {
               return;
             }
 
-            resolve(message);
+            resolve(sentMessage);
           }
         );
     });
