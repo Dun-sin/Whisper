@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js';
 
-const secretKey = process.env.SECRET_KEY;
+const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY;
 
 export default (message: string) => {
   if (!secretKey) {

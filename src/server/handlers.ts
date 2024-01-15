@@ -230,11 +230,11 @@ const messageCounts: {
   [id: string]: number;
 } = {};
 
-export const SendMessageHandler = (socket: Socket) => {
+export const SendMessageHandler = (io: Server, socket: Socket) => {
   socket.on(
     constants.NEW_EVENT_SEND_MESSAGE,
     async (
-      { senderId, message, time, chatId, containsBadword, replyTo },
+      { senderId, message, time, room: chatId, containsBadword, replyTo },
       returnMessageToSender
     ) => {
       // Below line is just a failed message simulator for testing purposes.
@@ -282,7 +282,7 @@ export const SendMessageHandler = (socket: Socket) => {
 
       const messageDetails = {
         ...sentMessage,
-        room: chatId,
+        chatId,
         status: 'sent',
       };
 
