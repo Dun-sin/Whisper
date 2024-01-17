@@ -4,23 +4,28 @@ import { useRouter } from 'next/navigation';
 // Store
 import { useAuth } from '@/context/AuthContext';
 import { useApp } from '@/context/AppContext';
-import { ChatProvider } from '@/context/ChatContext';
+import { ChatProvider, useChat } from '@/context/ChatContext';
+import events from '@/shared/constants/constants';
 
 // Components
 import NavBar from './NavBar';
 
 import useIsTabActive from '@/hooks/useIsTabActive';
 import { ProviderType } from '@/types/propstypes';
+import { useSocket } from '@/context/SocketContext';
 
 const PageWrapper = ({ children }: ProviderType) => {
   const { isLoggedIn } = useAuth();
-  const { updateOnlineStatus, app } = useApp();
+  const { updateOnlineStatus, endSearch, app } = useApp();
+  const { createChat } = useChat()
   const router = useRouter();
   const { settings } = app;
 
   const [onlineStatus, setOnlineStatus] = useState<Date | string | null>(null);
 
   const isTabActive = useIsTabActive();
+
+  const { socket } = useSocket();
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -41,6 +46,20 @@ const PageWrapper = ({ children }: ProviderType) => {
   useEffect(() => {
     !isLoggedIn && router.push('/login');
   }, [isLoggedIn, router]);
+
+  useEffect(() => {
+    const onRestoreChat = ({ chats, currentChatId }: any) => {
+      Object.values(chats).forEach((chat: any) => {
+        createChat(chat.id, chat.userIds, chat.messages, chat.createdAt);
+      });
+      endSearch(currentChatId);
+    };
+
+    socket?.on(events.NEW_EVENT_CHAT_RESTORE, onRestoreChat);
+    return () => {
+      socket?.off(events.NEW_EVENT_CHAT_RESTORE, onRestoreChat);
+    };
+  }, [socket]);
 
   return (
     <section

@@ -179,14 +179,6 @@ const Anonymous = () => {
       navigate.push('/searching');
     });
 
-    socket?.on(events.NEW_EVENT_CHAT_RESTORE, ({ chats, currentChatId }) => {
-      Object.values(chats).forEach((chat: any) => {
-        chat = chat as ChatIdType;
-        createChat(chat.id, chat.userIds, chat.messages, chat.createdAt);
-      });
-      endSearch(currentChatId);
-    });
-
     const connectionEvents = {
       connect: () => {
         updateConnection(false);
@@ -297,7 +289,6 @@ const Anonymous = () => {
     return () => {
       socket?.off(events.NEW_EVENT_ONLINE_STATUS, onlineStatushandler);
       socket?.off('connect');
-      socket?.off(events.NEW_EVENT_CHAT_RESTORE);
       socket?.off(events.NEW_EVENT_CLOSE);
       socket?.off(events.NEW_EVENT_INACTIVE);
       socket?.off('disconnect', onDisconnect);
@@ -305,6 +296,7 @@ const Anonymous = () => {
       socket?.io.off('reconnect_attempt', onReconnectAttempt);
       socket?.io.off('reconnect_error', onReconnectError);
 
+      socket?.disconnect();
 
       newMessageEvents.forEach(event => {
         socket?.off(event, onNewMessage);
