@@ -15,8 +15,6 @@ import { Icon } from '@iconify/react';
 import { v4 as uuid } from 'uuid';
 import { throttle } from 'lodash';
 import MarkdownIt from 'markdown-it';
-import BadWordsNext from 'bad-words-next';
-import en from 'bad-words-next/data/en.json';
 
 import { useChat } from '@/context/ChatContext';
 import { useAuth } from '@/context/AuthContext';
@@ -83,7 +81,11 @@ const Chat = () => {
     typographer: true,
   });
 
-  const badwords = new BadWordsNext({ data: en });
+  const getBadwords = async () => {
+    const BadWordsNext = (await import('bad-words-next')).default;
+    const en = (await import('bad-words-next/data/en.json')).default;
+    return new BadWordsNext({ data: en });
+  }
 
   function logOut() {
     dispatchAuth({
@@ -174,6 +176,7 @@ const Chat = () => {
 
   // Here whenever user will submit message it will be send to the server
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    const badwords = await getBadwords();
     e.preventDefault();
 
     socket?.emit(events.NEW_EVENT_TYPING, {
@@ -379,16 +382,16 @@ const Chat = () => {
               // original message this message is a reply to
               const repliedMessage = replyTo
                 ? (() => {
-                    const messageObj = getMessage(replyTo);
-                    if (!messageObj) {
-                      return null;
-                    }
+                  const messageObj = getMessage(replyTo);
+                  if (!messageObj) {
+                    return null;
+                  }
 
-                    return {
-                      ...messageObj,
-                      message: decryptMessage(messageObj.message),
-                    };
-                  })()
+                  return {
+                    ...messageObj,
+                    message: decryptMessage(messageObj.message),
+                  };
+                })()
                 : null;
 
               // is this message currently being replied?
@@ -452,14 +455,12 @@ const Chat = () => {
                     </div>
                   )}
                   <div
-                    className={`w-full flex text-white relative mb-2 ${
-                      isSender ? 'justify-end' : 'justify-start'
-                    }`}
+                    className={`w-full flex text-white relative mb-2 ${isSender ? 'justify-end' : 'justify-start'
+                      }`}
                   >
                     <div
-                      className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${
-                        isSender ? 'items-end' : 'items-start'
-                      }`}
+                      className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${isSender ? 'items-end' : 'items-start'
+                        }`}
                     >
                       {containsBadword && !isSender && !badwordChoices[id] ? (
                         <div className='flex flex-col border-red border w-full rounded-r-md p-3'>
@@ -482,26 +483,25 @@ const Chat = () => {
                       ) : (
                         <>
                           <div
-                            className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${
-                              isSender
-                                ? 'justify-between bg-secondary rounded-l-md'
-                                : 'rounded-r-md'
-                            }`}
+                            className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${isSender
+                              ? 'justify-between bg-secondary rounded-l-md'
+                              : 'rounded-r-md'
+                              }`}
                           >
                             {typeof message === 'string' ? (
                               <span
                                 dangerouslySetInnerHTML={{
                                   __html: md.render(
                                     badwordChoices[id] === 'hide'
-                                      ? badwords.filter(message)
+                                      ? 'badwords.filter(message)'
                                       : badwordChoices[id] === 'show'
-                                      ? message
-                                      : message
+                                        ? message
+                                        : message
                                   ),
                                 }}
                               />
                             ) : badwordChoices[id] === 'hide' ? (
-                              badwords.filter(message)
+                              'badwords.filter(message)'
                             ) : badwordChoices[id] === 'show' ? (
                               message
                             ) : (
@@ -518,16 +518,14 @@ const Chat = () => {
                             />
                           </div>
                           <div
-                            className={`flex gap-2 items-center ${
-                              isSender ? 'flex-row' : 'flex-row-reverse'
-                            }`}
+                            className={`flex gap-2 items-center ${isSender ? 'flex-row' : 'flex-row-reverse'
+                              }`}
                           >
                             <div
-                              className={`text-[12px] ${
-                                status === 'failed'
-                                  ? 'text-red-600'
-                                  : 'text-white'
-                              }`}
+                              className={`text-[12px] ${status === 'failed'
+                                ? 'text-red-600'
+                                : 'text-white'
+                                }`}
                             >
                               <MessageStatus
                                 time={getTime(time)}
