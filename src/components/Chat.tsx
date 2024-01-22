@@ -35,6 +35,7 @@ import PreviousMessages from './Chat/PreviousMessages';
 import decryptMessage from '@/lib/decryptMessage';
 import useInactiveChat from '@/hooks/useInactiveChat';
 import { MessageType, InputRefType } from '@/types/types';
+import BadwordHideShow from './Chat/BadwordHideShow';
 
 let senderId: string | undefined;
 
@@ -488,25 +489,7 @@ const Chat = () => {
                               : 'rounded-r-md'
                               }`}
                           >
-                            {typeof message === 'string' ? (
-                              <span
-                                dangerouslySetInnerHTML={{
-                                  __html: md.render(
-                                    badwordChoices[id] === 'hide'
-                                      ? 'badwords.filter(message)'
-                                      : badwordChoices[id] === 'show'
-                                        ? message
-                                        : message
-                                  ),
-                                }}
-                              />
-                            ) : badwordChoices[id] === 'hide' ? (
-                              'badwords.filter(message)'
-                            ) : badwordChoices[id] === 'show' ? (
-                              message
-                            ) : (
-                              message
-                            )}
+                            <BadwordHideShow message={message} md={md} badwordChoices={badwordChoices} id={id} />
 
                             <DropDownOptions
                               isSender={isSender && status !== 'pending'}

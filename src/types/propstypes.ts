@@ -2,6 +2,14 @@ import { Dispatch, SetStateAction, ReactNode } from 'react';
 
 import { DebouncedFunc } from 'lodash';
 import { InputRefType } from './types';
+import MarkdownIt from 'markdown-it';
+
+export type BadwordHideShowProps = {
+  id: string;
+  message: string;
+  md: MarkdownIt;
+  badwordChoices: { [id: string]: string };
+};
 
 export type DropDownProps = {
   id: string;
