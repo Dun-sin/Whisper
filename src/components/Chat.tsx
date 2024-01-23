@@ -15,8 +15,6 @@ import { Icon } from '@iconify/react';
 import { v4 as uuid } from 'uuid';
 import { throttle } from 'lodash';
 import MarkdownIt from 'markdown-it';
-import BadWordsNext from 'bad-words-next';
-import en from 'bad-words-next/data/en.json';
 
 import { useChat } from '@/context/ChatContext';
 import { useAuth } from '@/context/AuthContext';
@@ -37,6 +35,7 @@ import PreviousMessages from './Chat/PreviousMessages';
 import decryptMessage from '@/lib/decryptMessage';
 import useInactiveChat from '@/hooks/useInactiveChat';
 import { MessageType, InputRefType } from '@/types/types';
+import BadwordHideShow from './Chat/BadwordHideShow';
 
 let senderId: string | undefined;
 
@@ -83,7 +82,11 @@ const Chat = () => {
     typographer: true,
   });
 
-  const badwords = new BadWordsNext({ data: en });
+  const getBadwords = async () => {
+    const BadWordsNext = (await import('bad-words-next')).default;
+    const en = (await import('bad-words-next/data/en.json')).default;
+    return new BadWordsNext({ data: en });
+  }
 
   function logOut() {
     dispatchAuth({
@@ -174,6 +177,7 @@ const Chat = () => {
 
   // Here whenever user will submit message it will be send to the server
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    const badwords = await getBadwords();
     e.preventDefault();
 
     socket?.emit(events.NEW_EVENT_TYPING, {
@@ -488,25 +492,7 @@ const Chat = () => {
                                 : 'rounded-r-md'
                             }`}
                           >
-                            {typeof message === 'string' ? (
-                              <span
-                                dangerouslySetInnerHTML={{
-                                  __html: md.render(
-                                    badwordChoices[id] === 'hide'
-                                      ? badwords.filter(message)
-                                      : badwordChoices[id] === 'show'
-                                      ? message
-                                      : message
-                                  ),
-                                }}
-                              />
-                            ) : badwordChoices[id] === 'hide' ? (
-                              badwords.filter(message)
-                            ) : badwordChoices[id] === 'show' ? (
-                              message
-                            ) : (
-                              message
-                            )}
+                            <BadwordHideShow message={message} md={md} badwordChoices={badwordChoices} id={id} />
 
                             <DropDownOptions
                               isSender={isSender && status !== 'pending'}
