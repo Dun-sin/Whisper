@@ -383,16 +383,16 @@ const Chat = () => {
               // original message this message is a reply to
               const repliedMessage = replyTo
                 ? (() => {
-                  const messageObj = getMessage(replyTo);
-                  if (!messageObj) {
-                    return null;
-                  }
+                    const messageObj = getMessage(replyTo);
+                    if (!messageObj) {
+                      return null;
+                    }
 
-                  return {
-                    ...messageObj,
-                    message: decryptMessage(messageObj.message),
-                  };
-                })()
+                    return {
+                      ...messageObj,
+                      message: decryptMessage(messageObj.message),
+                    };
+                  })()
                 : null;
 
               // is this message currently being replied?
@@ -456,12 +456,14 @@ const Chat = () => {
                     </div>
                   )}
                   <div
-                    className={`w-full flex text-white relative mb-2 ${isSender ? 'justify-end' : 'justify-start'
-                      }`}
+                    className={`w-full flex text-white relative mb-2 ${
+                      isSender ? 'justify-end' : 'justify-start'
+                    }`}
                   >
                     <div
-                      className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${isSender ? 'items-end' : 'items-start'
-                        }`}
+                      className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${
+                        isSender ? 'items-end' : 'items-start'
+                      }`}
                     >
                       {containsBadword && !isSender && !badwordChoices[id] ? (
                         <div className='flex flex-col border-red border w-full rounded-r-md p-3'>
@@ -484,10 +486,11 @@ const Chat = () => {
                       ) : (
                         <>
                           <div
-                            className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${isSender
-                              ? 'justify-between bg-secondary rounded-l-md'
-                              : 'rounded-r-md'
-                              }`}
+                            className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${
+                              isSender
+                                ? 'justify-between bg-secondary rounded-l-md'
+                                : 'rounded-r-md'
+                            }`}
                           >
                             <BadwordHideShow message={message} md={md} badwordChoices={badwordChoices} id={id} />
 
