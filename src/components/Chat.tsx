@@ -504,14 +504,16 @@ const Chat = () => {
                             />
                           </div>
                           <div
-                            className={`flex gap-2 items-center ${isSender ? 'flex-row' : 'flex-row-reverse'
-                              }`}
+                            className={`flex gap-2 items-center ${
+                              isSender ? 'flex-row' : 'flex-row-reverse'
+                            }`}
                           >
                             <div
-                              className={`text-[12px] ${status === 'failed'
-                                ? 'text-red-600'
-                                : 'text-white'
-                                }`}
+                              className={`text-[12px] ${
+                                status === 'failed'
+                                  ? 'text-red-600'
+                                  : 'text-white'
+                              }`}
                             >
                               <MessageStatus
                                 time={getTime(time)}
