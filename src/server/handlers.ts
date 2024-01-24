@@ -22,20 +22,23 @@ import {
 export const CloseChatHandler = (socket: Socket) => {
   socket.on(
     constants.NEW_EVENT_CLOSE,
-    async (room: string | string[], setChatClosed: (arg0: boolean) => void) => {
+    async (
+      roomId: string | string[],
+      setChatClosed: (arg0: boolean) => void
+    ) => {
       const user = getActiveUser({
         socketId: socket.id,
       });
 
-      if (!user || !chatExists(room as string)) {
+      if (!user || !chatExists(roomId as string)) {
         setChatClosed(false);
         return;
       }
 
-      const inactiveList = await closeChat(room as string);
+      const inactiveList = await closeChat(roomId as string);
 
       setChatClosed(true);
-      socket.broadcast.to(room).emit(constants.NEW_EVENT_CLOSE, room);
+      socket.broadcast.to(roomId).emit(constants.NEW_EVENT_CLOSE, roomId);
       inactiveList?.forEach((loginId: string) => {
         socket.broadcast.to(loginId).emit(constants.NEW_EVENT_INACTIVE);
       });
@@ -46,21 +49,21 @@ export const CloseChatHandler = (socket: Socket) => {
 export const DeleteManagerHandler = (socket: Socket) => {
   socket.on(
     constants.NEW_EVENT_DELETE_MESSAGE,
-    async ({ id: messageId, room }, messageWasDeletedSuccessfully) => {
+    async ({ id: messageId, roomId }, messageWasDeletedSuccessfully) => {
       const user = getActiveUser({
         socketId: socket.id,
       });
 
-      if (!user || !messageId || !room) {
+      if (!user || !messageId || !roomId) {
         messageWasDeletedSuccessfully(false);
         return;
       }
 
-      const messageDeleted = await removeMessage(room, messageId);
+      const messageDeleted = await removeMessage(roomId, messageId);
 
       socket.broadcast
-        .to(room)
-        .emit(constants.NEW_EVENT_DELETE_MESSAGE, { id: messageId, room });
+        .to(roomId)
+        .emit(constants.NEW_EVENT_DELETE_MESSAGE, { id: messageId, roomId });
       messageWasDeletedSuccessfully(messageDeleted);
     }
   );
@@ -70,25 +73,25 @@ export const EditMessageHandler = (socket: Socket) => {
   socket.on(
     constants.NEW_EVENT_EDIT_MESSAGE,
     async (
-      { id: messageId, room, newMessage, oldMessage },
+      { id: messageId, roomId, newMessage, oldMessage },
       messageWasEditedSuccessfully
     ) => {
       const user = getActiveUser({
         socketId: socket.id,
       });
 
-      if (!user || !messageId || !room) {
+      if (!user || !messageId || !roomId) {
         messageWasEditedSuccessfully(false);
         return;
       }
 
-      const messageEdited = await editMessage(room, {
+      const messageEdited = await editMessage(roomId, {
         id: messageId,
         message: newMessage,
         oldMessage,
       });
       socket.broadcast
-        .to(room)
+        .to(roomId)
         .emit(constants.NEW_EVENT_EDIT_MESSAGE, messageEdited);
       messageWasEditedSuccessfully(messageEdited);
     }
@@ -130,21 +133,21 @@ export const JoinHandler = (io: Server, socket: Socket) => {
 
       // First join the user to the last chat
       if (!user?.socketIds.includes(socket.id)) {
-        socket.join(user?.currentroom as string);
+        socket.join(user?.currentRoomId as string);
         user?.socketConnections.push(socket);
         user?.socketIds.push(socket.id);
       }
 
       const chats: RoomType = {};
 
-      user?.rooms.forEach(room => {
-        chats[room] = getChat(room);
+      user?.rooms.forEach(roomId => {
+        chats[roomId] = getChat(roomId);
       });
 
       // Then return all chat messages
       socket.emit(constants.NEW_EVENT_CHAT_RESTORE, {
         chats,
-        currentroom: user?.currentroom,
+        currentRoomId: user?.currentRoomId,
       });
       return;
     }
@@ -170,9 +173,9 @@ export const LogOutHandler = (io: Server, socket: Socket) => {
 
     // User is an anonymous user, so close all active chats
     if (!user.email) {
-      for (const room of user.rooms) {
-        const inactiveList = await closeChat(room);
-        io.to(room).emit(constants.NEW_EVENT_CLOSE, room);
+      for (const roomId of user.rooms) {
+        const inactiveList = await closeChat(roomId);
+        io.to(roomId).emit(constants.NEW_EVENT_CLOSE, roomId);
         inactiveList?.forEach(emailOrLoginId => {
           socket.broadcast
             .to(emailOrLoginId)
@@ -188,13 +191,13 @@ export const OnlineStatusHandler = (socket: Socket) => {
     constants.NEW_EVENT_ONLINE_STATUS,
     ({
       onlineStatus,
-      room,
+      roomId,
     }: {
       onlineStatus: OnlineStatus;
-      room: string;
+      roomId: string;
     }): void => {
       socket.broadcast
-        .to(room)
+        .to(roomId)
         .emit(constants.NEW_EVENT_ONLINE_STATUS, onlineStatus);
     }
   );
@@ -203,19 +206,19 @@ export const OnlineStatusHandler = (socket: Socket) => {
 export const SeenMessageHandler = (socket: Socket) => {
   socket.on(
     constants.NEW_EVENT_READ_MESSAGE,
-    async ({ messageId, room }, messageSuccessfullySeen) => {
+    async ({ messageId, roomId }, messageSuccessfullySeen) => {
       const user = getActiveUser({ socketId: socket.id });
 
-      if (!user || !messageId || !room) {
+      if (!user || !messageId || !roomId) {
         messageSuccessfullySeen(false);
         return;
       }
 
-      const messageSeen = await seenMessage(room, messageId);
+      const messageSeen = await seenMessage(roomId, messageId);
 
-      socket.broadcast.to(room).emit(constants.NEW_EVENT_READ_MESSAGE, {
+      socket.broadcast.to(roomId).emit(constants.NEW_EVENT_READ_MESSAGE, {
         messageId,
-        room,
+        roomId,
       });
 
       messageSuccessfullySeen(messageSeen);
@@ -231,7 +234,7 @@ export const SendMessageHandler = (io: Server, socket: Socket) => {
   socket.on(
     constants.NEW_EVENT_SEND_MESSAGE,
     async (
-      { senderId, message, time, room: room, containsBadword, replyTo },
+      { senderId, message, time, roomId: roomId, containsBadword, replyTo },
       returnMessageToSender
     ) => {
       // Below line is just a failed message simulator for testing purposes.
@@ -268,7 +271,7 @@ export const SendMessageHandler = (io: Server, socket: Socket) => {
       /**
        * Cache the sent message in memory a nd persist to db
        */
-      const sentMessage = await addMessage(room, {
+      const sentMessage = await addMessage(roomId, {
         message,
         time,
         senderId,
@@ -279,14 +282,14 @@ export const SendMessageHandler = (io: Server, socket: Socket) => {
 
       const messageDetails = {
         ...sentMessage,
-        room,
+        roomId,
         status: 'sent',
       };
 
       returnMessageToSender(messageDetails);
 
       socket.broadcast
-        .to(room)
+        .to(roomId)
         .emit(constants.NEW_EVENT_RECEIVE_MESSAGE, messageDetails);
 
       // Update the message count for the user
@@ -312,10 +315,10 @@ export const StopSearchHandler = (socket: Socket) => {
 };
 
 export const TypingHandler = (socket: Socket) => {
-  socket.on(constants.NEW_EVENT_TYPING, ({ room, isTyping }) => {
+  socket.on(constants.NEW_EVENT_TYPING, ({ roomId, isTyping }) => {
     socket
-      .to(room)
+      .to(roomId)
       .timeout(5000)
-      .emit(constants.NEW_EVENT_DISPLAY, { isTyping, room });
+      .emit(constants.NEW_EVENT_DISPLAY, { isTyping, roomId });
   });
 };

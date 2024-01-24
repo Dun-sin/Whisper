@@ -77,7 +77,7 @@ const DropDownOptions = ({
     try {
       const messageDeleted = await deleteMessage({
         id,
-        room: gottenMessage.room as string,
+        roomId: gottenMessage.roomId as string,
       });
 
       console.log(messageDeleted);
@@ -86,7 +86,7 @@ const DropDownOptions = ({
         return;
       }
 
-      removeMessage(id, gottenMessage.room as string);
+      removeMessage(id, gottenMessage.roomId as string);
     } catch (e) {
       console.log(e);
       updateMessage(gottenMessage);

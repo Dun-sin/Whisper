@@ -14,7 +14,7 @@ export interface ActiveUserSchemaDocument extends Document {
     loginId: string;
     socketConnections: Socket[];
     socketIds: string[];
-    currentChat: string | null;
+    currentRoomId: string | null;
     rooms: string[];
   };
 }
@@ -48,7 +48,7 @@ activeUserSchema.virtual('optimizedVersion').get(function (
     loginId: this.loginId,
     socketConnections: [],
     socketIds: [],
-    currentChat: this.currentChat?.toString() || null,
+    currentRoomId: this.currentChat?.toString() || null,
     rooms: [],
   };
 });

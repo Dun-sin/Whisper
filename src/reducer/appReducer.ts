@@ -8,7 +8,7 @@ export const initialState: AppType = {
     theme: true,
   },
   tmpSettings: {},
-  currentroom: null,
+  currentRoomId: null,
   isSearching: false,
   onlineStatus: null,
   disconnected: false,
@@ -35,15 +35,15 @@ export default function appReducer(state: AppType, action: any) {
 
     case 'START_SEARCHING': {
       clonedState.isSearching = true;
-      clonedState.currentroom = null;
+      clonedState.currentRoomId = null;
       break;
     }
 
     case 'STOP_SEARCHING': {
-      const { currentroom } = action.payload;
+      const { currentRoomId } = action.payload;
 
       clonedState.isSearching = false;
-      clonedState.currentroom = currentroom;
+      clonedState.currentRoomId = currentRoomId;
       break;
     }
 

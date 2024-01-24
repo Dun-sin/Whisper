@@ -102,10 +102,10 @@ export const AppProvider = ({ children }: ProviderType) => {
     });
   }
 
-  function endSearch(currentroom: string | null = null): undefined {
+  function endSearch(currentRoomId: string | null = null): undefined {
     dispatch({
       type: 'STOP_SEARCHING',
-      payload: { currentroom },
+      payload: { currentRoomId },
     });
   }
 

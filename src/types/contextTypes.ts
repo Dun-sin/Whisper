@@ -18,20 +18,20 @@ export type DialogType = {
 
 export type ChatContextType = {
   createChat: (
-    room: string,
+    roomId: string,
     userIds: [string, string],
     messages?: MessageIdType,
     createdAt?: Date
   ) => any;
   messages: RoomType;
-  removeMessage: (id: string, room: string) => void;
+  removeMessage: (id: string, roomId: string) => void;
   addMessage: (message: MessageType) => void;
   updateMessage: (message: any) => void;
-  closeChat: (room: string) => void;
+  closeChat: (roomId: string) => void;
   currentReplyMessage: MessageType | null;
   currentReplyMessageId: string;
   closeAllChats: () => void;
-  receiveMessage: (id: string, room: string) => void;
+  receiveMessage: (id: string, roomId: string) => void;
   startReply: (messageId: string) => void;
   cancelReply: () => void;
 };
@@ -43,7 +43,7 @@ export type AppContextType = {
   updateTmpSettings: (newSettings: SettingsType) => void;
   cancelSettingsUpdate: () => void;
   startSearch: () => undefined;
-  endSearch: (currentroom: null | string) => undefined;
+  endSearch: (currentRoomId: null | string) => undefined;
   loadUserSettings: (settings: SettingsType) => void;
   updateOnlineStatus: (onlineStatus: Date | string | null) => void;
   updateConnection: (isDisconnected: boolean) => void;

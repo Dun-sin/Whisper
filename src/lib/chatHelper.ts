@@ -3,11 +3,11 @@ import { RefObject } from 'react';
 
 export default (state: RoomType, app: AppType) => {
   const getMessage = (id: string): MessageType | null => {
-    if (app.currentroom === null) {
+    if (app.currentRoomId === null) {
       return null;
     }
 
-    const chatContent = state[app.currentroom];
+    const chatContent = state[app.currentRoomId];
 
     if (!chatContent) {
       return null;
@@ -31,11 +31,11 @@ export default (state: RoomType, app: AppType) => {
       return;
     }
 
-    const { senderId, room, message, time } = gottenMessage;
+    const { senderId, roomId, message, time } = gottenMessage;
 
     doSend({
       senderId,
-      room,
+      roomId,
       message,
       time,
       tmpId: id,
