@@ -69,7 +69,7 @@ const NavBar = () => {
   const fullscreenPages = ['/founduser'];
 
   const hideNavbar = useMemo(
-    () => fullscreenPages.includes(location) && app.currentChatId,
+    () => fullscreenPages.includes(location) && app.currentRoomId,
     [location, app]
   );
 

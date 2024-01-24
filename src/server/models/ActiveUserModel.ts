@@ -1,4 +1,5 @@
 import { Schema, Document, Model, model, Types, models } from 'mongoose';
+import { Socket } from 'socket.io';
 
 export interface ActiveUserSchemaDocument extends Document {
   email: string | null;
@@ -11,10 +12,10 @@ export interface ActiveUserSchemaDocument extends Document {
     id: string;
     email: string | null;
     loginId: string;
-    socketConnections: any[];
-    socketIds: any[];
-    currentChatId: string | null;
-    chatIds: any[];
+    socketConnections: Socket[];
+    socketIds: string[];
+    currentRoomId: string | null;
+    rooms: string[];
   };
 }
 
@@ -47,8 +48,8 @@ activeUserSchema.virtual('optimizedVersion').get(function (
     loginId: this.loginId,
     socketConnections: [],
     socketIds: [],
-    currentChatId: this.currentChat?.toString() || null,
-    chatIds: [],
+    currentRoomId: this.currentChat?.toString() || null,
+    rooms: [],
   };
 });
 

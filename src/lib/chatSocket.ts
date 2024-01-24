@@ -30,7 +30,7 @@ export default function useChatUtils(socket: Socket | undefined) {
     });
   }
 
-  function deleteMessage({ id, chatId }: { id: string; chatId: string }) {
+  function deleteMessage({ id, roomId }: { id: string; roomId: string }) {
     return new Promise((resolve, reject) => {
       if (!socket?.connected) {
         reject(null);
@@ -41,7 +41,7 @@ export default function useChatUtils(socket: Socket | undefined) {
         .timeout(30000)
         .emit(
           events.NEW_EVENT_DELETE_MESSAGE,
-          { id, chatId },
+          { id, roomId },
           (err: any, messageDeleted: any) => {
             if (err) {
               reject(err);
@@ -56,13 +56,13 @@ export default function useChatUtils(socket: Socket | undefined) {
 
   function editMessage({
     id,
-    chatId,
+    roomId,
     newMessage,
     oldMessage,
     isEdited,
   }: {
     id: string;
-    chatId: string | null;
+    roomId: string | null;
     newMessage: string;
     oldMessage: string | undefined;
     isEdited?: boolean;
@@ -77,7 +77,7 @@ export default function useChatUtils(socket: Socket | undefined) {
         .timeout(30000)
         .emit(
           events.NEW_EVENT_EDIT_MESSAGE,
-          { id, chatId, newMessage, oldMessage, isEdited },
+          { id, roomId, newMessage, oldMessage, isEdited },
           (err: any, messageEdited: MessageType) => {
             if (err) {
               reject(err);
@@ -92,10 +92,10 @@ export default function useChatUtils(socket: Socket | undefined) {
 
   function seenMessage({
     messageId,
-    chatId,
+    roomId,
   }: {
     messageId: string;
-    chatId: string;
+    roomId: string;
   }) {
     return new Promise((resolve, reject) => {
       if (!socket?.connected) {
@@ -107,7 +107,7 @@ export default function useChatUtils(socket: Socket | undefined) {
         .timeout(30000)
         .emit(
           events.NEW_EVENT_READ_MESSAGE,
-          { messageId, chatId },
+          { messageId, roomId },
           (err: any, messagedRead: any) => {
             if (err) {
               reject(err);

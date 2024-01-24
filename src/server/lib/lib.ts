@@ -6,7 +6,7 @@ import ActiveUser from '@/server/models/ActiveUserModel';
 import Chat from '@/server/models/ChatModel';
 import Message from '@/server/models/MessageModel';
 import {
-  ChatIdType,
+  RoomType,
   activeUserIdType,
   ActiveUserType,
   ChatType,
@@ -14,20 +14,20 @@ import {
   MessageType,
 } from '@/types/types';
 
-const secretKey = process.env.SECRET_KEY;
+const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY;
 
 const waitingUsers: activeUserIdType = {};
 
 const activeUsers: activeUserIdType = {};
 
-const chats: ChatIdType = {};
+const chats: RoomType = {};
 
 function addActiveUser(user: ActiveUserType) {
   activeUsers[user.loginId] = user;
 }
 
-function getChat(chatId: string): ChatType {
-  return chats[chatId] ?? null;
+function getChat(roomId: string): ChatType {
+  return chats[roomId] ?? null;
 }
 
 function getActiveUser(
@@ -64,7 +64,7 @@ function getActiveUser(
 }
 
 function getChatsCount(id: string) {
-  return getActiveUser(id)?.chatIds.length;
+  return getActiveUser(id)?.rooms.length;
 }
 
 async function delActiveUser(user: ActiveUserType) {
@@ -105,6 +105,16 @@ async function init() {
     };
   }
 
+  type objType = {
+    id: string;
+    email: string | null;
+    loginId: string;
+    socketConnections: Socket[];
+    socketIds: string[];
+    currentRoomId: string | null;
+    rooms: string[];
+  };
+
   for await (const activeUser of ActiveUser.find()) {
     const chats = await Chat.find({
       users: {
@@ -112,10 +122,12 @@ async function init() {
       },
     });
 
-    activeUsers[activeUser.loginId] = {
+    const obj: objType = {
       ...activeUser.optimizedVersion,
-      chatIds: chats.map(chat => chat._id.toString()),
+      rooms: chats.map(chat => chat._id.toString()) as string[],
     };
+
+    activeUsers[activeUser.loginId] = obj;
   }
 }
 
@@ -130,7 +142,7 @@ async function createChat(users: ActiveUserType[]) {
     messages: [],
   };
 
-  const chatId = _chat._id.toString();
+  const roomId = _chat._id.toString();
 
   // TODO: this shouldn't happen as now new users are added to active users collection instead of users collection.
   // find a way to take users from users and fill it in active users.
@@ -145,10 +157,10 @@ async function createChat(users: ActiveUserType[]) {
     _chat.users.push(user.id);
 
     users[i].id = user._id.toString();
-    users[i].currentChatId = chatId;
-    users[i].chatIds.push(chatId);
+    users[i].currentRoomId = roomId;
+    users[i].rooms.push(roomId);
     users[i].socketConnections.map(socket => {
-      socket.join(chatId);
+      socket.join(roomId);
     });
 
     addActiveUser(users[i]);
@@ -161,17 +173,17 @@ async function createChat(users: ActiveUserType[]) {
     userIds: users.map(user => user.loginId) as [string, string],
   };
 
-  chats[chatId] = optimizedChat;
+  chats[roomId] = optimizedChat;
 
-  return { id: chatId, ...optimizedChat };
+  return { id: roomId, ...optimizedChat };
 }
 
-async function closeChat(chatId: string) {
+async function closeChat(roomId: string) {
   await Chat.deleteOne({
-    _id: chatId,
+    _id: roomId,
   });
 
-  const chat = getChat(chatId);
+  const chat = getChat(roomId);
 
   if (!chat) {
     return null;
@@ -192,18 +204,18 @@ async function closeChat(chatId: string) {
       continue;
     }
 
-    user.chatIds.forEach((id, i) => {
-      if (id === chatId) {
-        user.chatIds.splice(i, 1);
+    user.rooms.forEach((id, i) => {
+      if (id === roomId) {
+        user.rooms.splice(i, 1);
       }
     });
 
     await Chat.deleteOne({
-      _id: chatId,
+      _id: roomId,
     });
 
     if (getChatsCount(userId) === 0) {
-      user.currentChatId = null;
+      user.currentRoomId = null;
       await delActiveUser(user);
 
       if (!inactiveList.includes(user.loginId)) {
@@ -212,17 +224,17 @@ async function closeChat(chatId: string) {
     }
   }
 
-  delete chats[chatId];
+  delete chats[roomId];
 
   return inactiveList;
 }
 
-function chatExists(chatId: string) {
-  return Boolean(getChat(chatId));
+function chatExists(roomId: string) {
+  return Boolean(getChat(roomId));
 }
 
 async function addMessage(
-  chatId: string,
+  roomId: string,
   {
     message,
     time,
@@ -240,7 +252,7 @@ async function addMessage(
     return null;
   }
 
-  if (!chats[chatId]) {
+  if (!chats[roomId]) {
     return null;
   }
 
@@ -260,7 +272,7 @@ async function addMessage(
 
   await Chat.updateOne(
     {
-      _id: chatId,
+      _id: roomId,
     },
     {
       $push: {
@@ -269,13 +281,13 @@ async function addMessage(
     }
   );
 
-  chats[chatId].messages[optimizedMessage.id] = optimizedMessage;
+  chats[roomId].messages[optimizedMessage.id] = optimizedMessage;
 
   return optimizedMessage;
 }
 
-async function removeMessage(chatId: string, messageId: string) {
-  if (!chats[chatId]) {
+async function removeMessage(roomId: string, messageId: string) {
+  if (!chats[roomId]) {
     return false;
   }
 
@@ -287,24 +299,24 @@ async function removeMessage(chatId: string, messageId: string) {
     return false;
   }
 
-  delete chats[chatId].messages[messageId];
+  delete chats[roomId].messages[messageId];
 
   return true;
 }
 
 async function editMessage(
-  chatId: string,
+  roomId: string,
   {
     id,
     message,
     oldMessage,
   }: { id: string; message: string; oldMessage: string }
 ) {
-  if (!chats[chatId]) {
+  if (!chats[roomId]) {
     return false;
   }
 
-  if (!chats[chatId].messages[id]) {
+  if (!chats[roomId].messages[id]) {
     return false;
   }
 
@@ -320,20 +332,20 @@ async function editMessage(
       { new: true }
     );
 
-    chats[chatId].messages[id].message = message;
-    chats[chatId].messages[id].isEdited = true;
-    if (!Array.isArray(chats[chatId].messages[id].oldMessages)) {
-      chats[chatId].messages[id].oldMessages = [];
+    chats[roomId].messages[id].message = message;
+    chats[roomId].messages[id].isEdited = true;
+    if (!Array.isArray(chats[roomId].messages[id].oldMessages)) {
+      chats[roomId].messages[id].oldMessages = [];
     }
-    chats[chatId].messages[id]?.oldMessages?.push(oldMessage);
-    return chats[chatId].messages[id];
+    chats[roomId].messages[id]?.oldMessages?.push(oldMessage);
+    return chats[roomId].messages[id];
   } catch {
     return false;
   }
 }
 
-async function seenMessage(chatId: string, messageId: string) {
-  if (!chats[chatId]) {
+async function seenMessage(roomId: string, messageId: string) {
+  if (!chats[roomId]) {
     return false;
   }
 
@@ -352,7 +364,7 @@ async function seenMessage(chatId: string, messageId: string) {
       { new: true }
     );
 
-    chats[chatId].messages[messageId].isRead = isRead;
+    chats[roomId].messages[messageId].isRead = isRead;
   } catch {
     return false;
   }
@@ -399,8 +411,8 @@ function addToWaitingList({
       email,
       socketConnections: [socket],
       socketIds: [socket.id],
-      chatIds: [],
-      currentChatId: null,
+      rooms: [],
+      currentRoomId: null,
     },
     {
       get(target, prop, receiver) {

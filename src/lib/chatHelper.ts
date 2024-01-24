@@ -1,13 +1,13 @@
-import { AppType, ChatIdType, MessageType } from '@/types/types';
+import { AppType, RoomType, MessageType } from '@/types/types';
 import { RefObject } from 'react';
 
-export default (state: ChatIdType, app: AppType) => {
+export default (state: RoomType, app: AppType) => {
   const getMessage = (id: string): MessageType | null => {
-    if (app.currentChatId === null) {
+    if (app.currentRoomId === null) {
       return null;
     }
 
-    const chatContent = state[app.currentChatId];
+    const chatContent = state[app.currentRoomId];
 
     if (!chatContent) {
       return null;
@@ -31,11 +31,11 @@ export default (state: ChatIdType, app: AppType) => {
       return;
     }
 
-    const { senderId, room, message, time } = gottenMessage;
+    const { senderId, roomId, message, time } = gottenMessage;
 
     doSend({
       senderId,
-      room,
+      roomId,
       message,
       time,
       tmpId: id,

@@ -101,34 +101,34 @@ const Chat = () => {
     inputRef.current.value = '';
     setEditing({ isediting: false, messageID: '' });
     socket?.timeout(10000).emit(events.NEW_EVENT_TYPING, {
-      chatId: app.currentChatId,
+      roomId: app.currentRoomId,
       isTyping: false,
     });
   };
 
   const sortedMessages = useMemo(() => {
-    if (!app.currentChatId) {
+    if (!app.currentRoomId) {
       return;
     }
-    return Object.values(state[app.currentChatId]?.messages ?? {})?.sort(
+    return Object.values(state[app.currentRoomId]?.messages ?? {})?.sort(
       (a, b) => {
         const da = new Date(a.time),
           db = new Date(b.time);
         return da.getTime() - db.getTime();
       }
     );
-  }, [state, app.currentChatId]);
+  }, [state, app.currentRoomId]);
 
   const doSend = async ({
     senderId,
-    room,
+    roomId,
     message,
     time,
     containsBadword,
     replyTo = null,
   }: {
     senderId: string;
-    room: string | null;
+    roomId: string | null;
     message: string;
     time: number;
     containsBadword: boolean;
@@ -139,7 +139,7 @@ const Chat = () => {
         senderId,
         message,
         time,
-        room,
+        roomId,
         containsBadword,
         replyTo,
       });
@@ -157,7 +157,7 @@ const Chat = () => {
       try {
         updateMessage({
           senderId,
-          room,
+          roomId,
           id: uuid(),
           message,
           time,
@@ -181,7 +181,7 @@ const Chat = () => {
     e.preventDefault();
 
     socket?.emit(events.NEW_EVENT_TYPING, {
-      chatId: app.currentChatId,
+      roomId: app.currentRoomId,
       isTyping: false,
     });
     const d = new Date();
@@ -197,14 +197,14 @@ const Chat = () => {
         const oldMessage = messageObject?.message;
         const editedMessage = await editMessage({
           id: editing.messageID,
-          chatId: app.currentChatId,
+          roomId: app.currentRoomId,
           newMessage: message as string,
           oldMessage,
         });
 
         updateMessage({
           ...editedMessage,
-          room: app.currentChatId,
+          roomId: app.currentRoomId,
           isEdited: true,
         });
       } catch (e) {
@@ -215,7 +215,7 @@ const Chat = () => {
     } else {
       doSend({
         senderId,
-        room: app.currentChatId,
+        roomId: app.currentRoomId,
         message: message as string,
         time: d.getTime(),
         containsBadword: badwords.check(message as string),
@@ -234,7 +234,7 @@ const Chat = () => {
   const handleTypingStatus = throttle(e => {
     if (e.target.value.length > 0) {
       socket?.timeout(5000).emit(events.NEW_EVENT_TYPING, {
-        chatId: app.currentChatId,
+        roomId: app.currentRoomId,
         isTyping: true,
       });
     }
@@ -292,18 +292,18 @@ const Chat = () => {
 
     const deleteMessageHandler = ({
       id,
-      chatId,
+      roomId,
     }: {
       id: string;
-      chatId: string;
+      roomId: string;
     }) => {
-      removeMessage(id, chatId);
+      removeMessage(id, roomId);
     };
 
     const editMessageHandler = (messageEdited: MessageType) => {
       updateMessage({
         ...messageEdited,
-        room: app.currentChatId,
+        roomId: app.currentRoomId,
         isEdited: true,
       });
     };
@@ -314,12 +314,12 @@ const Chat = () => {
 
     const readMessageHandler = ({
       messageId,
-      chatId,
+      roomId,
     }: {
       messageId: string;
-      chatId: string;
+      roomId: string;
     }) => {
-      receiveMessage(messageId, chatId);
+      receiveMessage(messageId, roomId);
     };
 
     // This is used to recive message form other user.
@@ -336,7 +336,7 @@ const Chat = () => {
       socket?.off(events.NEW_EVENT_READ_MESSAGE, readMessageHandler);
       socket?.off(events.NEW_EVENT_SEND_FAILED, limitMessageHandler);
     };
-  }, [app.currentChatId, socket]);
+  }, [app.currentRoomId, socket]);
 
   // this is used to send the notification for inactive chat to the respective user
   // get the last message sent

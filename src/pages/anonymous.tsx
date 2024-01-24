@@ -29,19 +29,19 @@ import { createBrowserNotification } from '@/lib/browserNotification';
 
 import useKeyPress, { ShortcutFlags } from '@/hooks/useKeyPress';
 import useCheckTimePassed from '@/hooks/useCheckTimePassed';
-import { ChatIdType, OnlineStatus } from '@/types/types';
+import { RoomType, OnlineStatus } from '@/types/types';
 import PageWrapper from '@/components/PageWrapper';
 
 const centerItems = `flex items-center justify-center`;
 
 const Anonymous = () => {
   const { app, endSearch, updateConnection } = useApp();
-  const { currentChatId, onlineStatus, disconnected } = app;
+  const { currentRoomId, onlineStatus, disconnected } = app;
   const { clearTimer } = useCheckTimePassed(0, 0);
   const notification = useNotification({ settings: app.settings });
   const { createChat, closeAllChats } = useChat();
 
-  const currentChatIdRef = useRef(currentChatId);
+  const currentroomRef = useRef(currentRoomId);
   const reconnectAttempts = useRef(0);
 
   const [isTyping, setIsTyping] = useState(false);
@@ -63,9 +63,9 @@ const Anonymous = () => {
 
   socket?.on(
     events.NEW_EVENT_DISPLAY,
-    ({ isTyping, chatId }: { isTyping: boolean; chatId: string }) => {
+    ({ isTyping, roomId }: { isTyping: boolean; roomId: string }) => {
       // eslint-disable-next-line curly
-      if (chatId !== currentChatId) return;
+      if (roomId !== currentRoomId) return;
       if (!isTyping) {
         setIsTyping(false);
         return;
@@ -84,9 +84,9 @@ const Anonymous = () => {
   );
 
   const closeChatHandler = (autoSearch = false) => {
-    const currentChatId = currentChatIdRef.current;
+    const currentRoomId = currentroomRef.current;
 
-    if (!currentChatId) {
+    if (!currentRoomId) {
       navigate.push('/');
       return;
     }
@@ -97,7 +97,7 @@ const Anonymous = () => {
       ?.timeout(30000)
       .emit(
         events.NEW_EVENT_CLOSE,
-        currentChatId,
+        currentRoomId,
         (err: any, chatClosed: boolean) => {
           if (err) {
             alert('An error occured whiles closing chat.');
@@ -106,7 +106,7 @@ const Anonymous = () => {
           }
 
           if (chatClosed) {
-            closeChat(currentChatId);
+            closeChat(currentRoomId);
           }
 
           endSearch(null);
@@ -161,9 +161,9 @@ const Anonymous = () => {
       events.NEW_EVENT_EDIT_MESSAGE,
     ];
 
-    socket?.on(events.NEW_EVENT_CLOSE, async chatId => {
+    socket?.on(events.NEW_EVENT_CLOSE, async roomId => {
       endSearch(null);
-      closeChat(chatId);
+      closeChat(roomId);
       await notification?.playNotification('chatClosed');
 
       if (
@@ -178,8 +178,6 @@ const Anonymous = () => {
       createBrowserNotification('Chat Closed', 'Your buddy left the chat');
       navigate.push('/searching');
     });
-
-
 
     const connectionEvents = {
       connect: () => {
@@ -257,7 +255,7 @@ const Anonymous = () => {
 
     function disconnect() {
       reconnectAttempts.current = 0;
-      if (app.currentChatId) {
+      if (app.currentRoomId) {
         return;
       }
 
@@ -310,7 +308,7 @@ const Anonymous = () => {
         socket?.off(event, value);
       }
     };
-  }, [app.currentChatId, navigate, socket]);
+  }, [app.currentRoomId, navigate, socket]);
 
   useEffect(() => {
     if (!onlineStatus) {
@@ -319,9 +317,9 @@ const Anonymous = () => {
 
     socket?.timeout(5000).emit(events.NEW_EVENT_ONLINE_STATUS, {
       onlineStatus,
-      chatId: currentChatId,
+      roomId: currentRoomId,
     });
-  }, [onlineStatus, currentChatId, socket]);
+  }, [onlineStatus, currentRoomId, socket]);
 
   return (
     <PageWrapper>

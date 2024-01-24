@@ -20,7 +20,7 @@ export type SettingsType = {
 export type AppType = {
   settings: SettingsType;
   tmpSettings: {};
-  currentChatId: string | null;
+  currentRoomId: string | null;
   isSearching: boolean;
   onlineStatus: OnlineStatus;
   disconnected: boolean;
@@ -37,7 +37,7 @@ export type MessageType = {
   senderId: string;
   message: string;
   time: number;
-  room?: string | null;
+  roomId?: string | null;
   id?: string | null;
   containsBadword: boolean;
   replyTo: string | null;
@@ -58,7 +58,7 @@ export type ChatType = {
   userIds: [string, string];
 };
 
-export type ChatIdType = {
+export type RoomType = {
   [id: string]: ChatType;
 };
 
@@ -68,8 +68,8 @@ export type ActiveUserType = {
   loginId: string;
   socketConnections: Socket[];
   socketIds: string[];
-  currentChatId: null | string;
-  chatIds: string[];
+  currentRoomId: null | string;
+  rooms: string[];
 };
 
 export type activeUserIdType = {
