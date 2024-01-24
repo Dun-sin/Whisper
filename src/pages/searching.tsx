@@ -111,8 +111,8 @@ const Searching = () => {
       return;
     }
 
-    router.push('/anonymous')
-  }, [app.currentChatId])
+    router.push('/anonymous');
+  }, [app.currentroom]);
 
   useEffect(() => {
     if (loadingText === defaultLoadingText) {
