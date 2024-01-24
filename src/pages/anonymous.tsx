@@ -296,8 +296,6 @@ const Anonymous = () => {
       socket?.io.off('reconnect_attempt', onReconnectAttempt);
       socket?.io.off('reconnect_error', onReconnectError);
 
-      socket?.disconnect();
-
       newMessageEvents.forEach(event => {
         socket?.off(event, onNewMessage);
       });

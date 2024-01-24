@@ -107,6 +107,14 @@ const Searching = () => {
   }, [app.currentroom]);
 
   useEffect(() => {
+    if (!app.currentChatId) {
+      return;
+    }
+
+    router.push('/anonymous')
+  }, [app.currentChatId])
+
+  useEffect(() => {
     if (loadingText === defaultLoadingText) {
       timeout = setTimeout(() => {
         setLoadingText(
