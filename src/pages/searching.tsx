@@ -107,7 +107,7 @@ const Searching = () => {
   }, [app.currentroom]);
 
   useEffect(() => {
-    if (!app.currentChatId) {
+    if (!app.currentroom) {
       return;
     }
 
