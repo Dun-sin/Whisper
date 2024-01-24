@@ -6,7 +6,7 @@ import ActiveUser from '@/server/models/ActiveUserModel';
 import Chat from '@/server/models/ChatModel';
 import Message from '@/server/models/MessageModel';
 import {
-  ChatIdType,
+  RoomType,
   activeUserIdType,
   ActiveUserType,
   ChatType,
@@ -20,14 +20,14 @@ const waitingUsers: activeUserIdType = {};
 
 const activeUsers: activeUserIdType = {};
 
-const chats: ChatIdType = {};
+const chats: RoomType = {};
 
 function addActiveUser(user: ActiveUserType) {
   activeUsers[user.loginId] = user;
 }
 
-function getChat(chatId: string): ChatType {
-  return chats[chatId] ?? null;
+function getChat(room: string): ChatType {
+  return chats[room] ?? null;
 }
 
 function getActiveUser(
@@ -64,7 +64,7 @@ function getActiveUser(
 }
 
 function getChatsCount(id: string) {
-  return getActiveUser(id)?.chatIds.length;
+  return getActiveUser(id)?.rooms.length;
 }
 
 async function delActiveUser(user: ActiveUserType) {
@@ -105,6 +105,17 @@ async function init() {
     };
   }
 
+  type objType = {
+    id: string;
+    email: string | null;
+    loginId: string;
+    socketConnections: Socket[];
+    socketIds: string[];
+    currentChat?: string | null;
+    currentroom: string | null;
+    rooms: string[];
+  };
+
   for await (const activeUser of ActiveUser.find()) {
     const chats = await Chat.find({
       users: {
@@ -112,10 +123,15 @@ async function init() {
       },
     });
 
-    activeUsers[activeUser.loginId] = {
+    const obj: objType = {
       ...activeUser.optimizedVersion,
-      chatIds: chats.map(chat => chat._id.toString()),
+      currentroom: activeUser.optimizedVersion.currentChat,
+      rooms: chats.map(chat => chat._id.toString()) as string[],
     };
+
+    delete obj.currentChat;
+
+    activeUsers[activeUser.loginId] = obj;
   }
 }
 
@@ -130,7 +146,7 @@ async function createChat(users: ActiveUserType[]) {
     messages: [],
   };
 
-  const chatId = _chat._id.toString();
+  const room = _chat._id.toString();
 
   // TODO: this shouldn't happen as now new users are added to active users collection instead of users collection.
   // find a way to take users from users and fill it in active users.
@@ -145,10 +161,10 @@ async function createChat(users: ActiveUserType[]) {
     _chat.users.push(user.id);
 
     users[i].id = user._id.toString();
-    users[i].currentChatId = chatId;
-    users[i].chatIds.push(chatId);
+    users[i].currentroom = room;
+    users[i].rooms.push(room);
     users[i].socketConnections.map(socket => {
-      socket.join(chatId);
+      socket.join(room);
     });
 
     addActiveUser(users[i]);
@@ -161,17 +177,17 @@ async function createChat(users: ActiveUserType[]) {
     userIds: users.map(user => user.loginId) as [string, string],
   };
 
-  chats[chatId] = optimizedChat;
+  chats[room] = optimizedChat;
 
-  return { id: chatId, ...optimizedChat };
+  return { id: room, ...optimizedChat };
 }
 
-async function closeChat(chatId: string) {
+async function closeChat(room: string) {
   await Chat.deleteOne({
-    _id: chatId,
+    _id: room,
   });
 
-  const chat = getChat(chatId);
+  const chat = getChat(room);
 
   if (!chat) {
     return null;
@@ -192,18 +208,18 @@ async function closeChat(chatId: string) {
       continue;
     }
 
-    user.chatIds.forEach((id, i) => {
-      if (id === chatId) {
-        user.chatIds.splice(i, 1);
+    user.rooms.forEach((id, i) => {
+      if (id === room) {
+        user.rooms.splice(i, 1);
       }
     });
 
     await Chat.deleteOne({
-      _id: chatId,
+      _id: room,
     });
 
     if (getChatsCount(userId) === 0) {
-      user.currentChatId = null;
+      user.currentroom = null;
       await delActiveUser(user);
 
       if (!inactiveList.includes(user.loginId)) {
@@ -212,17 +228,17 @@ async function closeChat(chatId: string) {
     }
   }
 
-  delete chats[chatId];
+  delete chats[room];
 
   return inactiveList;
 }
 
-function chatExists(chatId: string) {
-  return Boolean(getChat(chatId));
+function chatExists(room: string) {
+  return Boolean(getChat(room));
 }
 
 async function addMessage(
-  chatId: string,
+  room: string,
   {
     message,
     time,
@@ -240,7 +256,7 @@ async function addMessage(
     return null;
   }
 
-  if (!chats[chatId]) {
+  if (!chats[room]) {
     return null;
   }
 
@@ -260,7 +276,7 @@ async function addMessage(
 
   await Chat.updateOne(
     {
-      _id: chatId,
+      _id: room,
     },
     {
       $push: {
@@ -269,13 +285,13 @@ async function addMessage(
     }
   );
 
-  chats[chatId].messages[optimizedMessage.id] = optimizedMessage;
+  chats[room].messages[optimizedMessage.id] = optimizedMessage;
 
   return optimizedMessage;
 }
 
-async function removeMessage(chatId: string, messageId: string) {
-  if (!chats[chatId]) {
+async function removeMessage(room: string, messageId: string) {
+  if (!chats[room]) {
     return false;
   }
 
@@ -287,24 +303,24 @@ async function removeMessage(chatId: string, messageId: string) {
     return false;
   }
 
-  delete chats[chatId].messages[messageId];
+  delete chats[room].messages[messageId];
 
   return true;
 }
 
 async function editMessage(
-  chatId: string,
+  room: string,
   {
     id,
     message,
     oldMessage,
   }: { id: string; message: string; oldMessage: string }
 ) {
-  if (!chats[chatId]) {
+  if (!chats[room]) {
     return false;
   }
 
-  if (!chats[chatId].messages[id]) {
+  if (!chats[room].messages[id]) {
     return false;
   }
 
@@ -320,20 +336,20 @@ async function editMessage(
       { new: true }
     );
 
-    chats[chatId].messages[id].message = message;
-    chats[chatId].messages[id].isEdited = true;
-    if (!Array.isArray(chats[chatId].messages[id].oldMessages)) {
-      chats[chatId].messages[id].oldMessages = [];
+    chats[room].messages[id].message = message;
+    chats[room].messages[id].isEdited = true;
+    if (!Array.isArray(chats[room].messages[id].oldMessages)) {
+      chats[room].messages[id].oldMessages = [];
     }
-    chats[chatId].messages[id]?.oldMessages?.push(oldMessage);
-    return chats[chatId].messages[id];
+    chats[room].messages[id]?.oldMessages?.push(oldMessage);
+    return chats[room].messages[id];
   } catch {
     return false;
   }
 }
 
-async function seenMessage(chatId: string, messageId: string) {
-  if (!chats[chatId]) {
+async function seenMessage(room: string, messageId: string) {
+  if (!chats[room]) {
     return false;
   }
 
@@ -352,7 +368,7 @@ async function seenMessage(chatId: string, messageId: string) {
       { new: true }
     );
 
-    chats[chatId].messages[messageId].isRead = isRead;
+    chats[room].messages[messageId].isRead = isRead;
   } catch {
     return false;
   }
@@ -399,8 +415,8 @@ function addToWaitingList({
       email,
       socketConnections: [socket],
       socketIds: [socket.id],
-      chatIds: [],
-      currentChatId: null,
+      rooms: [],
+      currentroom: null,
     },
     {
       get(target, prop, receiver) {

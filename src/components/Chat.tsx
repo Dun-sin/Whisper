@@ -101,23 +101,23 @@ const Chat = () => {
     inputRef.current.value = '';
     setEditing({ isediting: false, messageID: '' });
     socket?.timeout(10000).emit(events.NEW_EVENT_TYPING, {
-      chatId: app.currentChatId,
+      room: app.currentroom,
       isTyping: false,
     });
   };
 
   const sortedMessages = useMemo(() => {
-    if (!app.currentChatId) {
+    if (!app.currentroom) {
       return;
     }
-    return Object.values(state[app.currentChatId]?.messages ?? {})?.sort(
+    return Object.values(state[app.currentroom]?.messages ?? {})?.sort(
       (a, b) => {
         const da = new Date(a.time),
           db = new Date(b.time);
         return da.getTime() - db.getTime();
       }
     );
-  }, [state, app.currentChatId]);
+  }, [state, app.currentroom]);
 
   const doSend = async ({
     senderId,
@@ -181,7 +181,7 @@ const Chat = () => {
     e.preventDefault();
 
     socket?.emit(events.NEW_EVENT_TYPING, {
-      chatId: app.currentChatId,
+      room: app.currentroom,
       isTyping: false,
     });
     const d = new Date();
@@ -197,14 +197,14 @@ const Chat = () => {
         const oldMessage = messageObject?.message;
         const editedMessage = await editMessage({
           id: editing.messageID,
-          chatId: app.currentChatId,
+          room: app.currentroom,
           newMessage: message as string,
           oldMessage,
         });
 
         updateMessage({
           ...editedMessage,
-          room: app.currentChatId,
+          room: app.currentroom,
           isEdited: true,
         });
       } catch (e) {
@@ -215,7 +215,7 @@ const Chat = () => {
     } else {
       doSend({
         senderId,
-        room: app.currentChatId,
+        room: app.currentroom,
         message: message as string,
         time: d.getTime(),
         containsBadword: badwords.check(message as string),
@@ -234,7 +234,7 @@ const Chat = () => {
   const handleTypingStatus = throttle(e => {
     if (e.target.value.length > 0) {
       socket?.timeout(5000).emit(events.NEW_EVENT_TYPING, {
-        chatId: app.currentChatId,
+        room: app.currentroom,
         isTyping: true,
       });
     }
@@ -292,18 +292,18 @@ const Chat = () => {
 
     const deleteMessageHandler = ({
       id,
-      chatId,
+      room,
     }: {
       id: string;
-      chatId: string;
+      room: string;
     }) => {
-      removeMessage(id, chatId);
+      removeMessage(id, room);
     };
 
     const editMessageHandler = (messageEdited: MessageType) => {
       updateMessage({
         ...messageEdited,
-        room: app.currentChatId,
+        room: app.currentroom,
         isEdited: true,
       });
     };
@@ -314,12 +314,12 @@ const Chat = () => {
 
     const readMessageHandler = ({
       messageId,
-      chatId,
+      room,
     }: {
       messageId: string;
-      chatId: string;
+      room: string;
     }) => {
-      receiveMessage(messageId, chatId);
+      receiveMessage(messageId, room);
     };
 
     // This is used to recive message form other user.
@@ -336,7 +336,7 @@ const Chat = () => {
       socket?.off(events.NEW_EVENT_READ_MESSAGE, readMessageHandler);
       socket?.off(events.NEW_EVENT_SEND_FAILED, limitMessageHandler);
     };
-  }, [app.currentChatId, socket]);
+  }, [app.currentroom, socket]);
 
   // this is used to send the notification for inactive chat to the respective user
   // get the last message sent

@@ -1,13 +1,13 @@
-import { AppType, ChatIdType, MessageType } from '@/types/types';
+import { AppType, RoomType, MessageType } from '@/types/types';
 import { RefObject } from 'react';
 
-export default (state: ChatIdType, app: AppType) => {
+export default (state: RoomType, app: AppType) => {
   const getMessage = (id: string): MessageType | null => {
-    if (app.currentChatId === null) {
+    if (app.currentroom === null) {
       return null;
     }
 
-    const chatContent = state[app.currentChatId];
+    const chatContent = state[app.currentroom];
 
     if (!chatContent) {
       return null;

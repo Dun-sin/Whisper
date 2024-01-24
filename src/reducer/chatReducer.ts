@@ -1,5 +1,5 @@
 import { cloneState } from '@/lib/utils';
-import { ChatIdType } from '@/types/types';
+import { RoomType } from '@/types/types';
 
 const messageInitial = {
   message: '',
@@ -14,21 +14,21 @@ const messageInitial = {
   oldMessages: [],
   isRead: false,
 };
-export const initialState: ChatIdType = {};
+export const initialState: RoomType = {};
 
-export default function chatReducer(state: ChatIdType, action: any) {
+export default function chatReducer(state: RoomType, action: any) {
   const clonedState = cloneState(state);
   switch (action.type) {
     case 'CREATE_CHAT': {
       const {
-        chatId,
+        room,
         userIds,
         messages = messageInitial,
         createdAt = new Date(),
       } = action.payload;
 
-      console.log('context', { chatId, userIds });
-      clonedState[chatId] = {
+      console.log('context', { room, userIds });
+      clonedState[room] = {
         userIds,
         messages,
         createdAt,
@@ -38,15 +38,15 @@ export default function chatReducer(state: ChatIdType, action: any) {
     }
 
     case 'CLOSE_CHAT': {
-      const { chatId } = action.payload;
+      const { room } = action.payload;
 
-      delete clonedState[chatId];
+      delete clonedState[room];
       break;
     }
 
     case 'CLOSE_ALL_CHATS': {
-      for (const chatId in clonedState) {
-        delete clonedState[chatId];
+      for (const room in clonedState) {
+        delete clonedState[room];
       }
       break;
     }

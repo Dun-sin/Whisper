@@ -18,10 +18,10 @@ const MessageSeen = ({ isRead, isSender }: MessageSeenProps) => {
   const { seenMessage } = useChatUtils(socket);
 
   const sortedMessages = useMemo(() => {
-    if (!app.currentChatId) {
+    if (!app.currentroom) {
       return;
     }
-    return Object.values(state[app.currentChatId]?.messages ?? {})?.sort(
+    return Object.values(state[app.currentroom]?.messages ?? {})?.sort(
       (a, b) => {
         const da = new Date(a.time),
           db = new Date(b.time);
@@ -29,7 +29,7 @@ const MessageSeen = ({ isRead, isSender }: MessageSeenProps) => {
         return da.getTime() - db.getTime();
       }
     );
-  }, [state, app.currentChatId]);
+  }, [state, app.currentroom]);
 
   useEffect(() => {
     // Initialize Intersection Observer
@@ -42,19 +42,19 @@ const MessageSeen = ({ isRead, isSender }: MessageSeenProps) => {
               ?.getAttribute('id')
               ?.split('-')[1] as string;
 
-            if (!app.currentChatId) {
+            if (!app.currentroom) {
               return;
             }
 
             try {
               seenMessage({
                 messageId,
-                chatId: app.currentChatId,
+                room: app.currentroom,
               });
             } catch (e) {
               return;
             }
-            receiveMessage(messageId, app.currentChatId);
+            receiveMessage(messageId, app.currentroom);
           }
         });
       },
@@ -81,7 +81,7 @@ const MessageSeen = ({ isRead, isSender }: MessageSeenProps) => {
       // Clean up the observer
       observer.disconnect();
     };
-  }, [sortedMessages, isTabVisible, app.currentChatId, isSender]);
+  }, [sortedMessages, isTabVisible, app.currentroom, isSender]);
 
   return isSender && <p className='text-sm'>{isRead ? 'Seen' : 'Not Seen'}</p>;
 };

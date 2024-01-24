@@ -83,7 +83,7 @@ export const ChatProvider = ({ children }: ProviderType) => {
       });
     },
     createChat: (
-      chatId: string,
+      room: string,
       userIds: [string, string],
       messages: MessageIdType = {},
       createdAt?: Date
@@ -91,31 +91,31 @@ export const ChatProvider = ({ children }: ProviderType) => {
       try {
         dispatch({
           type: 'CREATE_CHAT',
-          payload: { chatId, userIds, messages, createdAt },
+          payload: { room, userIds, messages, createdAt },
         });
-        console.log('context', { chatId, userIds, messages, createdAt });
-        return { chatId, userIds };
+        console.log('context', { room, userIds, messages, createdAt });
+        return { room, userIds };
       } catch (error) {
         console.error('Error creating chat:', error);
         return { error };
       }
     },
-    removeMessage: (id: string, chatId: string) => {
+    removeMessage: (id: string, room: string) => {
       dispatch({
         type: 'REMOVE_MESSAGE',
-        payload: { id, room: chatId },
+        payload: { id, room },
       });
     },
-    receiveMessage: (id: string, chatId: string) => {
+    receiveMessage: (id: string, room: string) => {
       dispatch({
         type: 'RECEIVE_MESSAGE',
-        payload: { id, room: chatId },
+        payload: { id, room },
       });
     },
-    closeChat: (chatId: string) => {
+    closeChat: (room: string) => {
       dispatch({
         type: 'CLOSE_CHAT',
-        payload: { chatId },
+        payload: { room },
       });
     },
     closeAllChats: () => {

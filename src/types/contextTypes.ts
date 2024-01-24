@@ -2,7 +2,7 @@ import { Dispatch } from 'react';
 import {
   AppType,
   AuthType,
-  ChatIdType,
+  RoomType,
   MessageIdType,
   MessageType,
   SettingsType,
@@ -18,20 +18,20 @@ export type DialogType = {
 
 export type ChatContextType = {
   createChat: (
-    chatId: string,
+    room: string,
     userIds: [string, string],
     messages?: MessageIdType,
     createdAt?: Date
   ) => any;
-  messages: ChatIdType;
-  removeMessage: (id: string, chatid: string) => void;
+  messages: RoomType;
+  removeMessage: (id: string, room: string) => void;
   addMessage: (message: MessageType) => void;
   updateMessage: (message: any) => void;
-  closeChat: (chatId: string) => void;
+  closeChat: (room: string) => void;
   currentReplyMessage: MessageType | null;
   currentReplyMessageId: string;
   closeAllChats: () => void;
-  receiveMessage: (id: string, chatId: string) => void;
+  receiveMessage: (id: string, room: string) => void;
   startReply: (messageId: string) => void;
   cancelReply: () => void;
 };
@@ -43,7 +43,7 @@ export type AppContextType = {
   updateTmpSettings: (newSettings: SettingsType) => void;
   cancelSettingsUpdate: () => void;
   startSearch: () => undefined;
-  endSearch: (currentChatId: null | string) => undefined;
+  endSearch: (currentroom: null | string) => undefined;
   loadUserSettings: (settings: SettingsType) => void;
   updateOnlineStatus: (onlineStatus: Date | string | null) => void;
   updateConnection: (isDisconnected: boolean) => void;

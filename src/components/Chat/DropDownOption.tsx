@@ -77,7 +77,7 @@ const DropDownOptions = ({
     try {
       const messageDeleted = await deleteMessage({
         id,
-        chatId: gottenMessage.room as string,
+        room: gottenMessage.room as string,
       });
 
       console.log(messageDeleted);

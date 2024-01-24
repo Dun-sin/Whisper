@@ -57,7 +57,7 @@ const Searching = () => {
   }, [isStoppingSearch]);
 
   useEffect(() => {
-    if (!app.currentChatId) {
+    if (!app.currentroom) {
       startSearch();
     }
 
@@ -96,15 +96,15 @@ const Searching = () => {
     return () => {
       socket?.off(events.NEW_EVENT_STOP_SEARCH_SUCCESS);
     };
-  }, [app.currentChatId, authState.email, authState.loginId, router, socket]);
+  }, [app.currentroom, authState.email, authState.loginId, router, socket]);
 
   useEffect(() => {
-    if (!app.currentChatId) {
+    if (!app.currentroom) {
       return;
     }
 
-    router.push('/anonymous')
-  }, [app.currentChatId])
+    router.push('/anonymous');
+  }, [app.currentroom]);
 
   useEffect(() => {
     if (loadingText === defaultLoadingText) {

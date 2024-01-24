@@ -48,11 +48,11 @@ const PageWrapper = ({ children }: ProviderType) => {
   }, [isLoggedIn, router]);
 
   useEffect(() => {
-    const onRestoreChat = ({ chats, currentChatId }: any) => {
+    const onRestoreChat = ({ chats, currentroom }: any) => {
       Object.values(chats).forEach((chat: any) => {
         createChat(chat.id, chat.userIds, chat.messages, chat.createdAt);
       });
-      endSearch(currentChatId);
+      endSearch(currentroom);
     };
 
     socket?.on(events.NEW_EVENT_CHAT_RESTORE, onRestoreChat);
