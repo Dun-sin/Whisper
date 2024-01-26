@@ -202,6 +202,8 @@ const Chat = () => {
           oldMessage,
         });
 
+        console.log({ editedMessage });
+
         updateMessage({
           ...editedMessage,
           roomId: app.currentRoomId,

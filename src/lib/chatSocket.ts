@@ -23,7 +23,7 @@ export default function useChatUtils(socket: Socket | undefined) {
               reject(err);
               return;
             }
-
+            console.log({ sentMessage });
             resolve(sentMessage);
           }
         );
