@@ -6,7 +6,7 @@ let connection: Connection | null = null;
 let mongooseInstance: Mongoose | null = null;
 
 // Retrieve the MongoDB connection string from environment variables.
-const connectionString = process.env.MongoDB_URL;
+const connectionString = process.env.NEXT_PUBLIC_MongoDB_URL;
 
 // Async function to establish and return a MongoDB connection.
 const connectMongo = async (): Promise<Connection> => {
