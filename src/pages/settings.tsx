@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react'; // Import useState
 import {
   Animation,
   Button,
@@ -25,6 +25,9 @@ const Settings = () => {
   } = useApp();
   const { authState } = useAuth();
 
+  // State to manage theme
+  const [theme, setTheme] = useState('light');
+
   const settings = useMemo(() => {
     return app.tmpSettings
       ? { ...app.settings, ...app.tmpSettings }
@@ -44,39 +47,39 @@ const Settings = () => {
     }
   };
 
-  /**
-   *
-   * @param {Event | SubmitEvent} e
-   */
   const handleSubmit = async () => {
     updateSettings();
     await updateUserSettings();
   };
 
-  const handleChange = (newSettings: any) => {
+  const handleChange = (newSettings) => {
     updateTmpSettings(newSettings);
   };
 
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
   return (
-    <div className='flex justify-center items-center flex-col min-w-[calc(100%-120px)] p-2 gap-5 bg-white dark:bg-primary min-h-full'>
-      <div className='w-11/12 sm:w-[70%] md:w-[55%] lg:w-[35%] md:min-w-[300px] h-auto dark:bg-primary bg-light rounded-3xl px-6 py-6 md:px-14 md:py-20 border shadow-xl text-primary  dark:text-light '>
+    <div className={`flex justify-center items-center flex-col min-w-[calc(100%-120px)] p-2 gap-5 ${theme === 'dark' ? 'dark' : ''}`}>
+      <div className='w-11/12 sm:w-[70%] md:w-[55%] lg:w-[35%] md:min-w-[300px] h-auto dark:bg-primary bg-light rounded-3xl px-6 py-6 md:px-14 md:py-20 border shadow-xl text-primary dark:text-light '>
         <Form onSubmit={handleSubmit} onChange={handleChange}>
           <Form.Group className='flex justify-between' controlId='app-theme'>
             <div className='w-5/6'>
               <div className='flex'>
                 <Icon
-                  color={settings.theme ? 'white' : 'gray'}
+                  color={theme === 'dark' ? 'white' : 'gray'}
                   icon='ion:invert-mode'
                   height='18'
                   width='18'
                   className='mr-1.5'
                 />
-                <Form.ControlLabel className='text-primary  dark:text-light  text-[12px] sm:text-xs md:text-base font-normal'>
+                <Form.ControlLabel className='text-primary dark:text-light text-[12px] sm:text-xs md:text-base font-normal'>
                   MODE
                 </Form.ControlLabel>
               </div>
               <Form.HelpText className='text-zinc-600 text-xs dark:text-white'>
-                {settings.theme ? 'Dark' : 'Light'} mode
+                {theme === 'dark' ? 'Dark' : 'Light'} mode
               </Form.HelpText>
             </div>
             <div className='flex items-center'>
@@ -84,11 +87,11 @@ const Settings = () => {
                 className='flex justify-end items-center'
                 name='theme'
                 accepter={Toggle}
-                checked={settings.theme ?? true}
-                value={!settings.theme}
+                checked={theme === 'dark'}
+                onChange={toggleTheme} // Toggle theme on change
                 checkedChildren={
                   <Icon
-                    color={settings.theme ? 'white' : 'gray'}
+                    color={theme === 'dark' ? 'white' : 'gray'}
                     icon='ic:round-dark-mode'
                     height='22'
                     width='22'
@@ -97,7 +100,7 @@ const Settings = () => {
                 }
                 unCheckedChildren={
                   <Icon
-                    color={settings.theme ? 'white' : 'gray'}
+                    color={theme === 'dark' ? 'white' : 'gray'}
                     icon='ic:round-light-mode'
                     height='22'
                     width='22'
