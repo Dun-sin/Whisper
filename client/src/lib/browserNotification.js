@@ -22,7 +22,7 @@ export const createBrowserNotification = (title, body) => {
 
 	
 	if (title !== 'Inactive Chat') {
-		if (badwords.check(message)) {
+		if (badwords.check(body)) {
 			const message = badwords.filter(body);
 			new Notification(title, {
 				body: message,
