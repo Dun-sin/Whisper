@@ -1,55 +1,50 @@
 /* eslint-disable max-len */
-import { useEffect, useRef, useContext, useMemo, useState } from 'react';
-import { SocketContext } from 'context/Context';
-
-import ScrollToBottom from 'react-scroll-to-bottom';
-import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
-
-import { v4 as uuid } from 'uuid';
-import { throttle } from 'lodash';
-import MarkdownIt from 'markdown-it';
-import BadWordsNext from 'bad-words-next';
-import en from 'bad-words-next/data/en.json'
 
 import { BsArrow90DegLeft, BsArrow90DegRight } from 'react-icons/bs'
-
-import { useChat } from 'src/context/ChatContext';
-import { useAuth } from 'src/context/AuthContext';
-import { useApp } from 'src/context/AppContext';
-
-import useChatUtils from 'src/lib/chatSocket';
-import MessageStatus from './MessageStatus';
-import { useNotification } from 'src/lib/notification';
 import {
 	NEW_EVENT_DELETE_MESSAGE,
 	NEW_EVENT_EDIT_MESSAGE,
+  NEW_EVENT_READ_MESSAGE,
 	NEW_EVENT_RECEIVE_MESSAGE,
-	NEW_EVENT_TYPING,
-	NEW_EVENT_READ_MESSAGE,
-	NEW_EVENT_SEND_FAILED, 
-	NEW_EVENT_REQUEST_PUBLIC_KEY
+  NEW_EVENT_REQUEST_PUBLIC_KEY,
+  NEW_EVENT_SEND_FAILED,
+  NEW_EVENT_TYPING
 } from '../../../constants.json';
-import { createBrowserNotification } from 'src/lib/browserNotification';
-
 import chatHelper,
 {
 	adjustTextareaHeight,
-	arrayBufferToBase64,
-	checkPartnerResponse,
+  arrayBufferToBase64,
 	convertArrayBufferToPem,
 	getTime,
 	pemToArrayBuffer
 } from '../lib/chatHelper';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import MessageSeen from './Chat/MessageSeen';
-import MessageInput from './Chat/MessageInput';
+import BadWordsNext from 'bad-words-next';
 import DropDownOptions from './Chat/DropDownOption';
+import MarkdownIt from 'markdown-it';
+import MessageInput from './Chat/MessageInput';
+import MessageSeen from './Chat/MessageSeen';
+import MessageStatus from './MessageStatus';
 import PreviousMessages from './Chat/PreviousMessages';
+import ScrollToBottom from 'react-scroll-to-bottom';
+import { SocketContext } from 'context/Context';
+import { createBrowserNotification } from 'src/lib/browserNotification';
 import decryptMessage from 'src/lib/decryptMessage';
+import en from 'bad-words-next/data/en.json'
+import { throttle } from 'lodash';
+import { useApp } from 'src/context/AppContext';
+import { useAuth } from 'src/context/AuthContext';
+import { useChat } from 'src/context/ChatContext';
+import useChatUtils from 'src/lib/chatSocket';
+import useInactiveChat from 'src/hooks/useInactiveChat';
+import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
+import { useNotification } from 'src/lib/notification';
+import { v4 as uuid } from 'uuid';
 
 // import decryptMessage from 'src/lib/decryptMessage';
 
-import useInactiveChat from 'src/hooks/useInactiveChat';
+
 
 let senderId;
 
@@ -61,7 +56,7 @@ const Chat = () => {
 		messageID: null,
 	});
 	const [message, setMessage] = useState('');
-	const [quoteMessage, setQuoteMessage] = useState(null);
+
 	const [decryptedMessages, setDecryptedMessages] = useState();
 	// use the id so we can track what message's previousMessage is open
 	const [openPreviousMessages, setOpenPreviousMessages] = useState(null);
@@ -512,7 +507,7 @@ const Chat = () => {
 					className="h-[100%] md:max-h-full overflow-y-auto w-full scroll-smooth"
 				>
 					{decryptedMessages && decryptedMessages.map(
-						({ senderId: sender, id, message, time, status, isEdited, oldMessages, containsBadword, isRead }) => {
+            ({ senderId: sender, id, message, time, status, isEdited, oldMessages, containsBadword, isRead, replyTo, }) => {
 							const isSender = sender.toString() === senderId.toString();	
 							// original message this message is a reply to
 							const repliedMessage = replyTo ? (() => {
