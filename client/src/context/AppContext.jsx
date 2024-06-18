@@ -28,7 +28,6 @@ export const useApp = () => {
 
 export const AppProvider = ({ children }) => {
 	const [state, dispatch] = useReducer(appReducer, initialState, (defaultState) => {
-		console.log({initialState, defaultState})
 		try {
 			const persistedState = JSON.parse(localStorage.getItem('app'));
 
