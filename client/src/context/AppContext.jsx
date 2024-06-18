@@ -8,6 +8,7 @@ const initialState = {
 	settings: {
 		notificationsEnabled: true,
 		notificationVolume: 10,
+		theme: false
 	},
 	tmpSettings: null,
 	currentChatId: null,
@@ -27,6 +28,7 @@ export const useApp = () => {
 
 export const AppProvider = ({ children }) => {
 	const [state, dispatch] = useReducer(appReducer, initialState, (defaultState) => {
+		console.log({initialState, defaultState})
 		try {
 			const persistedState = JSON.parse(localStorage.getItem('app'));
 
