@@ -8,6 +8,7 @@ const initialState = {
 	settings: {
 		notificationsEnabled: true,
 		notificationVolume: 10,
+		theme: false
 	},
 	tmpSettings: null,
 	currentChatId: null,
