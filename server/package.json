@@ -7,6 +7,7 @@
     "start": "nodemon index.js",
     "dev": "nodemon index.js",
     "dev:docker": "docker compose up -d && nodemon index.js",
+    "debug:docker": "docker compose up -d && DEBUG=socket.io* nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore --fix ./",
     "format": "prettier --write .",

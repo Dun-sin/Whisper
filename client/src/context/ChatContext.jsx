@@ -35,7 +35,7 @@ export const useChat = () => {
 };
 
 export const ChatProvider = ({ children }) => {
-	const {app} = useApp()
+	const { app } = useApp();
 	const [state, dispatch] = useReducer(chatReducer, initialState, (defaultState) => {
 		try {
 			const persistedState = JSON.parse(localStorage.getItem('chats'));
@@ -49,11 +49,14 @@ export const ChatProvider = ({ children }) => {
 			return defaultState;
 		}
 	});
-	const { getMessage } = useChatHelper(state, app)
+	const { getMessage } = useChatHelper(state, app);
 
-	const [currentReplyMessageId, setCurrentReplyMessageId] = useState(null)
+	const [currentReplyMessageId, setCurrentReplyMessageId] = useState(null);
 	// eslint-disable-next-line no-use-before-define
-	const currentReplyMessage = useMemo(() => getMessage(currentReplyMessageId), [currentReplyMessageId]);
+	const currentReplyMessage = useMemo(
+		() => getMessage(currentReplyMessageId),
+		[currentReplyMessageId]
+	);
 
 	/**
 	 *
@@ -101,8 +104,8 @@ export const ChatProvider = ({ children }) => {
 	function receiveMessage(id, chatId) {
 		dispatch({
 			type: 'RECEIVE_MESSAGE',
-			payload: { id, room: chatId }
-		})
+			payload: { id, room: chatId },
+		});
 	}
 
 	function closeChat(chatId) {
@@ -120,11 +123,11 @@ export const ChatProvider = ({ children }) => {
 	}
 
 	function startReply(messageId) {
-		setCurrentReplyMessageId(messageId)
+		setCurrentReplyMessageId(messageId);
 	}
 
 	function cancelReply() {
-		setCurrentReplyMessageId(null)
+		setCurrentReplyMessageId(null);
 	}
 
 	return (
@@ -141,7 +144,7 @@ export const ChatProvider = ({ children }) => {
 				closeAllChats,
 				receiveMessage,
 				startReply,
-				cancelReply
+				cancelReply,
 			}}
 		>
 			{children}

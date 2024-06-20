@@ -1,5 +1,5 @@
 import BadWordsNext from 'bad-words-next';
-import en from 'bad-words-next/data/en.json'
+import en from 'bad-words-next/data/en.json';
 
 export const requestBrowserNotificationPermissions = () => {
 	if (!('Notification' in window)) {
@@ -20,7 +20,6 @@ export const createBrowserNotification = (title, body) => {
 		return;
 	}
 
-	
 	if (title !== 'Inactive Chat') {
 		if (badwords.check(body)) {
 			const message = badwords.filter(body);

@@ -34,14 +34,14 @@ const centerItems = `flex items-center justify-center`;
 const Anonymous = ({ onChatClosed }) => {
 	const { app, endSearch } = useApp();
 	const { currentChatId, onlineStatus } = app;
-	const { clearTimer } = useCheckTimePassed()
+	const { clearTimer } = useCheckTimePassed();
 
 	const currentChatIdRef = useRef(currentChatId);
 
 	const [isTyping, setIsTyping] = useState(false);
 	const [autoSearchAfterClose, setAutoSearchAfterClose] = useState(false);
 	const [disconnected, setDisconnected] = useState(false);
-	const [buddyOnlineStatus, setBuddyOnlineStatus] = useState(null)
+	const [buddyOnlineStatus, setBuddyOnlineStatus] = useState(null);
 
 	const autoSearchRef = useRef();
 	autoSearchRef.current = autoSearchAfterClose;
@@ -107,7 +107,7 @@ const Anonymous = ({ onChatClosed }) => {
 				navigate('/');
 			}
 
-			clearTimer()
+			clearTimer();
 		});
 	};
 
@@ -162,11 +162,7 @@ const Anonymous = ({ onChatClosed }) => {
 				// Set today's date to the beginning of the day
 				today.setHours(0, 0, 0, 0);
 				const yesterday = new Date(today);
-				yesterday
-					.setDate(
-						yesterday
-							.getDate() - 1
-					); // Set it to yesterday
+				yesterday.setDate(yesterday.getDate() - 1); // Set it to yesterday
 
 				let formattedDate;
 				if (date >= today) {
@@ -182,12 +178,12 @@ const Anonymous = ({ onChatClosed }) => {
 					const options = { year: 'numeric', month: 'short', day: 'numeric' };
 					formattedDate = date.toLocaleString('en-US', options);
 				}
-				setBuddyOnlineStatus(formattedDate)
+				setBuddyOnlineStatus(formattedDate);
 
-				return
+				return;
 			}
-			setBuddyOnlineStatus(onlineStatusState)
-		}
+			setBuddyOnlineStatus(onlineStatusState);
+		};
 
 		for (const event in connectionEvents) {
 			socket.on(event, connectionEvents[event]);
@@ -214,15 +210,11 @@ const Anonymous = ({ onChatClosed }) => {
 
 	useEffect(() => {
 		if (!onlineStatus) {
-			return
+			return;
 		}
 
-		socket.timeout(5000)
-			.emit(
-				NEW_EVENT_ONLINE_STATUS,
-				{ onlineStatus, chatId: currentChatId })
-
-	}, [onlineStatus])
+		socket.timeout(5000).emit(NEW_EVENT_ONLINE_STATUS, { onlineStatus, chatId: currentChatId });
+	}, [onlineStatus]);
 
 	return (
 		<div
@@ -258,28 +250,30 @@ const Anonymous = ({ onChatClosed }) => {
 						/>
 					</Whisper>
 				</div>
-				<div className='flex flex-col gap-2 items-center sm:items-start'>
+				<div className="flex flex-col gap-2 items-center sm:items-start">
 					<h2 className=" text-xl font-semibold">Anonymous User</h2>
-					<div className='flex items-center gap-3'>
+					<div className="flex items-center gap-3">
 						{isTyping && <span>Typing</span>}
-						{buddyOnlineStatus && <span className=' text-gray-400 text-sm'>{buddyOnlineStatus}</span>}
+						{buddyOnlineStatus && (
+							<span className=" text-gray-400 text-sm">{buddyOnlineStatus}</span>
+						)}
 					</div>
 				</div>
 
 				<Dropdown placement="leftStart" style={{ zIndex: 3 }} renderToggle={MenuToggle} noCaret>
-  <Dropdown.Item onClick={() => handleClose()} className='sm:w-[200px]'>
-    <div className="flex items-center justify-between gap-2 flex-wrap">
-      <span>Close Chat</span>
-      <span className="text-gray-500 text-xs">Ctrl + Shift + X</span>
-    </div>
-  </Dropdown.Item>
-  <Dropdown.Item onClick={() => handleClose(true)} className='sm:w-[200px]'>
-    <div className="flex items-center justify-between gap-2 flex-wrap">
-      <span>Find a new buddy</span>
-      <span className="text-gray-500 text-xs">Ctrl + Alt + N</span>
-    </div>
-  </Dropdown.Item>
-</Dropdown>
+					<Dropdown.Item onClick={() => handleClose()} className="sm:w-[200px]">
+						<div className="flex items-center justify-between gap-2 flex-wrap">
+							<span>Close Chat</span>
+							<span className="text-gray-500 text-xs">Ctrl + Shift + X</span>
+						</div>
+					</Dropdown.Item>
+					<Dropdown.Item onClick={() => handleClose(true)} className="sm:w-[200px]">
+						<div className="flex items-center justify-between gap-2 flex-wrap">
+							<span>Find a new buddy</span>
+							<span className="text-gray-500 text-xs">Ctrl + Alt + N</span>
+						</div>
+					</Dropdown.Item>
+				</Dropdown>
 			</div>
 			<div
 				className={createClassesFromArray([

@@ -3,6 +3,5 @@
 	"singleQuote": true,
 	"trailingComma": "es5",
 	"bracketSameLine": false,
-	"endOfLine": "lf",
-	"editorconfig": true
+	"endOfLine": "lf"
 }

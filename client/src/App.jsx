@@ -27,12 +27,12 @@ const clientID = import.meta.env.VITE_IMPORTANT;
 
 function App() {
 	const { isLoggedIn, dispatchAuth } = useAuth();
-	const { loadUserSettings, updateOnlineStatus, app } = useApp(); 
+	const { loadUserSettings, updateOnlineStatus, app } = useApp();
 
-	const { settings } = app
-	const [onlineStatus, setOnlineStatus] = useState(null)
+	const { settings } = app;
+	const [onlineStatus, setOnlineStatus] = useState(null);
 
-	const isTabActive = useIsTabActive()
+	const isTabActive = useIsTabActive();
 
 	async function loginWithEmail(email) {
 		try {
@@ -68,19 +68,19 @@ function App() {
 
 	useEffect(() => {
 		if (!isLoggedIn) {
-			return
+			return;
 		}
 
 		if (isTabActive) {
-			setOnlineStatus('online')
+			setOnlineStatus('online');
 		} else {
-			setOnlineStatus(new Date)
+			setOnlineStatus(new Date());
 		}
-	}, [isTabActive])
+	}, [isTabActive]);
 
 	useEffect(() => {
-		updateOnlineStatus(onlineStatus)
-	}, [onlineStatus])
+		updateOnlineStatus(onlineStatus);
+	}, [onlineStatus]);
 
 	return (
 		<KindeProvider

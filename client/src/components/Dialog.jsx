@@ -12,7 +12,7 @@ const Dialog = ({ ...rest }) => {
 
 	const { app } = useApp();
 
-	const { settings } = app
+	const { settings } = app;
 
 	const resetDialog = () => {
 		setDialog({ isOpen: false, text: '', handler: null });

@@ -41,8 +41,8 @@ export default function chatReducer(state, action) {
 		case 'CLOSE_CHAT': {
 			const { chatId } = action.payload;
 			localStorage.removeItem('cryptoKey' + chatId);
-			localStorage.removeItem('importPublicKey'+ chatId);
-			localStorage.removeItem('importedPrivateKey'+ chatId);
+			localStorage.removeItem('importPublicKey' + chatId);
+			localStorage.removeItem('importedPrivateKey' + chatId);
 			delete clonedState[chatId];
 			break;
 		}
@@ -55,7 +55,8 @@ export default function chatReducer(state, action) {
 		}
 
 		case 'ADD_MESSAGE': {
-			const { senderId, room, id, message, time, status, containsBadword, replyTo } = action.payload;
+			const { senderId, room, id, message, time, status, containsBadword, replyTo } =
+				action.payload;
 
 			if (!clonedState[room]) {
 				throw new Error('Room not found!');
@@ -69,7 +70,7 @@ export default function chatReducer(state, action) {
 				time,
 				status,
 				containsBadword,
-				replyTo
+				replyTo,
 			};
 			break;
 		}
@@ -104,7 +105,7 @@ export default function chatReducer(state, action) {
 				break;
 			}
 
-			clonedState[room].messages[messageId].oldMessages = oldMessages 
+			clonedState[room].messages[messageId].oldMessages = oldMessages;
 			break;
 		}
 

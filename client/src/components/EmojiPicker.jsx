@@ -7,11 +7,10 @@ import PropTypes from 'prop-types';
 import { useApp } from 'src/context/AppContext';
 
 export default function EmojiPicker({ onEmojiPick, focusInput }) {
-
 	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 	const { app } = useApp();
 
-	const { settings } = app
+	const { settings } = app;
 	const onClosePicker = () => {
 		setShowEmojiPicker(false);
 		focusInput();

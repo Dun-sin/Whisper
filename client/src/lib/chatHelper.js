@@ -110,7 +110,7 @@ export const arrayBufferToBase64 = (arrayBuffer) => {
 	const bytes = new Uint8Array(arrayBuffer);
 	const len = bytes.byteLength;
 	for (let i = 0; i < len; i++) {
-	  binary += String.fromCharCode(bytes[i]);
+		binary += String.fromCharCode(bytes[i]);
 	}
 	return btoa(binary);
 };
@@ -124,16 +124,18 @@ export const convertArrayBufferToPem = (arrayBuffer, type) => {
 
 // This function does opposite of above function. After receiving keys from socket.io in PEM string we need to apply below function.
 export const pemToArrayBuffer = (pemString) => {
-	const base64String = pemString && pemString
-	  .replace(/-----BEGIN (.+)-----/, '')
-	  .replace(/-----END (.+)-----/, '')
-	  .replace(/\s/g, '');
-  
+	const base64String =
+		pemString &&
+		pemString
+			.replace(/-----BEGIN (.+)-----/, '')
+			.replace(/-----END (.+)-----/, '')
+			.replace(/\s/g, '');
+
 	const binaryString = atob(base64String);
 	const byteArray = new Uint8Array(binaryString.length);
 	for (let i = 0; i < binaryString.length; i++) {
-	  byteArray[i] = binaryString.charCodeAt(i);
+		byteArray[i] = binaryString.charCodeAt(i);
 	}
-  
+
 	return byteArray.buffer;
-  }
+};
