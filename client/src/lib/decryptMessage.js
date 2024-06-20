@@ -12,21 +12,6 @@ export default async (message, cryptoKey) => {
     const decryptedMessage = decoder.decode(decryptedMessageBuffer)
     return decryptedMessage;
     } catch (error) {
-      console.log(error);
+      throw new Error(error);
     }
 }
-
-
-
-
-
-  
-  
-
-
-
-
-
-
-
-

@@ -35,11 +35,7 @@ module.exports = (io, socket) => {
      * This is necessary to enable us send notifications to users
      * using multiple devices to chat
      */
-    socket.join(loginId);
-    // Email is possibly null for anonymous users
-    if (email) {
-      socket.join(email);
-    }
+      socket.join(email ?? loginId);
 
     /**
      * First we check if user is already chatting.

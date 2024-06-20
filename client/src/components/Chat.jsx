@@ -117,6 +117,9 @@ const Chat = () => {
 			return;
 		  }
 	  
+		if(!importedPublicKey) {
+			throw Error('Public Key not Generated')
+		}
 		  // Encoding and encryting the message to be sent.
 		  const encoder = new TextEncoder();
 		  const encryptedMessagersa = await crypto.subtle.encrypt(
@@ -269,49 +272,6 @@ const Chat = () => {
 		};
 	}, [editing]);
 
-	useEffect(() => {
-		const newMessageHandler = async (message) => {
-			try {
-				const decryptedMessage = await decryptMessage(message.message, cryptoKey);
-				addMessage(message);
-				playNotification('newMessage');
-				createBrowserNotification('You received a new message on Whisper', decryptedMessage);
-			} catch {
-				logOut();
-			}
-		};
-		const deleteMessageHandler = ({ id, chatId }) => {
-			removeMessage(id, chatId);
-		};
-
-		const editMessageHandler = (messageEdited) => {
-			updateMessage({ ...messageEdited, room: app.currentChatId }, true);
-		};
-		
-		const limitMessageHandler = (data) => {
-			alert(data.message);
-		};
-
-		const readMessageHandler = ({ messageId, chatId }) => {
-			receiveMessage(messageId, chatId)
-		}
-
-		// This is used to recive message form other user.
-		socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);	
-		socket.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-		socket.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
-		socket.on(NEW_EVENT_READ_MESSAGE, readMessageHandler)
-		socket.on(NEW_EVENT_SEND_FAILED, limitMessageHandler);
-
-		return () => {
-			socket.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
-			socket.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-			socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
-			socket.off(NEW_EVENT_READ_MESSAGE, readMessageHandler)
-			socket.off(NEW_EVENT_SEND_FAILED, limitMessageHandler);
-		};
-	}, []);
-
 	// this is used to send the notification for inactive chat to the respective user
 	// get the last message sent
 	const getLastMessage = sortedMessages.at(-1);
@@ -339,6 +299,7 @@ const Chat = () => {
 			true,
 			['encrypt']
 			)
+
 				setImportedPublicKey(importedPublicKey);
 				if(!storedPublicKey){
 				const exportedPublicKey = await crypto.subtle.exportKey(
@@ -376,86 +337,65 @@ const Chat = () => {
 		const storedCryptoKey = localStorage.getItem('cryptoKey' + app.currentChatId);
 		const storedPublicKey = localStorage.getItem('importPublicKey' + app.currentChatId);
 		const storedPrivateKey = localStorage.getItem('importedPrivateKey' + app.currentChatId);
-		let pemPublicKey;	
+		let pemPublicKey;
 		let pemPrivateKey;
 	
-		// generate public and private key pair
+		// Generate public and private key pair
 		const keyPair = await crypto.subtle.generateKey(
 			{
-			  name: 'RSA-OAEP',
-			  modulusLength: 2048,
-			  publicExponent: new Uint8Array([1, 0, 1]),
-			  hash: 'SHA-256'
+				name: 'RSA-OAEP',
+				modulusLength: 2048,
+				publicExponent: new Uint8Array([1, 0, 1]),
+				hash: 'SHA-256'
 			},
 			true,
 			['encrypt', 'decrypt']
-		  );
-  if (storedCryptoKey) {
-	const privateKeyArray = new Uint8Array(JSON.parse(storedCryptoKey));
-
-	// import key or convert it from unit8array to cryptoKey
-	crypto.subtle.importKey(
-		'pkcs8',
-		privateKeyArray,
-		{
-			name: 'RSA-OAEP',
-			hash: { name: 'SHA-256' }
-		},
-		true,
-		['decrypt']
-		).then((importedPrivateKey) => {
-			setCryptoKey(importedPrivateKey);
-		});
-  } else {	
-		setCryptoKey(keyPair.privateKey);
-		// Below code is used to export the private key to send it to other user and store it locally
-		//  We cant store or send key directly that's why we need to export it
-		const exportedPrivateKey = await crypto.subtle.exportKey(
-			'pkcs8',
-			keyPair.privateKey
 		);
-		const privateKeyArray = new Uint8Array(exportedPrivateKey); 
-		pemPrivateKey = convertArrayBufferToPem(exportedPrivateKey, 'PRIVATE KEY');
-		// Store key in local storage because it should remain same until the chat exist so that we can decrypt
-		// messages even if we open chats later as the keys will not change. If we store in context, the keys will
-		// change and we will not able to decrypt the older messages. Same applies for all keys.
-		localStorage.setItem("cryptoKey" + app.currentChatId , JSON.stringify(Array.from(privateKeyArray)));
+	
+		if (storedCryptoKey) {
+			const privateKeyArray = new Uint8Array(JSON.parse(storedCryptoKey));
+	
+			// Import key or convert it from Uint8Array to CryptoKey
+			const importedPrivateKey = await crypto.subtle.importKey(
+				'pkcs8',
+				privateKeyArray.buffer,
+				{
+					name: 'RSA-OAEP',
+					hash: { name: 'SHA-256' }
+				},
+				true,
+				['decrypt']
+			);
+			setCryptoKey(importedPrivateKey);
+		} else {
+			setCryptoKey(keyPair.privateKey);
+	
+			// Export the private key
+			const exportedPrivateKey = await crypto.subtle.exportKey('pkcs8', keyPair.privateKey);
+			const privateKeyArray = new Uint8Array(exportedPrivateKey);
+			pemPrivateKey = convertArrayBufferToPem(exportedPrivateKey, 'PRIVATE KEY');
+	
+			// Store the private key in local storage
+			localStorage.setItem('cryptoKey' + app.currentChatId, JSON.stringify(Array.from(privateKeyArray)));
 		}
-		const exportedPublicKey = await crypto.subtle.exportKey(
-			'spki',
-			keyPair.publicKey
-		  );
-		  pemPublicKey = convertArrayBufferToPem(exportedPublicKey, 'PUBLIC KEY');
-		  if(storedPublicKey){
+	
+		const exportedPublicKey = await crypto.subtle.exportKey('spki', keyPair.publicKey);
+		pemPublicKey = convertArrayBufferToPem(exportedPublicKey, 'PUBLIC KEY');
+	
+		if (storedPublicKey && storedPrivateKey) {
 			const publicKeyArray = new Uint8Array(JSON.parse(storedPublicKey));
 			const privateKeyArray = new Uint8Array(JSON.parse(storedPrivateKey));
 			importKey(publicKeyArray, privateKeyArray);
-		  }else{
-			// emitting the public and private key to all receiver's. We need to emit private key too
-			// because we need to able to decrypt messages that we sent because we encrypt messages with receiver's
-			// public key
-		socket.emit(NEW_EVENT_REQUEST_PUBLIC_KEY, {
-			chatId: app.currentChatId,
-			publicKey: pemPublicKey,
-			privateKey: pemPrivateKey
-		  });}
-	  };
-
-	useEffect(() => {
-		generateKeyPair();
-		const publicStringHandler = (pemPublicKeyString, pemPrivateKeyString) => {
-			const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
-			const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
-
-			// Import PEM-formatted public key as CryptoKey
-			importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
+		} else {
+			console.log('sending', pemPublicKey)
+			socket.emit(NEW_EVENT_REQUEST_PUBLIC_KEY, {
+				chatId: app.currentChatId,
+				publicKey: pemPublicKey,
+				privateKey: pemPrivateKey
+			});
 		}
-		socket.on('publicKey', publicStringHandler); 
-		return () => {
-			socket.off('publicKey', publicStringHandler);
-		}
-	}, []);
-
+	};
+	
 	useEffect(() => {
 		// This function is used to decrypt all messages from sorted messages array depending upon if
 		// its sender's message or receiver's message it uses current importedPrivateKey or current private key respectively
@@ -494,6 +434,65 @@ const Chat = () => {
 	
 		fetchData();
 	  }, [sortedMessages, cryptoKey]);
+
+		useEffect(() => {
+			setTimeout(() => {
+				generateKeyPair()
+			}, 3000);
+			const newMessageHandler = async (message) => {
+				try {
+					const decryptedMessage = await decryptMessage(message.message, cryptoKey);
+					addMessage(message);
+					playNotification('newMessage');
+					createBrowserNotification('You received a new message on Whisper', decryptedMessage);
+				} catch {
+					throw new Error(`Could not decrypt message`)
+				}
+			};
+			const deleteMessageHandler = ({ id, chatId }) => {
+				removeMessage(id, chatId);
+			};
+	
+			const editMessageHandler = (messageEdited) => {
+				updateMessage({ ...messageEdited, room: app.currentChatId }, true);
+			};
+			
+			const limitMessageHandler = (data) => {
+				alert(data.message);
+			};
+	
+			const readMessageHandler = ({ messageId, chatId }) => {
+				receiveMessage(messageId, chatId)
+			}
+	
+			const publicStringHandler = ({pemPublicKeyString, pemPrivateKeyString}) => {
+				const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
+				const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
+	
+				console.log("==========received==============")
+				console.log(pemPublicKeyString, pemPrivateKeyString)
+				console.log("==========received==============")
+
+				// Import PEM-formatted public key as CryptoKey
+				importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
+			}
+
+			socket.on('publicKey', publicStringHandler); 
+			socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);	
+			socket.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+			socket.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+			socket.on(NEW_EVENT_READ_MESSAGE, readMessageHandler)
+			socket.on(NEW_EVENT_SEND_FAILED, limitMessageHandler);
+	
+			return () => {
+				socket.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+				socket.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+				socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+				socket.off(NEW_EVENT_READ_MESSAGE, readMessageHandler)
+				socket.off(NEW_EVENT_SEND_FAILED, limitMessageHandler);
+				socket.off('publicKey', publicStringHandler);
+			};
+		}, []);
 
 	return (
 		<div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6">
