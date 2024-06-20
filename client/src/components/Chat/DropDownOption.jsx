@@ -57,7 +57,7 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 				chatId: messageObject.room,
 			});
 
-			console.log(messageDeleted);
+	
 			if (!messageDeleted) {
 				updateMessage(id, messageObject);
 				return;

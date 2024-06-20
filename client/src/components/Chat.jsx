@@ -389,7 +389,6 @@ const Chat = () => {
 			const privateKeyArray = new Uint8Array(JSON.parse(storedPrivateKey));
 			importKey(publicKeyArray, privateKeyArray);
 		} else {
-			console.log('sending', pemPublicKey);
 			socket.emit(NEW_EVENT_REQUEST_PUBLIC_KEY, {
 				chatId: app.currentChatId,
 				publicKey: pemPublicKey,
@@ -472,10 +471,6 @@ const Chat = () => {
 		const publicStringHandler = ({ pemPublicKeyString, pemPrivateKeyString }) => {
 			const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
 			const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
-
-			console.log('==========received==============');
-			console.log(pemPublicKeyString, pemPrivateKeyString);
-			console.log('==========received==============');
 
 			// Import PEM-formatted public key as CryptoKey
 			importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
