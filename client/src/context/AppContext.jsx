@@ -8,7 +8,7 @@ const initialState = {
 	settings: {
 		notificationsEnabled: true,
 		notificationVolume: 10,
-		theme: false
+		theme: false,
 	},
 	tmpSettings: null,
 	currentChatId: null,
@@ -97,12 +97,10 @@ export const AppProvider = ({ children }) => {
 	}
 
 	function updateOnlineStatus(onlineStatus) {
-		dispatch(
-			{
-				type: 'ONLINE_STATUS',
-				payload: { onlineStatus }
-			}
-		)
+		dispatch({
+			type: 'ONLINE_STATUS',
+			payload: { onlineStatus },
+		});
 	}
 
 	return (
@@ -116,7 +114,7 @@ export const AppProvider = ({ children }) => {
 				startSearch,
 				endSearch,
 				loadUserSettings,
-				updateOnlineStatus
+				updateOnlineStatus,
 			}}
 		>
 			{children}

@@ -1,6 +1,6 @@
-import React, { useEffect, useContext, useMemo } from 'react'
+import React, { useEffect, useContext, useMemo } from 'react';
 
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 
 import useIsTabActive from 'src/hooks/useIsTabActive';
 
@@ -9,11 +9,10 @@ import { useApp } from 'src/context/AppContext';
 import { useChat } from 'src/context/ChatContext';
 import { SocketContext } from 'src/context/Context';
 
-
 const MessageSeen = ({ isRead, isSender }) => {
 	const { app } = useApp();
 
-	const isTabVisible = useIsTabActive()
+	const isTabVisible = useIsTabActive();
 
 	const { messages: state, receiveMessage } = useChat();
 	const socket = useContext(SocketContext);
@@ -21,13 +20,11 @@ const MessageSeen = ({ isRead, isSender }) => {
 
 	const sortedMessages = useMemo(
 		() =>
-			Object.values(
-				state[app.currentChatId]?.messages ?? {})?.
-				sort((a, b) => {
-					const da = new Date(a.time),
-						db = new Date(b.time);
-					return da - db;
-				}),
+			Object.values(state[app.currentChatId]?.messages ?? {})?.sort((a, b) => {
+				const da = new Date(a.time),
+					db = new Date(b.time);
+				return da - db;
+			}),
 		[state, app.currentChatId]
 	);
 
@@ -38,18 +35,16 @@ const MessageSeen = ({ isRead, isSender }) => {
 				entries.forEach((entry) => {
 					if (entry.isIntersecting && !isSender) {
 						// Mark the message as read
-						const messageId = entry.target.getAttribute('id').split('-')[1]
+						const messageId = entry.target.getAttribute('id').split('-')[1];
 						try {
-							seenMessage(
-								{
-									messageId,
-									chatId: app.currentChatId
-								}
-							)
+							seenMessage({
+								messageId,
+								chatId: app.currentChatId,
+							});
 						} catch (e) {
-							return
+							return;
 						}
-						receiveMessage(messageId, app.currentChatId)
+						receiveMessage(messageId, app.currentChatId);
 					}
 				});
 			},
@@ -59,7 +54,7 @@ const MessageSeen = ({ isRead, isSender }) => {
 
 		sortedMessages.forEach((message) => {
 			if (message.isRead) {
-				return
+				return;
 			}
 
 			const messageElement = document.getElementById(`message-${message.id}`);
@@ -74,12 +69,12 @@ const MessageSeen = ({ isRead, isSender }) => {
 		};
 	}, [sortedMessages, isTabVisible]);
 
-	return isSender && <p className='text-sm'>{isRead ? 'Seen' : 'Not Seen'}</p>
-}
+	return isSender && <p className="text-sm">{isRead ? 'Seen' : 'Not Seen'}</p>;
+};
 
-export default MessageSeen
+export default MessageSeen;
 
 MessageSeen.propTypes = {
 	isRead: PropTypes.bool,
-	isSender: PropTypes.bool.isRequired
-}
+	isSender: PropTypes.bool.isRequired,
+};

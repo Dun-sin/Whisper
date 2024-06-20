@@ -67,12 +67,12 @@ const NavBar = () => {
 
 	return (
 		<div
-			className={
-				`${hideNavbar && 'hidden'} bg-secondary md:w-[120px] md:min-h-screen md:max-h-screen items-center md:flex-col flex-row justify-between shadow-[rgb(0,_0,_0)_12px_0px_18px_-18px] p-2 md:p-5 sticky bottom-0 md:flex max-h-[70px] h-[70px] min-h-[70px]`
-			}
+			className={`${
+				hideNavbar && 'hidden'
+			} bg-secondary md:w-[120px] md:min-h-screen md:max-h-screen items-center md:flex-col flex-row justify-between shadow-[rgb(0,_0,_0)_12px_0px_18px_-18px] p-2 md:p-5 sticky bottom-0 md:flex max-h-[70px] h-[70px] min-h-[70px]`}
 		>
-			<div className='hidden md:flex'>
-				<img src='favicon.ico' />
+			<div className="hidden md:flex">
+				<img src="favicon.ico" />
 			</div>
 			<div className="justify-between md:justify-center flex items-center md:flex-col flex-row w-full gap-2 flex-nowrap overflow-auto">
 				<Whisper
@@ -107,7 +107,7 @@ const NavBar = () => {
 				</Whisper>
 
 				{/* show only on mobile screen */}
-				<div className='flex w-full md:hidden h-full'>
+				<div className="flex w-full md:hidden h-full">
 					<Whisper
 						placement="auto"
 						controlId="control-id-hover"
@@ -120,7 +120,7 @@ const NavBar = () => {
 					</Whisper>
 				</div>
 
-				<div className='flex w-full md:hidden h-full'>
+				<div className="flex w-full md:hidden h-full">
 					<Whisper
 						placement="auto"
 						controlId="control-id-hover"
@@ -133,7 +133,7 @@ const NavBar = () => {
 					</Whisper>
 				</div>
 			</div>
-			<div className='hidden md:flex w-full flex-col gap-2'>
+			<div className="hidden md:flex w-full flex-col gap-2">
 				<Whisper
 					placement="auto"
 					controlId="control-id-hover"

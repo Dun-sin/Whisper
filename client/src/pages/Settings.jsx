@@ -43,7 +43,9 @@ const Searching = () => {
 	};
 
 	return (
-		<div className={`flex justify-center items-center flex-col min-w-[calc(100%-120px)] p-2 gap-5 bg-white dark:bg-primary min-h-full`}>
+		<div
+			className={`flex justify-center items-center flex-col min-w-[calc(100%-120px)] p-2 gap-5 bg-white dark:bg-primary min-h-full`}
+		>
 			<div className="w-11/12 sm:w-[70%] md:w-[55%] lg:w-[35%] md:min-w-[300px] h-auto dark:bg-primary bg-light rounded-3xl px-6 py-6 md:px-14 md:py-20 border shadow-xl text-primary  dark:text-light ">
 				<Form onSubmit={handleSubmit} onChange={handleChange}>
 					<Form.Group className="flex justify-between" controlId="app-theme">

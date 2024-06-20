@@ -16,16 +16,16 @@ import './index.css';
 const root = createRoot(document.getElementById('root'));
 
 root.render(
-		<AuthProvider>
-			<AppProvider>
-				<Router>
-					<SocketContext.Provider value={socket}>
-						<DialogProvider>
-							<App />
-							<Dialog />
-						</DialogProvider>
-					</SocketContext.Provider>
-				</Router>
-			</AppProvider>
+	<AuthProvider>
+		<AppProvider>
+			<Router>
+				<SocketContext.Provider value={socket}>
+					<DialogProvider>
+						<App />
+						<Dialog />
+					</DialogProvider>
+				</SocketContext.Provider>
+			</Router>
+		</AppProvider>
 	</AuthProvider>
 );

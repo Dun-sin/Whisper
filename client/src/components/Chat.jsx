@@ -1,22 +1,21 @@
 /* eslint-disable max-len */
 
-import { BsArrow90DegLeft, BsArrow90DegRight } from 'react-icons/bs'
+import { BsArrow90DegLeft, BsArrow90DegRight } from 'react-icons/bs';
 import {
 	NEW_EVENT_DELETE_MESSAGE,
 	NEW_EVENT_EDIT_MESSAGE,
-  NEW_EVENT_READ_MESSAGE,
+	NEW_EVENT_READ_MESSAGE,
 	NEW_EVENT_RECEIVE_MESSAGE,
-  NEW_EVENT_REQUEST_PUBLIC_KEY,
-  NEW_EVENT_SEND_FAILED,
-  NEW_EVENT_TYPING
+	NEW_EVENT_REQUEST_PUBLIC_KEY,
+	NEW_EVENT_SEND_FAILED,
+	NEW_EVENT_TYPING,
 } from '../../../constants.json';
-import chatHelper,
-{
+import chatHelper, {
 	adjustTextareaHeight,
-  arrayBufferToBase64,
+	arrayBufferToBase64,
 	convertArrayBufferToPem,
 	getTime,
-	pemToArrayBuffer
+	pemToArrayBuffer,
 } from '../lib/chatHelper';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -31,7 +30,7 @@ import ScrollToBottom from 'react-scroll-to-bottom';
 import { SocketContext } from 'context/Context';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 import decryptMessage from 'src/lib/decryptMessage';
-import en from 'bad-words-next/data/en.json'
+import en from 'bad-words-next/data/en.json';
 import { throttle } from 'lodash';
 import { useApp } from 'src/context/AppContext';
 import { useAuth } from 'src/context/AuthContext';
@@ -43,8 +42,6 @@ import { useNotification } from 'src/lib/notification';
 import { v4 as uuid } from 'uuid';
 
 // import decryptMessage from 'src/lib/decryptMessage';
-
-
 
 let senderId;
 
@@ -65,14 +62,23 @@ const Chat = () => {
 	const [importedPublicKey, setImportedPublicKey] = useState(null);
 	const [importedPrivateKey, setImportedPrivateKey] = useState(null);
 
-	const { messages: state, addMessage, updateMessage, removeMessage, receiveMessage, startReply, currentReplyMessageId, cancelReply } = useChat();
+	const {
+		messages: state,
+		addMessage,
+		updateMessage,
+		removeMessage,
+		receiveMessage,
+		startReply,
+		currentReplyMessageId,
+		cancelReply,
+	} = useChat();
 
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 	const socket = useContext(SocketContext);
 
 	const { sendMessage, editMessage } = useChatUtils(socket);
-	const { getMessage, handleResend, scrollToMessage } = chatHelper(state, app)
+	const { getMessage, handleResend, scrollToMessage } = chatHelper(state, app);
 
 	const inputRef = useRef('');
 
@@ -84,7 +90,7 @@ const Chat = () => {
 		typographer: true,
 	});
 
-	const badwords = new BadWordsNext({ data: en })
+	const badwords = new BadWordsNext({ data: en });
 
 	function logOut() {
 		dispatchAuth({
@@ -100,39 +106,37 @@ const Chat = () => {
 	};
 
 	const sortedMessages = useMemo(
-		 () =>
-			  Object.values(state[app.currentChatId]?.messages ?? {})?.sort((a, b) => {
+		() =>
+			Object.values(state[app.currentChatId]?.messages ?? {})?.sort((a, b) => {
 				const da = new Date(a.time),
 					db = new Date(b.time);
 				return da - db;
-			}) 
-		,
+			}),
 		[state, app.currentChatId]
-	);	
-	  
+	);
+
 	const doSend = async ({ senderId, room, message, time, containsBadword, replyTo = null }) => {
-		let encryptedMessage;
 		if (!cryptoKey) {
 			console.error('Encryption key not generated yet.');
 			return;
-		  }
-	  
-		if(!importedPublicKey) {
-			throw Error('Public Key not Generated')
 		}
-		  // Encoding and encryting the message to be sent.
-		  const encoder = new TextEncoder();
-		  const encryptedMessagersa = await crypto.subtle.encrypt(
+
+		if (!importedPublicKey) {
+			throw Error('Public Key not Generated');
+		}
+		// Encoding and encryting the message to be sent.
+		const encoder = new TextEncoder();
+		const encryptedMessagersa = await crypto.subtle.encrypt(
 			{
-			  name: 'RSA-OAEP'
+				name: 'RSA-OAEP',
 			},
 			importedPublicKey,
 			encoder.encode(message)
-		  );
-	    
-		  // Convert the Uint8Array to Base64 string
-		  encryptedMessage = arrayBufferToBase64(new Uint8Array(encryptedMessagersa));
-		
+		);
+
+		// Convert the Uint8Array to Base64 string
+		const encryptedMessage = arrayBufferToBase64(new Uint8Array(encryptedMessagersa));
+
 		try {
 			const sentMessage = await sendMessage({
 				senderId,
@@ -140,7 +144,7 @@ const Chat = () => {
 				time,
 				chatId: room,
 				containsBadword,
-				replyTo
+				replyTo,
 			});
 			addMessage({
 				senderId,
@@ -150,7 +154,7 @@ const Chat = () => {
 				time,
 				status: 'pending',
 				containsBadword,
-				replyTo
+				replyTo,
 			});
 
 			try {
@@ -169,7 +173,7 @@ const Chat = () => {
 					time,
 					status: 'failed',
 					containsBadword,
-					replyTo
+					replyTo,
 				});
 			} catch {
 				logOut();
@@ -195,7 +199,7 @@ const Chat = () => {
 
 		if (editing.isediting === true) {
 			try {
-				const messageObject = getMessage(editing.messageID, state, app)
+				const messageObject = getMessage(editing.messageID, state, app);
 				const oldMessage = messageObject.message;
 				const editedMessage = await editMessage({
 					id: editing.messageID,
@@ -217,7 +221,7 @@ const Chat = () => {
 				message,
 				time: d.getTime(),
 				containsBadword: badwords.check(message),
-				replyTo: currentReplyMessageId
+				replyTo: currentReplyMessageId,
 			});
 		}
 
@@ -226,7 +230,7 @@ const Chat = () => {
 			setMessage('');
 			inputRef.current.focus();
 		}
-		cancelReply()
+		cancelReply();
 	};
 
 	const handleTypingStatus = throttle((e) => {
@@ -246,7 +250,6 @@ const Chat = () => {
 			setOpenPreviousMessages(messageId);
 		}
 	};
-
 
 	const hideBadword = (id) => {
 		setBadwordChoices({ ...badwordChoices, [id]: 'hide' });
@@ -276,92 +279,88 @@ const Chat = () => {
 	// get the last message sent
 	const getLastMessage = sortedMessages.at(-1);
 
-	const amITheSender = getLastMessage && getLastMessage.senderId === senderId
+	const amITheSender = getLastMessage && getLastMessage.senderId === senderId;
 
 	// pass it to the hook
-	useInactiveChat(getLastMessage, amITheSender)
-
+	useInactiveChat(getLastMessage, amITheSender);
 
 	useEffect(() => {
-		inputRef.current.focus()
-	}, [currentReplyMessageId])
+		inputRef.current.focus();
+	}, [currentReplyMessageId]);
 
 	const importKey = async (publicArrayBuffer, privateArrayBuffer) => {
 		const storedPublicKey = localStorage.getItem('importPublicKey' + app.currentChatId);
-		const storedPrivateKey = localStorage.getItem('importedPrivateKey'+ app.currentChatId);
+		const storedPrivateKey = localStorage.getItem('importedPrivateKey' + app.currentChatId);
 		const importedPublicKey = await crypto.subtle.importKey(
 			'spki',
 			publicArrayBuffer,
 			{
 				name: 'RSA-OAEP',
-				hash: { name: 'SHA-256' }
+				hash: { name: 'SHA-256' },
 			},
 			true,
 			['encrypt']
-			)
+		);
 
-				setImportedPublicKey(importedPublicKey);
-				if(!storedPublicKey){
-				const exportedPublicKey = await crypto.subtle.exportKey(
-					'spki',
-					importedPublicKey
-				  );
-				  const publicKeyArray = new Uint8Array(exportedPublicKey);
-				  localStorage.setItem("importPublicKey" + app.currentChatId , JSON.stringify(Array.from(publicKeyArray)));
-				}
-			    const importedPrivateKey = await crypto.subtle.importKey(
-					'pkcs8',
-					privateArrayBuffer,
-					{
-						name: 'RSA-OAEP',
-						hash: { name: 'SHA-256' }
-					},
-					true,
-					['decrypt']
-					)
-						setImportedPrivateKey(importedPrivateKey);
-						if(!storedPrivateKey){
-							const exportedPrivateKey = await crypto.subtle.exportKey(
-								'pkcs8',
-								importedPrivateKey
-							);
-							const privateKeyArray = new Uint8Array(exportedPrivateKey);
-							  localStorage.setItem("importedPrivateKey" + app.currentChatId , JSON.stringify(Array.from(privateKeyArray)));
-						}
-			
-			
-	}
-	  
+		setImportedPublicKey(importedPublicKey);
+		if (!storedPublicKey) {
+			const exportedPublicKey = await crypto.subtle.exportKey('spki', importedPublicKey);
+			const publicKeyArray = new Uint8Array(exportedPublicKey);
+			localStorage.setItem(
+				'importPublicKey' + app.currentChatId,
+				JSON.stringify(Array.from(publicKeyArray))
+			);
+		}
+		const importedPrivateKey = await crypto.subtle.importKey(
+			'pkcs8',
+			privateArrayBuffer,
+			{
+				name: 'RSA-OAEP',
+				hash: { name: 'SHA-256' },
+			},
+			true,
+			['decrypt']
+		);
+		setImportedPrivateKey(importedPrivateKey);
+		if (!storedPrivateKey) {
+			const exportedPrivateKey = await crypto.subtle.exportKey('pkcs8', importedPrivateKey);
+			const privateKeyArray = new Uint8Array(exportedPrivateKey);
+			localStorage.setItem(
+				'importedPrivateKey' + app.currentChatId,
+				JSON.stringify(Array.from(privateKeyArray))
+			);
+		}
+	};
+
 	const generateKeyPair = async () => {
 		// Check to see if keys are already stored in local storage
 		const storedCryptoKey = localStorage.getItem('cryptoKey' + app.currentChatId);
 		const storedPublicKey = localStorage.getItem('importPublicKey' + app.currentChatId);
 		const storedPrivateKey = localStorage.getItem('importedPrivateKey' + app.currentChatId);
-		let pemPublicKey;
 		let pemPrivateKey;
-	
+
 		// Generate public and private key pair
 		const keyPair = await crypto.subtle.generateKey(
 			{
 				name: 'RSA-OAEP',
 				modulusLength: 2048,
 				publicExponent: new Uint8Array([1, 0, 1]),
-				hash: 'SHA-256'
+				hash: 'SHA-256',
 			},
 			true,
 			['encrypt', 'decrypt']
 		);
-	
+
 		if (storedCryptoKey) {
 			const privateKeyArray = new Uint8Array(JSON.parse(storedCryptoKey));
-	
+
 			// Import key or convert it from Uint8Array to CryptoKey
 			const importedPrivateKey = await crypto.subtle.importKey(
 				'pkcs8',
 				privateKeyArray.buffer,
 				{
 					name: 'RSA-OAEP',
-					hash: { name: 'SHA-256' }
+					hash: { name: 'SHA-256' },
 				},
 				true,
 				['decrypt']
@@ -369,130 +368,135 @@ const Chat = () => {
 			setCryptoKey(importedPrivateKey);
 		} else {
 			setCryptoKey(keyPair.privateKey);
-	
+
 			// Export the private key
 			const exportedPrivateKey = await crypto.subtle.exportKey('pkcs8', keyPair.privateKey);
 			const privateKeyArray = new Uint8Array(exportedPrivateKey);
 			pemPrivateKey = convertArrayBufferToPem(exportedPrivateKey, 'PRIVATE KEY');
-	
+
 			// Store the private key in local storage
-			localStorage.setItem('cryptoKey' + app.currentChatId, JSON.stringify(Array.from(privateKeyArray)));
+			localStorage.setItem(
+				'cryptoKey' + app.currentChatId,
+				JSON.stringify(Array.from(privateKeyArray))
+			);
 		}
-	
+
 		const exportedPublicKey = await crypto.subtle.exportKey('spki', keyPair.publicKey);
-		pemPublicKey = convertArrayBufferToPem(exportedPublicKey, 'PUBLIC KEY');
-	
+		const pemPublicKey = convertArrayBufferToPem(exportedPublicKey, 'PUBLIC KEY');
+
 		if (storedPublicKey && storedPrivateKey) {
 			const publicKeyArray = new Uint8Array(JSON.parse(storedPublicKey));
 			const privateKeyArray = new Uint8Array(JSON.parse(storedPrivateKey));
 			importKey(publicKeyArray, privateKeyArray);
 		} else {
-			console.log('sending', pemPublicKey)
+			console.log('sending', pemPublicKey);
 			socket.emit(NEW_EVENT_REQUEST_PUBLIC_KEY, {
 				chatId: app.currentChatId,
 				publicKey: pemPublicKey,
-				privateKey: pemPrivateKey
+				privateKey: pemPrivateKey,
 			});
 		}
 	};
-	
+
 	useEffect(() => {
 		// This function is used to decrypt all messages from sorted messages array depending upon if
 		// its sender's message or receiver's message it uses current importedPrivateKey or current private key respectively
 		const fetchData = async () => {
-		  const decryptedPromises = sortedMessages.map(async ({ message, senderId: sender, ...rest }) => {
-			if (sender.toString() === senderId.toString()) {
-				const decryptedMessage = await decryptMessage(message, importedPrivateKey);
-				return {
-				  ...rest,
-				  senderId: senderId,
-				  message: decryptedMessage
-				};
-			  }
-	  
-			  try {
-				const finalMessage = await decryptMessage(message, cryptoKey);
-				return {
-				  ...rest,
-				  senderId: sender,
-				  message: finalMessage || message // Use the decrypted message, or fallback to the original message
-				};
-			  } catch (error) {
-				// Handle decryption errors if necessary
-				console.error('Decryption error:', error);
-				return {
-				  ...rest,
-				  senderId: sender,
-				  message: message // Use the original message in case of decryption error
-				};
-			  }
-		  });
-	
-		  const decryptedMessages = await Promise.all(decryptedPromises);
-		  setDecryptedMessages(decryptedMessages);
-		};
-	
-		fetchData();
-	  }, [sortedMessages, cryptoKey]);
+			const decryptedPromises = sortedMessages.map(
+				async ({ message, senderId: sender, ...rest }) => {
+					if (sender.toString() === senderId.toString()) {
+						const decryptedMessage = await decryptMessage(message, importedPrivateKey);
+						return {
+							...rest,
+							senderId: senderId,
+							message: decryptedMessage,
+						};
+					}
 
-		useEffect(() => {
-			setTimeout(() => {
-				generateKeyPair()
-			}, 3000);
-			const newMessageHandler = async (message) => {
-				try {
-					const decryptedMessage = await decryptMessage(message.message, cryptoKey);
-					addMessage(message);
-					playNotification('newMessage');
-					createBrowserNotification('You received a new message on Whisper', decryptedMessage);
-				} catch {
-					throw new Error(`Could not decrypt message`)
+					try {
+						const finalMessage = await decryptMessage(message, cryptoKey);
+						return {
+							...rest,
+							senderId: sender,
+							message: finalMessage || message, // Use the decrypted message, or fallback to the original message
+						};
+					} catch (error) {
+						// Handle decryption errors if necessary
+						console.error('Decryption error:', error);
+						return {
+							...rest,
+							senderId: sender,
+							message: message, // Use the original message in case of decryption error
+						};
+					}
 				}
-			};
-			const deleteMessageHandler = ({ id, chatId }) => {
-				removeMessage(id, chatId);
-			};
-	
-			const editMessageHandler = (messageEdited) => {
-				updateMessage({ ...messageEdited, room: app.currentChatId }, true);
-			};
-			
-			const limitMessageHandler = (data) => {
-				alert(data.message);
-			};
-	
-			const readMessageHandler = ({ messageId, chatId }) => {
-				receiveMessage(messageId, chatId)
-			}
-	
-			const publicStringHandler = ({pemPublicKeyString, pemPrivateKeyString}) => {
-				const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
-				const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
-	
-				console.log("==========received==============")
-				console.log(pemPublicKeyString, pemPrivateKeyString)
-				console.log("==========received==============")
+			);
 
-				// Import PEM-formatted public key as CryptoKey
-				importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
-			}
+			const decryptedMessages = await Promise.all(decryptedPromises);
+			setDecryptedMessages(decryptedMessages);
+		};
 
-			socket.on('publicKey', publicStringHandler); 
-			socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);	
-			socket.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-			socket.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
-			socket.on(NEW_EVENT_READ_MESSAGE, readMessageHandler)
-			socket.on(NEW_EVENT_SEND_FAILED, limitMessageHandler);
-	
-			return () => {
-				socket.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
-				socket.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-				socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
-				socket.off(NEW_EVENT_READ_MESSAGE, readMessageHandler)
-				socket.off(NEW_EVENT_SEND_FAILED, limitMessageHandler);
-				socket.off('publicKey', publicStringHandler);
-			};
-		}, []);
+		fetchData();
+	}, [sortedMessages, cryptoKey]);
+
+	useEffect(() => {
+		setTimeout(() => {
+			generateKeyPair();
+		}, 3000);
+		const newMessageHandler = async (message) => {
+			try {
+				const decryptedMessage = await decryptMessage(message.message, cryptoKey);
+				addMessage(message);
+				playNotification('newMessage');
+				createBrowserNotification('You received a new message on Whisper', decryptedMessage);
+			} catch {
+				throw new Error(`Could not decrypt message`);
+			}
+		};
+		const deleteMessageHandler = ({ id, chatId }) => {
+			removeMessage(id, chatId);
+		};
+
+		const editMessageHandler = (messageEdited) => {
+			updateMessage({ ...messageEdited, room: app.currentChatId }, true);
+		};
+
+		const limitMessageHandler = (data) => {
+			alert(data.message);
+		};
+
+		const readMessageHandler = ({ messageId, chatId }) => {
+			receiveMessage(messageId, chatId);
+		};
+
+		const publicStringHandler = ({ pemPublicKeyString, pemPrivateKeyString }) => {
+			const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
+			const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
+
+			console.log('==========received==============');
+			console.log(pemPublicKeyString, pemPrivateKeyString);
+			console.log('==========received==============');
+
+			// Import PEM-formatted public key as CryptoKey
+			importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
+		};
+
+		socket.on('publicKey', publicStringHandler);
+		socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+		socket.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+		socket.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+		socket.on(NEW_EVENT_READ_MESSAGE, readMessageHandler);
+		socket.on(NEW_EVENT_SEND_FAILED, limitMessageHandler);
+
+		return () => {
+			socket.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
+			socket.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
+			socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
+			socket.off(NEW_EVENT_READ_MESSAGE, readMessageHandler);
+			socket.off(NEW_EVENT_SEND_FAILED, limitMessageHandler);
+			socket.off('publicKey', publicStringHandler);
+		};
+	}, []);
 
 	return (
 		<div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6">
@@ -505,145 +509,186 @@ const Chat = () => {
 					initialScrollBehavior="auto"
 					className="h-[100%] md:max-h-full overflow-y-auto w-full scroll-smooth"
 				>
-					{decryptedMessages && decryptedMessages.map(
-            ({ senderId: sender, id, message, time, status, isEdited, oldMessages, containsBadword, isRead, replyTo, }) => {
-							const isSender = sender.toString() === senderId.toString();	
-							// original message this message is a reply to
-							const repliedMessage = replyTo ? (() => {
-								const messageObj = getMessage(replyTo)
-								if (!messageObj) {
-									return null
-								}
+					{decryptedMessages &&
+						decryptedMessages.map(
+							({
+								senderId: sender,
+								id,
+								message,
+								time,
+								status,
+								isEdited,
+								oldMessages,
+								containsBadword,
+								isRead,
+								replyTo,
+							}) => {
+								const isSender = sender.toString() === senderId.toString();
+								// original message this message is a reply to
+								const repliedMessage = replyTo
+									? (() => {
+											const messageObj = getMessage(replyTo);
+											if (!messageObj) {
+												return null;
+											}
 
-								return {
-									...messageObj,
-								}
-							})() : null
+											return {
+												...messageObj,
+											};
+									  })()
+									: null;
 
-							// is this message currently being replied? 
-							const hasActiveReply = currentReplyMessageId === id
+								// is this message currently being replied?
+								const hasActiveReply = currentReplyMessageId === id;
 
-							return (
-								<div key={id} id={`message-${id}`} className={`
+								return (
+									<div
+										key={id}
+										id={`message-${id}`}
+										className={`
 								flex flex-col gap-2 py-2 duration-500 transition-all
 									${hasActiveReply ? 'bg-[#FF9F1C]/25 border-[#FF9F1C]' : ''},
-									${hasActiveReply ? (isSender ? 'border-r-[3.5px]' : 'border-l-[3.5px]') : ''}`}>
-								{replyTo && (
-									<div
-										className={`
+									${hasActiveReply ? (isSender ? 'border-r-[3.5px]' : 'border-l-[3.5px]') : ''}`}
+									>
+										{replyTo && (
+											<div
+												className={`
 										max-w-[80%] md:max-w-[50%] min-w-[10px] flex gap-2 items-center
 											${sender.toString() === senderId.toString() ? 'self-end' : ''}
 											${repliedMessage ? 'cursor-pointer' : ''}
 										`}
-										onClick={() => scrollToMessage(replyTo)}
-									>
-										<div className="truncate border-b-4 border-[#FF9F1C] p-1">
-											{repliedMessage ? (
-												typeof repliedMessage.message === 'string' ? (
-													<div
-														className="message-reply-container flex flex-nowrap items-center gap-2"
-														dangerouslySetInnerHTML={{ __html: md.render(repliedMessage.message) }}
-													/>
-												) : (
-													repliedMessage.message
-												)
-											) : (
-												<p className="text-gray-400 uppercase text-sm italic">
-													Original Message Deleted
-												</p>
-											)}
-										</div>
+												onClick={() => scrollToMessage(replyTo)}
+											>
+												<div className="truncate border-b-4 border-[#FF9F1C] p-1">
+													{repliedMessage ? (
+														typeof repliedMessage.message === 'string' ? (
+															<div
+																className="message-reply-container flex flex-nowrap items-center gap-2"
+																dangerouslySetInnerHTML={{
+																	__html: md.render(repliedMessage.message),
+																}}
+															/>
+														) : (
+															repliedMessage.message
+														)
+													) : (
+														<p className="text-gray-400 uppercase text-sm italic">
+															Original Message Deleted
+														</p>
+													)}
+												</div>
+												<div
+													className={sender.toString() !== senderId.toString() ? 'order-first' : ''}
+												>
+													{sender.toString() === senderId.toString() ? (
+														<BsArrow90DegLeft className="fill-white text-2xl" />
+													) : (
+														<BsArrow90DegRight className="fill-white text-2xl" />
+													)}
+												</div>
+											</div>
+										)}
 										<div
-											className={
-												sender.toString() !== senderId.toString() ? 'order-first' : ''}
-										>
-											{sender.toString() === senderId.toString() ? (
-												<BsArrow90DegLeft className="fill-white text-2xl" />
-											) : (
-												<BsArrow90DegRight className="fill-white text-2xl" />
-											)}
-										</div>
-									</div>
-								)}
-									<div
-										className={`w-full flex text-white relative mb-2 ${
-											isSender ? 'justify-end' : 'justify-start'
-										}`}
-									>
-										<div
-											className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${
-												isSender ? 'items-end' : 'items-start'
+											className={`w-full flex text-white relative mb-2 ${
+												isSender ? 'justify-end' : 'justify-start'
 											}`}
 										>
-											{containsBadword && !isSender && !badwordChoices[id] ? (
-												<div className='flex flex-col border-red border w-full rounded-r-md p-3'>
-													<p>Your buddy is trying to send you a bad word</p>
-													<div className='flex w-full gap-6'>
-														<span onClick={() => showBadword(id)} className='text-sm cursor-pointer'>See</span>
-														<span onClick={() => hideBadword(id)} className='text-red text-sm cursor-pointer'>Hide</span>
+											<div
+												className={`flex flex-col mb-[2px] min-w-[10px] mdl:max-w-[80%] max-w-[50%] ${
+													isSender ? 'items-end' : 'items-start'
+												}`}
+											>
+												{containsBadword && !isSender && !badwordChoices[id] ? (
+													<div className="flex flex-col border-red border w-full rounded-r-md p-3">
+														<p>Your buddy is trying to send you a bad word</p>
+														<div className="flex w-full gap-6">
+															<span
+																onClick={() => showBadword(id)}
+																className="text-sm cursor-pointer"
+															>
+																See
+															</span>
+															<span
+																onClick={() => hideBadword(id)}
+																className="text-red text-sm cursor-pointer"
+															>
+																Hide
+															</span>
+														</div>
 													</div>
-												</div>
-											)
-												:
-												<>
-													<div
-														className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${isSender
-															? 'justify-between bg-secondary rounded-l-md'
-															: 'rounded-r-md'
-															}`}
-													>
-														{typeof message === 'string' ? (
-															<span dangerouslySetInnerHTML={{
-																__html: md.render(
-																	badwordChoices[id] === 'hide' ? badwords.filter(message) : badwordChoices[id] === 'show' ? message : message)
-															}} />
-														) : (
-															badwordChoices[id] === 'hide' ? badwords.filter(message) : badwordChoices[id] === 'show' ? message : message
-														)}
-
-														<DropDownOptions
-															isSender={
-																isSender
-																&& status !== 'pending'}
-															id={id}
-															inputRef={inputRef}
-															cancelEdit={cancelEdit}
-															setEditing={setEditing}
-															setReplyId={startReply}
-														/>
-													</div>
-													<div
-														className={`flex gap-2 items-center ${isSender ? 'flex-row' : 'flex-row-reverse'
-															}`}
-													>
+												) : (
+													<>
 														<div
-															className={`text-[12px] ${status === 'failed' ? 'text-red-600' : 'text-white'
-																}`}
+															className={`chat bg-red p-3 break-all will-change-auto flex gap-6 items-center text ${
+																isSender
+																	? 'justify-between bg-secondary rounded-l-md'
+																	: 'rounded-r-md'
+															}`}
 														>
-															<MessageStatus
-																time={getTime(time)}
-																status={status ?? 'sent'}
-																iAmTheSender={isSender}
-																onResend={() => handleResend(id, doSend, state, app)}
+															{typeof message === 'string' ? (
+																<span
+																	dangerouslySetInnerHTML={{
+																		__html: md.render(
+																			badwordChoices[id] === 'hide'
+																				? badwords.filter(message)
+																				: badwordChoices[id] === 'show'
+																				? message
+																				: message
+																		),
+																	}}
+																/>
+															) : badwordChoices[id] === 'hide' ? (
+																badwords.filter(message)
+															) : badwordChoices[id] === 'show' ? (
+																message
+															) : (
+																message
+															)}
+
+															<DropDownOptions
+																isSender={isSender && status !== 'pending'}
+																id={id}
+																inputRef={inputRef}
+																cancelEdit={cancelEdit}
+																setEditing={setEditing}
+																setReplyId={startReply}
 															/>
 														</div>
-														<PreviousMessages
-															id={id}
-															isSender={isSender}
-															isEdited={isEdited}
-															openPreviousEdit={openPreviousEdit}
-															openPreviousMessages={openPreviousMessages}
-															oldMessages={oldMessages}
-														/>
-													</div>
-													<MessageSeen isRead={isRead} isSender={isSender} />
-												</>}
+														<div
+															className={`flex gap-2 items-center ${
+																isSender ? 'flex-row' : 'flex-row-reverse'
+															}`}
+														>
+															<div
+																className={`text-[12px] ${
+																	status === 'failed' ? 'text-red-600' : 'text-white'
+																}`}
+															>
+																<MessageStatus
+																	time={getTime(time)}
+																	status={status ?? 'sent'}
+																	iAmTheSender={isSender}
+																	onResend={() => handleResend(id, doSend, state, app)}
+																/>
+															</div>
+															<PreviousMessages
+																id={id}
+																isSender={isSender}
+																isEdited={isEdited}
+																openPreviousEdit={openPreviousEdit}
+																openPreviousMessages={openPreviousMessages}
+																oldMessages={oldMessages}
+															/>
+														</div>
+														<MessageSeen isRead={isRead} isSender={isSender} />
+													</>
+												)}
+											</div>
 										</div>
 									</div>
-									</div>
-							);
-						}
-					)}
+								);
+							}
+						)}
 				</ScrollToBottom>
 			</div>
 

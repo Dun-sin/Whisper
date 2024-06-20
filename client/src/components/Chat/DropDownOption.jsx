@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext } from 'react';
 
 import PropTypes from 'prop-types';
 import Dropdown from 'rsuite/Dropdown';
@@ -13,28 +13,13 @@ import { SocketContext } from 'context/Context';
 
 import useChatUtils from 'src/lib/chatSocket';
 
-const DropDownOptions = ({
-	id,
-	isSender,
-	inputRef,
-	cancelEdit,
-	setEditing,
-	setReplyId
-}) => {
+const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setReplyId }) => {
 	const { app } = useApp();
 	const socket = useContext(SocketContext);
 
-	const {
-		messages: state,
-		updateMessage,
-		removeMessage
-	} = useChat();
-	const {
-		getMessage,
-		messageExists,
-		handleCopyToClipBoard
-	} = chatHelper(state, app)
-	const { deleteMessage } = useChatUtils(socket)
+	const { messages: state, updateMessage, removeMessage } = useChat();
+	const { getMessage, messageExists, handleCopyToClipBoard } = chatHelper(state, app);
+	const { deleteMessage } = useChatUtils(socket);
 
 	const handleEdit = (id) => {
 		inputRef.current.focus();
@@ -72,7 +57,7 @@ const DropDownOptions = ({
 				chatId: messageObject.room,
 			});
 
-			console.log(messageDeleted)
+			console.log(messageDeleted);
 			if (!messageDeleted) {
 				updateMessage(id, messageObject);
 				return;
@@ -80,7 +65,7 @@ const DropDownOptions = ({
 
 			removeMessage(id, messageObject.room);
 		} catch (e) {
-			console.log(e)
+			console.log(e);
 			updateMessage(id, messageObject);
 		}
 	};
@@ -94,49 +79,42 @@ const DropDownOptions = ({
 	};
 
 	if (isSender) {
-		return <Dropdown
-			placement="leftStart"
-			style={{
-				zIndex: 'auto',
-			}}
-			renderToggle={renderIconButton}
-			NoCaret
-		>
-			<Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>
+		return (
+			<Dropdown
+				placement="leftStart"
+				style={{
+					zIndex: 'auto',
+				}}
+				renderToggle={renderIconButton}
+				NoCaret
+			>
+				<Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>
 
-			<Dropdown.Item
-				onClick={() => handleCopyToClipBoard(id, state, app)}>
-				Copy
-			</Dropdown.Item>
-			<Dropdown.Item onClick={() => setReplyId(id)}>
-				Reply
-			</Dropdown.Item>
-			<Dropdown.Item
-				onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
-		</Dropdown>
+				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, state, app)}>Copy</Dropdown.Item>
+				<Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
+				<Dropdown.Item onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
+			</Dropdown>
+		);
 	} else if (!isSender) {
-		return <Dropdown
-			placement="rightStart"
-			style={{
-				zIndex: 'auto',
-			}}
-			renderToggle={renderIconButtonReceiver}
-			NoCaret
-		>
-			<Dropdown.Item
-				onClick={() => handleCopyToClipBoard(id, state, app)}>
-				Copy
-			</Dropdown.Item>
-			<Dropdown.Item onClick={() => setReplyId(id)}>
-				Reply
-			</Dropdown.Item>
-		</Dropdown>
+		return (
+			<Dropdown
+				placement="rightStart"
+				style={{
+					zIndex: 'auto',
+				}}
+				renderToggle={renderIconButtonReceiver}
+				NoCaret
+			>
+				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, state, app)}>Copy</Dropdown.Item>
+				<Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
+			</Dropdown>
+		);
 	} else {
-		return null
+		return null;
 	}
-}
+};
 
-export default DropDownOptions
+export default DropDownOptions;
 
 DropDownOptions.propTypes = {
 	id: PropTypes.string.isRequired,
@@ -144,5 +122,5 @@ DropDownOptions.propTypes = {
 	isSender: PropTypes.bool.isRequired,
 	cancelEdit: PropTypes.func.isRequired,
 	setEditing: PropTypes.func.isRequired,
-	setReplyId: PropTypes.func.isRequired
+	setReplyId: PropTypes.func.isRequired,
 };
