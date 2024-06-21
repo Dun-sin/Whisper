@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
@@ -17,7 +17,7 @@ import { Icon } from '@rsuite/icons';
 import { BiArrowBack, BiDotsVerticalRounded } from 'react-icons/bi';
 
 // Store
-import { SocketContext } from 'src/context/Context';
+import { socket } from 'src/lib/socketConnection';
 import { useChat } from 'src/context/ChatContext';
 import { useApp } from 'src/context/AppContext';
 import { useDialog } from 'src/context/DialogContext';
@@ -31,7 +31,10 @@ import useCheckTimePassed from 'src/hooks/useCheckTimePassed';
 
 const centerItems = `flex items-center justify-center`;
 
-const Anonymous = ({ onChatClosed }) => {
+const Anonymous = ({ 
+	onChatClosed,  
+	
+}) => {
 	const { app, endSearch } = useApp();
 	const { currentChatId, onlineStatus } = app;
 	const { clearTimer } = useCheckTimePassed();
@@ -51,7 +54,6 @@ const Anonymous = ({ onChatClosed }) => {
 	const typingStatusTimeoutRef = useRef(null);
 
 	const navigate = useNavigate();
-	const socket = useContext(SocketContext);
 	const { closeChat } = useChat();
 	const { setDialog } = useDialog();
 
@@ -284,7 +286,9 @@ const Anonymous = ({ onChatClosed }) => {
 					'flex-auto',
 				])}
 			>
-				<Chat />
+				<Chat 
+					
+				/>
 			</div>
 		</div>
 	);

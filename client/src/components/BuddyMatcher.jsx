@@ -1,7 +1,7 @@
-import { useState, useContext, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ThreeDots } from 'react-loading-icons';
 import { PiPlugsLight } from 'react-icons/pi';
-import { SocketContext } from 'context/Context';
+import { socket } from 'src/lib/socketConnection';
 
 import Anonymous from 'components/Anonymous';
 import { useAuth } from 'src/context/AuthContext';
@@ -11,6 +11,7 @@ import { useNotification } from 'src/lib/notification';
 import { useApp } from 'src/context/AppContext';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 import { isExplicitDisconnection } from 'src/lib/utils';
+
 import {
 	NEW_EVENT_ADDING,
 	NEW_EVENT_CHAT_RESTORE,
@@ -34,11 +35,10 @@ const BuddyMatcher = () => {
 	const reconnectAttempts = useRef(0);
 
 	const [isStoppingSearch, setIsStoppingSearch] = useState(false);
-	const socket = useContext(SocketContext);
 
 	const userID = authState.loginId;
 	const defaultLoadingText = <p>Looking for a random buddy</p>;
-	const [loadingText, setLoadingText] = useState(defaultLoadingText);
+	const [loadingText, setLoadingText] = useState(defaultLoadingText);	
 	let timeout = null;
 
 	const startNewSearch = () => {
@@ -68,6 +68,7 @@ const BuddyMatcher = () => {
 		setLoadingText(defaultLoadingText);
 		socket.connect();
 	}
+	
 
 	useEffect(() => {
 		setLoadingText(isStoppingSearch ? stoppingSearchLoadingText : defaultLoadingText);
@@ -250,7 +251,9 @@ const BuddyMatcher = () => {
 			</div>
 		</div>
 	) : (
-		<Anonymous onChatClosed={startNewSearch} />
+		<Anonymous 
+			onChatClosed={startNewSearch}  
+		/>
 	);
 };
 

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 import Dropdown from 'rsuite/Dropdown';
@@ -9,13 +9,12 @@ import chatHelper from 'src/lib/chatHelper';
 
 import { useChat } from 'src/context/ChatContext';
 import { useApp } from 'src/context/AppContext';
-import { SocketContext } from 'context/Context';
+import { socket } from 'src/lib/socketConnection';
 
 import useChatUtils from 'src/lib/chatSocket';
 
 const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setReplyId }) => {
 	const { app } = useApp();
-	const socket = useContext(SocketContext);
 
 	const { messages: state, updateMessage, removeMessage } = useChat();
 	const { getMessage, messageExists, handleCopyToClipBoard } = chatHelper(state, app);

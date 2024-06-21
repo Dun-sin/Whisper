@@ -70,7 +70,7 @@ io.on('connection', (socket) => {
   CloseChatHandler(socket);
   stopSearch(socket);
   onlineStatus(socket);
-  requestPublicKeyHandler(socket);
+  requestPublicKeyHandler(io,socket);
 });
 
 server.listen(HTTP_PORT, async () => {
