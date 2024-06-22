@@ -56,6 +56,10 @@ app.use(UserRouter);
 
 // triggers when a user is connected to a socket
 io.on('connection', (socket) => {
+  const chatId = socket.handshake.query.chatId;
+  if(chatId){
+    socket.join(chatId)
+  }  
   /**
    * This event is emitted once the user clicks on the Start button or
    * navigates to the /founduser route

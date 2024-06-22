@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ThreeDots } from 'react-loading-icons';
 import { PiPlugsLight } from 'react-icons/pi';
-import { socket } from 'src/lib/socketConnection';
+import { connectWithId, socket } from 'src/lib/socketConnection';
 
 import Anonymous from 'components/Anonymous';
 import { useAuth } from 'src/context/AuthContext';
@@ -41,21 +41,40 @@ const BuddyMatcher = () => {
 	const [loadingText, setLoadingText] = useState(defaultLoadingText);	
 	let timeout = null;
 
-	const startNewSearch = () => {
-		startSearch();
-		setLoadingText(defaultLoadingText);
+	function disconnect() {
+		reconnectAttempts.current = 0;
+		if (app.currentChatId) {
+			return;
+		}
 
+		socket.disconnect();
+		setDisconnected(true);
+		endSearch();
+	}
+
+	const emitJoin = useCallback(() => {
 		socket.volatile.emit(NEW_EVENT_JOIN, {
 			loginId: authState.loginId,
 			email: authState.email,
-		});
-	};
+		})
+	}, [])
 
-	const handleStopSearch = () => {
+	const emitStopSearch = useCallback(() => {
 		socket.emit(NEW_EVENT_STOP_SEARCH, {
 			loginId: authState.loginId,
 			email: authState.email,
 		});
+	}, [])
+
+	const startNewSearch = () => {
+		startSearch();
+		setLoadingText(defaultLoadingText);
+
+		emitJoin()
+	};
+
+	const handleStopSearch = () => {
+		emitStopSearch()
 		setIsStoppingSearch(true);
 	};
 
@@ -66,13 +85,92 @@ const BuddyMatcher = () => {
 
 		startSearch();
 		setLoadingText(defaultLoadingText);
-		socket.connect();
+		connectWithId(app.currentChatId)
 	}
 	
+	const onUserJoined = useCallback(({ roomId, userIds }) => {
+		playNotification('buddyPaired');
+		createBrowserNotification(
+			"Let's Chat :)",
+			"You've found a match, don't keep your Partner waiting ⌛"
+		);
+		createChat(roomId, userIds);
+		endSearch(roomId);
+	}, [])
 
+	const onRestoreChat = useCallback(({ chats, currentChatId }) => {
+		Object.values(chats).forEach((chat) => {
+			createChat(chat.id, chat.userIds, chat.messages, chat.createdAt);
+		});
+		endSearch(currentChatId);
+	}, [])
+
+	const onStopSearch = useCallback( () => {
+		setIsStoppingSearch(false);
+		endSearch();
+		navigate('/');
+	}, [])
+
+	const onConnect = useCallback(() => {
+		// Here server will be informed that user is searching for
+		// another user
+		socket.emit(NEW_EVENT_JOIN, {
+			loginId: authState.loginId,
+			email: authState.email,
+		});
+		setDisconnected(false);
+	}, [])
+
+	const onClose = useCallback((chatId) => {
+		endSearch();
+		closeChat(chatId);
+		playNotification('chatClosed');
+
+		if (!confirm('This chat is closed! Would you like to search for a new buddy?')) {
+			navigate('/');
+			return;
+		}
+
+		createBrowserNotification('Chat Closed', 'Your buddy left the chat');
+		startNewSearch();
+	}, [])
+
+	const onInactive = useCallback(() => {
+		closeAllChats();
+	}, [])
+
+	const onDisconnect = useCallback((reason) => {
+		if (isExplicitDisconnection(reason)) {
+			return;
+		}
+
+		disconnect();
+	}, [])
+
+	const onReconnectAttempt = useCallback((attempts) => {
+		reconnectAttempts.current = attempts;
+	}, [])
+
+	const onReconnectError = useCallback(() => {
+		if (reconnectAttempts.current >= 3) {
+			disconnect();
+		}
+	}, [])
+
+	const emitCreateRoom = useCallback(() => {
+		socket.emit(NEW_EVENT_CREATE_ROOM, `${userID}-in-search`);
+	}, [])
+
+	const emitAddingUser = useCallback(() => {
+		socket.emit(NEW_EVENT_ADDING, { userID });
+	}, [])
+
+
+	
 	useEffect(() => {
 		setLoadingText(isStoppingSearch ? stoppingSearchLoadingText : defaultLoadingText);
 	}, [isStoppingSearch]);
+
 	useEffect(() => {
 		if (loadingText === defaultLoadingText) {
 			timeout = setTimeout(() => {
@@ -109,104 +207,31 @@ const BuddyMatcher = () => {
 		}
 
 		if (!socket.connected) {
-			socket.connect();
+			connectWithId(app.currentChatId)
 		}
-
-		socket.on(NEW_EVENT_CLOSE, (chatId) => {
-			endSearch();
-			closeChat(chatId);
-			playNotification('chatClosed');
-
-			if (!confirm('This chat is closed! Would you like to search for a new buddy?')) {
-				navigate('/');
-				return;
-			}
-
-			createBrowserNotification('Chat Closed', 'Your buddy left the chat');
-			startNewSearch();
-		});
+		
+		emitCreateRoom()
+		socket.connected && emitAddingUser()
 
 		// This is necessary else chat won't be restored after re-connections
-		socket.on('connect', () => {
-			// Here server will be informed that user is searching for
-			// another user
-			socket.emit(NEW_EVENT_JOIN, {
-				loginId: authState.loginId,
-				email: authState.email,
-			});
-			setDisconnected(false);
-		});
-		socket.connected && socket.emit(NEW_EVENT_ADDING, { userID });
-		socket.emit(NEW_EVENT_CREATE_ROOM, `${userID}-in-search`);
+		socket.on('connect', onConnect);
+		socket.on(NEW_EVENT_CLOSE, onClose);		
 		// From here will get the info from server that user has joined the room
-
-		socket.on(NEW_EVENT_JOINED, ({ roomId, userIds }) => {
-			playNotification('buddyPaired');
-			createBrowserNotification(
-				"Let's Chat :)",
-				"You've found a match, don't keep your Partner waiting ⌛"
-			);
-			createChat(roomId, userIds);
-			endSearch(roomId);
-		});
-
-		socket.on(NEW_EVENT_CHAT_RESTORE, ({ chats, currentChatId }) => {
-			Object.values(chats).forEach((chat) => {
-				createChat(chat.id, chat.userIds, chat.messages, chat.createdAt);
-			});
-			endSearch(currentChatId);
-		});
-
-		socket.on(NEW_EVENT_INACTIVE, () => {
-			closeAllChats();
-		});
-
-		socket.on(NEW_EVENT_STOP_SEARCH_SUCCESS, () => {
-			setIsStoppingSearch(false);
-			endSearch();
-			navigate('/');
-		});
-
-		function disconnect() {
-			reconnectAttempts.current = 0;
-			if (app.currentChatId) {
-				return;
-			}
-
-			socket.disconnect();
-			setDisconnected(true);
-			endSearch();
-		}
-
-		function onDisconnect(reason) {
-			if (isExplicitDisconnection(reason)) {
-				return;
-			}
-
-			disconnect();
-		}
-
-		function onReconnectAttempt(attempts) {
-			reconnectAttempts.current = attempts;
-		}
-
-		function onReconnectError() {
-			if (reconnectAttempts.current >= 3) {
-				disconnect();
-			}
-		}
-
+		socket.on(NEW_EVENT_JOINED, onUserJoined);
+		socket.on(NEW_EVENT_CHAT_RESTORE, onRestoreChat);
+		socket.on(NEW_EVENT_INACTIVE, onInactive);
+		socket.on(NEW_EVENT_STOP_SEARCH_SUCCESS, onStopSearch);
 		socket.on('disconnect', onDisconnect);
 		socket.io.on('reconnect_attempt', onReconnectAttempt);
 		socket.io.on('reconnect_error', onReconnectError);
 
 		return () => {
 			socket
-				.off('connect')
-				.off(NEW_EVENT_JOINED)
-				.off(NEW_EVENT_CHAT_RESTORE)
-				.off(NEW_EVENT_CLOSE)
-				.off(NEW_EVENT_INACTIVE)
+				.off('connect', onConnect)
+				.off(NEW_EVENT_JOINED,  onUserJoined)
+				.off(NEW_EVENT_CHAT_RESTORE, onRestoreChat)
+				.off(NEW_EVENT_CLOSE, onClose)
+				.off(NEW_EVENT_INACTIVE, onInactive)
 				.off('disconnect', onDisconnect);
 
 			socket.io

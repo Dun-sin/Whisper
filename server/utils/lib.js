@@ -206,6 +206,7 @@ async function createChat(users) {
     users[i].id = user._id.toString();
     users[i].currentChatId = chatId;
     users[i].chatIds.push(chatId);
+
     users[i].socketConnections.map((socket) => {
       socket.join(chatId);
     });

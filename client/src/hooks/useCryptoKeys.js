@@ -128,7 +128,6 @@ const useCryptoKeys = (currentChatId) => {
 			// emitting the public and private key to all receiver's. We need to emit private key
 			// because we need to able to decrypt messages that we sent because we
 			// encrypt messages with receiver's public key
-			console.log('mine', pemPublicKey)
       socket.emit(NEW_EVENT_REQUEST_PUBLIC_KEY, {
         chatId: currentChatId,
         publicKey: pemPublicKey,

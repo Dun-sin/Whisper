@@ -15,7 +15,7 @@ import chatHelper, {
 	getTime,
 	pemToArrayBuffer,
 } from '../lib/chatHelper';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import BadWordsNext from 'bad-words-next';
 import DropDownOptions from './Chat/DropDownOption';
@@ -181,11 +181,15 @@ const Chat = () => {
 		return true;
 	};
 
+	const emitTyping = useCallback(() => {
+		socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
+	}, [])
+
 	// Here whenever user will submit message it will be send to the server
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
+		emitTyping()
 		const d = new Date();
 		const message = inputRef.current.value.trim(); // Trim the message to remove the extra spaces
 
@@ -254,6 +258,41 @@ const Chat = () => {
 	const showBadword = (id) => {
 		setBadwordChoices({ ...badwordChoices, [id]: 'show' });
 	};
+
+	const onNewMessageHandler = useCallback(async (message) => {
+		try {
+			const decryptedMessage = await decryptMessage(message.message, cryptoKey);
+			addMessage(message);
+			playNotification('newMessage');
+			createBrowserNotification('You received a new message on Whisper', decryptedMessage);
+		} catch {
+			throw new Error(`Could not decrypt message`);
+		}
+	}, []);
+
+	const onDeleteMessageHandler = useCallback(({ id, chatId }) => {
+		removeMessage(id, chatId);
+	}, []);
+
+	const onEditMessageHandler = useCallback((messageEdited) => {
+		updateMessage({ ...messageEdited, room: app.currentChatId }, true);
+	}, []);
+
+	const onLimitMessageHandler = useCallback((data) => {
+		alert(data.message);
+	}, []);
+
+	const onReadMessageHandler = useCallback(({ messageId, chatId }) => {
+		receiveMessage(messageId, chatId);
+	}, []);
+
+	const onPublicStringHandler = useCallback(({ pemPublicKeyString, pemPrivateKeyString }) => {
+		const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
+		const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
+
+		// Import PEM-formatted public key as CryptoKey
+		importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
+	}, []);
 
 	// Clear chat when escape is pressed
 	useEffect(() => {
@@ -327,58 +366,20 @@ const Chat = () => {
 
 	useEffect(() => {
 		generateKeyPair()
-		const newMessageHandler = async (message) => {
-			try {
-				const decryptedMessage = await decryptMessage(message.message, cryptoKey);
-				addMessage(message);
-				playNotification('newMessage');
-				createBrowserNotification('You received a new message on Whisper', decryptedMessage);
-			} catch {
-				throw new Error(`Could not decrypt message`);
-			}
-		};
-		const deleteMessageHandler = ({ id, chatId }) => {
-			removeMessage(id, chatId);
-		};
-
-		const editMessageHandler = (messageEdited) => {
-			updateMessage({ ...messageEdited, room: app.currentChatId }, true);
-		};
-
-		const limitMessageHandler = (data) => {
-			alert(data.message);
-		};
-
-		const readMessageHandler = ({ messageId, chatId }) => {
-			receiveMessage(messageId, chatId);
-		};
-
-		const publicStringHandler = ({ pemPublicKeyString, pemPrivateKeyString }) => {
-			const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
-			const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
-
-			alert('got it')
-			console.log('=========recieved==========')
-			console.log(pemPublicKeyString)
-			console.log('=========recieved==========')
-			// Import PEM-formatted public key as CryptoKey
-			importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
-		};
-
-		socket.on('publicKey', publicStringHandler);
-		socket.on(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
-		socket.on(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-		socket.on(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
-		socket.on(NEW_EVENT_READ_MESSAGE, readMessageHandler);
-		socket.on(NEW_EVENT_SEND_FAILED, limitMessageHandler);
+		socket.on('publicKey', onPublicStringHandler);
+		socket.on(NEW_EVENT_RECEIVE_MESSAGE, onNewMessageHandler);
+		socket.on(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
+		socket.on(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
+		socket.on(NEW_EVENT_READ_MESSAGE, onReadMessageHandler);
+		socket.on(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
 
 		return () => {
-			socket.off(NEW_EVENT_RECEIVE_MESSAGE, newMessageHandler);
-			socket.off(NEW_EVENT_DELETE_MESSAGE, deleteMessageHandler);
-			socket.off(NEW_EVENT_EDIT_MESSAGE, editMessageHandler);
-			socket.off(NEW_EVENT_READ_MESSAGE, readMessageHandler);
-			socket.off(NEW_EVENT_SEND_FAILED, limitMessageHandler);
-			socket.off('publicKey', publicStringHandler);
+			socket.off(NEW_EVENT_RECEIVE_MESSAGE, onNewMessageHandler);
+			socket.off(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
+			socket.off(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
+			socket.off(NEW_EVENT_READ_MESSAGE, onReadMessageHandler);
+			socket.off(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
+			socket.off('publicKey', onPublicStringHandler);
 		};
 	}, []);
 

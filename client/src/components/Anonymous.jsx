@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
@@ -57,7 +57,7 @@ const Anonymous = ({
 	const { closeChat } = useChat();
 	const { setDialog } = useDialog();
 
-	socket.on(NEW_EVENT_DISPLAY, ({ isTyping, chatId }) => {
+	const onDisplay = useCallback(({ isTyping, chatId }) => {
 		// eslint-disable-next-line curly
 		if (chatId !== currentChatId) return;
 		if (!isTyping) {
@@ -74,7 +74,68 @@ const Anonymous = ({
 		typingStatusTimeoutRef.current = setTimeout(() => {
 			setIsTyping(false);
 		}, 3000);
-	});
+	}, [])
+
+	const onOnlineStatushandler = useCallback((onlineStatusState) => {
+		if (!onlineStatusState.includes('online')) {
+			const date = new Date(onlineStatusState);
+			const today = new Date();
+			// Set today's date to the beginning of the day
+			today.setHours(0, 0, 0, 0);
+			const yesterday = new Date(today);
+			yesterday.setDate(yesterday.getDate() - 1); // Set it to yesterday
+
+			let formattedDate;
+			if (date >= today) {
+				// Today
+				const options = { hour: '2-digit', minute: '2-digit' };
+				formattedDate = `Last seen today at ${date.toLocaleString('en-US', options)}`;
+			} else if (date >= yesterday) {
+				// Yesterday
+				const options = { hour: '2-digit', minute: '2-digit' };
+				formattedDate = `Last seen yesterday at ${date.toLocaleString('en-US', options)}`;
+			} else {
+				// More than yesterday
+				const options = { year: 'numeric', month: 'short', day: 'numeric' };
+				formattedDate = date.toLocaleString('en-US', options);
+			}
+			setBuddyOnlineStatus(formattedDate);
+
+			return;
+		}
+		setBuddyOnlineStatus(onlineStatusState);
+	}, []);
+
+	const onNewMessage = useCallback(() => {
+		setIsTyping(false);
+	}, [])
+
+	const emitClose = useCallback((err, chatClosed) => {
+		if (err) {
+			alert('An error occured whiles closing chat.');
+			setAutoSearchAfterClose(false);
+			return err;
+		}
+
+		if (chatClosed) {
+			closeChat(currentChatId);
+		}
+
+		endSearch();
+
+		if (chatClosed && autoSearchRef.current) {
+			if (onChatClosed) {
+				onChatClosed();
+			}
+
+			setAutoSearchAfterClose(false);
+		} else {
+			navigate('/');
+		}
+
+		clearTimer();
+	}, [])
+
 
 	const closeChatHandler = (autoSearch = false) => {
 		const currentChatId = currentChatIdRef.current;
@@ -86,31 +147,7 @@ const Anonymous = ({
 
 		setAutoSearchAfterClose(autoSearch);
 
-		socket.timeout(30000).emit(NEW_EVENT_CLOSE, currentChatId, (err, chatClosed) => {
-			if (err) {
-				alert('An error occured whiles closing chat.');
-				setAutoSearchAfterClose(false);
-				return err;
-			}
-
-			if (chatClosed) {
-				closeChat(currentChatId);
-			}
-
-			endSearch();
-
-			if (chatClosed && autoSearchRef.current) {
-				if (onChatClosed) {
-					onChatClosed();
-				}
-
-				setAutoSearchAfterClose(false);
-			} else {
-				navigate('/');
-			}
-
-			clearTimer();
-		});
+		socket.timeout(30000).emit(NEW_EVENT_CLOSE, currentChatId, emitClose)
 	};
 
 	const MenuToggle = (props, ref) => {
@@ -153,40 +190,6 @@ const Anonymous = ({
 			},
 		};
 
-		function onNewMessage() {
-			setIsTyping(false);
-		}
-
-		const onlineStatushandler = (onlineStatusState) => {
-			if (!onlineStatusState.includes('online')) {
-				const date = new Date(onlineStatusState);
-				const today = new Date();
-				// Set today's date to the beginning of the day
-				today.setHours(0, 0, 0, 0);
-				const yesterday = new Date(today);
-				yesterday.setDate(yesterday.getDate() - 1); // Set it to yesterday
-
-				let formattedDate;
-				if (date >= today) {
-					// Today
-					const options = { hour: '2-digit', minute: '2-digit' };
-					formattedDate = `Last seen today at ${date.toLocaleString('en-US', options)}`;
-				} else if (date >= yesterday) {
-					// Yesterday
-					const options = { hour: '2-digit', minute: '2-digit' };
-					formattedDate = `Last seen yesterday at ${date.toLocaleString('en-US', options)}`;
-				} else {
-					// More than yesterday
-					const options = { year: 'numeric', month: 'short', day: 'numeric' };
-					formattedDate = date.toLocaleString('en-US', options);
-				}
-				setBuddyOnlineStatus(formattedDate);
-
-				return;
-			}
-			setBuddyOnlineStatus(onlineStatusState);
-		};
-
 		for (const event in connectionEvents) {
 			socket.on(event, connectionEvents[event]);
 		}
@@ -195,10 +198,11 @@ const Anonymous = ({
 			socket.on(event, onNewMessage);
 		});
 
-		socket.on(NEW_EVENT_ONLINE_STATUS, onlineStatushandler);
+		socket.on(NEW_EVENT_DISPLAY, onDisplay);
+		socket.on(NEW_EVENT_ONLINE_STATUS, onOnlineStatushandler);
 
 		return () => {
-			socket.off(NEW_EVENT_ONLINE_STATUS, onlineStatushandler);
+			socket.off(NEW_EVENT_ONLINE_STATUS, onOnlineStatushandler);
 
 			newMessageEvents.forEach((event) => {
 				socket.off(event, onNewMessage);
