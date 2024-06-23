@@ -320,7 +320,6 @@ const Chat = () => {
 
 	// pass it to the hook
 	useInactiveChat(getLastMessage, amITheSender);
-
 	useEffect(() => {
 		inputRef.current.focus();
 	}, [currentReplyMessageId]);

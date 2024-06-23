@@ -1,5 +1,4 @@
 import React from 'react';
-
 import PropTypes from 'prop-types';
 import Dropdown from 'rsuite/Dropdown';
 
@@ -56,7 +55,6 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 				chatId: messageObject.room,
 			});
 
-	
 			if (!messageDeleted) {
 				updateMessage(id, messageObject);
 				return;
