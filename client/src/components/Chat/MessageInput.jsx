@@ -5,7 +5,8 @@ import { IoSend } from 'react-icons/io5';
 import { IoIosArrowDropright } from 'react-icons/io';
 import EmojiPicker from '../EmojiPicker';
 import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
-import { socket } from 'context/Context';
+
+import { socket } from 'src/lib/socketConnection';
 import { NEW_EVENT_SEND_FAILED } from '../../../../constants.json';
 import { useChat } from 'src/context/ChatContext';
 import { useAuth } from 'src/context/AuthContext';

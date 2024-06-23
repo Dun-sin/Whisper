@@ -1,5 +1,4 @@
-import React, { useEffect, useContext, useMemo } from 'react';
-
+import React, { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import useIsTabActive from 'src/hooks/useIsTabActive';
@@ -7,7 +6,7 @@ import useIsTabActive from 'src/hooks/useIsTabActive';
 import useChatUtils from 'src/lib/chatSocket';
 import { useApp } from 'src/context/AppContext';
 import { useChat } from 'src/context/ChatContext';
-import { SocketContext } from 'src/context/Context';
+import { socket } from 'src/lib/socketConnection';
 
 const MessageSeen = ({ isRead, isSender }) => {
 	const { app } = useApp();
@@ -15,7 +14,6 @@ const MessageSeen = ({ isRead, isSender }) => {
 	const isTabVisible = useIsTabActive();
 
 	const { messages: state, receiveMessage } = useChat();
-	const socket = useContext(SocketContext);
 	const { seenMessage } = useChatUtils(socket);
 
 	const sortedMessages = useMemo(

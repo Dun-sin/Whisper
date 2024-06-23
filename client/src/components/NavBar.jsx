@@ -1,4 +1,4 @@
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -9,7 +9,7 @@ import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 // Store
 import { useDialog } from 'src/context/DialogContext';
 import { useAuth } from 'context/AuthContext';
-import { SocketContext } from 'context/Context';
+import { socket } from 'src/lib/socketConnection';
 
 // Lib
 import { useApp } from 'src/context/AppContext';
@@ -21,7 +21,6 @@ const activeStyle = linkStyle + 'bg-primary';
 const NavBar = () => {
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
-	const socket = useContext(SocketContext);
 
 	const { app } = useApp();
 	const location = useLocation();

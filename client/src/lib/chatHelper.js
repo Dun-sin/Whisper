@@ -104,7 +104,8 @@ export const isGreaterThan3Minutes = (interval, time) => {
 	return false;
 };
 
-// As we cant store data in array form directly in database we need to convert it into string which is Base64 of Unit8Array
+// As we cant store data in array form directly in database 
+// we need to convert it into string which is Base64 of Unit8Array
 export const arrayBufferToBase64 = (arrayBuffer) => {
 	let binary = '';
 	const bytes = new Uint8Array(arrayBuffer);
@@ -115,14 +116,16 @@ export const arrayBufferToBase64 = (arrayBuffer) => {
 	return btoa(binary);
 };
 
-// This function is used keys which are in ArrayBuffer form to PEM because we cant sent the keys through socket.io in ArrayBuffer form
+// This function is used keys which are in ArrayBuffer form to PEM 
+// because we cant sent the keys through socket.io in ArrayBuffer form
 export const convertArrayBufferToPem = (arrayBuffer, type) => {
 	const buffer = new Uint8Array(arrayBuffer);
 	const base64String = btoa(String.fromCharCode.apply(null, buffer));
 	return `-----BEGIN ${type}-----\n${base64String}\n-----END ${type}-----`;
 };
 
-// This function does opposite of above function. After receiving keys from socket.io in PEM string we need to apply below function.
+// This function does opposite of above function. 
+// After receiving keys from socket.io in PEM string we need to apply below function.
 export const pemToArrayBuffer = (pemString) => {
 	const base64String =
 		pemString &&

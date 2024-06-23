@@ -7,7 +7,6 @@ import Dialog from './components/Dialog';
 
 import { AppProvider } from './context/AppContext';
 import { AuthProvider } from './context/AuthContext';
-import { socket, SocketContext } from 'context/Context';
 import { DialogProvider } from './context/DialogContext';
 
 import 'rsuite/dist/rsuite.min.css';
@@ -19,12 +18,10 @@ root.render(
 	<AuthProvider>
 		<AppProvider>
 			<Router>
-				<SocketContext.Provider value={socket}>
 					<DialogProvider>
 						<App />
 						<Dialog />
 					</DialogProvider>
-				</SocketContext.Provider>
 			</Router>
 		</AppProvider>
 	</AuthProvider>
