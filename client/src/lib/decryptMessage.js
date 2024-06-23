@@ -1,5 +1,4 @@
 export default async (message, cryptoKey) => {
-	console.log(cryptoKey)
 	const encryptedMessageUint8Array = new Uint8Array(
 		atob(message)
 			.split('')

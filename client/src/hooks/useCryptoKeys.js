@@ -55,16 +55,15 @@ const useCryptoKeys = (currentChatId) => {
     setImportedPrivateKey(importedPrivateKey);
 
     // Store private key in local storage if not already stored
-    if (!storedPrivateKey) {
-      
-	const exportedPrivateKey = await crypto.subtle.exportKey('pkcs8', importedPrivateKey);
-      const privateKeyArray = new Uint8Array(exportedPrivateKey);
-      localStorage.setItem(
-        'importedPrivateKey' + currentChatId,
-        JSON.stringify(Array.from(privateKeyArray))
-      );
-    }
-  };
+    if (!storedPrivateKey) {      
+			const exportedPrivateKey = await crypto.subtle.exportKey('pkcs8', importedPrivateKey);
+			const privateKeyArray = new Uint8Array(exportedPrivateKey);
+			localStorage.setItem(
+				'importedPrivateKey' + currentChatId,
+				JSON.stringify(Array.from(privateKeyArray))
+			);
+		}
+	};
 
   // Function to generate a new key pair
   const generateKeyPair = async () => {
@@ -89,6 +88,7 @@ const useCryptoKeys = (currentChatId) => {
     // If a private key is already stored, import it
     if (storedCryptoKey) {
       const privateKeyArray = new Uint8Array(JSON.parse(storedCryptoKey));
+			
 
       const importedPrivateKey = await crypto.subtle.importKey(
         'pkcs8',

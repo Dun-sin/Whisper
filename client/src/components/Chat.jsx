@@ -77,6 +77,8 @@ const Chat = () => {
 	const { getMessage, handleResend, scrollToMessage } = chatHelper(state, app);
 
 	const inputRef = useRef('');
+	const cryptoKeyRef = useRef(null);
+	cryptoKeyRef.current = cryptoKey;
 
 	senderId = authState.loginId;
 
@@ -95,10 +97,14 @@ const Chat = () => {
 		logout();
 	}
 
+	const emitTyping = useCallback((boolean) => {
+		socket.timeout(5000).emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: boolean });
+	}, [])
+
 	const cancelEdit = () => {
 		inputRef.current.value = '';
 		setEditing({ isediting: false, messageID: null });
-		socket.timeout(10000).emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
+		emitTyping(false)
 	};
 
 	const sortedMessages = useMemo(
@@ -181,15 +187,11 @@ const Chat = () => {
 		return true;
 	};
 
-	const emitTyping = useCallback(() => {
-		socket.emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: false });
-	}, [])
-
 	// Here whenever user will submit message it will be send to the server
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		emitTyping()
+		emitTyping(false)
 		const d = new Date();
 		const message = inputRef.current.value.trim(); // Trim the message to remove the extra spaces
 
@@ -235,7 +237,7 @@ const Chat = () => {
 
 	const handleTypingStatus = throttle((e) => {
 		if (e.target.value.length > 0) {
-			socket.timeout(5000).emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: true });
+			emitTyping(true)
 		}
 		setMessage(e.target.value);
 		adjustTextareaHeight(inputRef);
@@ -261,14 +263,14 @@ const Chat = () => {
 
 	const onNewMessageHandler = useCallback(async (message) => {
 		try {
-			const decryptedMessage = await decryptMessage(message.message, cryptoKey);
+			const decryptedMessage = await decryptMessage(message.message, cryptoKeyRef.current);
 			addMessage(message);
 			playNotification('newMessage');
 			createBrowserNotification('You received a new message on Whisper', decryptedMessage);
-		} catch {
-			throw new Error(`Could not decrypt message`);
+		} catch (error) {
+			console.error(`Could not decrypt message: ${error.message}`, error);
 		}
-	}, []);
+	}, [cryptoKey]);
 
 	const onDeleteMessageHandler = useCallback(({ id, chatId }) => {
 		removeMessage(id, chatId);
@@ -289,7 +291,7 @@ const Chat = () => {
 	const onPublicStringHandler = useCallback(({ pemPublicKeyString, pemPrivateKeyString }) => {
 		const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
 		const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
-
+		
 		// Import PEM-formatted public key as CryptoKey
 		importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
 	}, []);
@@ -324,11 +326,10 @@ const Chat = () => {
 	}, [currentReplyMessageId]);
 
 	useEffect(() => {
-		// This function is used to decrypt all messages from sorted messages array depending upon if
-		// its sender's message or receiver's message it uses current importedPrivateKey or current private key respectively
-		const fetchData = async () => {
-			const decryptedPromises = sortedMessages.map(
-				async ({ message, senderId: sender, ...rest }) => {
+	const fetchData = async () => {
+		const decryptedPromises = sortedMessages.map(
+			async ({ message, senderId: sender, ...rest }) => {
+				try {
 					if (sender.toString() === senderId.toString()) {
 						const decryptedMessage = await decryptMessage(message, importedPrivateKey);
 						return {
@@ -338,31 +339,29 @@ const Chat = () => {
 						};
 					}
 
-					try {
-						const finalMessage = await decryptMessage(message, cryptoKey);
-						return {
-							...rest,
-							senderId: sender,
-							message: finalMessage || message, // Use the decrypted message, or fallback to the original message
-						};
-					} catch (error) {
-						// Handle decryption errors if necessary
-						console.error('Decryption error:', error);
-						return {
-							...rest,
-							senderId: sender,
-							message: message, // Use the original message in case of decryption error
-						};
-					}
+					const finalMessage = await decryptMessage(message, cryptoKey);
+					return {
+						...rest,
+						senderId: sender,
+						message: finalMessage || message, // Use the decrypted message, or fallback to the original message
+					};
+				} catch (error) {
+					console.error('Decryption error:', error);
+					return {
+						...rest,
+						senderId: sender,
+						message: message, // Use the original message in case of decryption error
+					};
 				}
-			);
+			}
+		);
 
-			const decryptedMessages = await Promise.all(decryptedPromises);
-			setDecryptedMessages(decryptedMessages);
-		};
+		const decryptedMessages = await Promise.all(decryptedPromises);
+		setDecryptedMessages(decryptedMessages);
+	};
 
-		fetchData();
-	}, [sortedMessages, cryptoKey]);
+	fetchData();
+}, [sortedMessages, cryptoKey]);
 
 	useEffect(() => {
 		generateKeyPair()
