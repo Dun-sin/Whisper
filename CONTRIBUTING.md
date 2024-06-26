@@ -3,7 +3,7 @@
 - [guidelines](#guidelines)
 - [Skills needed to contribute](#-prerequisite-skills-to-contribute)
 - [How to contribute](#-how-to-contribute)
-- [How to Document your code]()
+- [How to Document your code](#how-to-document-your-code)
 
 ## Guidelines
 ### Issues guidelines
