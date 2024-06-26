@@ -3,6 +3,7 @@
 - [guidelines](#guidelines)
 - [Skills needed to contribute](#-prerequisite-skills-to-contribute)
 - [How to contribute](#-how-to-contribute)
+- [How to Document your code]()
 
 ## Guidelines
 ### Issues guidelines
@@ -29,6 +30,13 @@
 - Your PR title should be according to the conventional commit standards([link](https://gist.github.com/Zekfad/f51cb06ac76e2457f11c80ed705c95a3)) for example, if the added something new to the project(doesn't matter how small), your PR title should be like this -> `feat: added a text` <- Whatever you added. If you fixed something then your PR title should be like this -> `fix: wrong link` <- whatever you fixed
 - Your PR description should have either `fixes`, `closes` with the issue number you worked on, for example, `fixes #123` or `closes #123` where #123 is the issue you worked on. It should not be `fixes issue #123`
 - Your PR description should also have the changes you did e.g added a new component, added a new image.
+
+### How to document your code
+- Include a link to the issue you're addressing in the summary tag after the previous details tag(e.g <details>Adding a new color [#issue_number](link to issue number)</details>
+- Clearly explain the issue that needs solving. Include context, such as when the issue occurs and its impact.
+- Provide a detailed explanation of how you solved the problem. Include the logic behind the solution and any relevant technical details.
+- If there are multiple related problems, list them separately with corresponding solutions.
+- Include snippets of code that illustrate the solution. Ensure these snippets are relevant and well-commented.
 
 ## 👩🏽‍💻 Prerequisite Skills to Contribute
 
