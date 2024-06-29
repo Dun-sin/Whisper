@@ -14,7 +14,7 @@ const Profile = () => {
 	const [username, setUsername] = useState('Anonymous');
 	const [profileResponse, setProfileResponse] = useState();
 	const [imageFile, setImageFile] = useState(null);
-	const [isImageSafe, setImageSafe] = useState(false);
+	// const [isImageSafe, setImageSafe] = useState(false);
 	const { authState, dispatchAuth } = useAuth();
 	const [loading, setLoading] = useState(false);
 	const { logout } = useKindeAuth();
@@ -73,9 +73,9 @@ const Profile = () => {
 					const imageSafe = await handlerisImageSafe();
 					imageSafe
 						? setProfileResponse()
-						: setProfileResponse('Profile image is not safe. Please upload a different image.');
+						: setProfileResponse();
 
-					setImageSafe(imageSafe);
+					// setImageSafe(imageSafe);
 					setImageFile(file);
 					setLoading(false);
 				};
@@ -98,7 +98,7 @@ const Profile = () => {
 		formData.append('gender', genderRef.current.value);
 		formData.append('age', Number(ageRef.current.value));
 
-		if (imageFile && isImageSafe) {
+		if (imageFile) {
 			formData.append('profileImage', imageFile);
 		}
 		setLoading(true);
