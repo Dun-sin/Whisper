@@ -11,7 +11,7 @@ const Searching = () => {
 	const { app, hasUnsavedSettings, updateSettings, updateTmpSettings, cancelSettingsUpdate } =
 		useApp();
 	const { authState } = useAuth();
-
+    
 	const settings = useMemo(() => {
 		return app.tmpSettings ? { ...app.settings, ...app.tmpSettings } : app.settings;
 	});
@@ -52,7 +52,7 @@ const Searching = () => {
 						<div className="w-5/6">
 							<div className="flex">
 								<Icon
-									color={settings.theme ? 'white' : 'gray'}
+									color={app.settings.theme ? 'white' : 'gray'}
 									icon="ion:invert-mode"
 									height="18"
 									width="18"
@@ -100,7 +100,7 @@ const Searching = () => {
 						<div className="w-5/6">
 							<div className="flex">
 								<Icon
-									color={settings.theme ? 'white' : 'gray'}
+									color={app.settings.theme ? 'white' : 'gray'}
 									icon="bxs:bell-ring"
 									height="18"
 									width="18"
@@ -129,7 +129,7 @@ const Searching = () => {
 					<Form.Group controlId="notification-volume">
 						<div className="flex">
 							<Icon
-								color={settings.theme ? 'white' : 'gray'}
+								color={app.settings.theme ? 'white' : 'gray'}
 								icon="ic:baseline-volume-up"
 								height="20"
 								width="19"
