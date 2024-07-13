@@ -6,7 +6,7 @@ tasks:
 
   - name: run backend
     openMode: split-right
-    init: cd ../server && npm i
+    init: cd server && npm i
     command: |
       echo "MongoDB_URL=mongodb://username:password@localhost:27018/" > .env
       npm start
