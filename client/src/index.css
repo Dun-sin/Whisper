@@ -59,3 +59,7 @@ h6 {
 .message-reply-container * {
 	@apply m-0 p-0;
 }
+
+.badword-lightmode-text-background {
+	background-color: theme('colors.secondary');
+  }
