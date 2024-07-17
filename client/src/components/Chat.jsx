@@ -45,7 +45,6 @@ let senderId;
 
 const Chat = () => {
 	const { app } = useApp();
-	const { settings } = app;
 	const { playNotification } = useNotification();
 	const [editing, setEditing] = useState({
 		isediting: false,
@@ -483,7 +482,7 @@ const Chat = () => {
 												}`}
 											>
 												{containsBadword && !isSender && !badwordChoices[id] ? (
-													<div className={`${!settings.theme && 'badword-lightmode-text-background'} flex flex-col border-red border w-full rounded-r-md p-3`}>
+													<div className="dark:text-white text-black flex flex-col border-red border w-full rounded-r-md p-3">
 														<p>Your buddy is trying to send you a bad word</p>
 														<div className="flex w-full gap-6">
 															<span
