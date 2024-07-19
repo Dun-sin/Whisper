@@ -535,6 +535,8 @@ const Chat = () => {
 																cancelEdit={cancelEdit}
 																setEditing={setEditing}
 																setReplyId={startReply}
+																cryptoKey={cryptoKey}
+																importedPrivateKey={importedPrivateKey}
 															/>
 														</div>
 														<div

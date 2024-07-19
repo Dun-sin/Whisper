@@ -12,9 +12,9 @@ import { socket } from 'src/lib/socketConnection';
 
 import useChatUtils from 'src/lib/chatSocket';
 
-const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setReplyId }) => {
+const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setReplyId ,cryptoKey,importedPrivateKey}) => {
 	const { app } = useApp();
-
+  
 	const { messages: state, updateMessage, removeMessage } = useChat();
 	const { getMessage, messageExists, handleCopyToClipBoard } = chatHelper(state, app);
 	const { deleteMessage } = useChatUtils(socket);
@@ -87,7 +87,7 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 			>
 				<Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>
 
-				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, state, app)}>Copy</Dropdown.Item>
+				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, state, app,importedPrivateKey)}>Copy</Dropdown.Item>
 				<Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
 				<Dropdown.Item onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
 			</Dropdown>
@@ -102,7 +102,7 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 				renderToggle={renderIconButtonReceiver}
 				NoCaret
 			>
-				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, state, app)}>Copy</Dropdown.Item>
+				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, state, app,cryptoKey)}>Copy</Dropdown.Item>
 				<Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
 			</Dropdown>
 		);
@@ -120,4 +120,6 @@ DropDownOptions.propTypes = {
 	cancelEdit: PropTypes.func.isRequired,
 	setEditing: PropTypes.func.isRequired,
 	setReplyId: PropTypes.func.isRequired,
+	cryptoKey:PropTypes.object.isRequired,
+	importedPrivateKey:PropTypes.object.isRequired
 };

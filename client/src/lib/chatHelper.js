@@ -1,3 +1,5 @@
+import decryptMessage from './decryptMessage';
+
 export default (state, app) => {
 	const getMessage = (id) => {
 		if (!state[app.currentChatId]) {
@@ -27,15 +29,16 @@ export default (state, app) => {
 		});
 	};
 
-	const handleCopyToClipBoard = async (id) => {
+	const handleCopyToClipBoard = async (id,state, app,key) => {
 		const { message } = getMessage(id, state, app);
+        const decryptedMessage =await decryptMessage(message,key)
 		if (message.includes('Warning Message')) {
 			return;
 		}
 		if ('clipboard' in navigator) {
-			return await navigator.clipboard.writeText(message);
+			return await navigator.clipboard.writeText(decryptedMessage);
 		} else {
-			return document.execCommand('copy', true, message);
+			return document.execCommand('copy', true, decryptedMessage);
 		}
 	};
 
