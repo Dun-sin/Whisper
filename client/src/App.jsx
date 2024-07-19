@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { KindeProvider } from '@kinde-oss/kinde-auth-react';
+import ReactGA from 'react-ga4';
 
 // Store
 import { useAuth } from 'context/AuthContext';
@@ -26,6 +27,8 @@ import useIsTabActive from './hooks/useIsTabActive';
 const clientID = import.meta.env.VITE_IMPORTANT;
 
 function App() {
+	ReactGA.initialize('G-HL8CN4JFXN');
+
 	const { isLoggedIn, dispatchAuth } = useAuth();
 	const { loadUserSettings, updateOnlineStatus, app } = useApp();
 
