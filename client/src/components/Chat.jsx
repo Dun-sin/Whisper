@@ -69,7 +69,9 @@ const Chat = () => {
 	} = useChat();
 	const {importedPublicKey, importedPrivateKey, cryptoKey, importKey, generateKeyPair
 
-	 } = useCryptoKeys(app.currentChatId);
+	 } =useCryptoKeys(app.currentChatId);
+ 
+	
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 
@@ -227,11 +229,11 @@ const Chat = () => {
 			});
 		}
 
-		if (inputRef.current) {
-			inputRef.current.value = '';
-			setMessage('');
-			inputRef.current.focus();
-		}
+		// if (inputRef.current) {
+		// 	inputRef.current.value = '';
+		// 	setMessage('');
+		// 	inputRef.current.focus();
+		// }
 		cancelReply();
 	};
 
@@ -321,7 +323,7 @@ const Chat = () => {
 	// pass it to the hook
 	useInactiveChat(getLastMessage, amITheSender);
 	useEffect(() => {
-		inputRef.current.focus();
+		// inputRef.current.focus();
 	}, [currentReplyMessageId]);
 
 	useEffect(() => {
@@ -363,6 +365,7 @@ const Chat = () => {
 }, [sortedMessages, cryptoKey]);
 
 	useEffect(() => {
+	
 		generateKeyPair()
 		socket.on('publicKey', onPublicStringHandler);
 		socket.on(NEW_EVENT_RECEIVE_MESSAGE, onNewMessageHandler);
@@ -382,6 +385,8 @@ const Chat = () => {
 	}, []);
 
 	return (
+		<>
+	
 		<div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6">
 			<div className="max-h-[67vh]">
 				<p className="text-[0.8em] font-semibold mb-[10px] mt-[20px] text-center">
@@ -527,7 +532,7 @@ const Chat = () => {
 															) : (
 																message
 															)}
-
+                                                        
 															<DropDownOptions
 																isSender={isSender && status !== 'pending'}
 																id={id}
@@ -535,9 +540,8 @@ const Chat = () => {
 																cancelEdit={cancelEdit}
 																setEditing={setEditing}
 																setReplyId={startReply}
-																cryptoKey={cryptoKey}
-																importedPrivateKey={importedPrivateKey}
 															/>
+                                                            
 														</div>
 														<div
 															className={`flex gap-2 items-center ${
@@ -587,6 +591,8 @@ const Chat = () => {
 				inputRef={inputRef}
 			/>
 		</div>
+	
+		</>
 	);
 };
 

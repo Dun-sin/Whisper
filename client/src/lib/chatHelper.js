@@ -1,6 +1,7 @@
 import decryptMessage from './decryptMessage';
 
 export default (state, app) => {
+	
 	const getMessage = (id) => {
 		if (!state[app.currentChatId]) {
 			return null;
@@ -29,9 +30,12 @@ export default (state, app) => {
 		});
 	};
 
-	const handleCopyToClipBoard = async (id,state, app,key) => {
+	const handleCopyToClipBoard = async (id,key) => {
+		
 		const { message } = getMessage(id, state, app);
+
         const decryptedMessage =await decryptMessage(message,key)
+		
 		if (message.includes('Warning Message')) {
 			return;
 		}
