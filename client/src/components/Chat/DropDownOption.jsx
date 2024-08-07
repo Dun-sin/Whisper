@@ -124,6 +124,4 @@ DropDownOptions.propTypes = {
 	cancelEdit: PropTypes.func.isRequired,
 	setEditing: PropTypes.func.isRequired,
 	setReplyId: PropTypes.func.isRequired,
-	cryptoKey:PropTypes.object.isRequired,
-	importedPrivateKey:PropTypes.object.isRequired
 };
