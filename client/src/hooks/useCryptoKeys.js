@@ -1,4 +1,4 @@
-import { useState,useEffect } from 'react';
+import { useState, } from 'react';
 import { convertArrayBufferToPem } from 'src/lib/chatHelper';
 import { NEW_EVENT_REQUEST_PUBLIC_KEY } from '../../../constants.json'
 
@@ -10,66 +10,11 @@ const useCryptoKeys = (currentChatId) => {
   const [importedPublicKey, setImportedPublicKey] = useState(null);
   const [importedPrivateKey, setImportedPrivateKey] = useState(null);
   const [cryptoKey, setCryptoKey] = useState(null);
-  // Retrieve keys from local storage
-  const storedCryptoKey = localStorage.getItem('cryptoKey' + currentChatId);
-  const storedPublicKey = localStorage.getItem('importPublicKey' + currentChatId);
-  const storedPrivateKey = localStorage.getItem('importedPrivateKey' + currentChatId);
-
-  useEffect(()=>{
-
-    const fetchData = async () => {
-      if(storedCryptoKey){
-    const privateKeyArray = new Uint8Array(JSON.parse(storedCryptoKey));
-    const importedPrivateKey = await crypto.subtle.importKey(
-      'pkcs8',
-      privateKeyArray.buffer,
-      {
-        name: 'RSA-OAEP',
-        hash: { name: 'SHA-256' },
-      },
-      true,
-      ['decrypt']
-    );
-    setCryptoKey(importedPrivateKey);
-  }
-    if(storedPublicKey && storedPrivateKey){
-    const publicKeyArray01 = new Uint8Array(JSON.parse(storedPublicKey));
-      const privateKeyArray01 = new Uint8Array(JSON.parse(storedPrivateKey));
-      const importedPublicKey = await crypto.subtle.importKey(
-        'spki',
-        publicKeyArray01,
-        {
-          name: 'RSA-OAEP',
-          hash: { name: 'SHA-256' },
-        },
-        true,
-        ['encrypt']
-      );
-  
-      setImportedPublicKey(importedPublicKey);
-
-      const importedPrivateKey01 = await crypto.subtle.importKey(
-        'pkcs8',
-        privateKeyArray01 ,
-        {
-          name: 'RSA-OAEP',
-          hash: { name: 'SHA-256' },
-        },
-        true,
-        ['decrypt']
-      );
-  
-      setImportedPrivateKey(importedPrivateKey01);
-    
-    }
-  }
-    fetchData()
-
-  },[currentChatId])
 
   // Function to import public and private keys
   const importKey = async (publicArrayBuffer, privateArrayBuffer) => {
-    
+    const storedPublicKey = localStorage.getItem('importPublicKey' + currentChatId);
+    const storedPrivateKey = localStorage.getItem('importedPrivateKey' + currentChatId);
 
     // Import public key
     const importedPublicKey = await crypto.subtle.importKey(
@@ -122,7 +67,10 @@ const useCryptoKeys = (currentChatId) => {
 
   // Function to generate a new key pair
   const generateKeyPair = async () => {
-    
+    const storedCryptoKey = localStorage.getItem('cryptoKey' + currentChatId);
+    const storedPublicKey = localStorage.getItem('importPublicKey' + currentChatId);
+    const storedPrivateKey = localStorage.getItem('importedPrivateKey' + currentChatId);
+
     let pemPrivateKey;
 
     // Generate a new RSA key pair
