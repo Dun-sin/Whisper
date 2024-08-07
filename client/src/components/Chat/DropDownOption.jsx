@@ -11,14 +11,10 @@ import { useApp } from 'src/context/AppContext';
 import { socket } from 'src/lib/socketConnection';
 
 import useChatUtils from 'src/lib/chatSocket';
-import useCryptoKeys from 'src/hooks/useCryptoKeys';
 
-const DropDownOptions =({ id, isSender, inputRef, cancelEdit, setEditing, setReplyId }) => {
-	
+const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setReplyId }) => {
 	const { app } = useApp();
-	const { importedPrivateKey, cryptoKey
 
-	} =useCryptoKeys(app.currentChatId);
 	const { messages: state, updateMessage, removeMessage } = useChat();
 	const { getMessage, messageExists, handleCopyToClipBoard } = chatHelper(state, app);
 	const { deleteMessage } = useChatUtils(socket);
@@ -91,7 +87,7 @@ const DropDownOptions =({ id, isSender, inputRef, cancelEdit, setEditing, setRep
 			>
 				<Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>
 
-				<Dropdown.Item onClick={() => handleCopyToClipBoard(id,importedPrivateKey)}>Copy</Dropdown.Item>
+				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, state, app)}>Copy</Dropdown.Item>
 				<Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
 				<Dropdown.Item onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
 			</Dropdown>
@@ -106,7 +102,7 @@ const DropDownOptions =({ id, isSender, inputRef, cancelEdit, setEditing, setRep
 				renderToggle={renderIconButtonReceiver}
 				NoCaret
 			>
-				<Dropdown.Item onClick={() => handleCopyToClipBoard(id,cryptoKey)}>Copy</Dropdown.Item>
+				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, state, app)}>Copy</Dropdown.Item>
 				<Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
 			</Dropdown>
 		);
