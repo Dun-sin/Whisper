@@ -1,63 +1,147 @@
-import React from 'react';
-import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
+import React, { useRef, useState } from 'react'
+import { decrypt, encrypt, generateCode } from 'src/lib/utils';
+
+import { PropTypes } from 'prop-types';
+import { api } from 'src/lib/axios';
 import { useAuth } from 'src/context/AuthContext';
 
-const userID = Math.random().toFixed(12).toString(36).slice(2);
-
 const Login = () => {
-	const { dispatchAuth } = useAuth();
-	const { login, isLoading } = useKindeAuth();
+  const { dispatchAuth } = useAuth()
 
-	function loginAnonymously() {
-		dispatchAuth({
-			type: 'LOGIN',
-			payload: {
-				loginType: 'anonymous',
-				loginId: userID,
-				email: null,
-			},
-		});
-	}
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [toInputCode, setToInputCode] = useState(false)
+  const [email, setEmail] = useState(null)
 
-	return (
-		<div
-			className={`bg-light dark:bg-primary h-[100vh] w-[100vw] text-primary dark:text-white flex`}
-		>
-			<div className="h-full w-full max-w-[1750px] flex">
-				<div className="flex items-center justify-center flex-col sm:w-2/4 w-full gap-4 px-4">
-					<div className="flex items-center justify-center flex-col gap-2 w-4/5 sm:w-full">
-						<h1 className="font-bold text-4xl 2xl:text-5xl">WHISPER</h1>
-						<p className="font-medium text-2xl text-center 2xl:text-3xl">
-							Chat anonymously and safely with people for free
-						</p>
-					</div>
-					{isLoading ? (
-						<div className="uppercase py-5">Processing Login</div>
-					) : (
-						<div className="flex gap-3 items-center w-4/5 sm:w-full justify-center flex-wrap">
-							<button
-								disabled={isLoading}
-								onClick={loginAnonymously}
-								className={`text-white bg-secondary h-10 px-10 font-light cursor-pointer rounded-md`}
-							>
-								Login Anonymously
-							</button>
-							<button
-								className="h-10 px-10 bg-highlight rounded-md cursor-pointer"
-								disabled={isLoading}
-								onClick={login}
-							>
-								Login
-							</button>
-						</div>
-					)}
-				</div>
-				<div className="h-full bg-secondary w-2/4 sm:flex hidden items-center justify-center px-4">
-					<img src="/landing page image.jpg" className="h-auto rounded-full w-auto object-cover" />
-				</div>
-			</div>
-		</div>
-	);
-};
+  const emailRef = useRef();
+  const codeRef = useRef();
 
-export default Login;
+  const handleEmailInput = async () => {
+    const email = emailRef.current.value
+
+    if (!email || email.length === '') {
+      setError('Email not provided')
+      return
+    }
+
+    try {
+      setIsLoading(true)
+      const code = generateCode()
+      const response = await api.post('/code', {
+        email,
+        code
+      })
+
+      localStorage.setItem('code', encrypt(code))
+
+      if (response.status === 200) {
+        setToInputCode(true)
+        setEmail(email)
+      }
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsLoading(false)
+      // eslint-disable-next-line require-atomic-updates
+      emailRef.current.value = ''
+    }
+  }
+
+  const handleCodeInput = async () => {
+    const inputedCode = codeRef.current.value
+    if (!inputedCode || inputedCode.length === '') {
+      setError('Email not provided')
+      return
+    }
+
+    try {
+      setIsLoading(true)
+      const code = decrypt(localStorage.getItem('code'))
+      if (inputedCode === code) {
+        const response = await api.post('/login', {
+          email,
+        });
+
+        const data = await response.data;
+        if (response.status === 200) {
+          const id = data.id;
+
+          dispatchAuth({
+            type: 'LOGIN',
+            payload: {
+              loginId: id,
+              loginType: 'email',
+              email,
+            },
+          });
+        } else if (response.status === 500) {
+          throw new Error(data.message);
+        }
+      }
+
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <section className='flex flex-col gap-3'>
+      {error && <p className='text-red'>{error}</p>}
+      {toInputCode ?
+        <InputMethod
+          refProp={codeRef}
+          isLoading={isLoading}
+          handleSubmit={handleCodeInput}
+          inputValue={{ type: 'text', name: 'code', placeholder: "Enter Code Recieved" }}
+
+        />
+        :
+        <InputMethod
+          refProp={emailRef}
+          isLoading={isLoading}
+          handleSubmit={handleEmailInput}
+          inputValue={{ type: "email", name: "email", placeholder: "Enter Your Email" }}
+        />}
+    </section>
+  )
+}
+
+export default Login
+
+const InputMethod = ({ refProp, isLoading, handleSubmit, inputValue }) => {
+  return <>
+    {inputValue.name === 'code' && <p className='text-center'>Check Your Email For the Code</p>}
+    <label htmlFor="email" className="w-full flex items-center justify-center">
+      <input
+        type={inputValue.type}
+        className="w-full max-w-[600px] min-w-[300px] p-3 rounded-md text-black border-highlight border"
+        name={inputValue.name}
+        ref={refProp}
+        placeholder={inputValue.placeholder}
+      />
+    </label>
+    <button
+      disabled={isLoading}
+      onClick={handleSubmit}
+      className="bg-highlight w-[80%] max-w-[400px] min-w-[300px] py-2 rounded-md"
+    >
+      {isLoading ? 'Loading' : 'Submit'}
+    </button>
+  </>
+}
+
+InputMethod.propTypes = {
+  refProp: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.instanceOf(Element) })
+  ]),
+  isLoading: PropTypes.bool,
+  handleSubmit: PropTypes.func,
+  inputValue: PropTypes.shape({
+    type: PropTypes.string,
+    name: PropTypes.string,
+    placeholder: PropTypes.string,
+  })
+}
