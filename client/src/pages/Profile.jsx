@@ -210,10 +210,10 @@ const Profile = () => {
 										placeholder="19"
 										className="outline-none bg-transparent text-right"
 										ref={ageRef}
-										min="1"
+										min="12"
 										onChange={(e) => {
-											if (e.target.value < 1) {
-												e.target.value = '1';
+											if (e.target.value < 12) {
+												e.target.value = '12';
 											}
 										}}
 									/>
