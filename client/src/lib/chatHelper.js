@@ -1,3 +1,5 @@
+import decryptMessage from './decryptMessage';
+
 export default (state, app) => {
 	const getMessage = (id) => {
 		if (!state[app.currentChatId]) {
@@ -27,15 +29,16 @@ export default (state, app) => {
 		});
 	};
 
-	const handleCopyToClipBoard = async (id) => {
+	const handleCopyToClipBoard = async (id, key) => {
 		const { message } = getMessage(id, state, app);
+		const decryptedMessage = await decryptMessage(message, key);
 		if (message.includes('Warning Message')) {
 			return;
 		}
 		if ('clipboard' in navigator) {
-			return await navigator.clipboard.writeText(message);
+			return await navigator.clipboard.writeText(decryptedMessage);
 		} else {
-			return document.execCommand('copy', true, message);
+			return document.execCommand('copy', true, decryptedMessage);
 		}
 	};
 
@@ -104,7 +107,7 @@ export const isGreaterThan3Minutes = (interval, time) => {
 	return false;
 };
 
-// As we cant store data in array form directly in database 
+// As we cant store data in array form directly in database
 // we need to convert it into string which is Base64 of Unit8Array
 export const arrayBufferToBase64 = (arrayBuffer) => {
 	let binary = '';
@@ -116,7 +119,7 @@ export const arrayBufferToBase64 = (arrayBuffer) => {
 	return btoa(binary);
 };
 
-// This function is used keys which are in ArrayBuffer form to PEM 
+// This function is used keys which are in ArrayBuffer form to PEM
 // because we cant sent the keys through socket.io in ArrayBuffer form
 export const convertArrayBufferToPem = (arrayBuffer, type) => {
 	const buffer = new Uint8Array(arrayBuffer);
@@ -124,7 +127,7 @@ export const convertArrayBufferToPem = (arrayBuffer, type) => {
 	return `-----BEGIN ${type}-----\n${base64String}\n-----END ${type}-----`;
 };
 
-// This function does opposite of above function. 
+// This function does opposite of above function.
 // After receiving keys from socket.io in PEM string we need to apply below function.
 export const pemToArrayBuffer = (pemString) => {
 	const base64String =
