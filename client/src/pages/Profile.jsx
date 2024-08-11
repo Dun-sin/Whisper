@@ -212,8 +212,8 @@ const Profile = () => {
 										ref={ageRef}
 										min="1"
 										onChange={(e) => {
-											if (e.target.value < 1) {
-												e.target.value = '1';
+											if (e.target.value < 12) {
+												e.target.value = '12';
 											}
 										}}
 									/>
