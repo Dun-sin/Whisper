@@ -1,3 +1,5 @@
+/* eslint-disable require-atomic-updates */
+
 import React, { useRef, useState } from 'react'
 import { decrypt, encrypt, generateCode } from 'src/lib/utils';
 
@@ -42,7 +44,6 @@ const Login = () => {
       console.error(error)
     } finally {
       setIsLoading(false)
-      // eslint-disable-next-line require-atomic-updates
       emailRef.current.value = ''
     }
   }
@@ -50,7 +51,7 @@ const Login = () => {
   const handleCodeInput = async () => {
     const inputedCode = codeRef.current.value
     if (!inputedCode || inputedCode.length === '') {
-      setError('Email not provided')
+      setError('No Code provided')
       return
     }
 
@@ -77,18 +78,20 @@ const Login = () => {
         } else if (response.status === 500) {
           throw new Error(data.message);
         }
+      } else {
+        setError('Wrong Code, Try Again')
       }
 
     } catch (error) {
       console.error(error)
     } finally {
       setIsLoading(false)
+      codeRef.current.value = ''
     }
   }
 
   return (
     <section className='flex flex-col gap-3'>
-      {error && <p className='text-red'>{error}</p>}
       {toInputCode ?
         <InputMethod
           refProp={codeRef}
@@ -104,6 +107,7 @@ const Login = () => {
           handleSubmit={handleEmailInput}
           inputValue={{ type: "email", name: "email", placeholder: "Enter Your Email" }}
         />}
+      {error && <p className='text-red text-center'>{error}</p>}
     </section>
   )
 }
