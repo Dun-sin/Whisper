@@ -63,5 +63,3 @@ const Home = () => {
 
 export default Home;
 
-
-// <div className="uppercase py-5">Processing Login</div> 

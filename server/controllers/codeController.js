@@ -51,3 +51,4 @@ const sendCode = async (req, res) => {
 CodeRouter.route('/').post(emailValidator, sendCode);
 
 module.exports = CodeRouter;
+

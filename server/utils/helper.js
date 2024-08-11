@@ -15,3 +15,4 @@ const emailValidator = (req, res, next) => {
 module.exports = {
   emailValidator,
 };
+
