@@ -35,6 +35,7 @@
 		"react-loading-icons": "^1.1.0",
 		"react-router-dom": "^6.15.0",
 		"react-scroll-to-bottom": "^4.2.0",
+		"react-spinners": "^0.14.1",
 		"rsuite": "^5.37.4",
 		"socket.io-client": "^4.7.2",
 		"styled-components": "^5.3.5",
