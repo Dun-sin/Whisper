@@ -14,7 +14,7 @@
 ### Pull Request guidelines
 
 - Don't create a pull request on an issue that doesn't exist, create an issue first and if the changes you are proposing are said to be okay, you can go ahead and create a pull request
-- Don't work on the main branch, create your own branch by following the instructions [here](#-how-to-make-a-pull-request)
+- Don't work on the main branch, create your own branch by following the instructions [here](#-how-to-fill-a-pull-request-templatetext)
 - If you are working on the backend, share a screenrecording of your working software
 - don't create a PR for things outside of your issue's scope, it will lead to more work for the maintainers
 
