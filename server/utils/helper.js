@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 // Defining separate email validation middleware
 const validator = require('validator').default;
 const emailValidator = (req, res, next) => {
@@ -12,7 +14,11 @@ const emailValidator = (req, res, next) => {
   }
 };
 
+function generateObjectId() {
+  return crypto.randomBytes(12).toString('hex');
+}
+
 module.exports = {
   emailValidator,
+  generateObjectId,
 };
-

@@ -1,11 +1,12 @@
 const { Socket } = require('socket.io');
 const mongoose = require('mongoose');
 const CryptoJS = require('crypto-js');
+const { ObjectId } = require('mongodb');
 
-const ActiveUser = require('../models/ActiveUserModel');
+const ActiveUser = require('../models/UserModel');
 const Chat = require('../models/ChatModel');
 const Message = require('../models/MessageModel');
-
+const { generateObjectId } = require('./helper');
 
 /**
  * @typedef {{
@@ -127,9 +128,11 @@ function getChatsCount(emailOrLoginId) {
  */
 async function delActiveUser(user) {
   delete activeUsers[user.emailOrLoginId];
-  await ActiveUser.deleteOne({
-    _id: user.id,
-  });
+
+  const userToDelete = await ActiveUser.findById(user.id);
+  if (!userToDelete.email) {
+    await ActiveUser.deleteOne({ _id: user.id });
+  }
 }
 
 // This funtion is used for removing user from waiting list
@@ -192,38 +195,54 @@ async function createChat(users) {
 
   const chatId = _chat._id.toString();
 
-  // this shouldn't happen as now new users are added to active users collection instead of users collection.
+  // this shouldn't happen as now new users are added to active
+  // users collection instead of users collection.
   // find a way to take users from users and fill it in active users.
-  for (let i = 0; i < users.length; i++) {
-    const { email, loginId } = users[i];
-    const user = await ActiveUser.create({
-      email,
-      loginId,
-      currentChat: _chat._id,
-    });
-    _chat.users.push(user._id);
+  try {
+    for (let i = 0; i < users.length; i++) {
+      const { email, loginId } = users[i];
+      let user;
+      const findUser = await ActiveUser.findOne({ loginId: loginId });
+      if (findUser) {
+        user = findUser;
+      } else {
+        user = await ActiveUser.create({
+          email,
+          loginId,
+          currentChat: _chat._id,
+          _id: new ObjectId(generateObjectId()),
+        });
+      }
+      _chat.users.push(user._id);
 
-    users[i].id = user._id.toString();
-    users[i].currentChatId = chatId;
-    users[i].chatIds.push(chatId);
+      users[i].id = user._id.toString();
+      users[i].currentChatId = chatId;
+      users[i].chatIds.push(chatId);
 
-    users[i].socketConnections.map((socket) => {
-      socket.join(chatId);
-    });
+      users[i].socketConnections.map((socket) => {
+        socket.join(chatId);
+      });
 
-    addActiveUser(users[i]);
+      addActiveUser(users[i]);
+    }
+  } catch (error) {
+    console.log(`error creating user: ${error}`);
   }
 
-  const chat = await Chat.create(_chat);
-  /** @type {Chat} */
-  const optimizedChat = {
-    ...chat.optimizedVersion,
-    userIds: users.map((user) => user.emailOrLoginId),
-  };
+  try {
+    const chat = await Chat.create(_chat);
+    /** @type {Chat} */
+    const optimizedChat = {
+      ...chat.optimizedVersion,
+      userIds: users.map((user) => user.emailOrLoginId),
+    };
 
-  chats[chatId] = optimizedChat;
+    chats[chatId] = optimizedChat;
 
-  return optimizedChat;
+    return optimizedChat;
+  } catch (error) {
+    console.log(`error creating chat: ${error}`);
+  }
 }
 
 /**
