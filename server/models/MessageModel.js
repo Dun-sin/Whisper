@@ -23,7 +23,7 @@ const MessageSchema = new Schema(
     sender: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: 'ActiveUser',
+      ref: 'User',
     },
     type: {
       type: String,
@@ -35,8 +35,8 @@ const MessageSchema = new Schema(
     },
     replyTo: {
       type: Schema.Types.ObjectId,
-      ref: 'Message'
-    }
+      ref: 'Message',
+    },
   },
   {
     timestamps: true,
@@ -53,7 +53,7 @@ const MessageSchema = new Schema(
             containsBadword: this.containsBadword,
             oldMessages: this.oldMessages,
             isRead: this.isRead,
-            replyTo: this.replyTo?.toString() || null
+            replyTo: this.replyTo?.toString() || null,
           };
         },
       },

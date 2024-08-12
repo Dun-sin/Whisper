@@ -1,13 +1,33 @@
 const mongoose = require('mongoose');
-const { model, Schema } = mongoose;
+const { Schema, model } = mongoose;
 
-const Chat = require('./ChatModel');
-
-const ActiveUserSchema = new Schema(
+const UserSchema = new Schema(
   {
+    _id: {
+      type: String,
+    },
     email: {
-      type: Schema.Types.Mixed,
-      default: null,
+      type: String,
+    },
+    gender: {
+      type: String,
+      enum: ['Male', 'Female', 'Unknown'],
+    },
+    age: {
+      type: Number,
+    },
+    username: {
+      type: String,
+      default: 'Anonymous',
+    },
+    aboutMe: {
+      type: String,
+    },
+    settings: {
+      type: Object,
+    },
+    profileImage: {
+      type: String,
     },
     loginId: {
       type: String,
@@ -31,6 +51,12 @@ const ActiveUserSchema = new Schema(
           return {
             id: this._id.toString(),
             email: this.email || null,
+            gender: this.gender,
+            age: this.age,
+            username: this.username,
+            aboutMe: this.aboutMe || null,
+            settings: this.settings || {},
+            profileImage: this.profileImage || null,
             loginId: this.loginId,
             emailOrLoginId: this.emailOrLoginId,
             socketConnections: [],
@@ -44,4 +70,6 @@ const ActiveUserSchema = new Schema(
   }
 );
 
-module.exports = model('ActiveUser', ActiveUserSchema);
+UserSchema.index({ loginId: 1 }, { unique: true });
+
+module.exports = model('User', UserSchema);
