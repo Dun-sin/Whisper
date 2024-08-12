@@ -5,7 +5,8 @@ labels:
   [
     "feature",
     "enhancement",
-    "hacktoberfest"
+    "hacktoberfest",
+    "🚦 status: awaiting approval"
   ]
 body:
   - type: textarea

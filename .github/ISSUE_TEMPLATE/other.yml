@@ -1,7 +1,7 @@
 name: Other
 description: Use this for any other issues. Please do NOT create blank issues
 title: "[OTHER]"
-labels: ["hacktoberfest"]
+labels: ["hacktoberfest", "🚦 status: awaiting approval"]
 body:
   - type: markdown
     attributes:
