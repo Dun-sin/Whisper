@@ -130,7 +130,10 @@ async function delActiveUser(user) {
   delete activeUsers[user.emailOrLoginId];
 
   const userToDelete = await ActiveUser.findById(user.id);
-  if (!userToDelete.email) {
+  if (
+    userToDelete &&
+    (!userToDelete.email || userToDelete.email.trim() === '')
+  ) {
     await ActiveUser.deleteOne({ _id: user.id });
   }
 }
