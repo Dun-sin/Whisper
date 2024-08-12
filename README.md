@@ -60,7 +60,7 @@ This app is developed to make chatting much private and easy without stealing yo
 <a href="https://socket.io/" target="_blank" rel="noreferrer"><img src="https://w7.pngwing.com/pngs/162/702/png-transparent-socket-io-node-js-express-js-npm-network-socket-github-angle-triangle-logo-thumbnail.png" width="36" height="36" alt="SocketIo"></a>
      <br>SocketIo
     </td>  
-   8. To test things out, you can open the same URL in two different browsers or open a private browsing window in the same browser. This allows you to connect to yourself, use `login anonymously` if you aren't dealing with anything that uses user data else use `login` and open an account on kinde `https://kinde.com/` following the instructions for react implementation and replace it with the data from your kinde.  
+   8. To test things out, yo can open the same URL in two different browsers or open a private browsing window in the same browser. This allows you to connect to yourself, use `login anonymously` if you aren't dealing with anything that uses user data else use `login` and open an account on kinde `https://kinde.com/` following the instructions for react implementation and replace it with the data from your kinde.  
     <td align="Center" width="30%">      
 <a href="https://tailwindcss.com/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/tailwindcss-colored.svg" width="36" height="36" alt="TailwindCSS" /></a> 
   <br>TailwindCSS
