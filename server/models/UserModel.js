@@ -70,6 +70,6 @@ const UserSchema = new Schema(
   }
 );
 
-UserSchema.index({ loginId: 1 }, { unique: true });
+UserSchema.index({ loginId: 1, email: 1 }, { unique: true, sparse: true });
 
 module.exports = model('User', UserSchema);
