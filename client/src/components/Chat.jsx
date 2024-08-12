@@ -19,27 +19,27 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import BadWordsNext from 'bad-words-next';
 import DropDownOptions from './Chat/DropDownOption';
+import Loading from './Loading';
 import MarkdownIt from 'markdown-it';
 import MessageInput from './Chat/MessageInput';
 import MessageSeen from './Chat/MessageSeen';
 import MessageStatus from './MessageStatus';
 import PreviousMessages from './Chat/PreviousMessages';
 import ScrollToBottom from 'react-scroll-to-bottom';
-import { socket } from 'src/lib/socketConnection';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 import decryptMessage from 'src/lib/decryptMessage';
 import en from 'bad-words-next/data/en.json';
+import { socket } from 'src/lib/socketConnection';
 import { throttle } from 'lodash';
 import { useApp } from 'src/context/AppContext';
 import { useAuth } from 'src/context/AuthContext';
 import { useChat } from 'src/context/ChatContext';
 import useChatUtils from 'src/lib/chatSocket';
+import useCryptoKeys from 'src/hooks/useCryptoKeys';
 import useInactiveChat from 'src/hooks/useInactiveChat';
 import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 import { useNotification } from 'src/lib/notification';
 import { v4 as uuid } from 'uuid';
-
-import useCryptoKeys from 'src/hooks/useCryptoKeys';
 
 let senderId;
 
@@ -55,7 +55,7 @@ const Chat = () => {
 	const [decryptedMessages, setDecryptedMessages] = useState();
 	// use the id so we can track what message's previousMessage is open
 	const [openPreviousMessages, setOpenPreviousMessages] = useState(null);
-	const [badwordChoices, setBadwordChoices] = useState({});
+  const [badwordChoices, setBadwordChoices] = useState({});
 
 	const {
 		messages: state,
@@ -67,9 +67,7 @@ const Chat = () => {
 		currentReplyMessageId,
 		cancelReply,
 	} = useChat();
-	const {importedPublicKey, importedPrivateKey, cryptoKey, importKey, generateKeyPair
-
-	 } = useCryptoKeys(app.currentChatId);
+  const { importedPublicKey, importedPrivateKey, cryptoKey, messageIsDecrypting, generateKeyPair, importKey } = useCryptoKeys(app.currentChatId);
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 
@@ -288,13 +286,14 @@ const Chat = () => {
 		receiveMessage(messageId, chatId);
 	}, []);
 
-	const onPublicStringHandler = useCallback(({ pemPublicKeyString, pemPrivateKeyString }) => {
-		const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
-		const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
-		
-		// Import PEM-formatted public key as CryptoKey
-		importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
-	}, []);
+  const onPublicStringHandler = useCallback(({ pemPublicKeyString, pemPrivateKeyString }) => {
+    const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
+    const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
+
+    // Import PEM-formatted public key as CryptoKey
+    importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
+  }, []);
+
 
 	// Clear chat when escape is pressed
 	useEffect(() => {
@@ -324,12 +323,12 @@ const Chat = () => {
 		inputRef.current.focus();
 	}, [currentReplyMessageId]);
 
-	useEffect(() => {
-	const fetchData = async () => {
+  useEffect(() => {
+    const fetchData = async (importedPrivateKey, cryptoKey) => {
 		const decryptedPromises = sortedMessages.map(
-			async ({ message, senderId: sender, ...rest }) => {
+      async ({ message, senderId: sender, ...rest }) => {
 				try {
-					if (sender.toString() === senderId.toString()) {
+          if (sender.toString() === senderId.toString()) {
 						const decryptedMessage = await decryptMessage(message, importedPrivateKey);
 						return {
 							...rest,
@@ -356,15 +355,17 @@ const Chat = () => {
 		);
 
 		const decryptedMessages = await Promise.all(decryptedPromises);
-		setDecryptedMessages(decryptedMessages);
+      setDecryptedMessages(decryptedMessages);
 	};
 
-	fetchData();
-}, [sortedMessages, cryptoKey]);
+    if (cryptoKey && importedPrivateKey) {
+      fetchData(importedPrivateKey, cryptoKey)
+    }
+  }, [sortedMessages, cryptoKey, importedPrivateKey]);
 
-	useEffect(() => {
-		generateKeyPair()
-		socket.on('publicKey', onPublicStringHandler);
+  useEffect(() => {
+    generateKeyPair();
+    socket.on('publicKey', onPublicStringHandler);
 		socket.on(NEW_EVENT_RECEIVE_MESSAGE, onNewMessageHandler);
 		socket.on(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
 		socket.on(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
@@ -376,8 +377,9 @@ const Chat = () => {
 			socket.off(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
 			socket.off(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
 			socket.off(NEW_EVENT_READ_MESSAGE, onReadMessageHandler);
-			socket.off(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
-			socket.off('publicKey', onPublicStringHandler);
+      socket.off(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
+      socket.off('publicKey', onPublicStringHandler);
+
 		};
 	}, []);
 
@@ -392,7 +394,7 @@ const Chat = () => {
 					initialScrollBehavior="auto"
 					className="h-[100%] md:max-h-full overflow-y-auto w-full scroll-smooth"
 				>
-					{decryptedMessages &&
+          {!messageIsDecrypting ? (decryptedMessages &&
 						decryptedMessages.map(
 							({
 								senderId: sender,
@@ -571,7 +573,10 @@ const Chat = () => {
 									</div>
 								);
 							}
-						)}
+            )) : (
+            <div className='w-full h-full flex flex-col items-center justify-center'><Loading loading={messageIsDecrypting} />
+            </div>
+          )}
 				</ScrollToBottom>
 			</div>
 
