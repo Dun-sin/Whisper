@@ -60,10 +60,6 @@ This app is developed to make chatting much private and easy without stealing yo
 <a href="https://socket.io/" target="_blank" rel="noreferrer"><img src="https://w7.pngwing.com/pngs/162/702/png-transparent-socket-io-node-js-express-js-npm-network-socket-github-angle-triangle-logo-thumbnail.png" width="36" height="36" alt="SocketIo"></a>
      <br>SocketIo
     </td>  
-  <td align="Center" width="30%">
-  <a href="https://kinde.com/" target="_blank" rel="noreferrer"><img src="https://pbs.twimg.com/profile_images/1577508370189520896/zAvyayM9_400x400.jpg" width="36" height="36" alt="Kinde"/></a>
-     <br>Kinde
-    </td>  
     <td align="Center" width="30%">      
 <a href="https://tailwindcss.com/" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/danielcranney/readme-generator/main/public/icons/skills/tailwindcss-colored.svg" width="36" height="36" alt="TailwindCSS" /></a> 
   <br>TailwindCSS
@@ -138,7 +134,7 @@ Before installation, please make sure you have already installed the following t
 
 > For those who do not wish to use Docker, here is another option -> [to start the project](https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md#starting-the-project-without-docker)
 
-8. To test things out, you can open the same URL in two different browsers or open a private browsing window in the same browser. This allows you to connect to yourself, use `login anonymously` if you aren't dealing with anything that uses user data else use `login` and open an account on kinde `https://kinde.com/` following the instructions for react implementation and replace it with the data from your kinde.
+8. To test things out, you can open the same URL in two different browsers or open a private browsing window in the same browser. This allows you to connect to yourself, use `login anonymously` if you aren't dealing with anything that uses user data, else use `login` and open an account on [mailtrap](https://mailtrap.io/) using their demo to domain and get the token into .env
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
