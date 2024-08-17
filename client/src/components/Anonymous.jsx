@@ -31,9 +31,9 @@ import useCheckTimePassed from 'src/hooks/useCheckTimePassed';
 
 const centerItems = `flex items-center justify-center`;
 
-const Anonymous = ({ 
-	onChatClosed,  
-	
+const Anonymous = ({
+	onChatClosed,
+
 }) => {
 	const { app, endSearch } = useApp();
 	const { currentChatId, onlineStatus } = app;
@@ -290,8 +290,8 @@ const Anonymous = ({
 					'flex-auto',
 				])}
 			>
-				<Chat 
-					
+				<Chat
+
 				/>
 			</div>
 		</div>
