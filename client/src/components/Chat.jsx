@@ -258,6 +258,10 @@ const Chat = () => {
 	const showBadword = (id) => {
 		setBadwordChoices({ ...badwordChoices, [id]: 'show' });
 	};
+ 
+	function getRepliedMessage(replyTo){
+		return decryptedMessages.find(object=>object.id===replyTo)
+	}
 
 	const onNewMessageHandler = useCallback(async (message) => {
 		try {
@@ -412,7 +416,7 @@ const Chat = () => {
 								// original message this message is a reply to
 								const repliedMessage = replyTo
 									? (() => {
-											const messageObj = getMessage(replyTo);
+											const messageObj = getRepliedMessage(replyTo);
 											if (!messageObj) {
 												return null;
 											}
