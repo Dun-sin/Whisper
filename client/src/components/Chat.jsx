@@ -55,7 +55,7 @@ const Chat = () => {
 	const [decryptedMessages, setDecryptedMessages] = useState();
 	// use the id so we can track what message's previousMessage is open
 	const [openPreviousMessages, setOpenPreviousMessages] = useState(null);
-  const [badwordChoices, setBadwordChoices] = useState({});
+	const [badwordChoices, setBadwordChoices] = useState({});
 
 	const {
 		messages: state,
@@ -67,7 +67,14 @@ const Chat = () => {
 		currentReplyMessageId,
 		cancelReply,
 	} = useChat();
-  const { importedPublicKey, importedPrivateKey, cryptoKey, messageIsDecrypting, generateKeyPair, importKey } = useCryptoKeys(app.currentChatId);
+	const {
+		importedPublicKey,
+		importedPrivateKey,
+		cryptoKey,
+		messageIsDecrypting,
+		generateKeyPair,
+		importKey,
+	} = useCryptoKeys(app.currentChatId);
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 
@@ -97,12 +104,12 @@ const Chat = () => {
 
 	const emitTyping = useCallback((boolean) => {
 		socket.timeout(5000).emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: boolean });
-	}, [])
+	}, []);
 
 	const cancelEdit = () => {
 		inputRef.current.value = '';
 		setEditing({ isediting: false, messageID: null });
-		emitTyping(false)
+		emitTyping(false);
 	};
 
 	const sortedMessages = useMemo(
@@ -189,7 +196,7 @@ const Chat = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		emitTyping(false)
+		emitTyping(false);
 		const d = new Date();
 		const message = inputRef.current.value.trim(); // Trim the message to remove the extra spaces
 
@@ -235,7 +242,7 @@ const Chat = () => {
 
 	const handleTypingStatus = throttle((e) => {
 		if (e.target.value.length > 0) {
-			emitTyping(true)
+			emitTyping(true);
 		}
 		setMessage(e.target.value);
 		adjustTextareaHeight(inputRef);
@@ -258,9 +265,9 @@ const Chat = () => {
 	const showBadword = (id) => {
 		setBadwordChoices({ ...badwordChoices, [id]: 'show' });
 	};
- 
-	function getRepliedMessage(replyTo){
-		return decryptedMessages.find(object=>object.id===replyTo)
+
+	function getRepliedMessage(replyTo) {
+		return decryptedMessages.find((object) => object.id === replyTo);
 	}
 
 	const onNewMessageHandler = useCallback(async (message) => {
@@ -299,6 +306,7 @@ const Chat = () => {
   }, []);
 
 
+
 	// Clear chat when escape is pressed
 	useEffect(() => {
 		const keyDownHandler = (event) => {
@@ -327,49 +335,49 @@ const Chat = () => {
 		inputRef.current.focus();
 	}, [currentReplyMessageId]);
 
-  useEffect(() => {
-    const fetchData = async (importedPrivateKey, cryptoKey) => {
-		const decryptedPromises = sortedMessages.map(
-      async ({ message, senderId: sender, ...rest }) => {
-				try {
-          if (sender.toString() === senderId.toString()) {
-						const decryptedMessage = await decryptMessage(message, importedPrivateKey);
+	useEffect(() => {
+		const fetchData = async (importedPrivateKey, cryptoKey) => {
+			const decryptedPromises = sortedMessages.map(
+				async ({ message, senderId: sender, ...rest }) => {
+					try {
+						if (sender.toString() === senderId.toString()) {
+							const decryptedMessage = await decryptMessage(message, importedPrivateKey);
+							return {
+								...rest,
+								senderId: senderId,
+								message: decryptedMessage,
+							};
+						}
+
+						const finalMessage = await decryptMessage(message, cryptoKey);
 						return {
 							...rest,
-							senderId: senderId,
-							message: decryptedMessage,
+							senderId: sender,
+							message: finalMessage || message, // Use the decrypted message, or fallback to the original message
+						};
+					} catch (error) {
+						console.error('Decryption error:', error);
+						return {
+							...rest,
+							senderId: sender,
+							message: message, // Use the original message in case of decryption error
 						};
 					}
-
-					const finalMessage = await decryptMessage(message, cryptoKey);
-					return {
-						...rest,
-						senderId: sender,
-						message: finalMessage || message, // Use the decrypted message, or fallback to the original message
-					};
-				} catch (error) {
-					console.error('Decryption error:', error);
-					return {
-						...rest,
-						senderId: sender,
-						message: message, // Use the original message in case of decryption error
-					};
 				}
-			}
-		);
+			);
 
-		const decryptedMessages = await Promise.all(decryptedPromises);
-      setDecryptedMessages(decryptedMessages);
-	};
+			const decryptedMessages = await Promise.all(decryptedPromises);
+			setDecryptedMessages(decryptedMessages);
+		};
 
-    if (cryptoKey && importedPrivateKey) {
-      fetchData(importedPrivateKey, cryptoKey)
-    }
-  }, [sortedMessages, cryptoKey, importedPrivateKey]);
+		if (cryptoKey && importedPrivateKey) {
+			fetchData(importedPrivateKey, cryptoKey);
+		}
+	}, [sortedMessages, cryptoKey, importedPrivateKey]);
 
-  useEffect(() => {
-    generateKeyPair();
-    socket.on('publicKey', onPublicStringHandler);
+	useEffect(() => {
+		generateKeyPair();
+		socket.on('publicKey', onPublicStringHandler);
 		socket.on(NEW_EVENT_RECEIVE_MESSAGE, onNewMessageHandler);
 		socket.on(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
 		socket.on(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
@@ -381,9 +389,8 @@ const Chat = () => {
 			socket.off(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
 			socket.off(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
 			socket.off(NEW_EVENT_READ_MESSAGE, onReadMessageHandler);
-      socket.off(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
-      socket.off('publicKey', onPublicStringHandler);
-
+			socket.off(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
+			socket.off('publicKey', onPublicStringHandler);
 		};
 	}, []);
 
@@ -398,7 +405,8 @@ const Chat = () => {
 					initialScrollBehavior="auto"
 					className="h-[100%] md:max-h-full overflow-y-auto w-full scroll-smooth"
 				>
-          {!messageIsDecrypting ? (decryptedMessages &&
+					{!messageIsDecrypting ? (
+						decryptedMessages &&
 						decryptedMessages.map(
 							({
 								senderId: sender,
@@ -577,10 +585,12 @@ const Chat = () => {
 									</div>
 								);
 							}
-            )) : (
-            <div className='w-full h-full flex flex-col items-center justify-center'><Loading loading={messageIsDecrypting} />
-            </div>
-          )}
+						)
+					) : (
+						<div className="w-full h-full flex flex-col items-center justify-center">
+							<Loading loading={messageIsDecrypting} />
+						</div>
+					)}
 				</ScrollToBottom>
 			</div>
 
