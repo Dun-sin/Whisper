@@ -30,7 +30,9 @@ const NavBar = () => {
 		dispatchAuth({
 			type: 'LOGOUT',
 		});
-		logout();
+		// close dialog
+		setDialog({ isOpen: false });
+		logout();		
 	}
 
 	const handleLogout = () => {
