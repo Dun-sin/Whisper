@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import PropTypes from 'prop-types';
 
 import { Tooltip, Whisper } from 'rsuite';
 import { Icon } from '@iconify/react';
@@ -156,10 +155,6 @@ const NavBar = () => {
 			</div>
 		</div>
 	);
-};
-
-NavBar.propTypes = {
-	className: PropTypes.string,
 };
 
 export default NavBar;
