@@ -5,6 +5,7 @@ const { ObjectId } = require('mongodb');
 
 const ActiveUser = require('../models/UserModel');
 const Chat = require('../models/ChatModel');
+const User = require('../models/UserModel');
 const Message = require('../models/MessageModel');
 const { generateObjectId } = require('./helper');
 
@@ -502,6 +503,31 @@ function getWaitingUserLen() {
   return Object.keys(waitingUsers).length;
 }
 
+async function blockUser(userIdToReport, currentUserId) {
+  try {
+    await User.findOneAndUpdate({ loginId: currentUserId }, {
+      $addToSet: { reportedUsers: userIdToReport }
+    });
+    console.log(`User ${currentUserId} has blocked user ${userIdToReport}`);
+  } catch (error) {
+    console.error("Error blocking user:", error);
+  }
+}
+
+async function isUserBlocked(userIdToReport, currentUserId) {
+  try {
+    const user = await User.findOne({ loginId: currentUserId });
+    console.log({ user });
+
+    if (user && user.reportedUsers) {
+      return user.reportedUsers.includes(userIdToReport);
+    }
+    return false;
+  } catch (error) {
+    console.error("Error checking if user is blocked:", error);
+  }
+}
+
 module.exports = {
   init,
   createChat,
@@ -521,4 +547,6 @@ module.exports = {
   addToWaitingList,
   delActiveUser,
   seenMessage,
+  blockUser,
+  isUserBlocked
 };

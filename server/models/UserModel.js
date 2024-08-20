@@ -37,6 +37,10 @@ const UserSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Chat',
     },
+    reportedUsers: {
+      type: [String],
+      default: []
+    }
   },
   {
     timestamps: true,
@@ -63,6 +67,7 @@ const UserSchema = new Schema(
             socketIds: [],
             currentChatId: this.currentChat?._id?.toString() || null,
             chatIds: [],
+            reportedUsers: []
           };
         },
       },

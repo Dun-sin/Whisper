@@ -10,6 +10,7 @@ const imageUpload = multer({ storage: storage });
 
 const User = require('../models/UserModel');
 const { emailValidator, generateObjectId } = require('../utils/helper');
+const { isUserBlocked, blockUser } = require('../utils/lib.js');
 
 const {
   OK,
@@ -146,6 +147,29 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const reportUser = async (req, res) => {
+  const {userIdToReport, currentUserId} = req.body
+
+  console.log(`${currentUserId} wants to report ${userIdToReport}`)
+  try {
+    // Check if the user is already blocked
+    if (await isUserBlocked(userIdToReport, currentUserId)) {
+      return res.status(400).json({ message: "This user is already blocked." });
+    }
+
+    // Implement the blocking logic
+    await blockUser(userIdToReport, currentUserId);
+
+    // You might want to log this action or notify admins
+    console.log(`User ${currentUserId} reported and blocked user ${userIdToReport}`);
+
+    res.status(200).json({ message: "User reported and blocked successfully" });
+  } catch (error) {
+    console.error("Error in /reportUser:", error);
+    res.status(500).json({ message: "An error occurred while processing your request" });
+  }
+}
+
 UserRouter.route('/login').post(emailValidator, loginUser);
 UserRouter.route('/profile').post(
   imageUpload.single('profileImage'),
@@ -154,5 +178,7 @@ UserRouter.route('/profile').post(
 );
 UserRouter.route('/profile/:email').get(getProfile);
 UserRouter.route('/deleteUser').delete(emailValidator, deleteUser); //Email validation applied to the required request handlers
+
+UserRouter.route("/reportUser").post(reportUser)
 
 module.exports = UserRouter;
