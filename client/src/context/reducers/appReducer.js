@@ -40,6 +40,12 @@ export default function chatReducer(state, action) {
 			break;
 		}
 
+		case 'CLEAR_CHATID': {
+			clonedState.isSearching = false;
+			clonedState.currentChatId = null
+			break
+		}
+
 		default:
 			throw new Error('No action provided!');
 	}

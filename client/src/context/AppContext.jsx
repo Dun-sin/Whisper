@@ -103,6 +103,12 @@ export const AppProvider = ({ children }) => {
 		});
 	}
 
+	function clearChatId() {
+		dispatch({
+			type: "CLEAR_CHATID",
+		})
+	}
+
 	return (
 		<AppContext.Provider
 			value={{
@@ -115,6 +121,7 @@ export const AppProvider = ({ children }) => {
 				endSearch,
 				loadUserSettings,
 				updateOnlineStatus,
+				clearChatId
 			}}
 		>
 			{children}

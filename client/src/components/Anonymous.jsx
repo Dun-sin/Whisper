@@ -28,6 +28,8 @@ import { createClassesFromArray, isExplicitDisconnection } from 'src/lib/utils';
 
 import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
 import useCheckTimePassed from 'src/hooks/useCheckTimePassed';
+import { useAuth } from 'src/context/AuthContext';
+import { api } from 'src/lib/axios';
 
 const centerItems = `flex items-center justify-center`;
 
@@ -36,7 +38,8 @@ const Anonymous = ({
 	
 }) => {
 	const { app, endSearch } = useApp();
-	const { currentChatId, onlineStatus } = app;
+	const { authState } = useAuth()
+	const { currentChatId, onlineStatus,  } = app;
 	const { clearTimer } = useCheckTimePassed();
 
 	const currentChatIdRef = useRef(currentChatId);
@@ -54,7 +57,7 @@ const Anonymous = ({
 	const typingStatusTimeoutRef = useRef(null);
 
 	const navigate = useNavigate();
-	const { closeChat } = useChat();
+	const { messages: state, closeChat } = useChat();
 	const { setDialog } = useDialog();
 
 	const onDisplay = useCallback(({ isTyping, chatId }) => {
@@ -170,6 +173,66 @@ const Anonymous = ({
 		});
 	};
 
+	const createAnAccount = () => {
+		// Creating new account logic goes here!
+		return navigate("/profile")
+	}
+
+	const reportUser = async () => {
+		// Get the other user id 
+		const otherUserId = state[currentChatId]?.userIds.find(
+			id => id !== authState.loginId && id !== authState.email
+		  );
+
+		  if (!otherUserId) {
+			return { success: false, message: "Could not identify the user to report" };
+		  }
+
+	 	 try {
+			const res = await api.post('/reportUser', {
+			  userIdToReport: otherUserId,
+			  currentUserId: authState.loginId
+			});
+		
+			if (res.status === 200) {
+			  return { success: true };
+			} else {
+			  return { success: false, message: "Error reporting user" };
+			}
+		  } catch (error) {
+			console.error("Error in reportUser:", error);
+			return { success: false, message: "An unexpected error occurred" };
+		  }
+	}
+
+	const handleReport = async () => {
+		// Check if user have an account i.e. not a anonymous user
+		if(authState.loginType === "anonymous") {
+			 setDialog({
+				isOpen: true,
+				text: "You have to create an account first to access this feature!",
+				yesBtnText: "Create an account",
+				noBtnText: "Back to chat",
+				handler: () => createAnAccount()
+			 })
+			 return
+		}
+
+		try {
+			const result = await reportUser();
+			if (result.success) {
+			  alert('User reported and blocked successfully');
+			  // Update the UI or redirect the user here
+			  closeChatHandler(false)
+			} else {
+			  alert(result.message || "Error reporting user. Please try again later.");
+			}
+		  } catch (err) {
+			console.error("Error in handleReport:", err);
+			alert("User is already blocked!");
+		  }
+	}
+
 	useKeyPress(['x'], () => handleClose(), ShortcutFlags.ctrl | ShortcutFlags.shift);
 	useKeyPress(['n'], () => handleClose(true), ShortcutFlags.ctrl | ShortcutFlags.alt);
 
@@ -277,6 +340,13 @@ const Anonymous = ({
 						<div className="flex items-center justify-between gap-2 flex-wrap">
 							<span>Find a new buddy</span>
 							<span className="text-gray-500 text-xs">Ctrl + Alt + N</span>
+						</div>
+					</Dropdown.Item>
+					<Dropdown.Item onClick={() => handleReport()} className="sm:w-[200px]">
+						<div className="flex  items-center justify-between gap-2 flex-wrap">
+							<span className='text-red'>Report User</span>
+							{/* Some keyboard commands! */}
+							{/* <span className="text-gray-500 text-xs"></span> */}
 						</div>
 					</Dropdown.Item>
 				</Dropdown>
