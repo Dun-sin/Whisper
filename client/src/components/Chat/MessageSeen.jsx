@@ -16,7 +16,6 @@ const MessageSeen = ({ isRead, isSender }) => {
 	const observer = useObserver(isSender);
 
 	const { messages: state } = useChat();
-	
 
 	const sortedMessages = useMemo(
 		() =>
@@ -29,8 +28,10 @@ const MessageSeen = ({ isRead, isSender }) => {
 	);
 
 	useEffect(() => {
-		// Initialize Intersection Observer
-		observer.connect();
+		// Only proceed if the observer and sortedMessages are available
+		if (!observer || !sortedMessages.length) {
+			return;
+		}
 
 		sortedMessages.forEach((message) => {
 			if (message.isRead) {
@@ -44,10 +45,11 @@ const MessageSeen = ({ isRead, isSender }) => {
 		});
 
 		return () => {
-			// Clean up the observer
-			observer.disconnect();
+			if (observer) {
+				observer.disconnect();
+			}
 		};
-	}, [sortedMessages, isTabVisible]);
+	}, [sortedMessages, isTabVisible, observer]);
 
 	return isSender && <p className="text-sm">{isRead ? 'Seen' : 'Not Seen'}</p>;
 };
