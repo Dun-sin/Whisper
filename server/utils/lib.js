@@ -517,7 +517,6 @@ async function blockUser(userIdToReport, currentUserId) {
 async function isUserBlocked(userIdToReport, currentUserId) {
   try {
     const user = await User.findOne({ loginId: currentUserId });
-    console.log({ user });
 
     if (user && user.reportedUsers) {
       return user.reportedUsers.includes(userIdToReport);

@@ -173,11 +173,6 @@ const Anonymous = ({
 		});
 	};
 
-	const createAnAccount = () => {
-		// Creating new account logic goes here!
-		return navigate("/profile")
-	}
-
 	const reportUser = async () => {
 		// Get the other user id 
 		const otherUserId = state[currentChatId]?.userIds.find(
@@ -213,7 +208,7 @@ const Anonymous = ({
 				text: "You have to create an account first to access this feature!",
 				yesBtnText: "Create an account",
 				noBtnText: "Back to chat",
-				handler: () => createAnAccount()
+				handler: () => navigate("/profile")
 			 })
 			 return
 		}
