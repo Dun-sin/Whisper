@@ -15,12 +15,12 @@ const Start = () => {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (app.isSearching) {
+		if (app.isSearching||app.currentChatId) {
 			navigate('/founduser');
 		}
 
 		requestBrowserNotificationPermissions();
-	}, []);
+	}, [app]);
 	return (
 		<div
 			className={createClassesFromArray([
@@ -54,7 +54,7 @@ const Start = () => {
 					'bg-[#FF9F1C] hover:bg-[#FBBF24]',
 				])}
 			>
-				{app.currentChatId ? 'Open Chat' : 'Start'}
+				Start
 			</Link>
 		</div>
 	);
