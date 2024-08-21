@@ -39,7 +39,7 @@ const Anonymous = ({
 }) => {
 	const { app, endSearch } = useApp();
 	const { authState } = useAuth()
-	const { currentChatId, onlineStatus,  } = app;
+	const { currentChatId, onlineStatus } = app;
 	const { clearTimer } = useCheckTimePassed();
 
 	const currentChatIdRef = useRef(currentChatId);
