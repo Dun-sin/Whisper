@@ -18,8 +18,6 @@ import {
 	NEW_EVENT_SEND_FAILED,
 	NEW_EVENT_TYPING,
 } from '../../../constants.json';
-import { useCallback } from 'react';
-import { useApp } from 'src/context/AppContext';
 /**
  *
  * @param {Socket} socket
