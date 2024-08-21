@@ -1,21 +1,13 @@
 /* eslint-disable max-len */
 
 import { BsArrow90DegLeft, BsArrow90DegRight } from 'react-icons/bs';
-import {
-	NEW_EVENT_DELETE_MESSAGE,
-	NEW_EVENT_EDIT_MESSAGE,
-	NEW_EVENT_READ_MESSAGE,
-	NEW_EVENT_RECEIVE_MESSAGE,
-	NEW_EVENT_SEND_FAILED,
-	NEW_EVENT_TYPING,
-} from '../../../constants.json';
+
 import chatHelper, {
 	adjustTextareaHeight,
 	arrayBufferToBase64,
 	getTime,
-	pemToArrayBuffer,
 } from '../lib/chatHelper';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import BadWordsNext from 'bad-words-next';
 import DropDownOptions from './Chat/DropDownOption';
@@ -26,7 +18,6 @@ import MessageSeen from './Chat/MessageSeen';
 import MessageStatus from './MessageStatus';
 import PreviousMessages from './Chat/PreviousMessages';
 import ScrollToBottom from 'react-scroll-to-bottom';
-import { createBrowserNotification } from 'src/lib/browserNotification';
 import decryptMessage from 'src/lib/decryptMessage';
 import en from 'bad-words-next/data/en.json';
 import { socket } from 'src/lib/socketConnection';
@@ -38,14 +29,14 @@ import useChatUtils from 'src/lib/chatSocket';
 import useCryptoKeys from 'src/hooks/useCryptoKeys';
 import useInactiveChat from 'src/hooks/useInactiveChat';
 import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
-import { useNotification } from 'src/lib/notification';
 import { v4 as uuid } from 'uuid';
+import useSocketEvents from 'src/lib/useSocketEvents';
 
 let senderId;
 
 const Chat = () => {
 	const { app } = useApp();
-	const { playNotification } = useNotification();
+	
 	const [editing, setEditing] = useState({
 		isediting: false,
 		messageID: null,
@@ -61,8 +52,6 @@ const Chat = () => {
 		messages: state,
 		addMessage,
 		updateMessage,
-		removeMessage,
-		receiveMessage,
 		startReply,
 		currentReplyMessageId,
 		cancelReply,
@@ -72,18 +61,16 @@ const Chat = () => {
 		importedPrivateKey,
 		cryptoKey,
 		messageIsDecrypting,
-		generateKeyPair,
-		importKey,
 	} = useCryptoKeys(app.currentChatId);
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 
-	const { sendMessage, editMessage } = useChatUtils(socket);
+	const { sendMessage, editMessage, emitTyping } = useChatUtils(socket);
 	const { getMessage, handleResend, scrollToMessage } = chatHelper(state, app);
 
+	useSocketEvents();
+
 	const inputRef = useRef('');
-	const cryptoKeyRef = useRef(null);
-	cryptoKeyRef.current = cryptoKey;
 
 	senderId = authState.loginId;
 
@@ -102,9 +89,7 @@ const Chat = () => {
 		logout();
 	}
 
-	const emitTyping = useCallback((boolean) => {
-		socket.timeout(5000).emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: boolean });
-	}, []);
+	
 
 	const cancelEdit = () => {
 		inputRef.current.value = '';
@@ -270,41 +255,6 @@ const Chat = () => {
 		return decryptedMessages.find((object) => object.id === replyTo);
 	}
 
-	const onNewMessageHandler = useCallback(async (message) => {
-		try {
-			const decryptedMessage = await decryptMessage(message.message, cryptoKeyRef.current);
-			addMessage(message);
-			playNotification('newMessage');
-			createBrowserNotification('You received a new message on Whisper', decryptedMessage);
-		} catch (error) {
-			console.error(`Could not decrypt message: ${error.message}`, error);
-		}
-	}, [cryptoKey]);
-
-	const onDeleteMessageHandler = useCallback(({ id, chatId }) => {
-		removeMessage(id, chatId);
-	}, []);
-
-	const onEditMessageHandler = useCallback((messageEdited) => {
-		updateMessage({ ...messageEdited, room: app.currentChatId }, true);
-	}, []);
-
-	const onLimitMessageHandler = useCallback((data) => {
-		alert(data.message);
-	}, []);
-
-	const onReadMessageHandler = useCallback(({ messageId, chatId }) => {
-		receiveMessage(messageId, chatId);
-	}, []);
-
-  const onPublicStringHandler = useCallback(({ pemPublicKeyString, pemPrivateKeyString }) => {
-    const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
-    const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
-
-    // Import PEM-formatted public key as CryptoKey
-    importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
-  }, []);
-
 
 
 	// Clear chat when escape is pressed
@@ -375,24 +325,7 @@ const Chat = () => {
 		}
 	}, [sortedMessages, cryptoKey, importedPrivateKey]);
 
-	useEffect(() => {
-		generateKeyPair();
-		socket.on('publicKey', onPublicStringHandler);
-		socket.on(NEW_EVENT_RECEIVE_MESSAGE, onNewMessageHandler);
-		socket.on(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
-		socket.on(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
-		socket.on(NEW_EVENT_READ_MESSAGE, onReadMessageHandler);
-		socket.on(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
-
-		return () => {
-			socket.off(NEW_EVENT_RECEIVE_MESSAGE, onNewMessageHandler);
-			socket.off(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
-			socket.off(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
-			socket.off(NEW_EVENT_READ_MESSAGE, onReadMessageHandler);
-			socket.off(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
-			socket.off('publicKey', onPublicStringHandler);
-		};
-	}, []);
+	
 
 	return (
 		<div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6">

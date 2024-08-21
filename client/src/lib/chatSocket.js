@@ -4,15 +4,20 @@
 import {
 	NEW_EVENT_DELETE_MESSAGE,
 	NEW_EVENT_EDIT_MESSAGE,
-	NEW_EVENT_SEND_MESSAGE,
 	NEW_EVENT_READ_MESSAGE,
+	NEW_EVENT_SEND_MESSAGE,
+	NEW_EVENT_TYPING,
 } from '../../../constants.json';
-
+import { useCallback } from 'react';
+import { useApp } from 'src/context/AppContext';
 /**
  *
  * @param {Socket} socket
  */
 export default function useChatUtils(socket) {
+
+	const { app } = useApp();
+
 	function sendMessage(message) {
 		return new Promise((resolve, reject) => {
 			if (!socket.connected) {
@@ -94,7 +99,13 @@ export default function useChatUtils(socket) {
 				});
 		});
 	}
+		
+	const emitTyping = useCallback((boolean) => {
+			socket.timeout(5000).emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: boolean });
+		}, []);
+
 	return {
+		emitTyping,
 		sendMessage,
 		deleteMessage,
 		editMessage,
