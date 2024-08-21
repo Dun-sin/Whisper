@@ -30,7 +30,6 @@ import useCryptoKeys from 'src/hooks/useCryptoKeys';
 import useInactiveChat from 'src/hooks/useInactiveChat';
 import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 import { v4 as uuid } from 'uuid';
-import useSocketEvents from 'src/lib/useSocketEvents';
 
 let senderId;
 
@@ -65,10 +64,12 @@ const Chat = () => {
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 
-	const { sendMessage, editMessage, emitTyping } = useChatUtils(socket);
+	const { sendMessage, editMessage, emitTyping, deploySocketEvents } = useChatUtils(socket);
 	const { getMessage, handleResend, scrollToMessage } = chatHelper(state, app);
 
-	useSocketEvents();
+	useEffect(() =>{
+		deploySocketEvents()
+	});
 
 	const inputRef = useRef('');
 
