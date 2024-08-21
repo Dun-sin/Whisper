@@ -69,7 +69,7 @@ const Chat = () => {
 
 	useEffect(() =>{
 		deploySocketEvents()
-	});
+	}, []);
 
 	const inputRef = useRef('');
 
