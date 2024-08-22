@@ -2,12 +2,15 @@
 
 import { BsArrow90DegLeft, BsArrow90DegRight } from 'react-icons/bs';
 
-import chatHelper, {
-	adjustTextareaHeight,
-	arrayBufferToBase64,
-	getTime,
-} from '../lib/chatHelper';
+import chatHelper, { adjustTextareaHeight, arrayBufferToBase64, getTime } from '../lib/chatHelper';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+	NEW_EVENT_DELETE_MESSAGE,
+	NEW_EVENT_EDIT_MESSAGE,
+	NEW_EVENT_READ_MESSAGE,
+	NEW_EVENT_RECEIVE_MESSAGE,
+	NEW_EVENT_SEND_FAILED,
+} from '../../../constants.json';
 
 import BadWordsNext from 'bad-words-next';
 import DropDownOptions from './Chat/DropDownOption';
@@ -35,7 +38,7 @@ let senderId;
 
 const Chat = () => {
 	const { app } = useApp();
-	
+
 	const [editing, setEditing] = useState({
 		isediting: false,
 		messageID: null,
@@ -55,21 +58,23 @@ const Chat = () => {
 		currentReplyMessageId,
 		cancelReply,
 	} = useChat();
-	const {
-		importedPublicKey,
-		importedPrivateKey,
-		cryptoKey,
-		messageIsDecrypting,
-	} = useCryptoKeys(app.currentChatId);
+	const { importedPublicKey, importedPrivateKey, generateKeyPair, cryptoKey, messageIsDecrypting } =
+		useCryptoKeys(app.currentChatId);
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 
-	const { sendMessage, editMessage, emitTyping, deploySocketEvents } = useChatUtils(socket);
+	const {
+		sendMessage,
+		editMessage,
+		emitTyping,
+		onDeleteMessageHandler,
+		onEditMessageHandler,
+		onLimitMessageHandler,
+		onNewMessageHandler,
+		onPublicStringHandler,
+		onReadMessageHandler,
+	} = useChatUtils(socket);
 	const { getMessage, handleResend, scrollToMessage } = chatHelper(state, app);
-
-	useEffect(() =>{
-		deploySocketEvents()
-	}, []);
 
 	const inputRef = useRef('');
 
@@ -89,8 +94,6 @@ const Chat = () => {
 		});
 		logout();
 	}
-
-	
 
 	const cancelEdit = () => {
 		inputRef.current.value = '';
@@ -256,8 +259,6 @@ const Chat = () => {
 		return decryptedMessages.find((object) => object.id === replyTo);
 	}
 
-
-
 	// Clear chat when escape is pressed
 	useEffect(() => {
 		const keyDownHandler = (event) => {
@@ -326,7 +327,25 @@ const Chat = () => {
 		}
 	}, [sortedMessages, cryptoKey, importedPrivateKey]);
 
-	
+	useEffect(() => {
+		generateKeyPair();
+
+		socket.on('publicKey', onPublicStringHandler);
+		socket.on(NEW_EVENT_RECEIVE_MESSAGE, onNewMessageHandler);
+		socket.on(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
+		socket.on(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
+		socket.on(NEW_EVENT_READ_MESSAGE, onReadMessageHandler);
+		socket.on(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
+
+		return () => {
+			socket.off(NEW_EVENT_RECEIVE_MESSAGE, onNewMessageHandler);
+			socket.off(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
+			socket.off(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
+			socket.off(NEW_EVENT_READ_MESSAGE, onReadMessageHandler);
+			socket.off(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
+			socket.off('publicKey', onPublicStringHandler);
+		};
+	}, []);
 
 	return (
 		<div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6">

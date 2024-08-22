@@ -2,7 +2,7 @@
  * @typedef {import('socket.io-client').Socket} Socket
  */
 import { pemToArrayBuffer } from '../lib/chatHelper';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 import { useNotification } from 'src/lib/notification';
 import { useChat } from 'src/context/ChatContext';
@@ -14,8 +14,6 @@ import {
 	NEW_EVENT_EDIT_MESSAGE,
 	NEW_EVENT_READ_MESSAGE,
 	NEW_EVENT_SEND_MESSAGE,
-	NEW_EVENT_RECEIVE_MESSAGE,
-	NEW_EVENT_SEND_FAILED,
 	NEW_EVENT_TYPING,
 } from '../../../constants.json';
 /**
@@ -23,24 +21,14 @@ import {
  * @param {Socket} socket
  */
 export default function useChatUtils(socket) {
-
 	const { playNotification } = useNotification();
 	const { app } = useApp();
 
-	const {
-		addMessage,
-		updateMessage,
-		removeMessage,
-		receiveMessage,
-	} = useChat();
+	const { addMessage, updateMessage, removeMessage, receiveMessage } = useChat();
 
-	const {
-		cryptoKey,
-		generateKeyPair,
-		importKey,
-	} = useCryptoKeys(app.currentChatId);
+	const { cryptoKey, importKey } = useCryptoKeys(app.currentChatId);
 
-    const cryptoKeyRef = useRef(null);
+	const cryptoKeyRef = useRef(null);
 	cryptoKeyRef.current = cryptoKey;
 
 	function sendMessage(message) {
@@ -124,21 +112,24 @@ export default function useChatUtils(socket) {
 				});
 		});
 	}
-		
-	const emitTyping = useCallback((boolean) => {
-			socket.timeout(5000).emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: boolean });
-		}, []);
 
-	const onNewMessageHandler = useCallback(async (message) => {
-		try {
-			const decryptedMessage = await decryptMessage(message.message, cryptoKeyRef.current);
-			addMessage(message);
-			playNotification('newMessage');
-			createBrowserNotification('You received a new message on Whisper', decryptedMessage);
-		} catch (error) {
-			console.error(`Could not decrypt message: ${error.message}`, error);
-		}
-	}, [cryptoKey]);
+	const emitTyping = useCallback((boolean) => {
+		socket.timeout(5000).emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: boolean });
+	}, []);
+
+	const onNewMessageHandler = useCallback(
+		async (message) => {
+			try {
+				const decryptedMessage = await decryptMessage(message.message, cryptoKeyRef.current);
+				addMessage(message);
+				playNotification('newMessage');
+				createBrowserNotification('You received a new message on Whisper', decryptedMessage);
+			} catch (error) {
+				console.error(`Could not decrypt message: ${error.message}`, error);
+			}
+		},
+		[cryptoKey]
+	);
 
 	const onDeleteMessageHandler = useCallback(({ id, chatId }) => {
 		removeMessage(id, chatId);
@@ -157,36 +148,20 @@ export default function useChatUtils(socket) {
 	}, []);
 
 	const onPublicStringHandler = useCallback(({ pemPublicKeyString, pemPrivateKeyString }) => {
-	const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
-	const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
+		const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
+		const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
 
-	// Import PEM-formatted public key as CryptoKey
-	importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
+		// Import PEM-formatted public key as CryptoKey
+		importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
 	}, []);
 
-
-	const deploySocketEvents = () => {
-		generateKeyPair();
-
-		socket.on('publicKey', onPublicStringHandler);
-		socket.on(NEW_EVENT_RECEIVE_MESSAGE, onNewMessageHandler);
-		socket.on(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
-		socket.on(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
-		socket.on(NEW_EVENT_READ_MESSAGE, onReadMessageHandler);
-		socket.on(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
-
-		return () => {
-			socket.off(NEW_EVENT_RECEIVE_MESSAGE, onNewMessageHandler);
-			socket.off(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
-			socket.off(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
-			socket.off(NEW_EVENT_READ_MESSAGE, onReadMessageHandler);
-			socket.off(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
-			socket.off('publicKey', onPublicStringHandler);
-		};
-	}
-
 	return {
-		deploySocketEvents,
+		onNewMessageHandler,
+		onDeleteMessageHandler,
+		onEditMessageHandler,
+		onLimitMessageHandler,
+		onReadMessageHandler,
+		onPublicStringHandler,
 		emitTyping,
 		sendMessage,
 		deleteMessage,
