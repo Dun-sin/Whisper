@@ -14,7 +14,7 @@ import { Dropdown, IconButton, Tooltip, Whisper } from 'rsuite';
 import { Icon } from '@rsuite/icons';
 
 // Icons
-import { BiArrowBack, BiDotsVerticalRounded } from 'react-icons/bi';
+import { BiArrowBack } from 'react-icons/bi';
 
 // Store
 import { socket } from 'src/lib/socketConnection';
@@ -24,6 +24,7 @@ import { useDialog } from 'src/context/DialogContext';
 
 // Components
 import Chat from 'components/Chat';
+import MenuToggle from 'components/MenuToggle';
 import { createClassesFromArray, isExplicitDisconnection } from 'src/lib/utils';
 
 import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
@@ -148,18 +149,6 @@ const Anonymous = ({
 		setAutoSearchAfterClose(autoSearch);
 
 		socket.timeout(30000).emit(NEW_EVENT_CLOSE, currentChatId, emitClose)
-	};
-
-	const MenuToggle = (props, ref) => {
-		return (
-			<IconButton
-				{...props}
-				ref={ref}
-				icon={<Icon as={BiDotsVerticalRounded} />}
-				appearance="subtle"
-				circle
-			/>
-		);
 	};
 
 	const handleClose = (autoSearch = false) => {
