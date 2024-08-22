@@ -17,6 +17,7 @@ const {
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
   CONFLICT,
+  BAD_REQUEST,
 } = require('../httpStatusCodes.js');
 
 const createUserWithAutoId = async (email) => {
@@ -147,26 +148,24 @@ const deleteUser = async (req, res) => {
   }
 };
 
-const reportUser = async (req, res) => {
-  const {userIdToReport, currentUserId} = req.body
+const blockUserHandler = async (req, res) => {
+  const {userIdToBlock, currentUserId} = req.body
 
-  console.log(`${currentUserId} wants to report ${userIdToReport}`)
   try {
     // Check if the user is already blocked
-    if (await isUserBlocked(userIdToReport, currentUserId)) {
-      return res.status(400).json({ message: "This user is already blocked." });
+    if (await isUserBlocked([userIdToBlock, currentUserId])) {
+      return res.status(BAD_REQUEST).json({ message: "This user is already blocked." });
     }
 
-    // Implement the blocking logic
-    await blockUser(userIdToReport, currentUserId);
+    // Block the user
+    await blockUser(userIdToBlock, currentUserId)
 
-    // You might want to log this action or notify admins
-    console.log(`User ${currentUserId} reported and blocked user ${userIdToReport}`);
-
-    res.status(200).json({ message: "User reported and blocked successfully" });
+    res.status(OK).json({ message: "User blocked successfully" });
   } catch (error) {
-    console.error("Error in /reportUser:", error);
-    res.status(500).json({ message: "An error occurred while processing your request" });
+    console.error(error);
+    return res
+      .status(INTERNAL_SERVER_ERROR)
+      .json({ error: 'Internal server error' });
   }
 }
 
@@ -179,6 +178,6 @@ UserRouter.route('/profile').post(
 UserRouter.route('/profile/:email').get(getProfile);
 UserRouter.route('/deleteUser').delete(emailValidator, deleteUser); //Email validation applied to the required request handlers
 
-UserRouter.route("/reportUser").post(reportUser)
+UserRouter.route("/blockUser").post(blockUserHandler)
 
 module.exports = UserRouter;

@@ -23,17 +23,14 @@ const {
 
 const matchMaker = async (io) => {
   while (getWaitingUserLen() > 1) {
-    const [user1, user2] = getRandomPairFromWaitingList();
+    const users = getRandomPairFromWaitingList();
     
     // Check if either user is blocked
-    if (
-        await isUserBlocked(user1.loginId, user2.loginId) 
-        || 
-        await isUserBlocked(user2.loginId, user1.loginId)) {
+    if ( await isUserBlocked(users) ) {
       continue
     }
 
-    const chat = await createChat([user1, user2]);
+    const chat = await createChat(users);
 
     io.to(chat.id).emit(NEW_EVENT_JOINED, {
       roomId: chat.id,
@@ -73,11 +70,6 @@ module.exports = (io, socket) => {
       user.chatIds.forEach((chatId) => {
         chats[chatId] = getChat(chatId);
       });
-
-      if(user.currentChatId <= 0) {
-        addToWaitingList({loginId, email, socket})
-        return
-      }
 
       // Then return all chat messages
       socket.emit(NEW_EVENT_CHAT_RESTORE, {

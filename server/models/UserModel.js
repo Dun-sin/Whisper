@@ -37,7 +37,7 @@ const UserSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Chat',
     },
-    reportedUsers: {
+    blockedUsers: {
       type: [String],
       default: []
     }
@@ -67,7 +67,7 @@ const UserSchema = new Schema(
             socketIds: [],
             currentChatId: this.currentChat?._id?.toString() || null,
             chatIds: [],
-            reportedUsers: []
+            blockedUsers: []
           };
         },
       },

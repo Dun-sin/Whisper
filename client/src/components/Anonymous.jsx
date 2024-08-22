@@ -173,19 +173,19 @@ const Anonymous = ({
 		});
 	};
 
-	const reportUser = async () => {
+	const blockUser = async () => {
 		// Get the other user id 
-		const otherUserId = state[currentChatId]?.userIds.find(
+		const chattingPartnersId = state[currentChatId]?.userIds.find(
 			id => id !== authState.loginId && id !== authState.email
 		  );
 
-		  if (!otherUserId) {
-			return { success: false, message: "Could not identify the user to report" };
+		  if (!chattingPartnersId) {
+			return { success: false, message: "could not find user to block" };
 		  }
 
 	 	 try {
-			const res = await api.post('/reportUser', {
-			  userIdToReport: otherUserId,
+			const res = await api.post('/blockUser', {
+			  userIdToBlock: chattingPartnersId,
 			  currentUserId: authState.loginId
 			});
 		
@@ -200,7 +200,7 @@ const Anonymous = ({
 		  }
 	}
 
-	const handleReport = async () => {
+	const handleBlock = async () => {
 		// Check if user have an account i.e. not a anonymous user
 		if(authState.loginType === "anonymous") {
 			 setDialog({
@@ -214,17 +214,15 @@ const Anonymous = ({
 		}
 
 		try {
-			const result = await reportUser();
+			const result = await blockUser();
 			if (result.success) {
-			  alert('User reported and blocked successfully');
-			  // Update the UI or redirect the user here
+			  alert('User blocked successfully');
 			  closeChatHandler(false)
 			} else {
-			  alert(result.message || "Error reporting user. Please try again later.");
+			  alert(result.message || "Error blocking user. Please try again later.");
 			}
 		  } catch (err) {
-			console.error("Error in handleReport:", err);
-			alert("User is already blocked!");
+			console.error("Error in handleBlock:", err);
 		  }
 	}
 
@@ -337,11 +335,9 @@ const Anonymous = ({
 							<span className="text-gray-500 text-xs">Ctrl + Alt + N</span>
 						</div>
 					</Dropdown.Item>
-					<Dropdown.Item onClick={() => handleReport()} className="sm:w-[200px]">
+					<Dropdown.Item onClick={() => handleBlock()} className="sm:w-[200px]">
 						<div className="flex  items-center justify-between gap-2 flex-wrap">
-							<span className='text-red'>Report User</span>
-							{/* Some keyboard commands! */}
-							{/* <span className="text-gray-500 text-xs"></span> */}
+							<span className='text-red'>Block User</span>
 						</div>
 					</Dropdown.Item>
 				</Dropdown>

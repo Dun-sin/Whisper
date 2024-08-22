@@ -503,27 +503,31 @@ function getWaitingUserLen() {
   return Object.keys(waitingUsers).length;
 }
 
-async function blockUser(userIdToReport, currentUserId) {
+async function blockUser(userIdToBlock, currentUserId) {
   try {
     await User.findOneAndUpdate({ loginId: currentUserId }, {
-      $addToSet: { reportedUsers: userIdToReport }
+      $addToSet: { blockedUsers: userIdToBlock }
     });
-    console.log(`User ${currentUserId} has blocked user ${userIdToReport}`);
   } catch (error) {
-    console.error("Error blocking user:", error);
+    console.log(`error blocking user: ${error}`);
   }
 }
 
-async function isUserBlocked(userIdToReport, currentUserId) {
-  try {
-    const user = await User.findOne({ loginId: currentUserId });
+async function isUserBlocked(users) {
+  const [userOne, userTwo] = users;
 
-    if (user && user.reportedUsers) {
-      return user.reportedUsers.includes(userIdToReport);
+  try {
+    const userOneData = await User.findOne({ loginId: userOne.loginId });
+    const userTwoData = await User.findOne({ loginId: userTwo.loginId });
+
+    if (userOneData && userTwoData) {
+      const userOneBlocked = userOneData.blockedUsers.includes(userTwo.loginId);
+      const userTwoBlocked = userTwoData.blockedUsers.includes(userOne.loginId);
+      return userOneBlocked || userTwoBlocked;
     }
     return false;
   } catch (error) {
-    console.error("Error checking if user is blocked:", error);
+    console.log(`error checking if users are blocked: ${error}`);
   }
 }
 
