@@ -606,5 +606,3 @@ const Chat = () => {
 		</div>
 	);
 };
-
-export default Chat;
