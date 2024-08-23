@@ -31,7 +31,6 @@ const matchMaker = async (io) => {
     }
 
     const chat = await createChat(users);
-
     io.to(chat.id).emit(NEW_EVENT_JOINED, {
       roomId: chat.id,
       userIds: chat.userIds,

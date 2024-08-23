@@ -10,8 +10,8 @@ const imageUpload = multer({ storage: storage });
 
 const User = require('../models/UserModel');
 const { emailValidator, generateObjectId } = require('../utils/helper');
-const { isUserBlocked, blockUser } = require('../utils/lib.js');
 
+const { isUserBlocked, blockUser } = require('../utils/lib.js');
 const {
   OK,
   NOT_FOUND,
