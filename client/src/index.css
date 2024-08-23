@@ -3,30 +3,29 @@
 @tailwind utilities;
 
 body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-        'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-        'Helvetica Neue', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+		'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 .mj-main-js {
-    height: fit-content !important;
+	height: fit-content !important;
 }
 
 .rs-form-control {
-    @apply w-full;
+	@apply w-full;
 }
 
 .chat h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-      font-size: revert !important;
-      font-weight: revert !important;
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-size: revert !important;
+	font-weight: revert !important;
 }
 
 .chat ul {
@@ -43,16 +42,20 @@ body {
 .chat ol ul {
 	list-style-type: circle !important;
 	list-style-position: inside !important;
-  margin-left: 15px !important;
+	margin-left: 15px !important;
 }
 
 .chat ol ol,
 .chat ul ol {
 	list-style-type: lower-latin !important;
 	list-style-position: inside !important;
-        margin-left: 15px !important;
+	margin-left: 15px !important;
 }
 
 .chat blockquote {
 	@apply px-2 my-4 border-l-4 border-gray-600;
+}
+
+.message-reply-container * {
+	@apply m-0 p-0;
 }

@@ -1,8 +1,12 @@
 tasks:
-  - init: |
-      cd ./$type
-      npm install
+  - name: run frontend
+    openMode: split-left
+    init: cd client && npm i --force
     command: npm start
-ports:
-  - port: 3000
-    onOpen: open-preview
+
+  - name: run backend
+    openMode: split-right
+    init: cd server && npm i
+    command: |
+      echo "MongoDB_URL=mongodb://username:password@localhost:27018/" > .env
+      npm run dev:docker

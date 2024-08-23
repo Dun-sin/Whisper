@@ -1,5 +1,5 @@
-const { NEW_EVENT_CLOSE, NEW_EVENT_INACTIVE } = require("../../constants.json");
-const { getActiveUser, chatExists, closeChat } = require("../utils/lib");
+const { NEW_EVENT_CLOSE, NEW_EVENT_INACTIVE } = require('../../constants.json');
+const { getActiveUser, chatExists, closeChat } = require('../utils/lib');
 
 module.exports = (socket) => {
   socket.on(NEW_EVENT_CLOSE, async (chatId, setChatClosed) => {

@@ -1,28 +1,49 @@
 {
-	"name": "server",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"start": "nodemon index.js",
-		"dev": "nodemon index.js",
-		"dev:docker": "docker compose up -d && nodemon index.js",
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Dun-sin/Whisper/blob/main/server"
-	},
-	"author": "Dun-sin",
-	"license": "ISC",
-	"dependencies": {
-		"cors": "^2.8.5",
-		"dotenv": "^16.3.1",
-		"express": "^4.18.2",
-		"mongodb": "^5.7.0",
-		"mongoose": "^7.4.3",
-		"nodemon": "^2.0.20",
-		"socket.io": "^4.7.2",
-		"validator": "^13.11.0"
-	}
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "dev": "nodemon index.js",
+    "dev:docker": "docker compose up -d && nodemon index.js",
+    "debug:docker": "docker compose up -d && DEBUG=socket.io* nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --ext .js,.ts --ignore-path .gitignore --fix ./",
+    "format": "prettier --write .",
+    "prepare": "cd .. && husky install server/.husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dun-sin/Whisper/blob/main/server"
+  },
+  "author": "Dun-sin",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.1",
+    "image-moderation": "^1.0.6",
+    "mailtrap": "^3.4.0",
+    "mongodb": "^5.7.0",
+    "mongoose": "^7.4.3",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^2.0.20",
+    "socket.io": "^4.7.2",
+    "uuid": "^9.0.1",
+    "validator": "^13.11.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.47.0",
+    "eslint-config-prettier": "^9.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.1",
+    "prettier": "^3.0.1"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint --fix",
+    "*.--write": "prettier --write ."
+  }
 }
