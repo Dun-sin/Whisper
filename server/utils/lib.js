@@ -517,12 +517,16 @@ async function isUserBlocked(users) {
   const [userOne, userTwo] = users;
 
   try {
-    const userOneData = await User.findOne({ loginId: userOne.loginId });
-    const userTwoData = await User.findOne({ loginId: userTwo.loginId });
+    const [userOneData, userTwoData] = await Promise.all([
+      User.findOne({ loginId: userOne.loginId }),
+      User.findOne({ loginId: userTwo.loginId })
+    ]);
 
-    if (userOneData && userTwoData) {
-      const userOneBlocked = userOneData.blockedUsers.includes(userTwo.loginId);
-      const userTwoBlocked = userTwoData.blockedUsers.includes(userOne.loginId);
+    // Using 'OR' because one of the users might be anonymously logged in,
+    // and in such cases, userData could be null.
+    if (userOneData || userTwoData) {
+      const userOneBlocked = userOneData?.blockedUsers.includes(userTwo.loginId);
+      const userTwoBlocked = userTwoData?.blockedUsers.includes(userOne.loginId);
       return userOneBlocked || userTwoBlocked;
     }
     return false;
