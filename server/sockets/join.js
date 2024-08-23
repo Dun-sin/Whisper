@@ -11,6 +11,7 @@ const {
   getRandomPairFromWaitingList,
   createChat,
   getActiveUser,
+  isUserBlocked,
 } = require('../utils/lib');
 
 /**
@@ -19,16 +20,24 @@ const {
  *
  * @param {Server} io
  */
+
 const matchMaker = async (io) => {
   while (getWaitingUserLen() > 1) {
-    const chat = await createChat(getRandomPairFromWaitingList());
+    const users = getRandomPairFromWaitingList();
+    
+    // Check if either user is blocked
+    if ( await isUserBlocked(users) ) {
+      continue
+    }
 
+    const chat = await createChat(users);
     io.to(chat.id).emit(NEW_EVENT_JOINED, {
       roomId: chat.id,
       userIds: chat.userIds,
     });
   }
 };
+
 module.exports = (io, socket) => {
   socket.on(NEW_EVENT_JOIN, ({ loginId, email }) => {
     /**

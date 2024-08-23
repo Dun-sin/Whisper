@@ -11,11 +11,13 @@ const imageUpload = multer({ storage: storage });
 const User = require('../models/UserModel');
 const { emailValidator, generateObjectId } = require('../utils/helper');
 
+const { isUserBlocked, blockUser } = require('../utils/lib.js');
 const {
   OK,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
   CONFLICT,
+  BAD_REQUEST,
 } = require('../httpStatusCodes.js');
 
 const createUserWithAutoId = async (email) => {
@@ -146,6 +148,27 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const blockUserHandler = async (req, res) => {
+  const {userIdToBlock, currentUserId} = req.body
+
+  try {
+    // Check if the user is already blocked
+    if (await isUserBlocked([userIdToBlock, currentUserId])) {
+      return res.status(BAD_REQUEST).json({ message: "This user is already blocked." });
+    }
+
+    // Block the user
+    await blockUser(userIdToBlock, currentUserId)
+
+    res.status(OK).json({ message: "User blocked successfully" });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(INTERNAL_SERVER_ERROR)
+      .json({ error: 'Internal server error' });
+  }
+}
+
 UserRouter.route('/login').post(emailValidator, loginUser);
 UserRouter.route('/profile').post(
   imageUpload.single('profileImage'),
@@ -154,5 +177,7 @@ UserRouter.route('/profile').post(
 );
 UserRouter.route('/profile/:email').get(getProfile);
 UserRouter.route('/deleteUser').delete(emailValidator, deleteUser); //Email validation applied to the required request handlers
+
+UserRouter.route("/blockUser").post(blockUserHandler)
 
 module.exports = UserRouter;
