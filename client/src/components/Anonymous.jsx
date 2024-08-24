@@ -28,6 +28,8 @@ import { createClassesFromArray, isExplicitDisconnection } from 'src/lib/utils';
 
 import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
 import useCheckTimePassed from 'src/hooks/useCheckTimePassed';
+import { useAuth } from 'src/context/AuthContext';
+import { api } from 'src/lib/axios';
 
 const centerItems = `flex items-center justify-center`;
 
@@ -36,6 +38,7 @@ const Anonymous = ({
 	
 }) => {
 	const { app, endSearch } = useApp();
+	const { authState } = useAuth()
 	const { currentChatId, onlineStatus } = app;
 	const { clearTimer } = useCheckTimePassed();
 
@@ -54,7 +57,7 @@ const Anonymous = ({
 	const typingStatusTimeoutRef = useRef(null);
 
 	const navigate = useNavigate();
-	const { closeChat } = useChat();
+	const { messages: state, closeChat } = useChat();
 	const { setDialog } = useDialog();
 
 	const onDisplay = useCallback(({ isTyping, chatId }) => {
@@ -170,6 +173,59 @@ const Anonymous = ({
 		});
 	};
 
+	const blockUser = async () => {
+		// Get the other user id 
+		const chattingPartnersId = state[currentChatId]?.userIds.find(
+			id => id !== authState.loginId && id !== authState.email
+		  );
+
+		  if (!chattingPartnersId) {
+			return { success: false, message: "could not find user to block" };
+		  }
+
+	 	 try {
+			const res = await api.post('/blockUser', {
+			  userIdToBlock: chattingPartnersId,
+			  currentUserId: authState.loginId
+			});
+		
+			if (res.status === 200) {
+			  return { success: true };
+			} else {
+			  return { success: false, message: "Error reporting user" };
+			}
+		  } catch (error) {
+			console.error("Error in reportUser:", error);
+			return { success: false, message: "An unexpected error occurred" };
+		  }
+	}
+
+	const handleBlock = async () => {
+		// Check if user have an account i.e. not a anonymous user
+		if(authState.loginType === "anonymous") {
+			 setDialog({
+				isOpen: true,
+				text: "You have to create an account first to access this feature!",
+				yesBtnText: "Create an account",
+				noBtnText: "Back to chat",
+				handler: () => navigate("/profile")
+			 })
+			 return
+		}
+
+		try {
+			const result = await blockUser();
+			if (result.success) {
+			  alert('User blocked successfully');
+			  closeChatHandler(false)
+			} else {
+			  alert(result.message || "Error blocking user. Please try again later.");
+			}
+		  } catch (err) {
+			console.error("Error in handleBlock:", err);
+		  }
+	}
+
 	useKeyPress(['x'], () => handleClose(), ShortcutFlags.ctrl | ShortcutFlags.shift);
 	useKeyPress(['n'], () => handleClose(true), ShortcutFlags.ctrl | ShortcutFlags.alt);
 
@@ -277,6 +333,11 @@ const Anonymous = ({
 						<div className="flex items-center justify-between gap-2 flex-wrap">
 							<span>Find a new buddy</span>
 							<span className="text-gray-500 text-xs">Ctrl + Alt + N</span>
+						</div>
+					</Dropdown.Item>
+					<Dropdown.Item onClick={() => handleBlock()} className="sm:w-[200px]">
+						<div className="flex  items-center justify-between gap-2 flex-wrap">
+							<span className='text-red'>Block User</span>
 						</div>
 					</Dropdown.Item>
 				</Dropdown>
