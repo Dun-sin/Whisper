@@ -5,6 +5,7 @@ const { ObjectId } = require('mongodb');
 
 const ActiveUser = require('../models/UserModel');
 const Chat = require('../models/ChatModel');
+const User = require('../models/UserModel');
 const Message = require('../models/MessageModel');
 const { generateObjectId } = require('./helper');
 
@@ -502,6 +503,38 @@ function getWaitingUserLen() {
   return Object.keys(waitingUsers).length;
 }
 
+async function blockUser(userIdToBlock, currentUserId) {
+  try {
+    await User.findOneAndUpdate({ loginId: currentUserId }, {
+      $addToSet: { blockedUsers: userIdToBlock }
+    });
+  } catch (error) {
+    console.log(`error blocking user: ${error}`);
+  }
+}
+
+async function isUserBlocked(users) {
+  const [userOne, userTwo] = users;
+
+  try {
+    const [userOneData, userTwoData] = await Promise.all([
+      User.findOne({ loginId: userOne.loginId }),
+      User.findOne({ loginId: userTwo.loginId })
+    ]);
+
+    // Using 'OR' because one of the users might be anonymously logged in,
+    // and in such cases, userData could be null.
+    if (userOneData || userTwoData) {
+      const userOneBlocked = userOneData?.blockedUsers.includes(userTwo.loginId);
+      const userTwoBlocked = userTwoData?.blockedUsers.includes(userOne.loginId);
+      return userOneBlocked || userTwoBlocked;
+    }
+    return false;
+  } catch (error) {
+    console.log(`error checking if users are blocked: ${error}`);
+  }
+}
+
 module.exports = {
   init,
   createChat,
@@ -521,4 +554,6 @@ module.exports = {
   addToWaitingList,
   delActiveUser,
   seenMessage,
+  blockUser,
+  isUserBlocked
 };
