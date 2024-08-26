@@ -437,15 +437,20 @@ const Chat = () => {
 
 								// is this message currently being replied?
 								const hasActiveReply = currentReplyMessageId === id;
+								const activeReplyClass = hasActiveReply ? 'bg-[#FF9F1C]/25 border-[#FF9F1C]' : '';
+								const activeReplySenderClass = hasActiveReply
+									? isSender
+										? 'border-r-[3.5px]'
+										: 'border-l-[3.5px]'
+									: '';
 
 								return (
 									<div
 										key={id}
 										id={`message-${id}`}
 										className={`
-								flex flex-col gap-2 py-2 duration-500 transition-all
-									${hasActiveReply ? 'bg-[#FF9F1C]/25 border-[#FF9F1C]' : ''},
-									${hasActiveReply ? (isSender ? 'border-r-[3.5px]' : 'border-l-[3.5px]') : ''}`}
+											flex flex-col gap-2 py-2 duration-500 transition-all 
+											${activeReplyClass} ${activeReplySenderClass}`}
 									>
 										{replyTo && (
 											<div
