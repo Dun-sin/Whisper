@@ -30,6 +30,7 @@ import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
 import useCheckTimePassed from 'src/hooks/useCheckTimePassed';
 import { useAuth } from 'src/context/AuthContext';
 import { api } from 'src/lib/axios';
+import MenuToggle from './MenuToggle';
 
 const centerItems = `flex items-center justify-center`;
 
@@ -153,17 +154,18 @@ const Anonymous = ({
 		socket.timeout(30000).emit(NEW_EVENT_CLOSE, currentChatId, emitClose)
 	};
 
-	const MenuToggle = (props, ref) => {
-		return (
-			<IconButton
-				{...props}
-				ref={ref}
-				icon={<Icon as={BiDotsVerticalRounded} />}
-				appearance="subtle"
-				circle
-			/>
-		);
-	};
+	// const MenuToggle = (props, ref) => {
+	// 	return (
+	// 		<IconButton
+	// 			{...props}
+	// 			ref={ref}
+	// 			icon={<Icon as={BiDotsVerticalRounded} />}
+	// 			appearance="subtle"
+	// 			circle
+	// 		/>
+	// 	);
+	// };
+	<MenuToggle/>
 
 	const handleClose = (autoSearch = false) => {
 		setDialog({
