@@ -1,5 +1,3 @@
-// MenuToggle.jsx
-
 import React from 'react';
 import { IconButton, Icon } from 'your-ui-library';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
