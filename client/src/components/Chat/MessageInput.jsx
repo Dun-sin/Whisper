@@ -58,8 +58,7 @@ const MessageInput = ({
 	useKeyPress(['Enter'], handleCtrlEnter, ShortcutFlags.ctrl);
 
 	return (
-		<>
-			<form className="flex flex-col justify-center items-center mt-[40px]" onSubmit={handleSubmit}>
+		<form className="flex flex-col justify-center items-center mt-[40px]" onSubmit={handleSubmit}>
 				{currentReplyMessage && (
 					<div className="w-full p-2 flex items-center justify-between gap-2 border rounded-t-md">
 						<div className="flex items-center gap-2">
@@ -115,7 +114,6 @@ const MessageInput = ({
 					</button>
 				</div>
 			</form>
-		</>
 	);
 };
 
