@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types'; // Import the PropTypes package
+import PropTypes from 'prop-types';
 import { PiPlugsLight } from 'react-icons/pi';
 import { Link } from 'react-router-dom';
 const ReconnectBanner = ({ handleReconnect }) => {
@@ -16,18 +16,14 @@ const ReconnectBanner = ({ handleReconnect }) => {
 				>
 					Try again
 				</button>
-        <Link
-          to="/"
-          className="underline text-white hover:text-white text-lg"
-        >
+				<Link to="/" className="underline text-white hover:text-white text-lg">
 					Return Home
 				</Link>
 			</div>
 		</div>
 	);
 };
-// Define the expected prop types
 ReconnectBanner.propTypes = {
-	handleReconnect: PropTypes.func.isRequired, 
+	handleReconnect: PropTypes.func.isRequired,
 };
 export default ReconnectBanner;

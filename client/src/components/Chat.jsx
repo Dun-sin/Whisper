@@ -270,16 +270,19 @@ const Chat = () => {
 		return decryptedMessages.find((object) => object.id === replyTo);
 	}
 
-	const onNewMessageHandler = useCallback(async (message) => {
-		try {
-			const decryptedMessage = await decryptMessage(message.message, cryptoKeyRef.current);
-			addMessage(message);
-			playNotification('newMessage');
-			createBrowserNotification('You received a new message on Whisper', decryptedMessage);
-		} catch (error) {
-			console.error(`Could not decrypt message: ${error.message}`, error);
-		}
-	}, [cryptoKey]);
+	const onNewMessageHandler = useCallback(
+		async (message) => {
+			try {
+				const decryptedMessage = await decryptMessage(message.message, cryptoKeyRef.current);
+				addMessage(message);
+				playNotification('newMessage');
+				createBrowserNotification('You received a new message on Whisper', decryptedMessage);
+			} catch (error) {
+				console.error(`Could not decrypt message: ${error.message}`, error);
+			}
+		},
+		[cryptoKey]
+	);
 
 	const onDeleteMessageHandler = useCallback(({ id, chatId }) => {
 		removeMessage(id, chatId);
@@ -297,15 +300,13 @@ const Chat = () => {
 		receiveMessage(messageId, chatId);
 	}, []);
 
-  const onPublicStringHandler = useCallback(({ pemPublicKeyString, pemPrivateKeyString }) => {
-    const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
-    const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
+	const onPublicStringHandler = useCallback(({ pemPublicKeyString, pemPrivateKeyString }) => {
+		const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
+		const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
 
-    // Import PEM-formatted public key as CryptoKey
-    importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
-  }, []);
-
-
+		// Import PEM-formatted public key as CryptoKey
+		importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
+	}, []);
 
 	// Clear chat when escape is pressed
 	useEffect(() => {

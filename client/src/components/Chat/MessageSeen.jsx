@@ -52,12 +52,10 @@ const MessageSeen = ({ isRead, isSender }) => {
 	}, [sortedMessages, isTabVisible, observer]);
 
 	return (
-    isSender && (
-      <p className="text-sm dark:text-white text-primary">
-        {isRead ? 'Seen' : 'Not Seen'}
-      </p>
-    )
-  );
+		isSender && (
+			<p className="text-sm dark:text-white text-primary">{isRead ? 'Seen' : 'Not Seen'}</p>
+		)
+	);
 };
 
 export default MessageSeen;

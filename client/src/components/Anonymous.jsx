@@ -14,7 +14,7 @@ import { Dropdown, IconButton, Tooltip, Whisper } from 'rsuite';
 import { Icon } from '@rsuite/icons';
 
 // Icons
-import { BiArrowBack} from 'react-icons/bi';
+import { BiArrowBack } from 'react-icons/bi';
 
 // Store
 import { socket } from 'src/lib/socketConnection';

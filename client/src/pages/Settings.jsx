@@ -11,7 +11,7 @@ const Searching = () => {
 	const { app, hasUnsavedSettings, updateSettings, updateTmpSettings, cancelSettingsUpdate } =
 		useApp();
 	const { authState } = useAuth();
-    
+
 	const settings = useMemo(() => {
 		return app.tmpSettings ? { ...app.settings, ...app.tmpSettings } : app.settings;
 	});

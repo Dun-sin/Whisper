@@ -30,7 +30,7 @@ const NavBar = () => {
 			type: 'LOGOUT',
 		});
 		setDialog({ isOpen: false });
-		logout();		
+		logout();
 	}
 
 	const handleLogout = () => {

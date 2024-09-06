@@ -5,8 +5,8 @@ export const socket = io(import.meta.env.VITE_SOCKET_URL, {
 });
 
 export function connectWithId(chatId) {
-	if(chatId){ 
+	if (chatId) {
 		socket.io.opts.query = { chatId };
 	}
-	socket.connect(); 
+	socket.connect();
 }

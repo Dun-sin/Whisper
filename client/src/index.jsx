@@ -18,10 +18,10 @@ root.render(
 	<AuthProvider>
 		<AppProvider>
 			<Router>
-					<DialogProvider>
-						<App />
-						<Dialog />
-					</DialogProvider>
+				<DialogProvider>
+					<App />
+					<Dialog />
+				</DialogProvider>
 			</Router>
 		</AppProvider>
 	</AuthProvider>
