@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ThreeDots } from 'react-loading-icons';
-import { PiPlugsLight } from 'react-icons/pi';
+//import { PiPlugsLight } from 'react-icons/pi';
 import { connectWithId, socket } from 'src/lib/socketConnection';
 
 import Anonymous from 'components/Anonymous';
 import ReconnectBanner from 'components/ReconnectBanner';
 import { useAuth } from 'src/context/AuthContext';
 import { useChat } from 'src/context/ChatContext';
-import { useNavigate, Link } from 'react-router-dom';
+//import { useNavigate, Link } from 'react-router-dom';
 import { useNotification } from 'src/lib/notification';
 import { useApp } from 'src/context/AppContext';
 import { createBrowserNotification } from 'src/lib/browserNotification';
@@ -24,6 +24,7 @@ import {
 	NEW_EVENT_STOP_SEARCH,
 	NEW_EVENT_STOP_SEARCH_SUCCESS,
 } from '../../../constants.json';
+import { useNavigate } from 'react-router-dom';
 
 const stoppingSearchLoadingText = <p>Stopping the search</p>;
 const BuddyMatcher = () => {
@@ -267,5 +268,4 @@ const BuddyMatcher = () => {
 		/>
 	);
 };
-
 export default BuddyMatcher;
