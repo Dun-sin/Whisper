@@ -1,13 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ThreeDots } from 'react-loading-icons';
-//import { PiPlugsLight } from 'react-icons/pi';
 import { connectWithId, socket } from 'src/lib/socketConnection';
-
 import Anonymous from 'components/Anonymous';
 import ReconnectBanner from 'components/ReconnectBanner';
 import { useAuth } from 'src/context/AuthContext';
 import { useChat } from 'src/context/ChatContext';
-//import { useNavigate, Link } from 'react-router-dom';
 import { useNotification } from 'src/lib/notification';
 import { useApp } from 'src/context/AppContext';
 import { createBrowserNotification } from 'src/lib/browserNotification';
@@ -40,7 +37,7 @@ const BuddyMatcher = () => {
 
 	const userID = authState.loginId;
 	const defaultLoadingText = <p>Looking for a random buddy</p>;
-	const [loadingText, setLoadingText] = useState(defaultLoadingText);	
+	const [loadingText, setLoadingText] = useState(defaultLoadingText);
 	let timeout = null;
 
 	function disconnect() {
@@ -58,25 +55,25 @@ const BuddyMatcher = () => {
 		socket.volatile.emit(NEW_EVENT_JOIN, {
 			loginId: authState.loginId,
 			email: authState.email,
-		})
-	}, [])
+		});
+	}, []);
 
 	const emitStopSearch = useCallback(() => {
 		socket.emit(NEW_EVENT_STOP_SEARCH, {
 			loginId: authState.loginId,
 			email: authState.email,
 		});
-	}, [])
+	}, []);
 
 	const startNewSearch = () => {
 		startSearch();
 		setLoadingText(defaultLoadingText);
 
-		emitJoin()
+		emitJoin();
 	};
 
 	const handleStopSearch = () => {
-		emitStopSearch()
+		emitStopSearch();
 		setIsStoppingSearch(true);
 	};
 
@@ -87,9 +84,9 @@ const BuddyMatcher = () => {
 
 		startSearch();
 		setLoadingText(defaultLoadingText);
-		connectWithId(app.currentChatId)
+		connectWithId(app.currentChatId);
 	}
-	
+
 	const onUserJoined = useCallback(({ roomId, userIds }) => {
 		playNotification('buddyPaired');
 		createBrowserNotification(
@@ -98,20 +95,20 @@ const BuddyMatcher = () => {
 		);
 		createChat(roomId, userIds);
 		endSearch(roomId);
-	}, [])
+	}, []);
 
 	const onRestoreChat = useCallback(({ chats, currentChatId }) => {
 		Object.values(chats).forEach((chat) => {
 			createChat(chat.id, chat.userIds, chat.messages, chat.createdAt);
 		});
 		endSearch(currentChatId);
-	}, [])
+	}, []);
 
-	const onStopSearch = useCallback( () => {
+	const onStopSearch = useCallback(() => {
 		setIsStoppingSearch(false);
 		endSearch();
 		navigate('/');
-	}, [])
+	}, []);
 
 	const onConnect = useCallback(() => {
 		// Here server will be informed that user is searching for
@@ -121,7 +118,7 @@ const BuddyMatcher = () => {
 			email: authState.email,
 		});
 		setDisconnected(false);
-	}, [])
+	}, []);
 
 	const onClose = useCallback((chatId) => {
 		endSearch();
@@ -135,11 +132,11 @@ const BuddyMatcher = () => {
 
 		createBrowserNotification('Chat Closed', 'Your buddy left the chat');
 		startNewSearch();
-	}, [])
+	}, []);
 
 	const onInactive = useCallback(() => {
 		closeAllChats();
-	}, [])
+	}, []);
 
 	const onDisconnect = useCallback((reason) => {
 		if (isExplicitDisconnection(reason)) {
@@ -147,28 +144,26 @@ const BuddyMatcher = () => {
 		}
 
 		disconnect();
-	}, [])
+	}, []);
 
 	const onReconnectAttempt = useCallback((attempts) => {
 		reconnectAttempts.current = attempts;
-	}, [])
+	}, []);
 
 	const onReconnectError = useCallback(() => {
 		if (reconnectAttempts.current >= 3) {
 			disconnect();
 		}
-	}, [])
+	}, []);
 
 	const emitCreateRoom = useCallback(() => {
 		socket.emit(NEW_EVENT_CREATE_ROOM, `${userID}-in-search`);
-	}, [])
+	}, []);
 
 	const emitAddingUser = useCallback(() => {
 		socket.emit(NEW_EVENT_ADDING, { userID });
-	}, [])
+	}, []);
 
-
-	
 	useEffect(() => {
 		setLoadingText(isStoppingSearch ? stoppingSearchLoadingText : defaultLoadingText);
 	}, [isStoppingSearch]);
@@ -209,15 +204,15 @@ const BuddyMatcher = () => {
 		}
 
 		if (!socket.connected) {
-			connectWithId(app.currentChatId)
+			connectWithId(app.currentChatId);
 		}
-		
-		emitCreateRoom()
-		socket.connected && emitAddingUser()
+
+		emitCreateRoom();
+		socket.connected && emitAddingUser();
 
 		// This is necessary else chat won't be restored after re-connections
 		socket.on('connect', onConnect);
-		socket.on(NEW_EVENT_CLOSE, onClose);		
+		socket.on(NEW_EVENT_CLOSE, onClose);
 		// From here will get the info from server that user has joined the room
 		socket.on(NEW_EVENT_JOINED, onUserJoined);
 		socket.on(NEW_EVENT_CHAT_RESTORE, onRestoreChat);
@@ -230,7 +225,7 @@ const BuddyMatcher = () => {
 		return () => {
 			socket
 				.off('connect', onConnect)
-				.off(NEW_EVENT_JOINED,  onUserJoined)
+				.off(NEW_EVENT_JOINED, onUserJoined)
 				.off(NEW_EVENT_CHAT_RESTORE, onRestoreChat)
 				.off(NEW_EVENT_CLOSE, onClose)
 				.off(NEW_EVENT_INACTIVE, onInactive)
@@ -260,12 +255,10 @@ const BuddyMatcher = () => {
 			)}
 		</div>
 	) : disconnected ? (
-		<ReconnectBanner handleReconnect={handleReconnect}/>
-		//Changes made here with moviing reconnector to another component.
+		<ReconnectBanner handleReconnect={handleReconnect} />
 	) : (
-		<Anonymous 
-			onChatClosed={startNewSearch}  
-		/>
+		//Changes made here with moviing reconnector to another component.
+		<Anonymous onChatClosed={startNewSearch} />
 	);
 };
 export default BuddyMatcher;
