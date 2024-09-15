@@ -504,18 +504,18 @@ const Chat = () => {
 													<div className="dark:text-white text-black flex flex-col border-red border w-full rounded-r-md p-3">
 														<p>Your buddy is trying to send you a bad word</p>
 														<div className="flex w-full gap-6">
-															<span
+															<Button
 																onClick={() => showBadword(id)}
-																className="text-sm cursor-pointer"
+																className="hover:opacity-80 px-4 py-2 rounded-lg bg-gray-500 dark:bg-primary text-primary dark:text-white"
 															>
 																See
-															</span>
-															<span
+															</Button>
+															<Button
 																onClick={() => hideBadword(id)}
-																className="text-red text-sm cursor-pointer"
+																className="hover:opacity-80 px-4 py-2 rounded-lg bg-gray-500 dark:bg-primary text-primary dark:text-white"
 															>
 																Hide
-															</span>
+															</Button>
 														</div>
 													</div>
 												) : (
