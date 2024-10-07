@@ -47,7 +47,6 @@ const Start = () => {
 			loginId: authState.loginId,
 			email: authState.email,
 		});
-		console.log('chat socket connected');
 	}, []);
 
 	const onInactive = useCallback(() => {
@@ -55,10 +54,8 @@ const Start = () => {
 	}, []);
 
 	const emitClose = useCallback((err, chatClosed) => {
-		console.log(err, chatClosed);
 		if (err) {
 			alert('An error occured whiles closing chat.');
-			console.log(err);
 			return err;
 		}
 
@@ -72,7 +69,6 @@ const Start = () => {
 		clearTimer();
 	}, []);
 	useEffect(() => {
-		console.log('is socket connected : ', socket.connected);
 		if (!socket.connected) {
 			connectWithId(app.currentChatId);
 		}
@@ -86,13 +82,10 @@ const Start = () => {
 			socket.off(NEW_EVENT_CLOSE, onClose);
 			socket.off(NEW_EVENT_INACTIVE, onInactive);
 			socket.disconnect();
-			console.log('useEffect used');
 		};
 	}, []);
 
 	const doCloseChat = () => {
-		console.log('ChatID', app.currentChatId);
-		console.log('is socket connected for closure ', socket.connected, socket.id);
 
 		if (!socket.connected) {
 			connectWithId(app.currentChatId);
