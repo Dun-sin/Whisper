@@ -126,7 +126,7 @@ const Chat = () => {
 	);
 
 	const doSend = async ({ senderId, room, message, time, containsBadword, replyTo = null }) => {
-		console.log('DODOO SEND !!!', { message, editing });
+		
 		if (!cryptoKey) {
 			console.error('Encryption key not generated yet.');
 			return;
@@ -137,7 +137,7 @@ const Chat = () => {
 		}
 
 		try {
-			// Encoding and encrypting the message
+		
 			const encoder = new TextEncoder();
 			const encodedMessage = encoder.encode(message);
 
@@ -149,12 +149,12 @@ const Chat = () => {
 				encodedMessage
 			);
 
-			// Convert the encrypted message to Base64 string
+			
 			const encryptedMessage = arrayBufferToBase64(new Uint8Array(encryptedMessagersa));
 
-			// Check if editing or sending a new message
+		
 			if (editing.isediting === true) {
-				// Editing an existing message
+				
 				try {
 					const messageObject = getMessage(editing.messageID, state, app);
 					const oldMessage = messageObject.message;
@@ -173,15 +173,14 @@ const Chat = () => {
 
 					updateMessage({ ...editedMessage, room: app.currentChatId }, true);
 				} catch (e) {
-					console.error('Error while editing the message:', e);
+					
 					setEditing({ isediting: false, messageID: null });
 					return false;
 				}
 
-				// Reset editing state
 				setEditing({ isediting: false, messageID: null });
 			} else {
-				// Sending a new message
+				
 				try {
 					const sentMessage = await sendMessage({
 						senderId,
@@ -192,7 +191,7 @@ const Chat = () => {
 						replyTo,
 					});
 
-					// Add message with a pending status
+					
 					addMessage({
 						senderId,
 						room,
@@ -204,18 +203,15 @@ const Chat = () => {
 						replyTo,
 					});
 
-					// Try to update the message status after sending
+					
 					try {
 						updateMessage(sentMessage);
 					} catch (e) {
-						console.error('Failed to update the message status:', e);
 						logOut();
 						return false;
 					}
 				} catch (e) {
-					console.error('Failed to send the message:', e);
 
-					// On failure, add the message with a failed status
 					try {
 						updateMessage({
 							senderId,
@@ -228,7 +224,6 @@ const Chat = () => {
 							replyTo,
 						});
 					} catch (e) {
-						console.error('Failed to update the failed message status:', e);
 						logOut();
 					}
 
@@ -238,7 +233,6 @@ const Chat = () => {
 
 			return true;
 		} catch (e) {
-			console.error('An error occurred during encryption or sending:', e);
 			return false;
 		}
 	};
@@ -254,7 +248,7 @@ const Chat = () => {
 		if (message === '' || senderId === undefined || senderId === '123456') {
 			return;
 		}
-
+		// ! bleow logic is moved inside DoSend - due to message needing to be encrypted !!
 		// if (editing.isediting === true) {
 		// 	try {
 		// 		const messageObject = getMessage(editing.messageID, state, app);

@@ -79,10 +79,10 @@ const MessageInput = ({
 							>
 								{
 									editing?.isediting
-										? `Editing ${oldMessage}` // Shows "Editing {oldMessage}" if the user is editing a message
+										? `Editing ${oldMessage}` 
 										: currentReplyMessage.senderId.toString() === senderId.toString()
-										? 'Replying Yourself' // Shows "Replying Yourself" if the user is replying to their own message
-										: 'Replying to Buddy' // Shows "Replying to Buddy" if replying to someone else's message
+										? 'Replying Yourself'
+										: 'Replying to Buddy'
 								}
 							</div>
 						)}

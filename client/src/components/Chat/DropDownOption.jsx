@@ -23,27 +23,19 @@ const DropDownOptions = ({
 }) => {
 	const { app } = useApp();
 
-	// const { importedPrivateKey, cryptoKey } = useCryptoKeys(app.currentChatId);
 	const { messages: state, updateMessage, removeMessage } = useChat();
 	const { getMessage, messageExists, handleCopyToClipBoard } = chatHelper(state, app);
 	const { deleteMessage } = useChatUtils(socket);
 
 	const handleEdit = async (id) => {
 		setReplyId(id);
-		// await generateKeyPair()
-		// console.log({ importedPrivateKey, cryptoKey, a: app.currentChatId });
-		// handleCopyToClipBoard(id,importedPrivateKey)
-		// return null;
-		// alert(id)
 		inputRef.current.focus();
 		const { message } = getMessage(id, state, app);
-		// const { message } = getMessage(id, state, app);
-		console.log('GOT EDIT MESSAGE!!', message);
+
 		const decryptedMessage = await decryptMessage(message, importedPrivateKey);
-		console.log('OHHHHHHH IS IT ?>?SD>?SDSDDS ', decryptedMessage);
+
 		if (message.includes('Warning Message')) {
 			cancelEdit();
-			// return;
 		} else {
 			setMessage(decryptedMessage);
 			// eslint-disable-next-line require-atomic-updates
@@ -90,7 +82,7 @@ const DropDownOptions = ({
 	const handleReply = (id) => {
 		// need to check if editing , only then call it to clear input
 		cancelEdit();
-		setReplyId(id)
+		setReplyId(id);
 	};
 	const renderIconButton = (props) => {
 		return <BiDotsVerticalRounded {...props} className="fill-white scale-[1.8]" />;
@@ -129,7 +121,9 @@ const DropDownOptions = ({
 				renderToggle={renderIconButtonReceiver}
 				NoCaret
 			>
-				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, cryptoKey)}>Copy</Dropdown.Item>
+				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, cryptoKey)}>
+					Copy
+				</Dropdown.Item>
 				<Dropdown.Item onClick={() => handleReply(id)}>Reply</Dropdown.Item>
 			</Dropdown>
 		);
