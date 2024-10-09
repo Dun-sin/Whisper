@@ -111,7 +111,7 @@ const Chat = () => {
 		inputRef.current.value = '';
 		setEditing({ isediting: false, messageID: null });
 		setMessage('');
-		cancelReply()
+		cancelReply();
 		emitTyping(false);
 	};
 
@@ -126,7 +126,6 @@ const Chat = () => {
 	);
 
 	const doSend = async ({ senderId, room, message, time, containsBadword, replyTo = null }) => {
-		
 		if (!cryptoKey) {
 			console.error('Encryption key not generated yet.');
 			return;
@@ -137,7 +136,6 @@ const Chat = () => {
 		}
 
 		try {
-		
 			const encoder = new TextEncoder();
 			const encodedMessage = encoder.encode(message);
 
@@ -149,12 +147,9 @@ const Chat = () => {
 				encodedMessage
 			);
 
-			
 			const encryptedMessage = arrayBufferToBase64(new Uint8Array(encryptedMessagersa));
 
-		
 			if (editing.isediting === true) {
-				
 				try {
 					const messageObject = getMessage(editing.messageID, state, app);
 					const oldMessage = messageObject.message;
@@ -173,14 +168,12 @@ const Chat = () => {
 
 					updateMessage({ ...editedMessage, room: app.currentChatId }, true);
 				} catch (e) {
-					
 					setEditing({ isediting: false, messageID: null });
 					return false;
 				}
 
 				setEditing({ isediting: false, messageID: null });
 			} else {
-				
 				try {
 					const sentMessage = await sendMessage({
 						senderId,
@@ -191,7 +184,6 @@ const Chat = () => {
 						replyTo,
 					});
 
-					
 					addMessage({
 						senderId,
 						room,
@@ -203,7 +195,6 @@ const Chat = () => {
 						replyTo,
 					});
 
-					
 					try {
 						updateMessage(sentMessage);
 					} catch (e) {
@@ -211,7 +202,6 @@ const Chat = () => {
 						return false;
 					}
 				} catch (e) {
-
 					try {
 						updateMessage({
 							senderId,
@@ -248,28 +238,7 @@ const Chat = () => {
 		if (message === '' || senderId === undefined || senderId === '123456') {
 			return;
 		}
-		// ! bleow logic is moved inside DoSend - due to message needing to be encrypted !!
-		// if (editing.isediting === true) {
-		// 	try {
-		// 		const messageObject = getMessage(editing.messageID, state, app);
-		// 		const oldMessage = messageObject.message;
-		// 		console.log({
-		// 			messageObject,oldMessage
-		// 		})
-		// 		const editedMessage = await editMessage({
-		// 			id: editing.messageID,
-		// 			chatId: app.currentChatId,
-		// 			newMessage: message,
-		// 			oldMessage,
-		// 		});
 
-		// 		updateMessage({ ...editedMessage, room: app.currentChatId }, true);
-		// 	} catch (e) {
-		// 		setEditing({ isediting: false, messageID: null });
-		// 		return;
-		// 	}
-		// 	setEditing({ isediting: false, messageID: null });
-		// } else {
 		doSend({
 			senderId,
 			room: app.currentChatId,
@@ -362,7 +331,7 @@ const Chat = () => {
 			if (event.key === 'Escape' && editing.isediting) {
 				event.preventDefault();
 				cancelEdit();
-				cancelReply()
+				cancelReply();
 			}
 		};
 
