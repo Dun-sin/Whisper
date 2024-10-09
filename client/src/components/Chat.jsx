@@ -49,6 +49,7 @@ const Chat = () => {
 	const [editing, setEditing] = useState({
 		isediting: false,
 		messageID: null,
+		// message:null,
 	});
 	const [message, setMessage] = useState('');
 
@@ -109,6 +110,8 @@ const Chat = () => {
 	const cancelEdit = () => {
 		inputRef.current.value = '';
 		setEditing({ isediting: false, messageID: null });
+		setMessage('');
+		cancelReply()
 		emitTyping(false);
 	};
 
@@ -123,77 +126,125 @@ const Chat = () => {
 	);
 
 	const doSend = async ({ senderId, room, message, time, containsBadword, replyTo = null }) => {
+		console.log('DODOO SEND !!!', { message, editing });
 		if (!cryptoKey) {
 			console.error('Encryption key not generated yet.');
 			return;
 		}
 
 		if (!importedPublicKey) {
-			throw Error('Public Key not Generated');
+			throw new Error('Public Key not Generated');
 		}
-		// Encoding and encryting the message to be sent.
-		const encoder = new TextEncoder();
-		const encryptedMessagersa = await crypto.subtle.encrypt(
-			{
-				name: 'RSA-OAEP',
-			},
-			importedPublicKey,
-			encoder.encode(message)
-		);
-
-		// Convert the Uint8Array to Base64 string
-		const encryptedMessage = arrayBufferToBase64(new Uint8Array(encryptedMessagersa));
 
 		try {
-			const sentMessage = await sendMessage({
-				senderId,
-				message: encryptedMessage,
-				time,
-				chatId: room,
-				containsBadword,
-				replyTo,
-			});
-			addMessage({
-				senderId,
-				room,
-				id: sentMessage.id,
-				message: encryptedMessage,
-				time,
-				status: 'pending',
-				containsBadword,
-				replyTo,
-			});
+			// Encoding and encrypting the message
+			const encoder = new TextEncoder();
+			const encodedMessage = encoder.encode(message);
 
-			try {
-				updateMessage(sentMessage);
-			} catch {
-				logOut();
-				return false;
+			const encryptedMessagersa = await crypto.subtle.encrypt(
+				{
+					name: 'RSA-OAEP',
+				},
+				importedPublicKey,
+				encodedMessage
+			);
+
+			// Convert the encrypted message to Base64 string
+			const encryptedMessage = arrayBufferToBase64(new Uint8Array(encryptedMessagersa));
+
+			// Check if editing or sending a new message
+			if (editing.isediting === true) {
+				// Editing an existing message
+				try {
+					const messageObject = getMessage(editing.messageID, state, app);
+					const oldMessage = messageObject.message;
+
+					console.log({
+						messageObject,
+						oldMessage,
+					});
+
+					const editedMessage = await editMessage({
+						id: editing.messageID,
+						chatId: app.currentChatId,
+						newMessage: encryptedMessage, // Send encrypted message
+						oldMessage,
+					});
+
+					updateMessage({ ...editedMessage, room: app.currentChatId }, true);
+				} catch (e) {
+					console.error('Error while editing the message:', e);
+					setEditing({ isediting: false, messageID: null });
+					return false;
+				}
+
+				// Reset editing state
+				setEditing({ isediting: false, messageID: null });
+			} else {
+				// Sending a new message
+				try {
+					const sentMessage = await sendMessage({
+						senderId,
+						message: encryptedMessage,
+						time,
+						chatId: room,
+						containsBadword,
+						replyTo,
+					});
+
+					// Add message with a pending status
+					addMessage({
+						senderId,
+						room,
+						id: sentMessage.id,
+						message: encryptedMessage,
+						time,
+						status: 'pending',
+						containsBadword,
+						replyTo,
+					});
+
+					// Try to update the message status after sending
+					try {
+						updateMessage(sentMessage);
+					} catch (e) {
+						console.error('Failed to update the message status:', e);
+						logOut();
+						return false;
+					}
+				} catch (e) {
+					console.error('Failed to send the message:', e);
+
+					// On failure, add the message with a failed status
+					try {
+						updateMessage({
+							senderId,
+							room,
+							id: uuid(),
+							message: encryptedMessage,
+							time,
+							status: 'failed',
+							containsBadword,
+							replyTo,
+						});
+					} catch (e) {
+						console.error('Failed to update the failed message status:', e);
+						logOut();
+					}
+
+					return false;
+				}
 			}
+
+			return true;
 		} catch (e) {
-			try {
-				updateMessage({
-					senderId,
-					room,
-					id: uuid(),
-					message: encryptedMessage,
-					time,
-					status: 'failed',
-					containsBadword,
-					replyTo,
-				});
-			} catch {
-				logOut();
-			}
-
+			console.error('An error occurred during encryption or sending:', e);
 			return false;
 		}
-
-		return true;
 	};
 
 	// Here whenever user will submit message it will be send to the server
-	const handleSubmit = async (e) => {
+	const handleSubmit = (e) => {
 		e.preventDefault();
 
 		emitTyping(false);
@@ -204,33 +255,36 @@ const Chat = () => {
 			return;
 		}
 
-		if (editing.isediting === true) {
-			try {
-				const messageObject = getMessage(editing.messageID, state, app);
-				const oldMessage = messageObject.message;
-				const editedMessage = await editMessage({
-					id: editing.messageID,
-					chatId: app.currentChatId,
-					newMessage: message,
-					oldMessage,
-				});
+		// if (editing.isediting === true) {
+		// 	try {
+		// 		const messageObject = getMessage(editing.messageID, state, app);
+		// 		const oldMessage = messageObject.message;
+		// 		console.log({
+		// 			messageObject,oldMessage
+		// 		})
+		// 		const editedMessage = await editMessage({
+		// 			id: editing.messageID,
+		// 			chatId: app.currentChatId,
+		// 			newMessage: message,
+		// 			oldMessage,
+		// 		});
 
-				updateMessage({ ...editedMessage, room: app.currentChatId }, true);
-			} catch (e) {
-				setEditing({ isediting: false, messageID: null });
-				return;
-			}
-			setEditing({ isediting: false, messageID: null });
-		} else {
-			doSend({
-				senderId,
-				room: app.currentChatId,
-				message,
-				time: d.getTime(),
-				containsBadword: badwords.check(message),
-				replyTo: currentReplyMessageId,
-			});
-		}
+		// 		updateMessage({ ...editedMessage, room: app.currentChatId }, true);
+		// 	} catch (e) {
+		// 		setEditing({ isediting: false, messageID: null });
+		// 		return;
+		// 	}
+		// 	setEditing({ isediting: false, messageID: null });
+		// } else {
+		doSend({
+			senderId,
+			room: app.currentChatId,
+			message,
+			time: d.getTime(),
+			containsBadword: badwords.check(message),
+			replyTo: currentReplyMessageId,
+		});
+		// }
 
 		if (inputRef.current) {
 			inputRef.current.value = '';
@@ -270,16 +324,19 @@ const Chat = () => {
 		return decryptedMessages.find((object) => object.id === replyTo);
 	}
 
-	const onNewMessageHandler = useCallback(async (message) => {
-		try {
-			const decryptedMessage = await decryptMessage(message.message, cryptoKeyRef.current);
-			addMessage(message);
-			playNotification('newMessage');
-			createBrowserNotification('You received a new message on Whisper', decryptedMessage);
-		} catch (error) {
-			console.error(`Could not decrypt message: ${error.message}`, error);
-		}
-	}, [cryptoKey]);
+	const onNewMessageHandler = useCallback(
+		async (message) => {
+			try {
+				const decryptedMessage = await decryptMessage(message.message, cryptoKeyRef.current);
+				addMessage(message);
+				playNotification('newMessage');
+				createBrowserNotification('You received a new message on Whisper', decryptedMessage);
+			} catch (error) {
+				console.error(`Could not decrypt message: ${error.message}`, error);
+			}
+		},
+		[cryptoKey]
+	);
 
 	const onDeleteMessageHandler = useCallback(({ id, chatId }) => {
 		removeMessage(id, chatId);
@@ -297,15 +354,13 @@ const Chat = () => {
 		receiveMessage(messageId, chatId);
 	}, []);
 
-  const onPublicStringHandler = useCallback(({ pemPublicKeyString, pemPrivateKeyString }) => {
-    const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
-    const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
+	const onPublicStringHandler = useCallback(({ pemPublicKeyString, pemPrivateKeyString }) => {
+		const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
+		const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
 
-    // Import PEM-formatted public key as CryptoKey
-    importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
-  }, []);
-
-
+		// Import PEM-formatted public key as CryptoKey
+		importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
+	}, []);
 
 	// Clear chat when escape is pressed
 	useEffect(() => {
@@ -313,6 +368,7 @@ const Chat = () => {
 			if (event.key === 'Escape' && editing.isediting) {
 				event.preventDefault();
 				cancelEdit();
+				cancelReply()
 			}
 		};
 
@@ -393,7 +449,9 @@ const Chat = () => {
 			socket.off('publicKey', onPublicStringHandler);
 		};
 	}, []);
-
+	useEffect(() => {
+		console.log('KEYS LOADED ????', { importedPublicKey, importedPrivateKey, cryptoKey });
+	}, [importedPublicKey, importedPrivateKey, cryptoKey]);
 	return (
 		<div className="w-full md:h-[90%] min-h-[100%] pb-[25px] flex flex-col justify-between gap-6">
 			<div className="max-h-[67vh]">
@@ -553,7 +611,10 @@ const Chat = () => {
 																inputRef={inputRef}
 																cancelEdit={cancelEdit}
 																setEditing={setEditing}
+																setMessage={setMessage}
 																setReplyId={startReply}
+																importedPrivateKey={importedPrivateKey}
+																cryptoKey={cryptoKey}
 															/>
 														</div>
 														<div

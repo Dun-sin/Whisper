@@ -7,27 +7,49 @@ import { socket } from 'src/lib/socketConnection';
 import { useApp } from 'src/context/AppContext';
 import { useChat } from 'src/context/ChatContext';
 import useChatUtils from 'src/lib/chatSocket';
-import useCryptoKeys from 'src/hooks/useCryptoKeys';
+// import useCryptoKeys from 'src/hooks/useCryptoKeys';
+import decryptMessage from 'src/lib/decryptMessage';
 
-const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setReplyId }) => {
+const DropDownOptions = ({
+	id,
+	isSender,
+	inputRef,
+	cancelEdit,
+	setEditing,
+	setReplyId,
+	importedPrivateKey,
+	cryptoKey,
+	setMessage,
+}) => {
 	const { app } = useApp();
 
-  const { importedPrivateKey, cryptoKey } = useCryptoKeys(app.currentChatId)
+	// const { importedPrivateKey, cryptoKey } = useCryptoKeys(app.currentChatId);
 	const { messages: state, updateMessage, removeMessage } = useChat();
 	const { getMessage, messageExists, handleCopyToClipBoard } = chatHelper(state, app);
 	const { deleteMessage } = useChatUtils(socket);
 
-	const handleEdit = (id) => {
+	const handleEdit = async (id) => {
+		setReplyId(id);
+		// await generateKeyPair()
+		// console.log({ importedPrivateKey, cryptoKey, a: app.currentChatId });
+		// handleCopyToClipBoard(id,importedPrivateKey)
+		// return null;
+		// alert(id)
 		inputRef.current.focus();
 		const { message } = getMessage(id, state, app);
-
+		// const { message } = getMessage(id, state, app);
+		console.log('GOT EDIT MESSAGE!!', message);
+		const decryptedMessage = await decryptMessage(message, importedPrivateKey);
+		console.log('OHHHHHHH IS IT ?>?SD>?SDSDDS ', decryptedMessage);
 		if (message.includes('Warning Message')) {
 			cancelEdit();
-			return;
+			// return;
+		} else {
+			setMessage(decryptedMessage);
+			// eslint-disable-next-line require-atomic-updates
+			inputRef.current.value = decryptedMessage;
+			setEditing({ isediting: true, messageID: id });
 		}
-		inputRef.current.value = message;
-
-		setEditing({ isediting: true, messageID: id });
 	};
 
 	const handleDelete = async (id) => {
@@ -65,6 +87,11 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 		}
 	};
 
+	const handleReply = (id) => {
+		// need to check if editing , only then call it to clear input
+		cancelEdit();
+		setReplyId(id)
+	};
 	const renderIconButton = (props) => {
 		return <BiDotsVerticalRounded {...props} className="fill-white scale-[1.8]" />;
 	};
@@ -85,9 +112,10 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 			>
 				<Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>
 
-        <Dropdown.Item onClick={() =>
-          handleCopyToClipBoard(id, importedPrivateKey)}>Copy</Dropdown.Item>
-				<Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
+				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, importedPrivateKey)}>
+					Copy
+				</Dropdown.Item>
+				<Dropdown.Item onClick={() => handleReply(id)}>Reply</Dropdown.Item>
 				<Dropdown.Item onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
 			</Dropdown>
 		);
@@ -101,8 +129,8 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 				renderToggle={renderIconButtonReceiver}
 				NoCaret
 			>
-        <Dropdown.Item onClick={() => handleCopyToClipBoard(id, cryptoKey)}>Copy</Dropdown.Item>
-				<Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
+				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, cryptoKey)}>Copy</Dropdown.Item>
+				<Dropdown.Item onClick={() => handleReply(id)}>Reply</Dropdown.Item>
 			</Dropdown>
 		);
 	} else {
@@ -119,4 +147,7 @@ DropDownOptions.propTypes = {
 	cancelEdit: PropTypes.func.isRequired,
 	setEditing: PropTypes.func.isRequired,
 	setReplyId: PropTypes.func.isRequired,
+	importedPrivateKey: PropTypes.object.isRequired,
+	cryptoKey: PropTypes.object.isRequired,
+	setMessage: PropTypes.func.isRequired,
 };

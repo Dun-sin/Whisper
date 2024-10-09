@@ -31,6 +31,7 @@ export default (state, app) => {
 
 	const handleCopyToClipBoard = async (id, key) => {
 		const { message } = getMessage(id, state, app);
+		console.log({ key,message });
 		const decryptedMessage = await decryptMessage(message, key);
 		if (message.includes('Warning Message')) {
 			return;

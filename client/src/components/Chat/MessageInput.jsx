@@ -25,6 +25,13 @@ const MessageInput = ({
 	const { authState } = useAuth();
 	const senderId = authState.loginId;
 
+	const [oldMessage, setOldMessage] = useState(null);
+
+	useEffect(() => {
+		if (editing?.isediting) {
+			setOldMessage(message);
+		}
+	}, [editing]);
 	// Define the limitMessageHandler function
 	function limitMessageHandler() {
 		setTextAreaDisabled(true);
@@ -59,61 +66,67 @@ const MessageInput = ({
 
 	return (
 		<form className="flex flex-col justify-center items-center mt-[40px]" onSubmit={handleSubmit}>
-				{currentReplyMessage && (
-					<div className="w-full p-2 flex items-center justify-between gap-2 border rounded-t-md">
-						<div className="flex items-center gap-2">
-							<IoIosArrowDropright className="fill-white scale-150" />
-							{typeof currentReplyMessage.message !== 'string' ? (
-								<div className="truncate">{currentReplyMessage.message}</div>
-							) : (
-								<div
-									className="truncate cursor-pointer"
-									onClick={() => scrollToMessage(currentReplyMessageId)}
-								>
-									{currentReplyMessage.senderId.toString() === senderId.toString()
-										? 'Replying Yourself'
-										: 'Replying to Buddy'}
-								</div>
-							)}
-						</div>
-						<ImCancelCircle
-							onClick={() => cancelReply(null)}
-							className="fill-white scale-150 cursor-pointer"
-						/>
-					</div>
-				)}
-				<div className="w-full flex justify-center items-center">
-					<div
-						className={`w-full flex items-center justify-between bg-secondary ${
-							currentReplyMessage ? 'rounded-bl-md' : 'rounded-l-md'
-						} max-h-[150px] relative`}
-					>
-						<textarea
-							placeholder="Press Ctrl + Enter to send a message"
-							className="h-[48px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] py-[10px] text-[18px] placeholder-shown:align-middle min-h-[40px] max-h-[100px] overflow-y-auto"
-							ref={inputRef}
-							value={message}
-							onChange={handleTypingStatus}
-							disabled={isTextAreaDisabled} // Disable textarea based on the state
-						/>
-						<EmojiPicker onEmojiPick={setMessage} focusInput={() => inputRef.current.focus()} />
-						{editing.isediting && (
-							<ImCancelCircle
-								onClick={cancelEdit}
-								className="fill-white mr-5 scale-[1.3] cursor-pointer"
-							/>
+			{currentReplyMessage && (
+				<div className="w-full p-2 flex items-center justify-between gap-2 border rounded-t-md">
+					<div className="flex items-center gap-2">
+						<IoIosArrowDropright className="fill-white scale-150" />
+						{typeof currentReplyMessage.message !== 'string' ? (
+							<div className="truncate">{currentReplyMessage.message}</div>
+						) : (
+							<div
+								className="truncate cursor-pointer"
+								onClick={() => scrollToMessage(currentReplyMessageId)}
+							>
+								{
+									editing?.isediting
+										? `Editing ${oldMessage}` // Shows "Editing {oldMessage}" if the user is editing a message
+										: currentReplyMessage.senderId.toString() === senderId.toString()
+										? 'Replying Yourself' // Shows "Replying Yourself" if the user is replying to their own message
+										: 'Replying to Buddy' // Shows "Replying to Buddy" if replying to someone else's message
+								}
+							</div>
 						)}
 					</div>
-					<button
-						type="submit"
-						className={`bg-[#FF9F1C] h-[47px] w-[70px] flex justify-center items-center ${
-							currentReplyMessage ? 'rounded-br-md' : 'rounded-r-md'
-						}`}
-					>
-						<IoSend className="fill-primary scale-[2]" />
-					</button>
+					{!editing?.isediting && (
+						<ImCancelCircle
+							onClick={() => cancelReply(null)}
+							className="fill-black scale-150 cursor-pointer"
+						/>
+					)}
 				</div>
-			</form>
+			)}
+			<div className="w-full flex justify-center items-center">
+				<div
+					className={`w-full flex items-center justify-between bg-secondary ${
+						currentReplyMessage ? 'rounded-bl-md' : 'rounded-l-md'
+					} max-h-[150px] relative`}
+				>
+					<textarea
+						placeholder="Press Ctrl + Enter to send a message"
+						className="h-[48px] focus:outline-none w-[96%] bg-secondary text-white rounded-[15px] resize-none pl-[22px] pr-[22px] py-[10px] text-[18px] placeholder-shown:align-middle min-h-[40px] max-h-[100px] overflow-y-auto"
+						ref={inputRef}
+						value={message}
+						onChange={handleTypingStatus}
+						disabled={isTextAreaDisabled} // Disable textarea based on the state
+					/>
+					<EmojiPicker onEmojiPick={setMessage} focusInput={() => inputRef.current.focus()} />
+					{editing.isediting && (
+						<ImCancelCircle
+							onClick={cancelEdit}
+							className="fill-white mr-5 scale-[1.3] cursor-pointer"
+						/>
+					)}
+				</div>
+				<button
+					type="submit"
+					className={`bg-[#FF9F1C] h-[47px] w-[70px] flex justify-center items-center ${
+						currentReplyMessage ? 'rounded-br-md' : 'rounded-r-md'
+					}`}
+				>
+					<IoSend className="fill-primary scale-[2]" />
+				</button>
+			</div>
+		</form>
 	);
 };
 
