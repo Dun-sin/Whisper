@@ -1,5 +1,6 @@
 {
 	"NEW_EVENT_CLOSE": "close",
+	"NEW_EVENT_CLOSED": "closed",
 	"NEW_EVENT_INACTIVE": "inactive",
 	"NEW_EVENT_DELETE_MESSAGE": "delete_message",
 	"NEW_EVENT_EDIT_MESSAGE": "edit_message",
@@ -17,6 +18,6 @@
 	"NEW_EVENT_ADDING": "adding",
 	"NEW_EVENT_CREATE_ROOM": "createRoom",
 	"NEW_EVENT_READ_MESSAGE": "read_message",
-  "NEW_EVENT_ONLINE_STATUS": "online_status",
-  "NEW_EVENT_REQUEST_PUBLIC_KEY": "requestPublicKey"
+	"NEW_EVENT_ONLINE_STATUS": "online_status",
+	"NEW_EVENT_REQUEST_PUBLIC_KEY": "requestPublicKey"
 }
