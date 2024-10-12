@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ThreeDots } from 'react-loading-icons';
-import { PiPlugsLight } from 'react-icons/pi';
 import { connectWithId, socket } from 'src/lib/socketConnection';
 
 import Anonymous from 'components/Anonymous';
 import { useAuth } from 'src/context/AuthContext';
 import { useChat } from 'src/context/ChatContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import { useNotification } from 'src/lib/notification';
 import { useApp } from 'src/context/AppContext';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 import { isExplicitDisconnection } from 'src/lib/utils';
+import ReconnectBanner from './ReconnectBanner';
 
 import {
 	NEW_EVENT_ADDING,
@@ -51,6 +51,9 @@ const BuddyMatcher = () => {
 		setDisconnected(true);
 		endSearch();
 	}
+
+
+	  
 
 	const emitJoin = useCallback(() => {
 		socket.volatile.emit(NEW_EVENT_JOIN, {
@@ -258,23 +261,8 @@ const BuddyMatcher = () => {
 			)}
 		</div>
 	) : disconnected ? (
-		<div className="flex flex-col w-full justify-center items-center h-full bg-primary">
-			<PiPlugsLight className="text-secondary text-8xl" />
-			<p className="text-lg text-center text-white">Sorry, it seems you&apos;re not connected</p>
-			<div className="flex flex-col sm:flex-row gap-1 sm:gap-4 text-[1.5em] mt-4 font-medium items-center">
-				<button
-					onClick={handleReconnect}
-					className={
-						'hover:no-underline hover:text-black text-black w-[8em] h-[2.3em] rounded-[30px] bg-[#FF9F1C] flex flex-col items-center justify-center'
-					}
-				>
-					Try again
-				</button>
-				<Link to="/" className="underline text-white hover:text-white text-lg">
-					Return Home
-				</Link>
-			</div>
-		</div>
+		<ReconnectBanner handleReconnect={handleReconnect} />
+		  
 	) : (
 		<Anonymous 
 			onChatClosed={startNewSearch}  
