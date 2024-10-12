@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
+import { ChatProvider } from './context/ChatContext';
 import ComingSoon from 'pages/ComingSoon';
 import Home from 'pages/Home';
 import NavBar from 'components/NavBar';
@@ -48,7 +49,7 @@ function App() {
       {isLoggedIn && <NavBar />}
       <Routes>
         <Route exact path="/" element={<ProtectedRoutes isLoggedIn={isLoggedIn} />}>
-          <Route exact path="/" element={<Start />} />
+          <Route exact path="/" element={<ChatProvider><Start /></ChatProvider>} />
           {/* TODO: Sepreate searching and foundUser into different routes */}
           <Route exact path="/founduser" element={<Searching />} />
           <Route exact path="/friends" element={<ComingSoon />} />

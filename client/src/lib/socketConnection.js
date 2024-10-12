@@ -5,8 +5,23 @@ export const socket = io(import.meta.env.VITE_SOCKET_URL, {
 });
 
 export function connectWithId(chatId) {
-	if(chatId){ 
-		socket.io.opts.query = { chatId };
-	}
-	socket.connect(); 
+	return new Promise((resolve, reject) => {
+		try {
+			if (chatId) {
+				socket.io.opts.query = { chatId };
+			}
+
+			socket.connect();
+
+			socket.on('connect', () => {
+				resolve(true);
+			});
+
+			socket.on('connect_error', (error) => {
+				reject(error);
+			});
+		} catch (error) {
+			reject(error);
+		}
+	});
 }

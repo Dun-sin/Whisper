@@ -1,61 +1,51 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import { Dropdown, IconButton, Tooltip, Whisper } from 'rsuite';
 import {
-	NEW_EVENT_CLOSE,
 	NEW_EVENT_DELETE_MESSAGE,
 	NEW_EVENT_DISPLAY,
 	NEW_EVENT_EDIT_MESSAGE,
-	NEW_EVENT_RECEIVE_MESSAGE,
-	NEW_EVENT_ONLINE_STATUS,
+  NEW_EVENT_ONLINE_STATUS,
+  NEW_EVENT_RECEIVE_MESSAGE,
 } from '../../../constants.json';
-// Rsuite
-import { Dropdown, IconButton, Tooltip, Whisper } from 'rsuite';
-import { Icon } from '@rsuite/icons';
-
-// Icons
-import { BiArrowBack} from 'react-icons/bi';
-
-// Store
-import { socket } from 'src/lib/socketConnection';
-import { useChat } from 'src/context/ChatContext';
-import { useApp } from 'src/context/AppContext';
-import { useDialog } from 'src/context/DialogContext';
-
-// Components
-import Chat from 'components/Chat';
 import { createClassesFromArray, isExplicitDisconnection } from 'src/lib/utils';
-
+import { useCallback, useEffect, useRef, useState } from 'react';
 import useKeyPress, { ShortcutFlags } from 'src/hooks/useKeyPress';
-import useCheckTimePassed from 'src/hooks/useCheckTimePassed';
-import { useAuth } from 'src/context/AuthContext';
-import { api } from 'src/lib/axios';
+
+import { BiArrowBack } from 'react-icons/bi';
+import Chat from 'components/Chat';
+import { Icon } from '@rsuite/icons';
 import MenuToggle from './MenuToggle';
+import { api } from 'src/lib/axios';
+import { socket } from 'src/lib/socketConnection';
+import { useApp } from 'src/context/AppContext';
+import { useAuth } from 'src/context/AuthContext';
+import { useChat } from 'src/context/ChatContext';
+import useCloseChat from 'src/hooks/useCloseChat';
+import { useDialog } from 'src/context/DialogContext';
+import { useNavigate } from 'react-router-dom';
+
 const centerItems = `flex items-center justify-center`;
 
-const Anonymous = ({ onChatClosed }) => {
-	const { app, endSearch } = useApp();
+const Anonymous = () => {
+  const { app } = useApp();
 	const { authState } = useAuth();
-	const { currentChatId, onlineStatus } = app;
-	const { clearTimer } = useCheckTimePassed();
+  const { currentChatId, onlineStatus } = app;
 
-	const currentChatIdRef = useRef(currentChatId);
-
-	const [isTyping, setIsTyping] = useState(false);
-	const [autoSearchAfterClose, setAutoSearchAfterClose] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 	const [disconnected, setDisconnected] = useState(false);
 	const [buddyOnlineStatus, setBuddyOnlineStatus] = useState(null);
 
-	const autoSearchRef = useRef();
-	autoSearchRef.current = autoSearchAfterClose;
+  const { setDialog } = useDialog();
+  const { handleClose, closeChatHandler } = useCloseChat()
+
+
 	/**
 	 * @type {React.MutableRefObject<null | ReturnType<setTimeout>>}
 	 */
 	const typingStatusTimeoutRef = useRef(null);
 
 	const navigate = useNavigate();
-	const { messages: state, closeChat } = useChat();
-	const { setDialog } = useDialog();
+  const { messages: state } = useChat();
+
 
 	const onDisplay = useCallback(({ isTyping, chatId }) => {
 		// eslint-disable-next-line curly
@@ -110,52 +100,6 @@ const Anonymous = ({ onChatClosed }) => {
 		setIsTyping(false);
 	}, []);
 
-	const emitClose = useCallback((err, chatClosed) => {
-		if (err) {
-			alert('An error occured whiles closing chat.');
-			setAutoSearchAfterClose(false);
-			return err;
-		}
-
-		if (chatClosed) {
-			closeChat(currentChatId);
-		}
-
-		endSearch();
-
-		if (chatClosed && autoSearchRef.current) {
-			if (onChatClosed) {
-				onChatClosed();
-			}
-
-			setAutoSearchAfterClose(false);
-		} else {
-			navigate('/');
-		}
-
-		clearTimer();
-	}, []);
-
-	const closeChatHandler = (autoSearch = false) => {
-		const currentChatId = currentChatIdRef.current;
-
-		if (!currentChatId) {
-			navigate('/');
-			return;
-		}
-
-		setAutoSearchAfterClose(autoSearch);
-
-		socket.timeout(30000).emit(NEW_EVENT_CLOSE, currentChatId, emitClose);
-	};
-
-	const handleClose = (autoSearch = false) => {
-		setDialog({
-			isOpen: true,
-			text: 'Are you sure you want to close this chat?',
-			handler: () => closeChatHandler(autoSearch),
-		});
-	};
 
 	const blockUser = async () => {
 		// Get the other user id
@@ -201,7 +145,7 @@ const Anonymous = ({ onChatClosed }) => {
 			const result = await blockUser();
 			if (result.success) {
 				alert('User blocked successfully');
-				closeChatHandler(false);
+        await closeChatHandler(false);
 			} else {
 				alert(result.message || 'Error blocking user. Please try again later.');
 			}
@@ -347,7 +291,3 @@ const Anonymous = ({ onChatClosed }) => {
 };
 
 export default Anonymous;
-
-Anonymous.propTypes = {
-	onChatClosed: PropTypes.func,
-};
