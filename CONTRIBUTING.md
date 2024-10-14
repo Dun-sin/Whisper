@@ -14,9 +14,48 @@
 ### Pull Request guidelines
 
 - Don't create a pull request on an issue that doesn't exist, create an issue first and if the changes you are proposing are said to be okay, you can go ahead and create a pull request
-- Don't work on the main branch, create your own branch by following the instructions [here](#-how-to-fill-a-pull-request-templatetext)
+- Don't work on the main branch, create your own branch by following the instructions [here](#how-to-create-a-branch)
 - If you are working on the backend, share a screenrecording of your working software
 - don't create a PR for things outside of your issue's scope, it will lead to more work for the maintainers
+
+### How to Create a Branch
+
+- create a branch using the following command(replace )
+
+```bash
+git checkout -b branchName
+```
+
+- to list all branches
+
+```bash
+git branch -a
+```
+
+- move to the branch
+
+```bash
+git checkout branchName
+```
+
+- to see the changes between the current branch and the main branch
+
+```bash
+git diff main
+```
+
+- to push changes to that particular branch
+
+```bash
+git push origin branchName
+```
+
+- After completing work on the branch, merge it with main (make sure you are on the main branch before merging):
+
+```bash
+git diff main
+git merge branchName
+```
 
 ### General guidelines
 
