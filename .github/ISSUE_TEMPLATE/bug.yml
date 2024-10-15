@@ -31,6 +31,7 @@ body:
       description: What do we have to do to reproduce/experience this bug
     validations:
       required: true
+      
   - type: dropdown
     id: browser
     attributes:
