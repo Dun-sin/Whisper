@@ -24,7 +24,14 @@ body:
       description: Is there anything else we should know about this bug?
     validations:
       required: false
-
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: What do we have to do to reproduce/experience this bug
+    validations:
+      required: true
+      
   - type: dropdown
     id: browser
     attributes:
