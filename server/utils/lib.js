@@ -1,6 +1,5 @@
 const { Socket } = require('socket.io');
 const mongoose = require('mongoose');
-const CryptoJS = require('crypto-js');
 const { ObjectId } = require('mongodb');
 
 const ActiveUser = require('../models/UserModel');
