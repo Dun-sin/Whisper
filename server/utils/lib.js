@@ -388,8 +388,6 @@ async function editMessage(chatId, { id, message, oldMessage }) {
     return false;
   }
 
-  message = CryptoJS.AES.encrypt(message, secretKey).toString();
-
   try {
     await Message.findOneAndUpdate(
       { _id: id },
