@@ -98,7 +98,7 @@ const Chat = () => {
 	const cancelEdit = () => {
 		inputRef.current.value = '';
 		setEditing({ isediting: false, messageID: null });
-		emitTyping(app.currentChatId, false);
+		emitTyping({ chatId: app.currentChatId, isTyping: false });
 	};
 
 	const sortedMessages = useMemo(
@@ -185,7 +185,7 @@ const Chat = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		emitTyping(app.currentChatId, false);
+		emitTyping({ chatId: app.currentChatId, isTyping: false });
 		const d = new Date();
 		const message = inputRef.current.value.trim(); // Trim the message to remove the extra spaces
 
@@ -231,7 +231,7 @@ const Chat = () => {
 
 	const handleTypingStatus = throttle((e) => {
 		if (e.target.value.length > 0) {
-			emitTyping(app.currentChatId, true);
+			emitTyping({ chatId: app.currentChatId, isTyping: true });
 		}
 		setMessage(e.target.value);
 		adjustTextareaHeight(inputRef);
@@ -259,7 +259,8 @@ const Chat = () => {
 		return decryptedMessages.find((object) => object.id === replyTo);
 	}
 
-	const onNewMessageHandler = useCallback(async (message) => {
+	const onNewMessageHandler = useCallback(
+		async (message) => {
 			try {
 				const decryptedMessage = await decryptMessage(message.message, cryptoKeyRef.current);
 				addMessage(message);
@@ -268,7 +269,9 @@ const Chat = () => {
 			} catch (error) {
 				console.error(`Could not decrypt message: ${error.message}`, error);
 			}
-		}, [cryptoKey]);
+		},
+		[cryptoKey]
+	);
 
 	const onDeleteMessageHandler = useCallback(({ id, chatId }) => {
 		removeMessage(id, chatId);
@@ -294,8 +297,6 @@ const Chat = () => {
 		importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
 	}, []);
 
-
-	
 	// Clear chat when escape is pressed
 	useEffect(() => {
 		const keyDownHandler = (event) => {
