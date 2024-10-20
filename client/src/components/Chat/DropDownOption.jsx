@@ -42,11 +42,6 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 			return;
 		}
 
-		updateMessage(id, {
-			...messageObject,
-			status: 'pending',
-		});
-
 		try {
 			const messageDeleted = await deleteMessage({
 				id,
