@@ -486,18 +486,18 @@ const Chat = () => {
 													<div className="dark:text-white text-black flex flex-col border-red border w-full rounded-r-md p-3">
 														<p>Your buddy is trying to send you a bad word</p>
 														<div className="flex w-full gap-6">
-															<span
+															<button
 																onClick={() => showBadword(id)}
 																className="text-sm cursor-pointer"
 															>
 																See
-															</span>
-															<span
+															</button>
+															<button
 																onClick={() => hideBadword(id)}
 																className="text-red text-sm cursor-pointer"
 															>
 																Hide
-															</span>
+															</button>
 														</div>
 													</div>
 												) : (
