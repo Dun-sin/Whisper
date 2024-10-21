@@ -515,9 +515,7 @@ const Chat = () => {
 																		__html: md.render(
 																			badwordChoices[id] === 'hide'
 																				? badwords.filter(message)
-																				: badwordChoices[id] === 'show'
-																				? message
-																				: message
+																				: badwordChoices[id] === 'show' && message
 																		),
 																	}}
 																/>
