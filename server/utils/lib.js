@@ -1,6 +1,5 @@
 const { Socket } = require('socket.io');
 const mongoose = require('mongoose');
-const CryptoJS = require('crypto-js');
 const { ObjectId } = require('mongodb');
 
 const ActiveUser = require('../models/UserModel');
@@ -387,8 +386,6 @@ async function editMessage(chatId, { id, message, oldMessage }) {
   if (!chats[chatId].messages[id]) {
     return false;
   }
-
-  message = CryptoJS.AES.encrypt(message, secretKey).toString();
 
   try {
     await Message.findOneAndUpdate(

@@ -1,14 +1,7 @@
 /* eslint-disable max-len */
 
 import { BsArrow90DegLeft, BsArrow90DegRight } from 'react-icons/bs';
-import {
-	NEW_EVENT_DELETE_MESSAGE,
-	NEW_EVENT_EDIT_MESSAGE,
-	NEW_EVENT_READ_MESSAGE,
-	NEW_EVENT_RECEIVE_MESSAGE,
-	NEW_EVENT_SEND_FAILED,
-	NEW_EVENT_TYPING,
-} from '../../../constants.json';
+
 import chatHelper, {
 	adjustTextareaHeight,
 	arrayBufferToBase64,
@@ -78,7 +71,7 @@ const Chat = () => {
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 
-	const { sendMessage, editMessage } = useChatUtils(socket);
+	const { sendMessage, editMessage, emitTyping, setupSocketListeners } = useChatUtils(socket);
 	const { getMessage, handleResend, scrollToMessage } = chatHelper(state, app);
 
 	const inputRef = useRef('');
@@ -102,14 +95,10 @@ const Chat = () => {
 		logout();
 	}
 
-	const emitTyping = useCallback((boolean) => {
-		socket.timeout(5000).emit(NEW_EVENT_TYPING, { chatId: app.currentChatId, isTyping: boolean });
-	}, []);
-
 	const cancelEdit = () => {
 		inputRef.current.value = '';
 		setEditing({ isediting: false, messageID: null });
-		emitTyping(false);
+		emitTyping({ chatId: app.currentChatId, isTyping: false });
 	};
 
 	const sortedMessages = useMemo(
@@ -196,7 +185,7 @@ const Chat = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		emitTyping(false);
+		emitTyping({ chatId: app.currentChatId, isTyping: false });
 		const d = new Date();
 		const message = inputRef.current.value.trim(); // Trim the message to remove the extra spaces
 
@@ -242,7 +231,7 @@ const Chat = () => {
 
 	const handleTypingStatus = throttle((e) => {
 		if (e.target.value.length > 0) {
-			emitTyping(true);
+			emitTyping({ chatId: app.currentChatId, isTyping: true });
 		}
 		setMessage(e.target.value);
 		adjustTextareaHeight(inputRef);
@@ -271,15 +260,15 @@ const Chat = () => {
 	}
 
 	const onNewMessageHandler = useCallback(async (message) => {
-		try {
-			const decryptedMessage = await decryptMessage(message.message, cryptoKeyRef.current);
-			addMessage(message);
-			playNotification('newMessage');
-			createBrowserNotification('You received a new message on Whisper', decryptedMessage);
-		} catch (error) {
-			console.error(`Could not decrypt message: ${error.message}`, error);
-		}
-	}, [cryptoKey]);
+			try {
+				const decryptedMessage = await decryptMessage(message.message, cryptoKeyRef.current);
+				addMessage(message);
+				playNotification('newMessage');
+				createBrowserNotification('You received a new message on Whisper', decryptedMessage);
+			} catch (error) {
+				console.error(`Could not decrypt message: ${error.message}`, error);
+			}
+		}, [cryptoKey]);
 
 	const onDeleteMessageHandler = useCallback(({ id, chatId }) => {
 		removeMessage(id, chatId);
@@ -297,15 +286,13 @@ const Chat = () => {
 		receiveMessage(messageId, chatId);
 	}, []);
 
-  const onPublicStringHandler = useCallback(({ pemPublicKeyString, pemPrivateKeyString }) => {
-    const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
-    const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
+	const onPublicStringHandler = useCallback(({ pemPublicKeyString, pemPrivateKeyString }) => {
+		const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
+		const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
 
-    // Import PEM-formatted public key as CryptoKey
-    importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
-  }, []);
-
-
+		// Import PEM-formatted public key as CryptoKey
+		importKey(pemPublicKeyArrayBuffer, pemPrivateKeyArrayBuffer);
+	}, []);
 
 	// Clear chat when escape is pressed
 	useEffect(() => {
@@ -377,21 +364,16 @@ const Chat = () => {
 
 	useEffect(() => {
 		generateKeyPair();
-		socket.on('publicKey', onPublicStringHandler);
-		socket.on(NEW_EVENT_RECEIVE_MESSAGE, onNewMessageHandler);
-		socket.on(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
-		socket.on(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
-		socket.on(NEW_EVENT_READ_MESSAGE, onReadMessageHandler);
-		socket.on(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
+		const cleanupListeners = setupSocketListeners({
+			onNewMessageHandler,
+			onDeleteMessageHandler,
+			onEditMessageHandler,
+			onReadMessageHandler,
+			onLimitMessageHandler,
+			onPublicStringHandler,
+		});
 
-		return () => {
-			socket.off(NEW_EVENT_RECEIVE_MESSAGE, onNewMessageHandler);
-			socket.off(NEW_EVENT_DELETE_MESSAGE, onDeleteMessageHandler);
-			socket.off(NEW_EVENT_EDIT_MESSAGE, onEditMessageHandler);
-			socket.off(NEW_EVENT_READ_MESSAGE, onReadMessageHandler);
-			socket.off(NEW_EVENT_SEND_FAILED, onLimitMessageHandler);
-			socket.off('publicKey', onPublicStringHandler);
-		};
+		return cleanupListeners;
 	}, []);
 
 	return (
