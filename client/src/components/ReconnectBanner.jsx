@@ -28,4 +28,3 @@ export default function ReconnectBanner({ handleReconnect }) {
 ReconnectBanner.propTypes = {
 	handleReconnect: PropTypes.func,
 };
-

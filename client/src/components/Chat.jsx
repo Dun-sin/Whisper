@@ -259,7 +259,8 @@ const Chat = () => {
 		return decryptedMessages.find((object) => object.id === replyTo);
 	}
 
-	const onNewMessageHandler = useCallback(async (message) => {
+	const onNewMessageHandler = useCallback(
+		async (message) => {
 			try {
 				const decryptedMessage = await decryptMessage(message.message, cryptoKeyRef.current);
 				addMessage(message);
@@ -268,7 +269,9 @@ const Chat = () => {
 			} catch (error) {
 				console.error(`Could not decrypt message: ${error.message}`, error);
 			}
-		}, [cryptoKey]);
+		},
+		[cryptoKey]
+	);
 
 	const onDeleteMessageHandler = useCallback(({ id, chatId }) => {
 		removeMessage(id, chatId);

@@ -104,15 +104,13 @@ export default function useChatUtils(socket) {
 				reject(null);
 				return;
 			}
-			socket
-				.timeout(30000)
-				.emit(NEW_EVENT_TYPING, { chatId, isTyping }, (err, typingStatus) => {
-					if (err) {
-						reject(err);
-						return;
-					}
+			socket.timeout(30000).emit(NEW_EVENT_TYPING, { chatId, isTyping }, (err, typingStatus) => {
+				if (err) {
+					reject(err);
+					return;
+				}
 
-					resolve(typingStatus);
+				resolve(typingStatus);
 			});
 		});
 	}

@@ -3,8 +3,8 @@ import {
 	NEW_EVENT_DELETE_MESSAGE,
 	NEW_EVENT_DISPLAY,
 	NEW_EVENT_EDIT_MESSAGE,
-  NEW_EVENT_ONLINE_STATUS,
-  NEW_EVENT_RECEIVE_MESSAGE,
+	NEW_EVENT_ONLINE_STATUS,
+	NEW_EVENT_RECEIVE_MESSAGE,
 } from '../../../constants.json';
 import { createClassesFromArray, isExplicitDisconnection } from 'src/lib/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -26,17 +26,16 @@ import { useNavigate } from 'react-router-dom';
 const centerItems = `flex items-center justify-center`;
 
 const Anonymous = () => {
-  const { app } = useApp();
+	const { app } = useApp();
 	const { authState } = useAuth();
-  const { currentChatId, onlineStatus } = app;
+	const { currentChatId, onlineStatus } = app;
 
-  const [isTyping, setIsTyping] = useState(false);
+	const [isTyping, setIsTyping] = useState(false);
 	const [disconnected, setDisconnected] = useState(false);
 	const [buddyOnlineStatus, setBuddyOnlineStatus] = useState(null);
 
-  const { setDialog } = useDialog();
-  const { handleClose, closeChatHandler } = useCloseChat()
-
+	const { setDialog } = useDialog();
+	const { handleClose, closeChatHandler } = useCloseChat();
 
 	/**
 	 * @type {React.MutableRefObject<null | ReturnType<setTimeout>>}
@@ -44,8 +43,7 @@ const Anonymous = () => {
 	const typingStatusTimeoutRef = useRef(null);
 
 	const navigate = useNavigate();
-  const { messages: state } = useChat();
-
+	const { messages: state } = useChat();
 
 	const onDisplay = useCallback(({ isTyping, chatId }) => {
 		// eslint-disable-next-line curly
@@ -100,7 +98,6 @@ const Anonymous = () => {
 		setIsTyping(false);
 	}, []);
 
-
 	const blockUser = async () => {
 		// Get the other user id
 		const chattingPartnersId = state[currentChatId]?.userIds.find(
@@ -145,7 +142,7 @@ const Anonymous = () => {
 			const result = await blockUser();
 			if (result.success) {
 				alert('User blocked successfully');
-        await closeChatHandler(false);
+				await closeChatHandler(false);
 			} else {
 				alert(result.message || 'Error blocking user. Please try again later.');
 			}
