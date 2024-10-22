@@ -1,0 +1,44 @@
+name: Prettier Lint and Format
+on:
+  push:
+    branches:
+      - main
+      
+permissions:
+  contents: write
+jobs:
+  prettier-lint-and-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.x"
+      - name: Install Dependencies
+        run: |
+          cd ./server && npm i
+          cd ../client && npm i --force
+      - name: Run ESLint and Prettier
+        working-directory: ./client
+        run: |
+          npm run lint
+          npm run format
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --quiet || echo "has_changes=true" >> $GITHUB_OUTPUT
+      - name: Commit changes
+        if: steps.git-check.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -am "style: format code with prettier and fix lint issues"
+          git add -A
+          git push
