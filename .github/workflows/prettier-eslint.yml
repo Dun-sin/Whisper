@@ -1,5 +1,5 @@
 ---
-name: Lint and Format
+name: Prettier Lint and Format
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  lint-and-format:
+  prettier-lint-and-format:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,24 +17,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: "20.x"
 
       - name: Install Dependencies
-        run: npm install
+        run: |
+          cd ../../server && npm i
+          cd ../client && npm i
 
       - name: Run ESLint and Prettier
         run: |
-          npm run lint -- --fix
-          npm run format -- --write
-
-      - name: Commit and Push Changes
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-          git add .
-          git commit -m "chore: auto-fix lint and prettier issues" || echo "No changes to commit"
-          git push origin feature/prettier-github-action
-
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          npm run lint
+          npm run format
