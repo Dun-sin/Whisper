@@ -22,7 +22,7 @@ jobs:
       - name: Install Dependencies
         run: |
           cd ./server && npm i
-          cd ../client && npm i
+          cd ../client && npm i --force
 
       - name: Run ESLint and Prettier
         run: |
