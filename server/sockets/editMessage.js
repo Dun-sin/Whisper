@@ -17,6 +17,12 @@ module.exports = (socket) => {
         return;
       }
 
+      // Check if message exists and is within the 15-minute editable window
+      if (!isMessageEditableOrDeletable(chatId, messageId)) {
+        messageWasEditedSuccessfully(false);
+        return;
+      }
+
       const messageEdited = await editMessage(chatId, {
         id: messageId,
         message: newMessage,
