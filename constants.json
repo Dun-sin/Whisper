@@ -19,5 +19,7 @@
 	"NEW_EVENT_CREATE_ROOM": "createRoom",
 	"NEW_EVENT_READ_MESSAGE": "read_message",
 	"NEW_EVENT_ONLINE_STATUS": "online_status",
-	"NEW_EVENT_REQUEST_PUBLIC_KEY": "requestPublicKey"
+	"NEW_EVENT_REQUEST_PUBLIC_KEY": "requestPublicKey",
+
+	"FIFTEEN_MINUTES": 900000
 }

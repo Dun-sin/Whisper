@@ -1,13 +1,16 @@
 import { BiDotsVerticalRounded } from 'react-icons/bi';
 import Dropdown from 'rsuite/Dropdown';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useMemo } from 'react';
 import chatHelper from 'src/lib/chatHelper';
 import { socket } from 'src/lib/socketConnection';
 import { useApp } from 'src/context/AppContext';
 import { useChat } from 'src/context/ChatContext';
 import useChatUtils from 'src/lib/chatSocket';
 import useCryptoKeys from 'src/hooks/useCryptoKeys';
+
+import { FIFTEEN_MINUTES } from '../../../../constants.json';
+
 
 const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setReplyId }) => {
 	const { app } = useApp();
@@ -17,7 +20,17 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 	const { getMessage, messageExists, handleCopyToClipBoard } = chatHelper(state, app);
 	const { deleteMessage } = useChatUtils(socket);
 
+	const message = getMessage(id, state, app);
+
+    const isWithin15Minutes = useMemo(() => {
+		return Date.now() - new Date(message.time).getTime() <= FIFTEEN_MINUTES;
+	}, [message.time])
+
 	const handleEdit = (id) => {
+		if (!isWithin15Minutes) {
+			return;
+		} 
+
 		inputRef.current.focus();
 		const { message } = getMessage(id, state, app);
 
@@ -31,7 +44,7 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 	};
 
 	const handleDelete = async (id) => {
-		if (!messageExists(id)) {
+		if (!messageExists(id) || !isWithin15Minutes) {
 			return;
 		}
 
@@ -78,13 +91,22 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 				renderToggle={renderIconButton}
 				NoCaret
 			>
-				<Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>
+				{
+					isWithin15Minutes && (
+						<Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>
+					)
+				}
 
 				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, importedPrivateKey)}>
 					Copy
 				</Dropdown.Item>
 				<Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
-				<Dropdown.Item onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
+
+				{
+					isWithin15Minutes && (
+						<Dropdown.Item onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
+					)
+				}
 			</Dropdown>
 		);
 	} else if (!isSender) {

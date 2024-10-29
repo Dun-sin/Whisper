@@ -1,5 +1,5 @@
 const { NEW_EVENT_DELETE_MESSAGE } = require('../../constants.json');
-const { getActiveUser, removeMessage } = require('../utils/lib');
+const { getActiveUser, removeMessage, isMessageEditableOrDeletable } = require('../utils/lib');
 
 module.exports = (socket) => {
   socket.on(
@@ -10,6 +10,12 @@ module.exports = (socket) => {
       });
 
       if (!user || !messageId || !chatId) {
+        messageWasDeletedSuccessfully(false);
+        return;
+      }
+
+      // Check if message exists and is within the 15-minute editable window
+      if (!isMessageEditableOrDeletable(chatId, messageId)) {
         messageWasDeletedSuccessfully(false);
         return;
       }

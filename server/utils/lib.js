@@ -8,6 +8,9 @@ const User = require('../models/UserModel');
 const Message = require('../models/MessageModel');
 const { generateObjectId } = require('./helper');
 
+const { FIFTEEN_MINUTES } = require('../../constants.json');
+
+
 /**
  * @typedef {{
  *     id: string,
@@ -532,6 +535,17 @@ async function isUserBlocked(users) {
   }
 }
 
+  function isMessageEditableOrDeletable(chatId, messageId) {
+    const chat = chats[chatId];
+    if (!chat || !chat.messages || !chat.messages[messageId]) {
+        return false; // Message doesn't exist
+    }
+
+    const message = chat.messages[messageId];
+    const timeSinceCreated = Date.now() - new Date(message.time).getTime();
+    return timeSinceCreated <= FIFTEEN_MINUTES; // Check if within 15 minutes
+}
+
 module.exports = {
   init,
   createChat,
@@ -552,5 +566,6 @@ module.exports = {
   delActiveUser,
   seenMessage,
   blockUser,
-  isUserBlocked
+  isUserBlocked,
+  isMessageEditableOrDeletable
 };
