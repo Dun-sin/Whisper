@@ -11,7 +11,6 @@ import useCryptoKeys from 'src/hooks/useCryptoKeys';
 
 import { FIFTEEN_MINUTES } from '../../../../constants.json';
 
-
 const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setReplyId }) => {
 	const { app } = useApp();
 
@@ -22,14 +21,14 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 
 	const message = getMessage(id, state, app);
 
-    const isWithin15Minutes = useMemo(() => {
+	const isWithin15Minutes = useMemo(() => {
 		return Date.now() - new Date(message.time).getTime() <= FIFTEEN_MINUTES;
-	}, [message.time])
+	}, [message.time]);
 
 	const handleEdit = (id) => {
 		if (!isWithin15Minutes) {
 			return;
-		} 
+		}
 
 		inputRef.current.focus();
 		const { message } = getMessage(id, state, app);
@@ -91,22 +90,16 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 				renderToggle={renderIconButton}
 				NoCaret
 			>
-				{
-					isWithin15Minutes && (
-						<Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>
-					)
-				}
+				{isWithin15Minutes && <Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>}
 
 				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, importedPrivateKey)}>
 					Copy
 				</Dropdown.Item>
 				<Dropdown.Item onClick={() => setReplyId(id)}>Reply</Dropdown.Item>
 
-				{
-					isWithin15Minutes && (
-						<Dropdown.Item onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
-					)
-				}
+				{isWithin15Minutes && (
+					<Dropdown.Item onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
+				)}
 			</Dropdown>
 		);
 	} else if (!isSender) {
