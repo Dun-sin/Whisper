@@ -70,7 +70,6 @@ const BuddyMatcher = () => {
 		endSearch(currentChatId);
 	}, []);
 
-
 	const onConnect = useCallback(() => {
 		// Here server will be informed that user is searching for
 		// another user
@@ -160,15 +159,11 @@ const BuddyMatcher = () => {
 		};
 	}, [app.currentChatId]);
 
-	if(app.isSearching || !app.currentChatId){
+	if (app.isSearching || !app.currentChatId) {
 		navigate('/searching');
 	}
 
-	return disconnected ? (
-		<ReconnectBanner handleReconnect={handleReconnect} />
-	) : (
-		<Anonymous />
-	);
+	return disconnected ? <ReconnectBanner handleReconnect={handleReconnect} /> : <Anonymous />;
 };
 
 export default BuddyMatcher;

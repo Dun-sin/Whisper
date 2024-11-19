@@ -29,13 +29,12 @@ const Searching = () => {
 	const [isStoppingSearch, setIsStoppingSearch] = useState(false);
 
 	let timeout = null;
-	
+
 	const onConnect = useCallback(() => {
 		socket.emit(NEW_EVENT_JOIN, {
 			loginId: authState.loginId,
 			email: authState.email,
 		});
-		
 	}, []);
 
 	const onUserJoined = useCallback(({ roomId, userIds }) => {
@@ -46,7 +45,7 @@ const Searching = () => {
 		);
 		createChat(roomId, userIds);
 		endSearch(roomId);
-		navigate('/founduser')
+		navigate('/founduser');
 	}, []);
 
 	const onStopSearch = useCallback(() => {
@@ -123,29 +122,27 @@ const Searching = () => {
 		socket.on(NEW_EVENT_STOP_SEARCH_SUCCESS, onStopSearch);
 
 		return () => {
-			socket
-				.off('connect', onConnect)
-				.off(NEW_EVENT_JOINED, onUserJoined)
-				
+			socket.off('connect', onConnect).off(NEW_EVENT_JOINED, onUserJoined);
+
 			socket.disconnect();
 		};
 	}, [app.currentChatId]);
 	return (
 		<ChatProvider>
 			<div className="flex w-full justify-center items-center min-h-[calc(100vh-70px)] flex-col bg-light dark:bg-primary">
-			<ThreeDots fill="rgb(255 159 28)" />
-			<div className="text-lg text-center text-primary dark:text-white">{loadingText}</div>
-			{!isStoppingSearch && (
-				<button
-					onClick={handleStopSearch}
-					className={
-						'hover:no-underline hover:text-white font-medium text-white text-[1.5em] w-[8em] h-[2.3em] mt-4 rounded-[30px] bg-[#FF3A46] flex flex-col items-center justify-center'
-					}
-				>
-					Stop
-				</button>
-			)}
-		</div>
+				<ThreeDots fill="rgb(255 159 28)" />
+				<div className="text-lg text-center text-primary dark:text-white">{loadingText}</div>
+				{!isStoppingSearch && (
+					<button
+						onClick={handleStopSearch}
+						className={
+							'hover:no-underline hover:text-white font-medium text-white text-[1.5em] w-[8em] h-[2.3em] mt-4 rounded-[30px] bg-[#FF3A46] flex flex-col items-center justify-center'
+						}
+					>
+						Stop
+					</button>
+				)}
+			</div>
 		</ChatProvider>
 	);
 };

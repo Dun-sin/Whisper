@@ -1,6 +1,5 @@
-import BuddyMatcher from "src/components/BuddyMatcher";
-import { ChatProvider } from "src/context/ChatContext";
-
+import BuddyMatcher from 'src/components/BuddyMatcher';
+import { ChatProvider } from 'src/context/ChatContext';
 
 const MatchFound = () => {
 	return (
