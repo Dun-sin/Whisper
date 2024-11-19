@@ -15,6 +15,7 @@ import Start from 'pages/Start';
 import { useApp } from 'src/context/AppContext';
 import { useAuth } from 'context/AuthContext';
 import useIsTabActive from './hooks/useIsTabActive';
+import MatchFound from './pages/MatchFound';
 
 function App() {
 	ReactGA.initialize(import.meta.env.VITE_GOOGLE_ANALYTICS);
@@ -57,8 +58,8 @@ function App() {
 							</ChatProvider>
 						}
 					/>
-					{/* TODO: Sepreate searching and foundUser into different routes */}
-					<Route exact path="/founduser" element={<Searching />} />
+					<Route exact path="/searching" element={<Searching />} />
+					<Route exact path="/founduser" element={<MatchFound />} />
 					<Route exact path="/friends" element={<ComingSoon />} />
 					<Route exact path="/profile" element={<Profile />} />
 					<Route exact path="/settings" element={<Settings />} />

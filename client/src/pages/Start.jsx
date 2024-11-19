@@ -16,7 +16,7 @@ const Start = () => {
 
 	useEffect(() => {
 		if (app.isSearching) {
-			navigate('/founduser');
+			navigate('/searching');
 		}
 
 		requestBrowserNotificationPermissions();
@@ -40,7 +40,7 @@ const Start = () => {
 			<div className="flex items-center gap-6">
 				{/* from the below link user will trigger search of another user*/}
 				<Link
-					to="/founduser"
+					to={app.currentChatId ? '/founduser' : '/searching'}
 					className={createClassesFromArray([
 						centerElement,
 						'hover:no-underline',

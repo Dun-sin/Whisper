@@ -5,14 +5,11 @@ import {
 	NEW_EVENT_INACTIVE,
 	NEW_EVENT_JOIN,
 	NEW_EVENT_JOINED,
-	NEW_EVENT_STOP_SEARCH,
-	NEW_EVENT_STOP_SEARCH_SUCCESS,
 } from '../../../constants.json';
 import { connectWithId, socket } from 'src/lib/socketConnection';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Anonymous from 'components/Anonymous';
-import { ThreeDots } from 'react-loading-icons';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 import { isExplicitDisconnection } from 'src/lib/utils';
 import { useApp } from 'src/context/AppContext';
@@ -22,7 +19,6 @@ import useCloseChat from 'src/hooks/useCloseChat';
 import { useNotification } from 'src/lib/notification';
 import ReconnectBanner from './ReconnectBanner';
 
-const stoppingSearchLoadingText = <p>Stopping the search</p>;
 const defaultLoadingText = <p>Looking for a random buddy</p>;
 
 const BuddyMatcher = () => {
@@ -31,14 +27,10 @@ const BuddyMatcher = () => {
 	const { authState } = useAuth();
 	const { createChat, closeChat, closeAllChats } = useChat();
 	const { startSearch, endSearch, app } = useApp();
-	const { setLoadingText, startNewSearch, loadingText } = useCloseChat();
+	const { setLoadingText, startNewSearch } = useCloseChat();
 
 	const [disconnected, setDisconnected] = useState(false);
 	const reconnectAttempts = useRef(0);
-
-	const [isStoppingSearch, setIsStoppingSearch] = useState(false);
-
-	let timeout = null;
 
 	function disconnect() {
 		reconnectAttempts.current = 0;
@@ -50,18 +42,6 @@ const BuddyMatcher = () => {
 		setDisconnected(true);
 		endSearch();
 	}
-
-	const emitStopSearch = useCallback(() => {
-		socket.emit(NEW_EVENT_STOP_SEARCH, {
-			loginId: authState.loginId,
-			email: authState.email,
-		});
-	}, []);
-
-	const handleStopSearch = () => {
-		emitStopSearch();
-		setIsStoppingSearch(true);
-	};
 
 	async function handleReconnect() {
 		if (socket.connected) {
@@ -90,11 +70,6 @@ const BuddyMatcher = () => {
 		endSearch(currentChatId);
 	}, []);
 
-	const onStopSearch = useCallback(() => {
-		setIsStoppingSearch(false);
-		endSearch();
-		navigate('/');
-	}, []);
 
 	const onConnect = useCallback(() => {
 		// Here server will be informed that user is searching for
@@ -143,40 +118,6 @@ const BuddyMatcher = () => {
 	}, []);
 
 	useEffect(() => {
-		setLoadingText(isStoppingSearch ? stoppingSearchLoadingText : defaultLoadingText);
-	}, [isStoppingSearch]);
-
-	useEffect(() => {
-		if (loadingText === defaultLoadingText) {
-			timeout = setTimeout(() => {
-				setLoadingText(
-					<>
-						<p>
-							Taking too long? <br className="md:hidden" />
-							No <span className="hidden sm:inline">chat</span> buddy is currently available :({' '}
-						</p>
-						<p>
-							<a
-								href="https://ctt.ac/US0h0"
-								target="_blank"
-								rel="noreferrer"
-								className="text-blue-500 underline"
-							>
-								Tweet
-							</a>{' '}
-							about this app and get more people to use it!
-						</p>
-					</>
-				);
-			}, 15000);
-		}
-
-		return () => {
-			clearTimeout(timeout);
-		};
-	}, [loadingText]);
-
-	useEffect(() => {
 		const setupSocket = async () => {
 			if (!app.currentChatId) {
 				startSearch();
@@ -198,7 +139,6 @@ const BuddyMatcher = () => {
 		socket.on(NEW_EVENT_JOINED, onUserJoined);
 		socket.on(NEW_EVENT_CHAT_RESTORE, onRestoreChat);
 		socket.on(NEW_EVENT_INACTIVE, onInactive);
-		socket.on(NEW_EVENT_STOP_SEARCH_SUCCESS, onStopSearch);
 		socket.on('disconnect', onDisconnect);
 		socket.io.on('reconnect_attempt', onReconnectAttempt);
 		socket.io.on('reconnect_error', onReconnectError);
@@ -220,22 +160,11 @@ const BuddyMatcher = () => {
 		};
 	}, [app.currentChatId]);
 
-	return app.isSearching || !app.currentChatId ? (
-		<div className="flex w-full justify-center items-center min-h-[calc(100vh-70px)] flex-col bg-light dark:bg-primary">
-			<ThreeDots fill="rgb(255 159 28)" />
-			<div className="text-lg text-center text-primary dark:text-white">{loadingText}</div>
-			{!isStoppingSearch && (
-				<button
-					onClick={handleStopSearch}
-					className={
-						'hover:no-underline hover:text-white font-medium text-white text-[1.5em] w-[8em] h-[2.3em] mt-4 rounded-[30px] bg-[#FF3A46] flex flex-col items-center justify-center'
-					}
-				>
-					Stop
-				</button>
-			)}
-		</div>
-	) : disconnected ? (
+	if(app.isSearching || !app.currentChatId){
+		navigate('/searching');
+	}
+
+	return disconnected ? (
 		<ReconnectBanner handleReconnect={handleReconnect} />
 	) : (
 		<Anonymous />
