@@ -2,7 +2,7 @@
 
 import chatHelper, {
 	adjustTextareaHeight,
-	arrayBufferToBase64,
+  arrayBufferToBase64,
 	pemToArrayBuffer,
 } from '../lib/chatHelper';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -38,14 +38,14 @@ const Chat = () => {
 	});
 	const [message, setMessage] = useState('');
 
-	const [decryptedMessages, setDecryptedMessages] = useState();
+  const [decryptedMessages, setDecryptedMessages] = useState();
 
 	const {
 		messages: state,
 		addMessage,
 		updateMessage,
 		removeMessage,
-		receiveMessage,
+    receiveMessage,
 		currentReplyMessageId,
 		cancelReply,
 	} = useChat();
@@ -61,7 +61,7 @@ const Chat = () => {
 	const { logout } = useKindeAuth();
 
 	const { sendMessage, editMessage, emitTyping, setupSocketListeners } = useChatUtils(socket);
-	const { getMessage } = chatHelper(state, app);
+  const { getMessage } = chatHelper(state, app);
 
 	const inputRef = useRef('');
 	const cryptoKeyRef = useRef(null);
@@ -354,15 +354,15 @@ const Chat = () => {
 					className="h-[100%] md:max-h-full overflow-y-auto w-full scroll-smooth"
 				>
 					{!messageIsDecrypting ? (
-						<MessageList
-							decryptedMessages={decryptedMessages}
-							senderId={senderId}
-							currentReplyMessageId={currentReplyMessageId}
-							doSend={doSend}
-							inputRef={inputRef}
-							cancelEdit={cancelEdit}
-							setEditing={setEditing}
-						/>
+            <MessageList
+              decryptedMessages={decryptedMessages}
+              senderId={senderId}
+              currentReplyMessageId={currentReplyMessageId}
+              doSend={doSend}
+              inputRef={inputRef} 
+              cancelEdit={cancelEdit}
+              setEditing={setEditing}
+            />
 					) : (
 						<div className="w-full h-full flex flex-col items-center justify-center">
 							<Loading loading={messageIsDecrypting} />
