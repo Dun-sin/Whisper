@@ -1,14 +1,14 @@
 import { BsArrow90DegLeft, BsArrow90DegRight } from 'react-icons/bs';
 import React, { useState } from 'react'
-import chatHelper, { getTime } from 'src/lib/chatHelper';
 
 import BadWordsNext from 'bad-words-next';
+import BadwordWarning from './BadwordWarning';
 import DropDownOptions from './DropDownOption';
 import MarkdownIt from 'markdown-it';
 import MessageSeen from './MessageSeen';
-import MessageStatus from '../MessageStatus';
-import PreviousMessages from './PreviousMessages';
 import PropTypes from 'prop-types'
+import Status from './Status';
+import chatHelper from 'src/lib/chatHelper';
 import en from 'bad-words-next/data/en.json';
 import { useApp } from 'src/context/AppContext';
 import { useChat } from 'src/context/ChatContext';
@@ -24,10 +24,10 @@ const MessageList = (
 ) => {
   const { app } = useApp();
   const { messasges: state, startReply } = useChat()
-  const { handleResend, scrollToMessage } = chatHelper(state, app);
+  const { scrollToMessage } = chatHelper(state, app);
 
   // use the id so we can track what message's previousMessage is open
-  const [openPreviousMessages, setOpenPreviousMessages] = useState(null);
+
   const [badwordChoices, setBadwordChoices] = useState({});
 
   const badwords = new BadWordsNext({ data: en });
@@ -38,23 +38,7 @@ const MessageList = (
     typographer: true,
   });
 
-  console.log({decryptedMessages})
 
-  const openPreviousEdit = (messageId) => {
-    if (openPreviousMessages === messageId) {
-      setOpenPreviousMessages(null);
-    } else {
-      setOpenPreviousMessages(messageId);
-    }
-  };
-
-  const hideBadword = (id) => {
-    setBadwordChoices({ ...badwordChoices, [id]: 'hide' });
-  };
-
-  const showBadword = (id) => {
-    setBadwordChoices({ ...badwordChoices, [id]: 'show' });
-  };
 
   function getRepliedMessage(replyTo) {
     return decryptedMessages.find((object) => object.id === replyTo);
@@ -154,23 +138,10 @@ const MessageList = (
                   }`}
               >
                 {containsBadword && !isSender && !badwordChoices[id] ? (
-                  <div className="dark:text-white text-black flex flex-col border-red border w-full rounded-r-md p-3">
-                    <p>Your buddy is trying to send you a bad word</p>
-                    <div className="flex w-full gap-6">
-                      <span
-                        onClick={() => showBadword(id)}
-                        className="text-sm cursor-pointer"
-                      >
-                        See
-                      </span>
-                      <span
-                        onClick={() => hideBadword(id)}
-                        className="text-red text-sm cursor-pointer"
-                      >
-                        Hide
-                      </span>
-                    </div>
-                  </div>
+                  <BadwordWarning
+                    id={id}
+                    setBadwordChoices={setBadwordChoices}
+                    badwordChoices={badwordChoices} />
                 ) : (
                   <>
                     <div
@@ -208,30 +179,15 @@ const MessageList = (
                         setReplyId={startReply}
                       />
                     </div>
-                    <div
-                      className={`flex gap-2 items-center ${isSender ? 'flex-row' : 'flex-row-reverse'
-                        }`}
-                    >
-                      <div
-                        className={`text-[12px] ${status === 'failed' ? 'text-red-600' : 'text-white'
-                          }`}
-                      >
-                        <MessageStatus
-                          time={getTime(time)}
-                          status={status ?? 'sent'}
-                          iAmTheSender={isSender}
-                          onResend={() => handleResend(id, doSend, state, app)}
-                        />
-                      </div>
-                      <PreviousMessages
+                      <Status
                         id={id}
                         isSender={isSender}
+                        doSend={doSend}
+                        time={time}
                         isEdited={isEdited}
-                        openPreviousEdit={openPreviousEdit}
-                        openPreviousMessages={openPreviousMessages}
                         oldMessages={oldMessages}
+                        status={status}
                       />
-                    </div>
                     <MessageSeen isRead={isRead} isSender={isSender} />
                   </>
                 )}
