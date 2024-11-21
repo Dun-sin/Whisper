@@ -1,4 +1,5 @@
 import { BsArrow90DegLeft, BsArrow90DegRight } from 'react-icons/bs';
+
 import React, { useState } from 'react'
 
 import BadWordsNext from 'bad-words-next';
@@ -9,6 +10,7 @@ import MessageSeen from './MessageSeen';
 import PropTypes from 'prop-types'
 import Status from './Status';
 import chatHelper from 'src/lib/chatHelper';
+
 import en from 'bad-words-next/data/en.json';
 import { useApp } from 'src/context/AppContext';
 import { useChat } from 'src/context/ChatContext';
