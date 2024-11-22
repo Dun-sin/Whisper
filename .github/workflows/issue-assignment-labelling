@@ -1,0 +1,30 @@
+name: Manage Issue Assignment Labels
+
+on: 
+  issues:
+    types: [assigned, unassigned]
+
+jobs:
+  manage-labels:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Manage issue labels based on assignment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+        run: |
+          # Issue is being assigned
+          if [[ "${{ github.event.action }}" == "assigned" ]]; then
+            echo "Issue is being assigned"
+            gh issue edit "$NUMBER" --add-label "assigned"
+            gh issue edit "$NUMBER" --remove-label "up for grabs"
+          
+          # Issue is being unassigned  
+          elif [[ "${{ github.event.action }}" == "unassigned" ]]; then
+            echo "Issue is being unassigned"
+            gh issue edit "$NUMBER" --remove-label "assigned"
+            gh issue edit "$NUMBER" --add-label "up for grabs"
+          fi
