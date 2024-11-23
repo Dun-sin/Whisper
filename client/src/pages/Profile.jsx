@@ -1,14 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
-
-import UserAvatar from '../components/UserAvatar';
-import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 import * as nsfwjs from 'nsfwjs';
 
-import { useAuth } from 'context/AuthContext';
+import { useEffect, useRef, useState } from 'react';
 
+import SignupAnonUser from './SignupAnonUser';
+import UserAvatar from '../components/UserAvatar';
 import { api } from 'src/lib/axios';
 import { createClassesFromArray } from 'src/lib/utils';
-import SignupAnonUser from './SignupAnonUser';
+import { useAuth } from 'context/AuthContext';
+import { useKindeAuth } from '@kinde-oss/kinde-auth-react';
 
 const Profile = () => {
 	const [username, setUsername] = useState('Anonymous');
@@ -47,16 +46,13 @@ const Profile = () => {
 	const handlerisImageSafe = async () => {
 		setLoading(true);
 		try {
-			const model = await nsfwjs.load();
+      const model = await nsfwjs.load();
 			const predictions = await model.classify(imageRef.current);
 			const neutralProb = predictions.find((p) => p.className === 'Neutral');
 			return neutralProb.probability >= 0.6;
-		} catch (error) {
-			setProfileResponse(
-				'Profile image update is temporarily unavailable. Please try again later.'
-			);
+    } catch (error) {
 			console.error('Error classifying image:', error);
-			return false;
+      return null;
 		}
 	};
 	const handleImageUpload = () => {
@@ -71,9 +67,14 @@ const Profile = () => {
 					imageRef.current.src = event.target.result;
 					setLoading(true);
 					const imageSafe = await handlerisImageSafe();
+
+          if (imageSafe === null) {
+            setProfileResponse(`Error: Service to uplaod image is currently unavailable`)
+          }
+
 					imageSafe
-						? setProfileResponse()
-						: setProfileResponse('Profile image is not safe. Please upload a different image.');
+            ? setProfileResponse('Image added Successfully, please save changes')
+            : setProfileResponse(`Error: Image uploaded isn't safe, try another`);
 
 					setImageSafe(imageSafe);
 					setImageFile(file);
@@ -139,7 +140,7 @@ const Profile = () => {
 	};
 
 	useEffect(() => {
-		if (email === null || email === '') {
+    if (!email || email === '') {
 			return;
 		}
 		getProfileData(email);
@@ -237,7 +238,7 @@ const Profile = () => {
 					</button>
 					{profileResponse ? (
 						<div>
-							<p className="text-green-300">{profileResponse}</p>
+                <p className={profileResponse.includes('Error') ? 'text-red' : 'text-green-500'}>{profileResponse}</p>
 						</div>
 					) : null}
 				</>
