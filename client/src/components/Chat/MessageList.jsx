@@ -154,13 +154,15 @@ const MessageList = ({
 														__html: md.render(
 															badwordChoices[id] === 'hide'
 																? badwords.filter(message)
-                                : badwordChoices[id] === 'show' && message 
+																: badwordChoices[id] === 'show' && message
 														),
 													}}
 												/>
 											) : badwordChoices[id] === 'hide' ? (
 												badwords.filter(message)
-                        ) : badwordChoices[id] === 'show' && message}
+											) : (
+												badwordChoices[id] === 'show' && message
+											)}
 
 											<DropDownOptions
 												isSender={isSender && status !== 'pending'}
