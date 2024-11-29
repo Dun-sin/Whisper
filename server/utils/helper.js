@@ -20,18 +20,18 @@ function generateObjectId() {
 }
 
 const validateUserID = (req, res, next) => {
-  const {id} = req.body;
-	const userIDPattern = /^[a-z0-9]{12}$/;
+  const { id } = req.body;
+  const userIDPattern = /^[a-z0-9]{12}$/;
 
-  if(id !== undefined && (typeof id !== 'string' || !userIDPattern.test(id))){
-    //if id of type string is coming it'll be via the anonymous validation
-    return res.status(NOT_ACCEPTABLE).json({
+  // If id is required and not present or invalid, reject the request
+  if (!id || typeof id !== 'string' || !userIDPattern.test(id)) {
+    return res.status(406).json({
       message: 'Invalid login Id.'
     });
-  }else{
-    // if id is not there or the id is valid move ahead
-    next();
   }
+
+  // If id is valid, proceed to the next middleware
+  next();
 }
 
 module.exports = {

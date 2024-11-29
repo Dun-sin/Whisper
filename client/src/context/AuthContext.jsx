@@ -23,6 +23,7 @@ const initializeAuthState = (defaultState) => {
 		if (!persistedState) {
 			return defaultState;
 		}
+
 		if (!validateUserID(persistedState.loginId, persistedState.loginType)) {
 			// User is trying to hack app by manipulating localStorage
 			throw new Error('Invalid loginId! :(');
