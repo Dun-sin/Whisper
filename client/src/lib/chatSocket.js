@@ -54,7 +54,7 @@ export default function useChatUtils(socket) {
 		});
 	}
 
-	function editMessage({ id, chatId, newMessage, oldMessage, isEdited }) {
+	function editMessage({ id, chatId, newMessage, oldMessage,time }) {
 		return new Promise((resolve, reject) => {
 			if (!socket.connected) {
 				reject(null);
@@ -65,7 +65,7 @@ export default function useChatUtils(socket) {
 				.timeout(30000)
 				.emit(
 					NEW_EVENT_EDIT_MESSAGE,
-					{ id, chatId, newMessage, oldMessage, isEdited },
+					{ id, chatId, newMessage, oldMessage, time },
 					(err, messageEdited) => {
 						if (err) {
 							reject(err);

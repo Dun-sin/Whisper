@@ -185,6 +185,7 @@ const Chat = () => {
 					chatId: app.currentChatId,
 					newMessage: message,
 					oldMessage,
+					time:messageObject.time
 				});
 
 				updateMessage({ ...editedMessage, room: app.currentChatId }, true);
