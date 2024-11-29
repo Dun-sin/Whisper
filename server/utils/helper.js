@@ -24,7 +24,7 @@ const validateUserID = (req, res, next) => {
   const userIDPattern = /^[a-z0-9]{12}$/;
 
   // If id is required and not present or invalid, reject the request
-  if (!id || typeof id !== 'string' || !userIDPattern.test(id)) {
+  if (!id && (typeof id !== 'string' || !userIDPattern.test(id))) {
     return res.status(406).json({
       message: 'Invalid login Id.'
     });
