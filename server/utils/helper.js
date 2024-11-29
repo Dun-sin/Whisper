@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const { NOT_ACCEPTABLE } = require('../httpStatusCodes');
 
 // Defining separate email validation middleware
 const validator = require('validator').default;
