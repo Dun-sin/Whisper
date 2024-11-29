@@ -1,0 +1,165 @@
+name: Issue Timer Tracker
+
+on:
+  issues:
+    types: [labeled, unlabeled]
+  pull_request:
+    types: [opened, closed]
+  schedule:
+    - cron: '0 */3 * * *'  # Run every 3 hours
+
+permissions:
+  issues: write
+  pull-requests: read
+  contents: read
+
+jobs:
+  track-issue-timer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Parse time labels and check status
+        uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Configuration and utility functions
+            const timeLabels = {
+              '2days': 2 * 24 * 60 * 60 * 1000, // 2 days in milliseconds
+              '4days': 4 * 24 * 60 * 60 * 1000, // 4 days in milliseconds
+              '7days': 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+              '2weeks': 14 * 24 * 60 * 60 * 1000 // 2 weeks in milliseconds
+            };
+
+            const PR_LIST_INTERVAL = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
+
+            function msToFutureTime(ms) {
+              return new Date(Date.now() + ms);
+            }
+
+            function isValidMetadata(metadata) {
+              try {
+                const parsed = JSON.parse(metadata);
+                return parsed && parsed.startTime && parsed.deadline && parsed.dayBefore;
+              } catch (error) {
+                return false;
+              }
+            }
+
+            function extractIssueMetadata(issueBody) {
+              const metadataMatch = issueBody?.match(/<!-- TIMER_METADATA: (.*?) -->/);
+              if (!metadataMatch || !isValidMetadata(metadataMatch[1])) return null;
+              return JSON.parse(metadataMatch[1]);
+            }
+
+            async function findRelevantPRs(github, context, issueNumber, assignee) {
+              const associatedPRs = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open'
+              });
+
+              return associatedPRs.data.filter(pr => 
+                (pr.body?.includes(`#${issueNumber}`) ||
+                 pr.body?.match(new RegExp(`Closes? #${issueNumber}`, 'i'))) ||
+                (pr.title.includes(`#${issueNumber}`) ||
+                 pr.title.match(new RegExp(`Closes? #${issueNumber}`, 'i'))) ||
+                (assignee && pr.user.login === assignee)
+              );
+            }
+
+            async function updateIssueMetadata(github, context, issueNumber, metadata) {
+              const issue = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber
+              });
+
+              const currentBody = issue.data.body || "";
+              const metadataTag = `<!-- TIMER_METADATA: ${JSON.stringify(metadata)} -->`;
+
+              let updatedBody;
+              if (currentBody.includes("<!-- TIMER_METADATA:")) {
+                updatedBody = currentBody.replace(/<!-- TIMER_METADATA: .*? -->/, metadataTag);
+              } else {
+                updatedBody = `${currentBody}\n\n${metadataTag}`;
+              }
+
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: updatedBody
+              });
+            }
+
+            async function handleLabeledEvent(github, context) {
+              const issue = context.payload.issue;
+              const labelName = context.payload.label.name;
+              const durationMs = timeLabels[labelName];
+
+              if (!durationMs) return;
+
+              const hasAssignedLabel = issue.labels.some(label => label.name.toLowerCase() === 'assigned');
+              if (!hasAssignedLabel) return;
+
+              const startTime = new Date();
+              const deadline = msToFutureTime(durationMs);
+              const dayBefore = msToFutureTime(durationMs - 24 * 60 * 60 * 1000); // 1 day before deadline
+
+              const metadata = {
+                startTime: startTime.toISOString(),
+                deadline: deadline.toISOString(),
+                dayBefore: dayBefore.toISOString(),
+                reminderSent: false,
+                timeLabel: labelName
+              };
+
+              await updateIssueMetadata(github, context, issue.number, metadata);
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `⏰ Timer started: ${labelName} duration.\nDeadline: ${deadline.toLocaleString()}`
+              });
+            }
+
+            async function handleScheduledEvent(github, context) {
+              const issues = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open'
+              });
+
+              for (const issue of issues.data) {
+                const metadata = extractIssueMetadata(issue.body);
+                if (!metadata) continue;
+
+                const now = new Date();
+                const deadline = new Date(metadata.deadline);
+                const dayBefore = new Date(metadata.dayBefore);
+
+                if (now >= dayBefore && now < deadline && !metadata.reminderSent) {
+                  const assignee = issue.assignee?.login;
+                  if (assignee) {
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: issue.number,
+                      body: `@${assignee} ⚠️ Reminder: This issue is due tomorrow!`
+                    });
+
+                    metadata.reminderSent = true;
+                    await updateIssueMetadata(github, context, issue.number, metadata);
+                  }
+                }
+              }
+            }
+
+            if (context.payload.action === 'labeled') {
+              await handleLabeledEvent(github, context);
+            } else if (context.eventName === 'schedule') {
+              await handleScheduledEvent(github, context);
+            }

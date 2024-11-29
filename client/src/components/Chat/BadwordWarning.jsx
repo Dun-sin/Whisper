@@ -14,12 +14,12 @@ const BadwordWarning = ({ id, setBadwordChoices, badwordChoices }) => {
 		<div className="dark:text-white text-black flex flex-col border-red border w-full rounded-r-md p-3">
 			<p>Your buddy is trying to send you a bad word</p>
 			<div className="flex w-full gap-6">
-				<span onClick={() => showBadword(id)} className="text-sm cursor-pointer">
+				<button onClick={() => showBadword(id)} className="text-sm">
 					See
-				</span>
-				<span onClick={() => hideBadword(id)} className="text-red text-sm cursor-pointer">
+				</button>
+				<button onClick={() => hideBadword(id)} className="text-red text-sm">
 					Hide
-				</span>
+				</button>
 			</div>
 		</div>
 	);
