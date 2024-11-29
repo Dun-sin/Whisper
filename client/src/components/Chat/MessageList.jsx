@@ -40,9 +40,9 @@ const MessageList = ({
 
 	function getRepliedMessage(replyTo) {
 		return decryptedMessages.find((object) => object.id === replyTo);
-  }
+	}
 
-  console.log(decryptedMessages)
+	console.log(decryptedMessages);
 
 	return (
 		decryptedMessages &&
@@ -156,7 +156,9 @@ const MessageList = ({
 														__html: md.render(
 															badwordChoices[id] === 'hide'
 																? badwords.filter(message)
-                                : badwordChoices[id] === 'show' ? message : message
+																: badwordChoices[id] === 'show'
+																? message
+																: message
 														),
 													}}
 												/>
@@ -199,9 +201,9 @@ const MessageList = ({
 export default MessageList;
 
 MessageList.propTypes = {
-  decryptedMessages: PropTypes.array,
+	decryptedMessages: PropTypes.array,
 	senderId: PropTypes.string.isRequired,
-  currentReplyMessageId: PropTypes.string,
+	currentReplyMessageId: PropTypes.string,
 	doSend: PropTypes.func.isRequired,
 	inputRef: PropTypes.object.isRequired,
 	cancelEdit: PropTypes.func.isRequired,
