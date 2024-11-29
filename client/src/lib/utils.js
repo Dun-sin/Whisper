@@ -58,4 +58,4 @@ export const validateUserID = (userID, userType) => {
 		// user id validation for anonymous login
 		return userIDPattern.test(userID);
 	}
-  }
+};
