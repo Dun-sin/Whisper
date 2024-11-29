@@ -9,7 +9,7 @@ const storage = multer.memoryStorage();
 const imageUpload = multer({ storage: storage });
 
 const User = require('../models/UserModel');
-const { emailValidator, generateObjectId, validateUserID } = require('../utils/helper');
+const { emailValidator, generateObjectId } = require('../utils/helper');
 
 const { isUserBlocked, blockUser } = require('../utils/lib.js');
 const {
@@ -149,27 +149,29 @@ const deleteUser = async (req, res) => {
 };
 
 const blockUserHandler = async (req, res) => {
-  const {userIdToBlock, currentUserId} = req.body
+  const { userIdToBlock, currentUserId } = req.body;
 
   try {
     // Check if the user is already blocked
     if (await isUserBlocked([userIdToBlock, currentUserId])) {
-      return res.status(BAD_REQUEST).json({ message: "This user is already blocked." });
+      return res
+        .status(BAD_REQUEST)
+        .json({ message: 'This user is already blocked.' });
     }
 
     // Block the user
-    await blockUser(userIdToBlock, currentUserId)
+    await blockUser(userIdToBlock, currentUserId);
 
-    res.status(OK).json({ message: "User blocked successfully" });
+    res.status(OK).json({ message: 'User blocked successfully' });
   } catch (error) {
     console.error(error);
     return res
       .status(INTERNAL_SERVER_ERROR)
       .json({ error: 'Internal server error' });
   }
-}
+};
 
-UserRouter.route('/login').post(emailValidator, validateUserID, loginUser);
+UserRouter.route('/login').post(emailValidator, loginUser);
 UserRouter.route('/profile').post(
   imageUpload.single('profileImage'),
   emailValidator,
