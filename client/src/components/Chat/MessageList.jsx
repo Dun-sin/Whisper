@@ -42,6 +42,8 @@ const MessageList = ({
 		return decryptedMessages.find((object) => object.id === replyTo);
 	}
 
+	console.log(decryptedMessages);
+
 	return (
 		decryptedMessages &&
 		decryptedMessages.map(
@@ -154,7 +156,9 @@ const MessageList = ({
 														__html: md.render(
 															badwordChoices[id] === 'hide'
 																? badwords.filter(message)
-																: badwordChoices[id] === 'show' && message
+																: badwordChoices[id] === 'show'
+																? message
+																: message
 														),
 													}}
 												/>
@@ -197,9 +201,9 @@ const MessageList = ({
 export default MessageList;
 
 MessageList.propTypes = {
-	decryptedMessages: PropTypes.array.isRequired,
+	decryptedMessages: PropTypes.array,
 	senderId: PropTypes.string.isRequired,
-	currentReplyMessageId: PropTypes.string.isRequired,
+	currentReplyMessageId: PropTypes.string,
 	doSend: PropTypes.func.isRequired,
 	inputRef: PropTypes.object.isRequired,
 	cancelEdit: PropTypes.func.isRequired,
