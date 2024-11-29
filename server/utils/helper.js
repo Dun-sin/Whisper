@@ -21,10 +21,9 @@ function generateObjectId() {
 const validateUserID = (req, res, next) => {
   const {id} = req.body;
 	const userIDPattern = /^[a-z0-9]{12}$/;
-	const userHexIdPattern = /^[a-f0-9]{24}$/;
 
-  if(id !== undefined && (typeof id !== 'string' || (!userIDPattern.test(id) && !userHexIdPattern.test(id)))){
-    //if id of type string is coming it'll be via the email validation or the anonymous validation
+  if(id !== undefined && (typeof id !== 'string' || !userIDPattern.test(id))){
+    //if id of type string is coming it'll be via the anonymous validation
     return res.status(NOT_ACCEPTABLE).json({
       message: 'Invalid login Id.'
     });
