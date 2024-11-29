@@ -2,6 +2,7 @@ import { createContext, useContext, useMemo, useReducer } from 'react';
 import PropTypes from 'prop-types';
 
 import authReducer, { initialState } from './reducers/authReducer';
+import { validateUserID } from 'src/lib/utils';
 
 const AuthContext = createContext({
 	...initialState,
@@ -22,11 +23,10 @@ const initializeAuthState = (defaultState) => {
 		if (!persistedState) {
 			return defaultState;
 		}
-
-		/**
-		 * TODO: Validate loginId to be a valid uuid using the uuid
-		 *       library from npm
-		 */
+		if (!validateUserID(persistedState.loginId, persistedState.loginType)) {
+			// User is trying to hack app by manipulating localStorage
+			throw new Error('Invalid loginId! :(');
+		}
 		if (!persistedState.loginId && persistedState.isLoggedIn === true) {
 			// User is trying to hack app by manipulating localStorage
 			throw new Error('Gotcha! :D');

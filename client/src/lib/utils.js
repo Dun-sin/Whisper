@@ -46,3 +46,16 @@ export const decrypt = (encryptedText) => {
 
 	return originalText;
 };
+
+export const validateUserID = (userID, userType) => {
+	const userIDPattern = /^[a-z0-9]{12}$/;
+	const userHexIdPattern = /^[a-f0-9]{24}$/;
+	
+	if (userType === 'email') {
+		// user id validation for hex pattern of email login
+		return userHexIdPattern.test(userID);
+	} else {
+		// user id validation for anonymous login
+		return userIDPattern.test(userID);
+	}
+  }

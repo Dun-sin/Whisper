@@ -9,7 +9,7 @@ const storage = multer.memoryStorage();
 const imageUpload = multer({ storage: storage });
 
 const User = require('../models/UserModel');
-const { emailValidator, generateObjectId } = require('../utils/helper');
+const { emailValidator, generateObjectId, validateUserID } = require('../utils/helper');
 
 const { isUserBlocked, blockUser } = require('../utils/lib.js');
 const {
@@ -169,7 +169,7 @@ const blockUserHandler = async (req, res) => {
   }
 }
 
-UserRouter.route('/login').post(emailValidator, loginUser);
+UserRouter.route('/login').post(emailValidator, validateUserID, loginUser);
 UserRouter.route('/profile').post(
   imageUpload.single('profileImage'),
   emailValidator,
