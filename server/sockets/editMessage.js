@@ -8,7 +8,8 @@ module.exports = (socket) => {
       { id: messageId, chatId, newMessage, oldMessage },
       messageWasEditedSuccessfully
     ) => {
-      const user = getActiveUser({
+      try {
+        const user = getActiveUser({
         socketId: socket.id,
       });
 
@@ -30,6 +31,9 @@ module.exports = (socket) => {
       });
       socket.broadcast.to(chatId).emit(NEW_EVENT_EDIT_MESSAGE, messageEdited);
       messageWasEditedSuccessfully(messageEdited);
+      } catch (error) {
+       console.log('Error while editing Message: ', error) 
+      }
     }
   );
 };
