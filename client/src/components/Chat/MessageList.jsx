@@ -42,8 +42,6 @@ const MessageList = ({
 		return decryptedMessages.find((object) => object.id === replyTo);
 	}
 
-	console.log(decryptedMessages);
-
 	return (
 		decryptedMessages &&
 		decryptedMessages.map(

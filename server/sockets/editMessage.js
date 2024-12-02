@@ -1,5 +1,5 @@
 const { NEW_EVENT_EDIT_MESSAGE } = require('../../constants.json');
-const { getActiveUser, editMessage } = require('../utils/lib');
+const { getActiveUser, editMessage, isMessageEditableOrDeletable } = require('../utils/lib');
 
 module.exports = (socket) => {
   socket.on(
