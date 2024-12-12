@@ -22,7 +22,7 @@ const Start = () => {
 			if (!isGranted) {
 				setDialog({
 					isOpen: true,
-					text: "We noticed you've blocked Whisper from sending notifications. Are you sure you don’t want to enable them? Notifications help you stay updated, remember who you're talking to, and ensure you dont miss important messages.",
+					text: "You've blocked Whisper notifications. Enable them to stay updated, keep track of conversations, and never miss important messages.",
 					handler: async (response) => {
 						if (response) {
 							await requestBrowserNotificationPermissions();
