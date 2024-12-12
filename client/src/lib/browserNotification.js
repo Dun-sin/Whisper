@@ -1,11 +1,16 @@
 import BadWordsNext from 'bad-words-next';
 import en from 'bad-words-next/data/en.json';
 
-export const requestBrowserNotificationPermissions = () => {
+export const requestBrowserNotificationPermissions = async () => {
 	if (!('Notification' in window)) {
 		console.log('Browser does not support desktop notification');
 	} else {
-		Notification.requestPermission();
+		const res = await Notification.requestPermission();
+		if (res === 'granted') {
+			return true;
+		} else {
+			return false;
+		}
 	}
 };
 

@@ -6,6 +6,7 @@ import { requestBrowserNotificationPermissions } from 'src/lib/browserNotificati
 import { useApp } from 'src/context/AppContext';
 import useCloseChat from 'src/hooks/useCloseChat';
 import { useEffect } from 'react';
+import { useDialog } from 'src/context/DialogContext';
 
 const centerElement = 'flex flex-col items-center justify-center';
 
@@ -13,13 +14,42 @@ const Start = () => {
 	const { app } = useApp();
 	const navigate = useNavigate();
 	const { handleClose } = useCloseChat();
+	const { setDialog } = useDialog();
 
+	const requestPermission = async () => {
+		try {
+			const isGranted = await requestBrowserNotificationPermissions();
+			if (!isGranted) {
+				setDialog({
+					isOpen: true,
+					text: "You've blocked Whisper notifications. Enable them to stay updated, keep track of conversations, and never miss important messages.",
+					handler: async (response) => {
+						if (response) {
+							await requestBrowserNotificationPermissions();
+							setDialog({ isOpen: false });
+						} else {
+							setDialog({ isOpen: false });
+						}
+					},
+					noBtnText: 'No',
+					yesBtnText: 'Try Again',
+				});
+			}
+
+			return isGranted;
+		} catch (error) {
+			console.error('Error requesting notification permission:', error);
+			return false;
+		}
+	};
 	useEffect(() => {
 		if (app.isSearching) {
 			navigate('/searching');
 		}
-
-		requestBrowserNotificationPermissions();
+		const checkPermission = async () => {
+			await requestPermission();
+		};
+		checkPermission();
 	}, []);
 
 	return (
