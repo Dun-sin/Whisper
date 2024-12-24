@@ -7,7 +7,7 @@ import { PropTypes } from 'prop-types';
 import { api } from 'src/lib/axios';
 import { useAuth } from 'src/context/AuthContext';
 
-const Login = () => {
+const Login = ({ setIsLogginWithEmail }) => {
 	const { dispatchAuth } = useAuth();
 
 	const [isLoading, setIsLoading] = useState(false);
@@ -96,7 +96,8 @@ const Login = () => {
 					refProp={codeRef}
 					isLoading={isLoading}
 					handleSubmit={handleCodeInput}
-					inputValue={{ type: 'text', name: 'code', placeholder: 'Enter Code Recieved' }}
+					inputValue={{ type: 'text', name: 'code', placeholder: 'Enter Code Received' }}
+					setIsLogginWithEmail={setIsLogginWithEmail}
 				/>
 			) : (
 				<InputMethod
@@ -104,6 +105,7 @@ const Login = () => {
 					isLoading={isLoading}
 					handleSubmit={handleEmailInput}
 					inputValue={{ type: 'email', name: 'email', placeholder: 'Enter Your Email' }}
+					setIsLogginWithEmail={setIsLogginWithEmail}
 				/>
 			)}
 			{error && <p className="text-red text-center">{error}</p>}
@@ -111,13 +113,17 @@ const Login = () => {
 	);
 };
 
+Login.propTypes = {
+	setIsLogginWithEmail: PropTypes.func.isRequired,
+};
+
 export default Login;
 
-const InputMethod = ({ refProp, isLoading, handleSubmit, inputValue }) => {
+const InputMethod = ({ refProp, isLoading, handleSubmit, inputValue, setIsLogginWithEmail }) => {
 	return (
 		<>
 			{inputValue.name === 'code' && <p className="text-center">Check Your Email For the Code</p>}
-			<label htmlFor="email" className="w-full flex items-center justify-center">
+			<label htmlFor={inputValue.name} className="w-full flex items-center justify-center">
 				<input
 					type={inputValue.type}
 					className="w-full max-w-[600px] min-w-[300px] p-3 rounded-md text-black border-highlight border"
@@ -132,6 +138,12 @@ const InputMethod = ({ refProp, isLoading, handleSubmit, inputValue }) => {
 				className="bg-highlight w-[80%] max-w-[400px] min-w-[300px] py-2 rounded-md"
 			>
 				{isLoading ? 'Loading' : 'Submit'}
+			</button>
+			<button
+				onClick={() => setIsLogginWithEmail(false)}
+				className="bg-secondary text-white w-[80%] max-w-[400px] min-w-[300px] py-2 rounded-md mt-2"
+			>
+				Back to Home
 			</button>
 		</>
 	);
@@ -149,4 +161,5 @@ InputMethod.propTypes = {
 		name: PropTypes.string,
 		placeholder: PropTypes.string,
 	}),
+	setIsLogginWithEmail: PropTypes.func.isRequired,
 };
