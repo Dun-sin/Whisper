@@ -73,7 +73,7 @@ const NavBar = () => {
 			<div className="hidden md:flex">
 				<img src="favicon.ico" />
 			</div>
-			<div className="justify-between md:justify-center flex items-center md:flex-col flex-row w-full gap-2 flex-nowrap overflow-auto">
+			<div className="justify-between md:justify-center flex items-center md:flex-col flex-row w-full h-full gap-2 flex-nowrap overflow-auto">
 				<Whisper
 					placement="auto"
 					controlId="control-id-hover"
