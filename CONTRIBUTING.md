@@ -26,8 +26,8 @@
 #### 👌🏾 How to fill a pull request template(Text)
 
 - Your Pull Request title should be like a commit message which should look like this -> `[prefix]: [what you did]`
-[how to write what you did](https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/)
-[how to pick which prefix to use](https://kapeli.com/cheat_sheets/Conventional_Commits.docset/Contents/Resources/Documents/index)
+  [how to write what you did](https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/)
+  [how to pick which prefix to use](https://kapeli.com/cheat_sheets/Conventional_Commits.docset/Contents/Resources/Documents/index)
 
 - Your PR description should have either `fixes`, `closes` with the issue number you worked on, for example, `fixes #123` or `closes #123` where #123 is the issue you worked on. It should not be `fixes issue #123`
 - Your PR description should also have the changes you did e.g added a new component, added a new image.
@@ -51,6 +51,15 @@
 
 - Take a look at the existing [Issues](https://github.com/Dun-sin/Whisper/issues) or [create a new issue](https://github.com/Dun-sin/Whisper/issues/new/choose)!
 - [Fork the Repo](https://github.com/Dun-sin/Whisper/fork). Then, create a branch for any issue that you are working on. Finally, commit your work.
+- Create and Push a Branch
+  - To create a new branch and switch to it:
+    ```bash
+    git checkout -b new-branch-name
+    ```
+  - To push the branch to the remote repository:
+    ```bash
+    git push origin new-branch-name
+    ```
 - Create a [Pull Request](https://github.com/Dun-sin/Whisper/compare) (PR), which will be promptly reviewed and given suggestions for improvements by the community.
 - Add screenshots or screen captures to your Pull Request to help us understand the effects of the changes proposed in your PR.
 
