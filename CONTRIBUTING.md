@@ -14,9 +14,20 @@
 ### Pull Request guidelines
 
 - Don't create a pull request on an issue that doesn't exist, create an issue first and if the changes you are proposing are said to be okay, you can go ahead and create a pull request
-- Don't work on the main branch, create your own branch by following the instructions [here](#-how-to-make-a-pull-request)
+- Don't work on the main branch, create your own branch by following the instructions [here](#Creating-and-pushing-a-branch)
 - If you are working on the backend, share a screenrecording of your working software
 - don't create a PR for things outside of your issue's scope, it will lead to more work for the maintainers
+
+### Creating and Pushing a Branch
+
+- To create a new branch and switch to it:
+  ```bash
+  git checkout -b new-branch-name
+  ```
+- To push the branch to the remote repository:
+  ```bash
+  git push origin new-branch-name
+  ```
 
 ### General guidelines
 
@@ -51,15 +62,6 @@
 
 - Take a look at the existing [Issues](https://github.com/Dun-sin/Whisper/issues) or [create a new issue](https://github.com/Dun-sin/Whisper/issues/new/choose)!
 - [Fork the Repo](https://github.com/Dun-sin/Whisper/fork). Then, create a branch for any issue that you are working on. Finally, commit your work.
-- Create and Push a Branch
-  - To create a new branch and switch to it:
-    ```bash
-    git checkout -b new-branch-name
-    ```
-  - To push the branch to the remote repository:
-    ```bash
-    git push origin new-branch-name
-    ```
 - Create a [Pull Request](https://github.com/Dun-sin/Whisper/compare) (PR), which will be promptly reviewed and given suggestions for improvements by the community.
 - Add screenshots or screen captures to your Pull Request to help us understand the effects of the changes proposed in your PR.
 
