@@ -59,16 +59,6 @@ const BuddyMatcher = () => {
 		};
 	}, []); // Empty dependency array since handleBeforeUnload doesn't depend on props/state
 
-	useEffect(() => {
-		// Add event listener for beforeunload
-		window.addEventListener('beforeunload', handleBeforeUnload);
-
-		return () => {
-			// Cleanup event listener
-			window.removeEventListener('beforeunload', handleBeforeUnload);
-		};
-	}, []);
-
 	async function handleReconnect() {
 		if (socket.connected) {
 			return;
