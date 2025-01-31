@@ -14,9 +14,20 @@
 ### Pull Request guidelines
 
 - Don't create a pull request on an issue that doesn't exist, create an issue first and if the changes you are proposing are said to be okay, you can go ahead and create a pull request
-- Don't work on the main branch, create your own branch by following the instructions [here](#-how-to-make-a-pull-request)
+- Don't work on the main branch, create your own branch by following the instructions [here](#Creating-and-pushing-a-branch)
 - If you are working on the backend, share a screenrecording of your working software
 - don't create a PR for things outside of your issue's scope, it will lead to more work for the maintainers
+
+### Creating and Pushing a Branch
+
+- To create a new branch and switch to it:
+  ```bash
+  git checkout -b new-branch-name
+  ```
+- To push the branch to the remote repository:
+  ```bash
+  git push origin new-branch-name
+  ```
 
 ### General guidelines
 
@@ -26,8 +37,8 @@
 #### 👌🏾 How to fill a pull request template(Text)
 
 - Your Pull Request title should be like a commit message which should look like this -> `[prefix]: [what you did]`
-[how to write what you did](https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/)
-[how to pick which prefix to use](https://kapeli.com/cheat_sheets/Conventional_Commits.docset/Contents/Resources/Documents/index)
+  [how to write what you did](https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/)
+  [how to pick which prefix to use](https://kapeli.com/cheat_sheets/Conventional_Commits.docset/Contents/Resources/Documents/index)
 
 - Your PR description should have either `fixes`, `closes` with the issue number you worked on, for example, `fixes #123` or `closes #123` where #123 is the issue you worked on. It should not be `fixes issue #123`
 - Your PR description should also have the changes you did e.g added a new component, added a new image.
