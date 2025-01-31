@@ -43,6 +43,22 @@ const BuddyMatcher = () => {
 		endSearch();
 	}
 
+	const handleBeforeUnload = (event) => {
+		const message = 'You have an active chat. Are you sure you want to leave?';
+		event.preventDefault();
+		event.returnValue = message;
+		return message; // This is required for modern browsers
+	};
+
+	useEffect(() => {
+		window.addEventListener('beforeunload', handleBeforeUnload);
+
+		// Clean up event listener on component unmount
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+		};
+	}, []); // Empty dependency array since handleBeforeUnload doesn't depend on props/state
+
 	async function handleReconnect() {
 		if (socket.connected) {
 			return;
