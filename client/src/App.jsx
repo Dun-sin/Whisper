@@ -8,7 +8,7 @@ import NavBar from 'components/NavBar';
 import NoPage from './pages/NoPage';
 import Profile from './pages/Profile';
 import ProtectedRoutes from 'components/ProtectedRoutes';
-import ReactGA from 'react-ga4';
+// import ReactGA from 'react-ga4';
 import Searching from 'pages/Searching';
 import Settings from 'pages/Settings';
 import Start from 'pages/Start';
@@ -18,7 +18,7 @@ import useIsTabActive from './hooks/useIsTabActive';
 import MatchFound from './pages/MatchFound';
 
 function App() {
-	ReactGA.initialize(import.meta.env.VITE_GOOGLE_ANALYTICS);
+	// ReactGA.initialize(import.meta.env.VITE_GOOGLE_ANALYTICS);
 
 	const { isLoggedIn } = useAuth();
 	const { updateOnlineStatus, app } = useApp();
