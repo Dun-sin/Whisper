@@ -16,9 +16,11 @@ import { useApp } from 'src/context/AppContext';
 import { useAuth } from 'context/AuthContext';
 import useIsTabActive from './hooks/useIsTabActive';
 import MatchFound from './pages/MatchFound';
+import { useCloseAndReloadHandle } from './hooks/useCloseHandle';
 
 function App() {
 	ReactGA.initialize(import.meta.env.VITE_GOOGLE_ANALYTICS);
+	useCloseAndReloadHandle();
 
 	const { isLoggedIn } = useAuth();
 	const { updateOnlineStatus, app } = useApp();
