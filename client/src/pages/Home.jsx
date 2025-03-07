@@ -79,7 +79,7 @@ const Home = () => {
 					)}
 				</div>
 				<div className="h-full bg-secondary w-2/4 sm:flex hidden items-center justify-center px-4">
-					<img src="/landing page image.jpg" className="h-auto rounded-full w-auto object-cover" />
+					<img src="/landing page image.jpg" className="w-full h-auto rounded-full object-cover" />
 				</div>
 			</div>
 		</div>
