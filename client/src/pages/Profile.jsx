@@ -16,6 +16,7 @@ const Profile = () => {
 	const [isImageSafe, setImageSafe] = useState(false);
 	const { authState, dispatchAuth } = useAuth();
 	const [loading, setLoading] = useState(false);
+	const [age, setAge] = useState('')
 	const { logout } = useKindeAuth();
 
 	const aboutRef = useRef(null);
@@ -97,6 +98,12 @@ const Profile = () => {
 		formData.append('username', username);
 		formData.append('aboutMe', aboutRef.current.value);
 		formData.append('gender', genderRef.current.value);
+		const numericAge = Number(age);
+		if (isNaN(numericAge) || numericAge < 12 || numericAge > 120) {
+			setProfileResponse('Error: Please enter a valid age between 12 and 120.');
+			setLoading(false);
+			return;
+		}
 		formData.append('age', Number(ageRef.current.value));
 
 		if (imageFile && isImageSafe) {
@@ -212,13 +219,9 @@ const Profile = () => {
 										className="outline-none bg-transparent text-right"
 										ref={ageRef}
 										min="12"
+										max="120"
 										onChange={(e) => {
-											const value = Number(e.target.value);
-											if (value < 12) {
-												e.target.value = 12;
-											} else if (value > 120) {
-												e.target.value = 120;
-											}
+											setAge(e.target.value)
 										}}
 									/>
 								</div>
