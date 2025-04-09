@@ -16,7 +16,7 @@ const Profile = () => {
 	const [isImageSafe, setImageSafe] = useState(false);
 	const { authState, dispatchAuth } = useAuth();
 	const [loading, setLoading] = useState(false);
-	const [age, setAge] = useState('')
+	const [age, setAge] = useState('');
 	const { logout } = useKindeAuth();
 
 	const aboutRef = useRef(null);
@@ -221,7 +221,7 @@ const Profile = () => {
 										min="12"
 										max="120"
 										onChange={(e) => {
-											setAge(e.target.value)
+											setAge(e.target.value);
 										}}
 									/>
 								</div>
