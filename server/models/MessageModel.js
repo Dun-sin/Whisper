@@ -37,6 +37,11 @@ const MessageSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Message',
     },
+    reactions: {
+      type: Map,
+      of: [String], // Array of user IDs who reacted with this emoji
+      default: new Map()
+    }
   },
   {
     timestamps: true,
@@ -54,11 +59,11 @@ const MessageSchema = new Schema(
             oldMessages: this.oldMessages,
             isRead: this.isRead,
             replyTo: this.replyTo?.toString() || null,
+            reactions: this.reactions ? Object.fromEntries(this.reactions) : {}
           };
         },
       },
     },
   }
 );
-
 module.exports = model('Message', MessageSchema);
