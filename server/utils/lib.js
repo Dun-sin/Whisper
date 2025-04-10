@@ -546,6 +546,81 @@ async function isUserBlocked(users) {
     return timeSinceCreated <= FIFTEEN_MINUTES; // Check if within 15 minutes
 }
 
+
+/**
+ * Add a reaction to a message
+ * @param {string} chatId - The chat ID
+ * @param {string} messageId - The message ID
+ * @param {string} emoji - The emoji to add
+ * @param {string} userId - The user ID who reacted
+ * @returns {Promise<boolean>} - Whether the reaction was added
+ */
+async function addReaction(chatId, messageId, emoji, userId) {
+  if (!chats[chatId] || !chats[chatId].messages[messageId]) {
+    return false;
+  }
+
+  // Get the message from the database
+  const messageDoc = await Message.findById(messageId);
+  if (!messageDoc) {return false;}
+  
+  // Add the reaction using the instance method
+  const reactionAdded = await messageDoc.addReaction(emoji, userId);
+  
+  if (reactionAdded) {
+    // Update in-memory cache
+    const message = chats[chatId].messages[messageId];
+    if (!message.reactions) {
+      message.reactions = {};
+    }
+    
+    if (!message.reactions[emoji]) {
+      message.reactions[emoji] = [];
+    }
+    
+    if (!message.reactions[emoji].includes(userId)) {
+      message.reactions[emoji].push(userId);
+    }
+  }
+  
+  return reactionAdded;
+}
+
+/**
+ * Remove a reaction from a message
+ * @param {string} chatId - The chat ID
+ * @param {string} messageId - The message ID
+ * @param {string} emoji - The emoji to remove
+ * @param {string} userId - The user ID who reacted
+ * @returns {Promise<boolean>} - Whether the reaction was removed
+ */
+async function removeReaction(chatId, messageId, emoji, userId) {
+  if (!chats[chatId] || !chats[chatId].messages[messageId]) {
+    return false;
+  }
+
+  // Get the message from the database
+  const messageDoc = await Message.findById(messageId);
+  if (!messageDoc) {return false;}
+  
+  // Remove the reaction using the instance method
+  const reactionRemoved = await messageDoc.removeReaction(emoji, userId);
+  
+  if (reactionRemoved) {
+    // Update in-memory cache
+    const message = chats[chatId].messages[messageId];
+    if (message.reactions && message.reactions[emoji]) {
+      message.reactions[emoji] = message.reactions[emoji].filter(id => id !== userId);
+      
+      if (message.reactions[emoji].length === 0) {
+        delete message.reactions[emoji];
+      }
+    }
+  }
+  
+  return reactionRemoved;
+}
+
 module.exports = {
   init,
   createChat,
@@ -567,5 +642,8 @@ module.exports = {
   seenMessage,
   blockUser,
   isUserBlocked,
-  isMessageEditableOrDeletable
+  isMessageEditableOrDeletable,
+  removeReaction,
+  addReaction,
+  addReaction,
 };

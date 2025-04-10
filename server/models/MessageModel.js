@@ -40,7 +40,7 @@ const MessageSchema = new Schema(
     reactions: {
       type: Map,
       of: [String], // Array of user IDs who reacted with this emoji
-      default: new Map()
+      default: () => new Map()  // Using a function to return a new Map instance
     }
   },
   {

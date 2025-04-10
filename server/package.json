@@ -11,7 +11,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore --fix ./",
     "format": "prettier --write .",
-    "prepare": "cd .. && husky install server/.husky"
+    "prepare": "cd .. && husky install server/.husky",
+    "migrate:reactions": "node migrations/addReactionsField.js"
   },
   "repository": {
     "type": "git",

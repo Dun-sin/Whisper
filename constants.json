@@ -1,4 +1,6 @@
 {
+	"NEW_EVENT_ADD_REACTION": "add_reaction",
+	"NEW_EVENT_REMOVE_REACTION": "remove_reaction",
 	"NEW_EVENT_CLOSE": "close",
 	"NEW_EVENT_CLOSED": "closed",
 	"NEW_EVENT_INACTIVE": "inactive",

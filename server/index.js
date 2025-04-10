@@ -50,6 +50,7 @@ const CloseChatHandler = require('./sockets/close');
 const stopSearch = require('./sockets/stopSearch');
 const onlineStatus = require('./sockets/onlineStatus');
 const requestPublicKeyHandler = require('./sockets/requestPublicKey');
+const ReactionsHandler = require('./sockets/reactions');
 
 app.use(express.json());
 app.use(cors());
@@ -66,6 +67,7 @@ io.on('connection', (socket) => {
    * This event is emitted once the user clicks on the Start button or
    * navigates to the /founduser route
    */
+  ReactionsHandler(socket);
   JoinHandler(io, socket);
   SendMessageHandler(socket);
   EditMessageHandler(socket);
