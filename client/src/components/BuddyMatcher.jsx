@@ -3,10 +3,10 @@ import {
 	NEW_EVENT_CHAT_RESTORE,
 	NEW_EVENT_CLOSED,
 	NEW_EVENT_INACTIVE,
-	NEW_EVENT_JOIN,
 	NEW_EVENT_JOINED,
 } from '../../../constants.json';
 import { connectWithId, socket } from 'src/lib/socketConnection';
+import useBuddyUtils from 'src/lib/buddysocket';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Anonymous from 'components/Anonymous';
@@ -28,6 +28,7 @@ const BuddyMatcher = () => {
 	const { createChat, closeChat, closeAllChats } = useChat();
 	const { startSearch, endSearch, app } = useApp();
 	const { setLoadingText, startNewSearch } = useCloseChat();
+	const { joinSearch, setupSocketListeners } = useBuddyUtils(socket);
 
 	const [disconnected, setDisconnected] = useState(false);
 	const reconnectAttempts = useRef(0);
@@ -73,7 +74,7 @@ const BuddyMatcher = () => {
 	const onConnect = useCallback(() => {
 		// Here server will be informed that user is searching for
 		// another user
-		socket.emit(NEW_EVENT_JOIN, {
+		joinSearch({
 			loginId: authState.loginId,
 			email: authState.email,
 		});
@@ -132,6 +133,16 @@ const BuddyMatcher = () => {
 		};
 
 		setupSocket();
+		const cleanupListeners = setupSocketListeners({
+			onConnectHandler: onConnect,
+			onUserJoinedHandler: onUserJoined,
+			onRestoreChatHandler: onRestoreChat,
+			onCloseHandler: onClose,
+			onInactiveHandler: onInactive,
+			onDisconnectHandler: onDisconnect,
+			onReconnectAttemptHandler: onReconnectAttempt,
+			onReconnectErrorHandler: onReconnectError,
+		});
 
 		socket.on('connect', onConnect);
 		socket.on(NEW_EVENT_CLOSED, onClose);
@@ -143,18 +154,7 @@ const BuddyMatcher = () => {
 		socket.io.on('reconnect_error', onReconnectError);
 
 		return () => {
-			socket
-				.off('connect', onConnect)
-				.off(NEW_EVENT_JOINED, onUserJoined)
-				.off(NEW_EVENT_CHAT_RESTORE, onRestoreChat)
-				.off(NEW_EVENT_CLOSED, onClose)
-				.off(NEW_EVENT_INACTIVE, onInactive)
-				.off('disconnect', onDisconnect);
-
-			socket.io
-				.off('reconnect_attempt', onReconnectAttempt)
-				.off('reconnect_error', onReconnectError);
-
+			cleanupListeners();
 			socket.disconnect();
 		};
 	}, [app.currentChatId]);
