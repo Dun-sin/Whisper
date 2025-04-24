@@ -6,9 +6,8 @@ import {
 	NEW_EVENT_JOINED,
 } from '../../../constants.json';
 import { connectWithId, socket } from 'src/lib/socketConnection';
-import useBuddyUtils from 'src/lib/buddysocket';
+import useBuddyUtils from 'src/lib/buddySocket';
 import { useCallback, useEffect, useRef, useState } from 'react';
-
 import Anonymous from 'components/Anonymous';
 import { createBrowserNotification } from 'src/lib/browserNotification';
 import { isExplicitDisconnection } from 'src/lib/utils';
