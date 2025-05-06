@@ -1,9 +1,26 @@
+version: "3.8"
+
 services:
-    mongo:
-        image: mongo:5.0
-        restart: always
-        ports:
-            - 27018:27017
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: username
-            MONGO_INITDB_ROOT_PASSWORD: password
+  mongodb:
+    image: mongo:5.0
+    container_name: "mongodb"
+    restart: always
+    ports:
+      - 27018:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: username
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+  app:
+    build: .
+    ports:
+      - 4000:4000
+      - 5173:5173
+    depends_on:
+      - mongodb
+    environment:
+      MongoDB_URL: mongodb://username:password@mongodb:27017/whisper?authSource=admin
+
+volumes:
+  mongodb_data:
