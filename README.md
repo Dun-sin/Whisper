@@ -103,13 +103,13 @@ Before installation, please make sure you have already installed the following t
 
 4. Navigate to the respective client and server directory
 
-    ```bash
-    cd client
-    ```
+   ```bash
+   cd client
+   ```
 
-    ```bash
-    cd server
-    ```
+   ```bash
+   cd server
+   ```
 
 5. Install dependencies with `npm install`
 
@@ -122,15 +122,17 @@ Before installation, please make sure you have already installed the following t
    > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0  
    > Note: If using Docker, the MongoDB port is **27018**
 
-7. Run npm start in the client directory and npm run dev:docker in the server directory, this uses docker for the server part
+7. Run npm start in the client directory
 
-    ```bash
-    npm start
-    ```
+   ```bash
+   npm start
+   ```
 
-    ```bash
-    npm run dev:docker
-    ```
+8. Run the whole application with docker
+
+   ```bash
+   docker-compose up -d
+   ```
 
 > For those who do not wish to use Docker, here is another option -> [to start the project](https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md#starting-the-project-without-docker)
 
