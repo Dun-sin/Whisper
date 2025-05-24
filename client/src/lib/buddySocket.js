@@ -9,6 +9,8 @@ import {
 	NEW_EVENT_JOINED,
 } from '../../../constants.json';
 import { connectWithId } from './socketConnection';
+import { createBrowserNotification } from './browserNotification';
+import { isExplicitDisconnection } from './utils';
 
 /**
  *
@@ -16,6 +18,20 @@ import { connectWithId } from './socketConnection';
  */
 export default function useBuddyUtils(socket) {
 	let reconnectAttempts = 0;
+
+	async function setupSocket(currentChatId, startSearch) {
+		if (!currentChatId) {
+			startSearch();
+		}
+
+		if (!socket.connected) {
+			try {
+				await connectWithId(currentChatId);
+			} catch (error) {
+				console.error('Failed to connect:', error);
+			}
+		}
+	}
 
 	function joinSearch({ loginId, email }) {
 		return new Promise((resolve, reject) => {
@@ -61,6 +77,10 @@ export default function useBuddyUtils(socket) {
 		await connectWithId(currentChatId);
 	}
 
+	function handleReconnectClick(currentChatId, startSearch, setLoadingText, defaultLoadingText) {
+		return () => handleReconnect(currentChatId, startSearch, setLoadingText, defaultLoadingText);
+	}
+
 	function handleReconnectAttempt(attempt) {
 		reconnectAttempts = attempt;
 	}
@@ -71,14 +91,99 @@ export default function useBuddyUtils(socket) {
 		}
 	}
 
+	function onUserJoined({ roomId, userIds }, { playNotification, createChat, endSearch }) {
+		playNotification('buddyPaired');
+		createBrowserNotification(
+			"Let's Chat :)",
+			"You've found a match, don't keep your Partner waiting ⌛"
+		);
+		createChat(roomId, userIds);
+		endSearch(roomId);
+	}
+
+	function onRestoreChat({ chats, currentChatId }, { createChat, endSearch }) {
+		Object.values(chats).forEach((chat) => {
+			createChat(chat.id, chat.userIds, chat.messages, chat.createdAt);
+		});
+		endSearch(currentChatId);
+	}
+
+	function onConnect({ loginId, email }, { joinSearch, setDisconnected }) {
+		joinSearch({
+			loginId,
+			email,
+		});
+		setDisconnected(false);
+	}
+
+	function onClose(
+		chatId,
+		{ endSearch, closeChat, playNotification, navigate, createBrowserNotification, startNewSearch }
+	) {
+		endSearch();
+		closeChat(chatId);
+		playNotification('chatClosed');
+
+		if (!confirm('This chat is closed! Would you like to search for a new buddy?')) {
+			navigate('/');
+			return;
+		}
+
+		createBrowserNotification('Chat Closed', 'Your buddy left the chat');
+		startNewSearch();
+	}
+
+	function onInactive({ closeAllChats }) {
+		closeAllChats();
+	}
+
+	function onDisconnect(reason, { app, disconnect, setDisconnected, endSearch }) {
+		if (isExplicitDisconnection(reason)) {
+			return;
+		}
+
+		disconnect(app.currentChatId, () => setDisconnected(true), endSearch);
+	}
+
 	function setupSocketListeners({
-		onConnectHandler,
-		onUserJoinedHandler,
-		onRestoreChatHandler,
-		onCloseHandler,
-		onInactiveHandler,
-		onDisconnectHandler,
+		authState,
+		playNotification,
+		createChat,
+		endSearch,
+		closeChat,
+		navigate,
+		createBrowserNotification,
+		startNewSearch,
+		closeAllChats,
+		app,
+		setDisconnected,
 	}) {
+		const onConnectHandler = () =>
+			onConnect(
+				{ loginId: authState.loginId, email: authState.email },
+				{ joinSearch, setDisconnected }
+			);
+
+		const onUserJoinedHandler = (data) =>
+			onUserJoined(data, { playNotification, createChat, endSearch });
+
+		const onRestoreChatHandler = (data) => onRestoreChat(data, { createChat, endSearch });
+
+		const onCloseHandler = (chatId) =>
+			onClose(chatId, {
+				endSearch,
+				closeChat,
+				playNotification,
+				navigate,
+				createBrowserNotification,
+				startNewSearch,
+			});
+
+		const onInactiveHandler = () => onInactive({ closeAllChats });
+
+		const onDisconnectHandler = (reason) =>
+			onDisconnect(reason, { app, disconnect, setDisconnected, endSearch });
+
 		const reconnectErrorHandler = () => handleReconnectError(onDisconnectHandler);
 
 		socket.on('connect', onConnectHandler);
@@ -107,5 +212,13 @@ export default function useBuddyUtils(socket) {
 		setupSocketListeners,
 		disconnect,
 		handleReconnect,
+		handleReconnectClick,
+		onUserJoined,
+		onRestoreChat,
+		onConnect,
+		onClose,
+		onInactive,
+		onDisconnect,
+		setupSocket,
 	};
 }
