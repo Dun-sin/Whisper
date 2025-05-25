@@ -1,3 +1,4 @@
+import { showError, showSuccess } from 'src/lib/toast';
 import { cloneState } from './utils';
 
 export const initialState = {
@@ -23,11 +24,15 @@ export default function authReducer(state, action) {
 			// Save auth state to localStorage on each change
 			localStorage.setItem('auth', JSON.stringify(clonedState));
 
+			showSuccess('Logged in successfully');
+
 			return clonedState;
 		}
 
 		case 'LOGOUT':
 			localStorage.clear();
+
+			showError('Logged out successfully');
 
 			return {
 				...clonedState,
