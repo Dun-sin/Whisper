@@ -16,6 +16,7 @@ import { useApp } from 'src/context/AppContext';
 import { useAuth } from 'context/AuthContext';
 import useIsTabActive from './hooks/useIsTabActive';
 import MatchFound from './pages/MatchFound';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
 	ReactGA.initialize(import.meta.env.VITE_GOOGLE_ANALYTICS);
@@ -46,6 +47,7 @@ function App() {
 
 	return (
 		<div className={`flex flex-col-reverse md:flex-row h-screen ${settings.theme && 'dark'}`}>
+			<Toaster position="top-center" reverseOrder={false} />
 			{isLoggedIn && <NavBar />}
 			<Routes>
 				<Route exact path="/" element={<ProtectedRoutes isLoggedIn={isLoggedIn} />}>
