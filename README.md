@@ -86,9 +86,10 @@ Before installation, please make sure you have already installed the following t
 - [NodeJs](https://nodejs.org/en/download/)
 - [Docker](https://docker.com/desktop)
 
-### 🛠️ Manual Installation
+### 🛠️ Installation
 
 1. [Fork](https://github.com/Dun-sin/Whisper/fork) the project. Click on the fork icon in the top right to get started
+
 2. Clone the project, you can use the following command:
 
    ```bash
@@ -101,42 +102,23 @@ Before installation, please make sure you have already installed the following t
    cd Whisper
    ```
 
-4. Navigate to the respective client and server directory
+4. Use `.env_sample` to configure the `.env` file for both client and server. For the server .env mongodb url use the localhost to test
+
+   > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0
+
+5. Run the application with docker compose
 
    ```bash
-   cd client
+   docker-compose up -d
    ```
 
-   ```bash
-   cd server
-   ```
+6. Port mappings:
 
-5. Install dependencies with `npm install`
+   - Server running on port `4000`
+   - Client running on port `5173`
+   - MongoDB running on port `27018`
 
-   ```bash
-   npm install
-   ```
-
-6. Use `.env_sample` to configure the `.env` file for both client and server. For the server .env mongodb url use the localhost to test
-
-   > Check this video of how to do that: https://www.youtube.com/watch?v=D0U8vD8m1I0  
-   > Note: If using Docker, the MongoDB port is **27018**
-
-7. Run npm start in the client directory
-
-   ```bash
-   npm start
-   ```
-
-8. To test things out, you can open the same URL in two different browsers or open a private browsing window in the same browser. This allows you to connect to yourself, use `login anonymously` if you aren't dealing with anything that uses user data, else use `login` and open an account on [mailtrap](https://mailtrap.io/) using their demo to domain and get the token into `.env`
-
-### 📦 Docker Installation
-
-Run the whole application with Docker Compose.
-
-```bash
-docker-compose up -d
-```
+7. To test things out, you can open the same URL in two different browsers or open a private browsing window in the same browser. This allows you to connect to yourself, use `login anonymously` if you aren't dealing with anything that uses user data, else use `login` and open an account on [mailtrap](https://mailtrap.io/) using their demo to domain and get the token into `.env`
 
 > For those who do not wish to use Docker, here is another option -> [to start the project](https://github.com/Dun-sin/Whisper/blob/main/CONTRIBUTING.md#starting-the-project-without-docker)
 
