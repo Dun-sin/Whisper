@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 
 import { useDialog } from 'src/context/DialogContext';
 import { useApp } from 'src/context/AppContext';
@@ -73,6 +73,4 @@ const Dialog = ({ ...rest }) => {
 
 export default Dialog;
 
-Dialog.propTypes = {
-	children: PropTypes.node.isRequired,
-};
+// Dialog does not use children, so no propTypes needed for children

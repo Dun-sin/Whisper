@@ -14,8 +14,8 @@ import { socket } from 'src/lib/socketConnection';
 import { useApp } from 'src/context/AppContext';
 import { NEW_EVENT_LOGOUT } from '../../../constants.json';
 
-const linkStyle = `h-full w-full flex items-center justify-center hover:bg-primary rounded-[15px] md:max-h-[60px] md:h-[60px] md:min-h-[60px] `;
-const activeStyle = linkStyle + 'bg-primary';
+const linkStyle = `h-full w-full flex items-center justify-center transition-all duration-200 rounded-full md:max-h-[60px] md:h-[60px] md:min-h-[60px] hover:scale-110 hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-500`;
+const activeStyle = `${linkStyle} bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg scale-110`;
 
 const NavBar = () => {
 	const { authState, dispatchAuth } = useAuth();
@@ -66,12 +66,12 @@ const NavBar = () => {
 
 	return (
 		<div
-			className={`${
-				hideNavbar && 'hidden'
-			} bg-secondary md:w-[120px] md:min-h-screen md:max-h-screen items-center md:flex-col flex-row justify-between shadow-[rgb(0,_0,_0)_12px_0px_18px_-18px] p-2 md:p-5 sticky bottom-0 md:flex max-h-[70px] h-[70px] min-h-[70px]`}
+			className={`${hideNavbar ? 'hidden' : ''} bg-gradient-to-br from-blue-100 via-purple-200 to-pink-200 md:w-[80px] md:min-h-screen md:max-h-screen items-center md:flex-col flex-row justify-between shadow-lg p-1 md:p-2 sticky bottom-0 md:flex max-h-[56px] h-[56px] min-h-[56px]`}
 		>
-			<div className="hidden md:flex">
-				<img src="favicon.ico" />
+			{/* User Avatar Section */}
+			<div className="flex flex-col items-center justify-center mb-2 md:mb-4">
+				<img src={authState?.avatarUrl || '/public/logo192.png'} alt="User Avatar" className="w-8 h-8 rounded-full border-2 border-purple-400 shadow-md" />
+				<span className="mt-1 text-xs font-semibold text-purple-700">{authState?.username || 'User'}</span>
 			</div>
 			<div className="justify-between md:justify-center flex items-center md:flex-col flex-row w-full h-full gap-2 flex-nowrap overflow-auto">
 				<Whisper
@@ -81,7 +81,7 @@ const NavBar = () => {
 					speaker={<Tooltip>Search for random buddies</Tooltip>}
 				>
 					<NavLink to="/" className={getLinkStyle}>
-						<Icon icon="fluent:people-search-20-regular" color="white" height="24" width="24" />
+						<Icon icon="material-symbols:search-rounded" color="#7c3aed" height="22" width="22" />
 					</NavLink>
 				</Whisper>
 				<Whisper
@@ -91,7 +91,7 @@ const NavBar = () => {
 					speaker={<Tooltip>Friends</Tooltip>}
 				>
 					<NavLink to="/friends" className={getLinkStyle}>
-						<Icon color="white" icon="la:user-friends" height="24" width="24" />
+						<Icon icon="mdi:account-group" color="#7c3aed" height="22" width="22" />
 					</NavLink>
 				</Whisper>
 				<Whisper
@@ -101,7 +101,7 @@ const NavBar = () => {
 					speaker={<Tooltip>My Profile</Tooltip>}
 				>
 					<NavLink to="/profile" className={getLinkStyle}>
-						<Icon icon="fluent:person-circle-20-regular" color="white" height="24" width="24" />
+						<Icon icon="mdi:account-circle" color="#7c3aed" height="22" width="22" />
 					</NavLink>
 				</Whisper>
 
@@ -114,7 +114,7 @@ const NavBar = () => {
 						speaker={<Tooltip>Settings</Tooltip>}
 					>
 						<NavLink to="/settings" className={getLinkStyle}>
-							<Icon icon="ic:outline-settings" color="white" height="24" width="24" />
+							<Icon icon="mdi:cog-outline" color="#7c3aed" height="22" width="22" />
 						</NavLink>
 					</Whisper>
 				</div>
@@ -127,7 +127,7 @@ const NavBar = () => {
 						speaker={<Tooltip>Logout</Tooltip>}
 					>
 						<button className={linkStyle} onClick={() => handleLogout()}>
-							<Icon icon="majesticons:logout-half-circle" color="white" height={24} width={24} />
+							<Icon icon="mdi:logout" color="#7c3aed" height={22} width={22} />
 						</button>
 					</Whisper>
 				</div>
@@ -140,7 +140,7 @@ const NavBar = () => {
 					speaker={<Tooltip>Settings</Tooltip>}
 				>
 					<NavLink to="/settings" className={getLinkStyle}>
-						<Icon icon="ic:outline-settings" color="white" height="24" width="24" />
+						<Icon icon="mdi:cog-outline" color="#7c3aed" height="22" width="22" />
 					</NavLink>
 				</Whisper>
 				<Whisper
@@ -150,12 +150,12 @@ const NavBar = () => {
 					speaker={<Tooltip>Logout</Tooltip>}
 				>
 					<button className={linkStyle} onClick={() => handleLogout()}>
-						<Icon icon="majesticons:logout-half-circle" color="white" height={24} width={24} />
+						<Icon icon="mdi:logout" color="#7c3aed" height={22} width={22} />
 					</button>
 				</Whisper>
 			</div>
 		</div>
 	);
-};
+}
 
 export default NavBar;

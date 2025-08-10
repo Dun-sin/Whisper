@@ -5,6 +5,7 @@
 	"private": true,
 	"scripts": {
 		"start": "vite --host",
+		"dev": "vite",
 		"build": "vite build",
 		"lint": "eslint --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --fix src",
 		"format": "prettier --write .",
