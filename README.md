@@ -21,7 +21,7 @@
 
 ## Whisper
 
-This app is developed to make chatting much private and easy without stealing your data!!
+This app is developed to make chating much private and easy without stealing your data!!
 
 ### ✨ Built With
 
@@ -76,7 +76,7 @@ This app is developed to make chatting much private and easy without stealing yo
 
 ## 📚 Getting Started
 
-To get a local copy up and running follow these simple steps.
+To get a local copy up and runing follow these simple steps.
 
 ### 👇🏽 Prerequisites
 
