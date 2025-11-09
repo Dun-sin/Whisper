@@ -471,31 +471,38 @@ function isUserActive(emailOrLoginId) {
  *     socket: Socket
  * }} param0
  */
-function addToWaitingList({ loginId, email, socket, io }) {
-  const emailOrLoginId = email ?? `${loginId}-${socket.id}`;
+function addToWaitingList({ loginId, email, socket }) {
+  const emailOrLoginId = email ?? loginId;
 
-  waitingUsers[emailOrLoginId] = new Proxy(
-    {
-      loginId,
-      email,
-      socketConnections: [socket],
-      socketIds: [socket.id],
-      chatIds: [],
-      currentChatId: null,
-    },
-    {
-      get(target, prop) {
-        if (prop === 'emailOrLoginId') {
-          return target.email ?? target.loginId;
-        }
-        return Reflect.get(target, prop);
+  if (waitingUsers[emailOrLoginId]) {
+    console.log(`User already in waiting list: ${emailOrLoginId}. Adding new socket connection.`);
+    waitingUsers[emailOrLoginId].socketConnections.push(socket);
+    waitingUsers[emailOrLoginId].socketIds.push(socket.id);
+    console.log(`Updated socketIds: ${waitingUsers[emailOrLoginId].socketIds}`);
+  } else {
+    console.log(`Adding new user to waiting list: ${emailOrLoginId}`);
+    waitingUsers[emailOrLoginId] = new Proxy(
+      {
+        loginId,
+        email,
+        socketConnections: [socket],
+        socketIds: [socket.id],
+        chatIds: [],
+        currentChatId: null,
       },
-    }
-  );
-
- 
-  
+      {
+        get(target, prop) {
+          if (prop === 'emailOrLoginId') {
+            return target.email ?? target.loginId;
+          }
+          return Reflect.get(target, prop);
+        },
+      }
+    );
+    console.log(`Waiting users now: ${Object.keys(waitingUsers)}`);
+  }
 }
+
 
 
 function getWaitingUserLen() {

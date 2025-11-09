@@ -21,22 +21,52 @@ const {
  * @param {Server} io
  */
 
-const matchMaker = async (io) => {
-  while (getWaitingUserLen() > 1) {
-    const users = getRandomPairFromWaitingList();
-    
-    // Check if either user is blocked
-    if ( await isUserBlocked(users) ) {
-      continue
-    }
+let isMatching = false;
 
-    const chat = await createChat(users);
-    io.to(chat.id).emit(NEW_EVENT_JOINED, {
-      roomId: chat.id,
-      userIds: chat.userIds,
-    });
+const matchMaker = async (io) => {
+  if (isMatching) {
+    console.log('MatchMaker already running, skipping...');
+    return;
+  }
+
+  isMatching = true;
+  console.log('MatchMaker started. Waiting users:', getWaitingUserLen());
+
+  try {
+    while (getWaitingUserLen() > 1) {
+      const users = getRandomPairFromWaitingList();
+      console.log('Picked users for pairing:', users.map(u => u.loginId));
+
+      if (!users || users.length < 2) {
+        console.log('Not enough users to pair, breaking...');
+        break;
+      }
+
+      // Check if either user is blocked
+      if (await isUserBlocked(users)) {
+        console.log('Users are blocked, adding back to waiting list');
+        users.forEach(user => addToWaitingList({
+          loginId: user.loginId,
+          email: user.email,
+          socket: user.socketConnections[0],
+        }));
+        continue;
+      }
+
+      const chat = await createChat(users);
+      console.log('Chat created with id:', chat.id);
+
+      io.to(chat.id).emit(NEW_EVENT_JOINED, {
+        roomId: chat.id,
+        userIds: chat.userIds,
+      });
+    }
+  } finally {
+    console.log('MatchMaker finished.');
+    isMatching = false;
   }
 };
+
 
 module.exports = (io, socket) => {
   socket.on(NEW_EVENT_JOIN, ({ loginId, email }) => {
