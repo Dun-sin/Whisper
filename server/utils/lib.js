@@ -493,9 +493,7 @@ function addToWaitingList({ loginId, email, socket, io }) {
     }
   );
 
-  console.log(`🟢 Added to waiting list: ${emailOrLoginId}`);
-  console.log(`Current waiting users: ${Object.keys(waitingUsers).length}`);
-
+ 
   
 }
 
