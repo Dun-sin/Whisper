@@ -440,25 +440,21 @@ async function seenMessage(chatId, messageId) {
 }
 
 function getRandomPairFromWaitingList() {
-  /**
-   * Since we indexed waiting users by emailOrLoginId, we need to first
-   * retrieve all the keys which would be used for getting random users
-   */
   const waitingUserIds = Object.keys(waitingUsers);
-  const pairedUsers = [];
+  if (waitingUserIds.length < 2) return [];
 
+  const pairedUsers = [];
   for (let i = 0; i < 2; i++) {
     const randomIndex = Math.floor(Math.random() * waitingUserIds.length);
-
     const randomId = waitingUserIds[randomIndex];
     pairedUsers.push(waitingUsers[randomId]);
-
     delWaitingUser(randomId);
     waitingUserIds.splice(randomIndex, 1);
   }
 
   return pairedUsers;
 }
+
 
 /**
  * @param {string} emailOrLoginId
@@ -475,8 +471,8 @@ function isUserActive(emailOrLoginId) {
  *     socket: Socket
  * }} param0
  */
-function addToWaitingList({ loginId, email, socket }) {
-  const emailOrLoginId = email ?? loginId;
+function addToWaitingList({ loginId, email, socket, io }) {
+  const emailOrLoginId = email ?? `${loginId}-${socket.id}`;
 
   waitingUsers[emailOrLoginId] = new Proxy(
     {
@@ -488,16 +484,21 @@ function addToWaitingList({ loginId, email, socket }) {
       currentChatId: null,
     },
     {
-      get(target, prop, receiver) {
+      get(target, prop) {
         if (prop === 'emailOrLoginId') {
           return target.email ?? target.loginId;
         }
-
-        return Reflect.get(...arguments);
+        return Reflect.get(target, prop);
       },
     }
   );
+
+  console.log(`🟢 Added to waiting list: ${emailOrLoginId}`);
+  console.log(`Current waiting users: ${Object.keys(waitingUsers).length}`);
+
+  
 }
+
 
 function getWaitingUserLen() {
   return Object.keys(waitingUsers).length;
