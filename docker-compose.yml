@@ -19,6 +19,11 @@ services:
       - mongodb
     environment:
       MongoDB_URL: mongodb://username:password@mongodb:27017/whisper?authSource=admin
+    volumes:
+      - ./client:/usr/src/client
+      - ./server:/usr/src/server
+      - /usr/src/client/node_modules
+      - /usr/src/server/node_modules
 
 volumes:
   mongodb_data:

@@ -29,6 +29,4 @@ RUN npm i -g concurrently
 EXPOSE 4000 
 EXPOSE 5173
 
-CMD concurrently "npm --prefix ./server start" "npm --prefix ./client start"
-
-
+CMD concurrently "npm --prefix ./server run dev" "npm --prefix ./client run dev"
