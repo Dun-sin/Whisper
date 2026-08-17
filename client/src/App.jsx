@@ -15,6 +15,7 @@ import Start from 'pages/Start';
 import { useApp } from 'src/context/AppContext';
 import { useAuth } from 'context/AuthContext';
 import useIsTabActive from './hooks/useIsTabActive';
+import useWarnBeforeUnload from './hooks/useWarnBeforeUnload';
 import MatchFound from './pages/MatchFound';
 import { Toaster } from 'react-hot-toast';
 
@@ -28,6 +29,8 @@ function App() {
 	const [onlineStatus, setOnlineStatus] = useState(null);
 
 	const isTabActive = useIsTabActive();
+
+	useWarnBeforeUnload(Boolean(app.currentChatId));
 
 	useEffect(() => {
 		if (!isLoggedIn) {
