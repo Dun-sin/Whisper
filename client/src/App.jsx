@@ -24,7 +24,9 @@ function App() {
 	const { isLoggedIn } = useAuth();
 	const { updateOnlineStatus, app } = useApp();
 
-	const { settings } = app;
+	const settings = app.tmpSettings
+    ? { ...app.settings, ...app.tmpSettings }
+    : app.settings;
 	const [onlineStatus, setOnlineStatus] = useState(null);
 
 	const isTabActive = useIsTabActive();
@@ -46,7 +48,7 @@ function App() {
 	}, [onlineStatus]);
 
 	return (
-		<div className={`flex flex-col-reverse md:flex-row h-screen ${settings.theme && 'dark'}`}>
+		<div className={`flex flex-col-reverse md:flex-row h-screen ${settings.theme ? 'dark' : ''}`}>
 			<Toaster position="top-center" reverseOrder={false} />
 			{isLoggedIn && <NavBar />}
 			<Routes>

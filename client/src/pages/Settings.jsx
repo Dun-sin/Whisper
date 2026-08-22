@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { Animation, Button, ButtonToolbar, Divider, Form, Slider, Toggle } from 'rsuite';
 
 import { Icon } from '@iconify/react';
@@ -41,6 +41,11 @@ const Searching = () => {
 	const handleChange = (newSettings) => {
 		updateTmpSettings(newSettings);
 	};
+	useEffect(() => {
+    return () => {
+        cancelSettingsUpdate();
+    };
+}, []);
 
 	return (
 		<div
