@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Animation, Button, ButtonToolbar, Divider, Form, Slider, Toggle } from 'rsuite';
+import { Divider, Form, Slider, Toggle } from 'rsuite';
 
 import { Icon } from '@iconify/react';
 
@@ -8,7 +8,7 @@ import { useAuth } from 'src/context/AuthContext';
 import { api } from 'src/lib/axios';
 
 const Searching = () => {
-	const { app, hasUnsavedSettings, updateSettings, updateTmpSettings, cancelSettingsUpdate } =
+	const { app, updateSettings, updateTmpSettings } =
 		useApp();
 	const { authState } = useAuth();
 
@@ -153,42 +153,6 @@ const Searching = () => {
 						/>
 					</Form.Group>
 					<Divider className="border border-gray-500 my-2 sm:my-4 md:my-7"></Divider>
-					<Form.Group>
-						{hasUnsavedSettings && (
-							<Animation.Bounce in={hasUnsavedSettings}>
-								<div className="w-[100%] flex justify-end mb-3.5 text-xs items-center">
-									<Icon
-										className="text-highlight"
-										icon="fluent:warning-20-filled"
-										height="16"
-										width="16"
-									/>
-									<p className="dark:text-highlight text-red text-[10px] md:text-sm">
-										Warning: You have unsaved settings
-									</p>
-								</div>
-							</Animation.Bounce>
-						)}
-						<ButtonToolbar className="flex md:justify-end justify-center">
-							<Animation.Fade in={hasUnsavedSettings}>
-								<Button
-									appearance="primary"
-									onClick={cancelSettingsUpdate}
-									className="text-[12px] sm:text-xs md:text-base bg-secondary font-normal w-24 h-9 rounded-md hover:bg-slate-700"
-								>
-									Cancel
-								</Button>
-							</Animation.Fade>
-							<Button
-								type="submit"
-								appearance="primary"
-								disabled={!hasUnsavedSettings}
-								className="text-base font-normal w-24 h-9 bg-blue-500 rounded-md hover:bg-blue-400"
-							>
-								Update
-							</Button>
-						</ButtonToolbar>
-					</Form.Group>
 				</Form>
 			</div>
 		</div>
