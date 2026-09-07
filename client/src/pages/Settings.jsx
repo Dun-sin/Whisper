@@ -8,8 +8,7 @@ import { useAuth } from 'src/context/AuthContext';
 import { api } from 'src/lib/axios';
 
 const Searching = () => {
-	const { app, updateSettings, updateTmpSettings } =
-		useApp();
+	const { app, updateSettings, updateTmpSettings } = useApp();
 	const { authState } = useAuth();
 
 	const settings = useMemo(() => {

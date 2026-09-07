@@ -25,9 +25,7 @@ function App() {
 	const { isLoggedIn } = useAuth();
 	const { updateOnlineStatus, app } = useApp();
 
-	const settings = app.tmpSettings
-    ? { ...app.settings, ...app.tmpSettings }
-    : app.settings;
+	const settings = app.tmpSettings ? { ...app.settings, ...app.tmpSettings } : app.settings;
 	const [onlineStatus, setOnlineStatus] = useState(null);
 
 	const isTabActive = useIsTabActive();
