@@ -37,6 +37,22 @@ const MessageSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Message',
     },
+    reactions: {
+      type: [
+        {
+          _id: false,
+          reaction: {
+            type: String,
+            required: true,
+          },
+          userId: {
+            type: String,
+            required: true,
+          },
+        },
+      ],
+      default: [],
+    },
   },
   {
     timestamps: true,
@@ -54,6 +70,7 @@ const MessageSchema = new Schema(
             oldMessages: this.oldMessages,
             isRead: this.isRead,
             replyTo: this.replyTo?.toString() || null,
+            reactions: this.reactions,
           };
         },
       },

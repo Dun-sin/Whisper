@@ -37,7 +37,8 @@ const { FIFTEEN_MINUTES } = require('../../constants.json');
  *     message: string,
  *     senderId: string,
  *     time: string | Date,
- *     type: 'room_notification' | 'message'
+ *     type: 'room_notification' | 'message',
+ *     reactions: { reaction: string, userId: string }[]
  * }} Message
  */
 
@@ -381,6 +382,37 @@ async function removeMessage(chatId, messageId) {
   return true;
 }
 
+async function reactToMessage(chatId, messageId, userId, reaction) {
+  const chat = chats[chatId];
+  const message = chat?.messages?.[messageId];
+
+  if (!chat || !message || !chat.userIds.includes(userId)) {
+    return null;
+  }
+
+  const reactions = Array.isArray(message.reactions) ? message.reactions : [];
+  const existingReaction = reactions.find((item) => item.userId === userId);
+  const updatedReactions =
+    existingReaction?.reaction === reaction
+      ? reactions.filter((item) => item.userId !== userId)
+      : [
+          ...reactions.filter((item) => item.userId !== userId),
+          { reaction, userId },
+        ];
+
+  await Message.updateOne(
+    { _id: messageId },
+    { $set: { reactions: updatedReactions } }
+  );
+
+  message.reactions = updatedReactions;
+  return {
+    id: messageId,
+    room: chatId,
+    reactions: updatedReactions,
+  };
+}
+
 async function editMessage(chatId, { id, message, oldMessage }) {
   if (!chats[chatId]) {
     return false;
@@ -560,6 +592,7 @@ module.exports = {
   getChat,
   addMessage,
   removeMessage,
+  reactToMessage,
   editMessage,
   getChatsCount,
   addActiveUser,
