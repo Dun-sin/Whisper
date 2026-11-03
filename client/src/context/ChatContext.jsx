@@ -108,6 +108,13 @@ export const ChatProvider = ({ children }) => {
 		});
 	}
 
+	function updateReactions(message) {
+		dispatch({
+			type: 'UPDATE_REACTIONS',
+			payload: message,
+		});
+	}
+
 	function closeChat(chatId) {
 		dispatch({
 			type: 'CLOSE_CHAT',
@@ -143,6 +150,7 @@ export const ChatProvider = ({ children }) => {
 				closeChat,
 				closeAllChats,
 				receiveMessage,
+				updateReactions,
 				startReply,
 				cancelReply,
 			}}

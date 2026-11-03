@@ -55,8 +55,17 @@ export default function chatReducer(state, action) {
 		}
 
 		case 'ADD_MESSAGE': {
-			const { senderId, room, id, message, time, status, containsBadword, replyTo } =
-				action.payload;
+			const {
+				senderId,
+				room,
+				id,
+				message,
+				time,
+				status,
+				containsBadword,
+				replyTo,
+				reactions,
+			} = action.payload;
 
 			if (!clonedState[room]) {
 				throw new Error('Room not found!');
@@ -71,7 +80,19 @@ export default function chatReducer(state, action) {
 				status,
 				containsBadword,
 				replyTo,
+				reactions: reactions ?? [],
 			};
+			break;
+		}
+
+		case 'UPDATE_REACTIONS': {
+			const { id, room, reactions } = action.payload;
+
+			if (!clonedState[room]?.messages[id]) {
+				break;
+			}
+
+			clonedState[room].messages[id].reactions = reactions;
 			break;
 		}
 
