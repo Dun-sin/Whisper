@@ -6,6 +6,7 @@ import BadwordWarning from './BadwordWarning';
 import DropDownOptions from './DropDownOption';
 import MarkdownIt from 'markdown-it';
 import MessageSeen from './MessageSeen';
+import MessageReactions from './MessageReactions';
 import PropTypes from 'prop-types';
 import Status from './Status';
 import chatHelper from 'src/lib/chatHelper';
@@ -21,6 +22,7 @@ const MessageList = ({
 	inputRef,
 	cancelEdit,
 	setEditing,
+	onReact,
 }) => {
 	const { app } = useApp();
 	const { messasges: state, startReply } = useChat();
@@ -56,6 +58,7 @@ const MessageList = ({
 				containsBadword,
 				isRead,
 				replyTo,
+				reactions,
 			}) => {
 				const isSender = sender.toString() === senderId.toString();
 				// original message this message is a reply to
@@ -185,6 +188,11 @@ const MessageList = ({
 											status={status}
 										/>
 										<MessageSeen isRead={isRead} isSender={isSender} />
+										<MessageReactions
+											reactions={reactions}
+											userId={senderId}
+											onReact={(reaction) => onReact(id, reaction)}
+										/>
 									</>
 								)}
 							</div>
@@ -206,4 +214,5 @@ MessageList.propTypes = {
 	inputRef: PropTypes.object.isRequired,
 	cancelEdit: PropTypes.func.isRequired,
 	setEditing: PropTypes.func.isRequired,
+	onReact: PropTypes.func.isRequired,
 };

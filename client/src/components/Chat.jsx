@@ -46,6 +46,7 @@ const Chat = () => {
 		updateMessage,
 		removeMessage,
 		receiveMessage,
+		updateReactions,
 		currentReplyMessageId,
 		cancelReply,
 	} = useChat();
@@ -60,7 +61,13 @@ const Chat = () => {
 	const { authState, dispatchAuth } = useAuth();
 	const { logout } = useKindeAuth();
 
-	const { sendMessage, editMessage, emitTyping, setupSocketListeners } = useChatUtils(socket);
+	const {
+		sendMessage,
+		editMessage,
+		emitTyping,
+		reactToMessage,
+		setupSocketListeners,
+	} = useChatUtils(socket);
 	const { getMessage } = chatHelper(state, app);
 
 	const inputRef = useRef('');
@@ -252,6 +259,28 @@ const Chat = () => {
 		receiveMessage(messageId, chatId);
 	}, []);
 
+	const onReactionHandler = useCallback((reactionUpdate) => {
+		updateReactions(reactionUpdate);
+	}, []);
+
+	const handleReaction = useCallback(
+		async (messageId, reaction) => {
+			try {
+				const updatedMessage = await reactToMessage({
+					messageId,
+					chatId: app.currentChatId,
+					reaction,
+				});
+				if (updatedMessage) {
+					updateReactions(updatedMessage);
+				}
+			} catch (error) {
+				console.error('Could not update message reaction:', error);
+			}
+		},
+		[app.currentChatId]
+	);
+
 	const onPublicStringHandler = useCallback(({ pemPublicKeyString, pemPrivateKeyString }) => {
 		const pemPublicKeyArrayBuffer = pemToArrayBuffer(pemPublicKeyString);
 		const pemPrivateKeyArrayBuffer = pemToArrayBuffer(pemPrivateKeyString);
@@ -337,6 +366,7 @@ const Chat = () => {
 			onReadMessageHandler,
 			onLimitMessageHandler,
 			onPublicStringHandler,
+			onReactionHandler,
 		});
 
 		return cleanupListeners;
@@ -362,6 +392,7 @@ const Chat = () => {
 							inputRef={inputRef}
 							cancelEdit={cancelEdit}
 							setEditing={setEditing}
+							onReact={handleReaction}
 						/>
 					) : (
 						<div className="w-full h-full flex flex-col items-center justify-center">
