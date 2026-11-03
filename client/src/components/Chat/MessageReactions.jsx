@@ -18,7 +18,7 @@ const MessageReactions = ({ reactions = [], userId, onReact }) => {
 	};
 
 	return (
-		<div className="relative flex items-center gap-1">
+		<div className="relative flex min-h-8 items-center gap-1">
 			{Object.entries(reactionCounts).map(([reaction, count]) => {
 				const isActive = reactions.some(
 					(item) => item.userId === userId && item.reaction === reaction
@@ -40,11 +40,14 @@ const MessageReactions = ({ reactions = [], userId, onReact }) => {
 			})}
 			<button
 				type="button"
-				className="rounded-full p-1 text-white/80 hover:bg-white/10"
+				className="flex items-center gap-1 rounded-full border border-white/40 px-2 py-1 text-sm text-white hover:bg-white/10"
 				onClick={() => setIsPickerOpen((isOpen) => !isOpen)}
 				aria-label="Add reaction"
+				aria-expanded={isPickerOpen}
+				title="Add reaction"
 			>
 				<MdAddReaction />
+				<span>React</span>
 			</button>
 			{isPickerOpen && (
 				<div className="absolute bottom-full z-30 mb-2 flex gap-1 rounded-full bg-highlight px-2 py-1 shadow-lg">
