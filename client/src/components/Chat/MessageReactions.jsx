@@ -1,19 +1,24 @@
 import { MdAddReaction } from 'react-icons/md';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React from 'react';
 
 const REACTIONS = ['❤️', '👍', '😂', '😮', '😢', '🔥'];
 
-const MessageReactions = ({ reactions = [], userId, isSender, onReact }) => {
-	const [isPickerOpen, setIsPickerOpen] = useState(false);
-
+const MessageReactions = ({
+	reactions = [],
+	userId,
+	isSender,
+	isPickerOpen,
+	onTogglePicker,
+	onReact,
+}) => {
 	const reactionCounts = reactions.reduce((counts, item) => {
 		counts[item.reaction] = (counts[item.reaction] || 0) + 1;
 		return counts;
 	}, {});
 
 	const handleReaction = (reaction) => {
-		setIsPickerOpen(false);
+		onTogglePicker();
 		onReact(reaction);
 	};
 
@@ -41,7 +46,7 @@ const MessageReactions = ({ reactions = [], userId, isSender, onReact }) => {
 			<button
 				type="button"
 				className="flex items-center justify-center rounded-full border-2 border-[#FF9F1C] bg-[#FF9F1C] p-1.5 text-lg text-primary shadow-sm transition hover:bg-[#ffb347]"
-				onClick={() => setIsPickerOpen((isOpen) => !isOpen)}
+				onClick={onTogglePicker}
 				aria-label="Add reaction"
 				aria-expanded={isPickerOpen}
 				title="Add reaction"
@@ -80,6 +85,8 @@ MessageReactions.propTypes = {
 	),
 	userId: PropTypes.string.isRequired,
 	isSender: PropTypes.bool.isRequired,
+	isPickerOpen: PropTypes.bool.isRequired,
+	onTogglePicker: PropTypes.func.isRequired,
 	onReact: PropTypes.func.isRequired,
 };
 

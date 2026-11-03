@@ -31,6 +31,7 @@ const MessageList = ({
 	// use the id so we can track what message's previousMessage is open
 
 	const [badwordChoices, setBadwordChoices] = useState({});
+	const [openReactionMessageId, setOpenReactionMessageId] = useState(null);
 
 	const badwords = new BadWordsNext({ data: en });
 
@@ -42,6 +43,10 @@ const MessageList = ({
 
 	function getRepliedMessage(replyTo) {
 		return decryptedMessages.find((object) => object.id === replyTo);
+	}
+
+	function toggleReactionPicker(messageId) {
+		setOpenReactionMessageId((openId) => (openId === messageId ? null : messageId));
 	}
 
 	return (
@@ -192,6 +197,8 @@ const MessageList = ({
 											reactions={reactions}
 											userId={senderId}
 											isSender={isSender}
+											isPickerOpen={openReactionMessageId === id}
+											onTogglePicker={() => toggleReactionPicker(id)}
 											onReact={(reaction) => onReact(id, reaction)}
 										/>
 									</>
