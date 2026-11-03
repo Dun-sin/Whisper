@@ -40,14 +40,13 @@ const MessageReactions = ({ reactions = [], userId, onReact }) => {
 			})}
 			<button
 				type="button"
-				className="flex items-center gap-1 rounded-full border-2 border-[#FF9F1C] bg-[#FF9F1C] px-3 py-1 text-sm font-semibold text-primary shadow-sm transition hover:bg-[#ffb347]"
+				className="flex items-center justify-center rounded-full border-2 border-[#FF9F1C] bg-[#FF9F1C] p-1.5 text-lg text-primary shadow-sm transition hover:bg-[#ffb347]"
 				onClick={() => setIsPickerOpen((isOpen) => !isOpen)}
 				aria-label="Add reaction"
 				aria-expanded={isPickerOpen}
 				title="Add reaction"
 			>
 				<MdAddReaction />
-				<span>React</span>
 			</button>
 			{isPickerOpen && (
 				<div className="absolute bottom-full z-30 mb-2 flex gap-1 rounded-full bg-highlight px-2 py-1 shadow-lg">
