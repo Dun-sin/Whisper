@@ -191,6 +191,7 @@ const MessageList = ({
 										<MessageReactions
 											reactions={reactions}
 											userId={senderId}
+											isSender={isSender}
 											onReact={(reaction) => onReact(id, reaction)}
 										/>
 									</>

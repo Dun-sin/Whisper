@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 const REACTIONS = ['❤️', '👍', '😂', '😮', '😢', '🔥'];
 
-const MessageReactions = ({ reactions = [], userId, onReact }) => {
+const MessageReactions = ({ reactions = [], userId, isSender, onReact }) => {
 	const [isPickerOpen, setIsPickerOpen] = useState(false);
 
 	const reactionCounts = reactions.reduce((counts, item) => {
@@ -49,7 +49,11 @@ const MessageReactions = ({ reactions = [], userId, onReact }) => {
 				<MdAddReaction />
 			</button>
 			{isPickerOpen && (
-				<div className="absolute bottom-full z-30 mb-2 flex gap-1 rounded-full bg-highlight px-2 py-1 shadow-lg">
+				<div
+					className={`absolute bottom-full z-30 mb-2 flex gap-1 rounded-full bg-highlight px-2 py-1 shadow-lg ${
+						isSender ? 'right-0' : 'left-0'
+					}`}
+				>
 					{REACTIONS.map((reaction) => (
 						<button
 							key={reaction}
@@ -75,6 +79,7 @@ MessageReactions.propTypes = {
 		})
 	),
 	userId: PropTypes.string.isRequired,
+	isSender: PropTypes.bool.isRequired,
 	onReact: PropTypes.func.isRequired,
 };
 
