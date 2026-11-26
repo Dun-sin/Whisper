@@ -1,7 +1,7 @@
 import { BiDotsVerticalRounded } from 'react-icons/bi';
 import Dropdown from 'rsuite/Dropdown';
 import PropTypes from 'prop-types';
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import chatHelper from 'src/lib/chatHelper';
 import { socket } from 'src/lib/socketConnection';
 import { useApp } from 'src/context/AppContext';
@@ -13,6 +13,7 @@ import { FIFTEEN_MINUTES } from '../../../../constants.json';
 
 const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setReplyId }) => {
 	const { app } = useApp();
+	const toggleRef = useRef(null);
 
 	const { importedPrivateKey, cryptoKey } = useCryptoKeys(app.currentChatId);
 	const { messages: state, updateMessage, removeMessage } = useChat();
@@ -73,11 +74,48 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 	};
 
 	const renderIconButton = (props) => {
-		return <BiDotsVerticalRounded {...props} className="fill-white scale-[1.8]" />;
+		return <BiDotsVerticalRounded {...props} ref={toggleRef} className="fill-white scale-[1.8]" />;
 	};
 
 	const renderIconButtonReceiver = (props) => {
-		return <BiDotsVerticalRounded {...props} className="fill-white scale-[1.8]" />;
+		return <BiDotsVerticalRounded {...props} ref={toggleRef} className="fill-white scale-[1.8]" />;
+	};
+
+	const restoreScrollPosition = () => {
+		const scrollPositions = [];
+		let element = toggleRef.current;
+
+		while (element) {
+			if (
+				element.scrollHeight > element.clientHeight ||
+				element.scrollWidth > element.clientWidth
+			) {
+				scrollPositions.push({ element, top: element.scrollTop, left: element.scrollLeft });
+			}
+			element = element.parentElement;
+		}
+
+		const scrollingElement = document.scrollingElement;
+		if (scrollingElement && !scrollPositions.some(({ element }) => element === scrollingElement)) {
+			scrollPositions.push({
+				element: scrollingElement,
+				top: scrollingElement.scrollTop,
+				left: scrollingElement.scrollLeft,
+			});
+		}
+
+		// RSuite focuses the opened menu on the next frame. Restore scroll after
+		// that focus so opening a message menu does not move the chat viewport.
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				scrollPositions.forEach(({ element, top, left }) => {
+					if (element.isConnected) {
+						element.scrollTop = top;
+						element.scrollLeft = left;
+					}
+				});
+			});
+		});
 	};
 
 	if (isSender) {
@@ -88,6 +126,7 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 					zIndex: 'auto',
 				}}
 				renderToggle={renderIconButton}
+				onOpen={restoreScrollPosition}
 				NoCaret
 			>
 				{isWithin15Minutes && <Dropdown.Item onClick={() => handleEdit(id)}>Edit</Dropdown.Item>}
@@ -110,6 +149,7 @@ const DropDownOptions = ({ id, isSender, inputRef, cancelEdit, setEditing, setRe
 					zIndex: 'auto',
 				}}
 				renderToggle={renderIconButtonReceiver}
+				onOpen={restoreScrollPosition}
 				NoCaret
 			>
 				<Dropdown.Item onClick={() => handleCopyToClipBoard(id, cryptoKey)}>Copy</Dropdown.Item>
